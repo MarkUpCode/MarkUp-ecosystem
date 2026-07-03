@@ -1,0 +1,8 @@
+// src/types/creditEstado.ts
+export enum CreditEstado {
+  CREADA = "CREADA",
+  ENVIADA = "ENVIADA",
+  PRE_APROBADA = "PRE_APROBADA",
+  SOLICITANDO_GARANTE = "SOLICITANDO_GARANTE",
+  RECHAZADA = "RECHAZADA",
+}
