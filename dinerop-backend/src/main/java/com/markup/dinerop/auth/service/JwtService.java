@@ -31,7 +31,7 @@ public class JwtService {
                 .claim("role", user.getRole().name())
                 .claim("userId", user.getIdUser());
 
-        // ðŸ”‘ SOLO para cooperativas
+        // Solo las cooperativas necesitan cooperativa_id en el token.
         if (user.getRole() == com.markup.dinerop.auth.entity.Role.COOPERATIVE) {
 
             if (user.getCooperativaId() == null) {
@@ -88,6 +88,11 @@ public class JwtService {
     }
 
     private Key getSigningKey() {
+        System.out.println("====================================");
+        System.out.println("JWT SECRET: " + secret);
+        System.out.println("LONGITUD: " + secret.length());
+        System.out.println("====================================");
+
         byte[] keyBytes;
 
         if (isValidBase64(secret)) {

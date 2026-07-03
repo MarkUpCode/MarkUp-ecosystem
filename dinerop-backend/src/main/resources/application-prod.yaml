@@ -62,6 +62,7 @@ resend:
 
 app:
   frontend-url: ${FRONTEND_URL}
+  email-enabled: true
 
 management:
   endpoints:

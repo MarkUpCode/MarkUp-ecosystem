@@ -175,6 +175,11 @@ public class AuthService {
                 .build();
     }
 
+    @Transactional
+    public String adminRegister(String email) {
+        return preRegister(email, Role.ADMIN);
+    }
+
     // =========================================================
     // OBTENER EMAIL POR CLIENT ID
     // =========================================================
