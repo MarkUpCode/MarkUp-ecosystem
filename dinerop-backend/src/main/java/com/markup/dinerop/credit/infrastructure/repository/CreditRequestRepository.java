@@ -74,6 +74,10 @@ public interface CreditRequestRepository extends JpaRepository<CreditRequest, Lo
             CreditRequestStatus newStatus
     );
 
+    long countByEstado(CreditRequestStatus estado);
+
+    List<CreditRequest> findTop10ByOrderByFechaSolicitudDesc();
+
 
 
 

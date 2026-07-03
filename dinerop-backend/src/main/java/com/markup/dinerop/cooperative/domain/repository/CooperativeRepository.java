@@ -29,4 +29,6 @@ public interface CooperativeRepository extends JpaRepository<Cooperative, Long> 
             String provincia,
             BigDecimal montoMaximo
     );
+
+    List<Cooperative> findTop10ByOrderByIdDesc();
 }
