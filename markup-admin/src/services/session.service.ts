@@ -27,6 +27,11 @@ export function getStoredSession() {
   }
 }
 
+export function getStoredUser() {
+  const session = getStoredSession();
+  return session?.user ?? null;
+}
+
 export function clearSession() {
   localStorage.removeItem(TOKEN_KEY);
   localStorage.removeItem(USER_KEY);

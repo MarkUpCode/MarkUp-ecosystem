@@ -6,7 +6,7 @@ import {
   getStoredSession,
   setStoredSession,
 } from "@/services/session.service";
-import type { AuthState, AuthUser } from "@/types/auth";
+import { isAdminRole, type AuthState, type AuthUser } from "@/types/auth";
 
 interface AuthContextValue extends AuthState {
   login: (email: string, password: string) => Promise<void>;
@@ -24,6 +24,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const session = getStoredSession();
     if (session) {
+      if (!isAdminRole(session.user.role)) {
+        clearSession();
+        setUser(null);
+        setToken(null);
+        setIsLoading(false);
+        return;
+      }
       setUser(session.user);
       setToken(session.token);
     }
@@ -32,6 +39,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = async (email: string, password: string) => {
     const response = await loginRequest({ email, password });
+
+    if (!isAdminRole(response.user?.role)) {
+      clearSession();
+      throw new Error("Acceso denegado");
+    }
+
     setStoredSession(response.accessToken, response.user);
     setUser(response.user);
     setToken(response.accessToken);

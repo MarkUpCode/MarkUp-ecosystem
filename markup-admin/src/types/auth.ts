@@ -10,6 +10,10 @@ export interface AuthUser {
   cooperativaId?: number | null;
 }
 
+export function isAdminRole(role?: string | null) {
+  return role?.toUpperCase() === "ADMIN";
+}
+
 export interface LoginRequest {
   email: string;
   password: string;

@@ -8,6 +8,7 @@ import { useAuth } from "@/contexts/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
+import { isAdminRole } from "@/types/auth";
 
 const schema = z.object({
   email: z.string().email("Correo inválido"),
@@ -18,7 +19,7 @@ type LoginForm = z.infer<typeof schema>;
 
 export function LoginPage() {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, user } = useAuth();
   const [error, setError] = useState("");
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<LoginForm>({
     resolver: zodResolver(schema),
@@ -29,9 +30,13 @@ export function LoginPage() {
     setError("");
     try {
       await login(values.email, values.password);
+      if (!isAdminRole(user?.role)) {
+        setError("Acceso denegado");
+        return;
+      }
       navigate("/dashboard");
-    } catch {
-      setError("No fue posible iniciar sesión");
+    } catch (error) {
+      setError(error instanceof Error ? error.message : "No fue posible iniciar sesión");
     }
   };
 

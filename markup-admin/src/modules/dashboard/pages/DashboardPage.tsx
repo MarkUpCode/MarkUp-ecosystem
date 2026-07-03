@@ -2,14 +2,14 @@ import { Card } from "@/components/ui/card";
 import { BarChart3, Building2, CircleDollarSign, Users, BadgeCheck, Banknote, TrendingUp, TrendingDown } from "lucide-react";
 
 const metrics = [
-  { label: "Total Cooperativas", value: "128", icon: Building2 },
-  { label: "Cooperativas activas", value: "114", icon: BadgeCheck },
-  { label: "Usuarios", value: "8,240", icon: Users },
-  { label: "Solicitudes", value: "1,287", icon: BarChart3 },
-  { label: "Créditos aprobados", value: "642", icon: TrendingUp },
-  { label: "Créditos desembolsados", value: "511", icon: TrendingDown },
-  { label: "Monto solicitado", value: "$12.4M", icon: CircleDollarSign },
-  { label: "Monto desembolsado", value: "$8.7M", icon: Banknote },
+  { label: "Total Cooperativas", value: "TODO", icon: Building2 },
+  { label: "Cooperativas activas", value: "TODO", icon: BadgeCheck },
+  { label: "Usuarios", value: "TODO", icon: Users },
+  { label: "Solicitudes", value: "TODO", icon: BarChart3 },
+  { label: "Créditos aprobados", value: "TODO", icon: TrendingUp },
+  { label: "Créditos desembolsados", value: "TODO", icon: TrendingDown },
+  { label: "Monto solicitado", value: "TODO", icon: CircleDollarSign },
+  { label: "Monto desembolsado", value: "TODO", icon: Banknote },
 ];
 
 export function DashboardPage() {
@@ -38,15 +38,15 @@ export function DashboardPage() {
         <Card className="border-white/10 bg-white/5">
           <h2 className="text-lg font-semibold">Gráficos y actividad</h2>
           <div className="mt-6 grid min-h-[280px] place-items-center rounded-3xl border border-dashed border-white/10 bg-black/20 text-slate-400">
-            Próximamente: gráficos de conversión, comisiones y tendencias.
+            TODO: conectar con endpoints reales del backend para KPIs y series históricas.
           </div>
         </Card>
         <Card className="border-white/10 bg-white/5">
           <h2 className="text-lg font-semibold">Actividad reciente</h2>
           <div className="mt-6 space-y-4 text-sm text-slate-300">
-            <div className="rounded-2xl border border-white/10 bg-black/20 p-4">Nueva cooperativa creada</div>
-            <div className="rounded-2xl border border-white/10 bg-black/20 p-4">Usuario ADMIN asignado</div>
-            <div className="rounded-2xl border border-white/10 bg-black/20 p-4">Solicitud preaprobada</div>
+            <div className="rounded-2xl border border-white/10 bg-black/20 p-4">TODO: actividad reciente desde backend</div>
+            <div className="rounded-2xl border border-white/10 bg-black/20 p-4">TODO: eventos de cooperativas</div>
+            <div className="rounded-2xl border border-white/10 bg-black/20 p-4">TODO: eventos de solicitudes</div>
           </div>
         </Card>
       </div>
