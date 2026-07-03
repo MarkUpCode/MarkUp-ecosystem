@@ -1,0 +1,73 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://${PGHOST}:${PGPORT}/${PGDATABASE}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 2        # mínimo absoluto
+      minimum-idle: 1
+      idle-timeout: 30000
+      connection-timeout: 30000
+      max-lifetime: 1200000
+      pool-name: DineropHikariPool
+      connection-test-query: SELECT 1
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: false
+        # quitar dialect explícito reduce advertencias y overhead de inicialización
+        jdbc:
+          batch_size: 5
+        order_inserts: true
+        order_updates: true
+        generate_statistics: false
+
+  # Desactiva autoconfiguración de webflux si no se usa directamente
+  # (reduce beans cargados en memoria)
+
+server:
+  port: ${PORT:8080}
+  tomcat:
+    threads:
+      max: 10                     # mínimo — cada thread usa 256k de stack
+      min-spare: 2
+    max-connections: 50
+    accept-count: 20
+    connection-timeout: 20000
+
+jwt:
+  secret: ${JWT_SECRET}
+  expiration: ${JWT_EXPIRATION:28800000}
+
+logging:
+  level:
+    root: warn
+    com.markup.dinerop: warn
+    org.hibernate: warn
+    com.zaxxer.hikari: warn
+    org.springframework: warn
+
+cors:
+  allowed-origins: https://www.dinerop.com,https://dinerop.com,https://markup-landing.vercel.app,https://dinerup-app.vercel.app
+
+resend:
+  api-key: ${RESEND_API_KEY}
+  from-email: dinerop@dinerop.com
+
+app:
+  frontend-url: ${FRONTEND_URL}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: never
