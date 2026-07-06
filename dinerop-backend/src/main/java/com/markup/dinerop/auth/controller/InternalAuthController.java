@@ -20,7 +20,8 @@ public class InternalAuthController {
     ) {
         String token = authService.preRegister(
                 request.getEmail(),
-                request.getRole()
+                request.getRole(),
+                null
         );
 
         return ResponseEntity.ok(new PreRegisterResponse(token));

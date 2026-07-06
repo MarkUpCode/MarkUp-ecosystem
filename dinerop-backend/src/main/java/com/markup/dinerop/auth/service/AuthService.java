@@ -1,5 +1,6 @@
 package com.markup.dinerop.auth.service;
 
+import com.markup.dinerop.admin.users.exception.CooperativeRequiredException;
 import com.markup.dinerop.auth.dto.*;
 
 import com.markup.dinerop.auth.entity.ActivationToken;
@@ -26,9 +27,11 @@ import com.markup.dinerop.auth.entity.PasswordResetToken;
 import com.markup.dinerop.auth.repository.PasswordResetTokenRepository;
 import com.markup.dinerop.auth.dto.ForgotPasswordRequest;
 import com.markup.dinerop.auth.dto.ResetPasswordRequest;
+import com.markup.dinerop.auth.dto.InviteUserRequest;
+import com.markup.dinerop.cooperative.domain.repository.CooperativeRepository;
 
-
-
+import com.markup.dinerop.auth.exception.UserAlreadyActiveException;
+import com.markup.dinerop.auth.exception.CooperativeNotFoundException;
 
 
 import java.time.Instant;
@@ -50,14 +53,14 @@ public class AuthService {
     private final PasswordResetTokenRepository passwordResetTokenRepository;
     private final NotificationService notificationService;
     private final UserPreRegistrationRepository userPreRegistrationRepository;
-
+    private final CooperativeRepository cooperativeRepository;
 
 
     // =========================================================
     // PRE-REGISTRO (SIN contraseÃ±a, SIN JWT)
     // =========================================================
     @Transactional
-    public String preRegister(String email, Role role) {
+    public String preRegister(String email, Role role, Long cooperativaId) {
 
         String normalizedEmail = email.toLowerCase().trim();
 
@@ -71,7 +74,7 @@ public class AuthService {
 
             // Ya activo â†’ no hacemos nada
             if ("ACTIVE".equals(existing.getStatus())) {
-                throw new RuntimeException("USER_ALREADY_ACTIVE");
+                throw new UserAlreadyActiveException(existing.getEmail());
             }
 
             // Buscar token vÃ¡lido
@@ -100,6 +103,7 @@ public class AuthService {
         User user = User.builder()
                 .email(normalizedEmail)
                 .role(role)
+                .cooperativaId(cooperativaId)
                 .status("PENDING_ACTIVATION")
                 .active(false)
                 .build();
@@ -136,6 +140,35 @@ public class AuthService {
         return tokenValue;
     }
 
+    @Transactional
+    public User inviteUser(InviteUserRequest request) {
+
+        Role role = request.role();
+
+        if (role == Role.COOPERATIVE) {
+
+            if (request.cooperativaId() == null) {
+                throw new CooperativeRequiredException();
+            }
+
+            cooperativeRepository
+                    .findById(request.cooperativaId())
+                    .orElseThrow(() ->
+                        new CooperativeNotFoundException(request.cooperativaId()));
+
+        }
+
+        preRegister(
+                request.email(),
+                role,
+                request.cooperativaId()
+        );
+
+        return userRepository
+                .findByEmail(request.email().toLowerCase().trim())
+                .orElseThrow(() -> new RuntimeException("USER_NOT_FOUND"));
+    }
+
 
 
     // =========================================================
@@ -148,7 +181,7 @@ public class AuthService {
         log.info("[PUBLIC_REGISTER] Inicio | email={}", normalizedEmail);
 
         // Reutiliza toda la lógica: crear user PENDING_ACTIVATION + token + correo
-        preRegister(normalizedEmail, Role.CLIENT);
+        preRegister(normalizedEmail, Role.CLIENT, null);
 
         User user = userRepository.findByEmail(normalizedEmail)
                 .orElseThrow(() -> new RuntimeException("USER_NOT_FOUND"));
@@ -177,7 +210,7 @@ public class AuthService {
 
     @Transactional
     public String adminRegister(String email) {
-        return preRegister(email, Role.ADMIN);
+        return preRegister(email, Role.ADMIN, null);
     }
 
     // =========================================================

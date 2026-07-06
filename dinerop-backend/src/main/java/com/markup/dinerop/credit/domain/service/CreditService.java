@@ -86,7 +86,7 @@ public class CreditService {
         creditRequestRepository.save(request);
 
         // 4. Pre-registro en auth-service (datos personales/contacto)
-        authService.preRegister(dto.getEmail(), Role.CLIENT);
+        authService.preRegister(dto.getEmail(), Role.CLIENT, null);
 
 
         return request.getId();
