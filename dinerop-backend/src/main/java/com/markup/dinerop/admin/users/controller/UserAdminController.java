@@ -10,6 +10,7 @@ import com.markup.dinerop.admin.users.dto.request.CreateUserRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import com.markup.dinerop.admin.users.dto.request.ChangeStatusRequest;
 
 @RestController
 @RequestMapping("/api/admin/users")
@@ -49,6 +50,25 @@ public class UserAdminController {
             @Valid @RequestBody CreateUserRequest request
     ) {
         return userAdminService.createUser(request);
+    }
+
+    @PatchMapping("/{id}/status")
+    public UserDetailResponse changeStatus(
+
+            @PathVariable Long id,
+
+            @Valid @RequestBody ChangeStatusRequest request
+
+    ) {
+
+        return userAdminService.changeStatus(
+
+                id,
+
+                request.active()
+
+        );
+
     }
 
 }

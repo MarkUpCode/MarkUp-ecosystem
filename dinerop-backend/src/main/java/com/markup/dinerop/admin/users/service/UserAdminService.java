@@ -65,4 +65,26 @@ public class UserAdminService {
 
     }
 
+    public UserDetailResponse changeStatus(
+            Long id,
+            Boolean active
+    ) {
+
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException(id));
+
+        user.setActive(active);
+
+        if (Boolean.TRUE.equals(active)) {
+            user.setStatus("ACTIVE");
+        } else {
+            user.setStatus("DISABLED");
+        }
+
+        user = userRepository.save(user);
+
+        return mapper.toDetail(user);
+
+    }
+
 }
