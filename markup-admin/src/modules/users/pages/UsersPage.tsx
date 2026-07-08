@@ -6,16 +6,27 @@ import { UsersTable } from "../components/UsersTable";
 import { useUsers } from "../hooks/useUsers";
 import { UsersStats } from "../components/UsersStats";
 import { UsersFilters } from "../components/UsersFilters";
+import { InviteUserModal } from "../components/InviteUserModal";
+import { ConfirmationModal } from "@/components/ui/ConfirmationModal";
+import type { UserListItem } from "../types/user";
 
 export function UsersPage() {
 
   const [inviteOpen, setInviteOpen] = useState(false);
 
+  const [selectedUser, setSelectedUser] =
+  useState<UserListItem | null>(null);
+
+  const [confirmOpen, setConfirmOpen] =
+  useState(false);
+  
   const {
 
       users,
 
       loading,
+
+      createUser,
 
       search,
 
@@ -71,6 +82,18 @@ export function UsersPage() {
         <UsersTable users={users} />
 
       )}
+
+      <InviteUserModal
+
+          open={inviteOpen}
+
+          loading={loading}
+
+          onClose={() => setInviteOpen(false)}
+
+          onSubmit={createUser}
+
+      />
 
     </div>
 

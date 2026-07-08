@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { useToast } from "@/hooks/useToast";
 
 import {
   getUsers,
@@ -13,6 +14,9 @@ import type {
 } from "../types/user";
 
 export function useUsers() {
+  
+  const toast = useToast();
+  
   const [users, setUsers] = useState<UserListItem[]>([]);
 
   const [loading, setLoading] = useState(false);
@@ -74,13 +78,32 @@ export function useUsers() {
 
   const createUser = async (
     request: InviteUserRequest
-  ) => {
+    ) => {
 
-    await inviteUser(request);
+    try {
 
-    await loadUsers();
+        await inviteUser(request);
 
-  };
+        toast.success(
+        "Usuario invitado",
+        "Se envió el correo de activación."
+        );
+
+        await loadUsers();
+
+    } catch (error: any) {
+
+        toast.error(
+        "No se pudo invitar al usuario",
+        error?.response?.data?.message ??
+        "Ha ocurrido un error."
+        );
+
+        throw error;
+
+    }
+
+    };
 
   const updateStatus = async (
     id: number,
@@ -126,6 +149,8 @@ export function useUsers() {
     setRole,
 
     setStatus,
+
+    
 
 };
 }
