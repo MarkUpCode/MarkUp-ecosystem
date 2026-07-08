@@ -7,10 +7,16 @@ import { UserAvatar } from "@/components/ui/UserAvatar";
 
 interface UsersTableProps {
   users: UserListItem[];
+
+  onToggleStatus: (user: UserListItem) => void;
+
+  onView?: (user: UserListItem) => void;
 }
 
 export function UsersTable({
   users,
+  onToggleStatus,
+  onView,
 }: UsersTableProps) {
   return (
     <div className="overflow-hidden rounded-3xl border border-white/10 bg-slate-900">
@@ -65,17 +71,17 @@ export function UsersTable({
 
               <td className="px-6 py-5">
 
-                <td className="px-6 py-5">
+                
                     <RoleBadge role={user.role} />
-                </td>
+                
 
               </td>
 
               <td className="px-6 py-5">
 
-                <td className="px-6 py-5">
+                
                     <StatusBadge status={user.status} />
-                </td>
+                
 
               </td>
 
@@ -95,17 +101,9 @@ export function UsersTable({
 
                     active={user.active}
 
-                    onToggleStatus={() => {
+                    onToggleStatus={() => onToggleStatus(user)}
 
-                        console.log(user.id);
-
-                    }}
-
-                    onView={() => {
-
-                        console.log(user.id);
-
-                    }}
+                    onView={() => onView?.(user)}
 
                 />
 

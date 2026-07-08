@@ -17,17 +17,36 @@ export interface UserListItem {
   createdAt: string;
 }
 
+export interface UserStats {
+
+  total: number;
+
+  active: number;
+
+  pending: number;
+
+  disabled: number;
+
+}
+
 export interface UsersPageResponse {
+
   content: UserListItem[];
 
   page: number;
+
   size: number;
 
   totalElements: number;
+
   totalPages: number;
 
   first: boolean;
+
   last: boolean;
+
+  stats: UserStats;
+
 }
 
 export interface InviteUserRequest {

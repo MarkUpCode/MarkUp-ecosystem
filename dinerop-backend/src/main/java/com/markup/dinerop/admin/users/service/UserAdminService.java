@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import com.markup.dinerop.admin.users.dto.request.CreateUserRequest;
 import com.markup.dinerop.auth.dto.InviteUserRequest;
 import com.markup.dinerop.auth.service.AuthService;
+import com.markup.dinerop.admin.users.dto.response.UserStatsResponse;
 
 @Service
 @RequiredArgsConstructor
@@ -29,14 +30,27 @@ public class UserAdminService {
 
         Page<UserListItemResponse> mappedUsers = mapper.toPage(users);
 
+        UserStatsResponse stats = new UserStatsResponse(
+
+            userRepository.count(),
+
+            userRepository.countByStatus("ACTIVE"),
+
+            userRepository.countByStatus("PENDING_ACTIVATION"),
+
+            userRepository.countByStatus("DISABLED")
+
+        );
+
         return new PagedUsersResponse(
-                mappedUsers.getContent(),
-                mappedUsers.getNumber(),
-                mappedUsers.getSize(),
-                mappedUsers.getTotalElements(),
-                mappedUsers.getTotalPages(),
-                mappedUsers.isFirst(),
-                mappedUsers.isLast()
+            mappedUsers.getContent(),
+            mappedUsers.getNumber(),
+            mappedUsers.getSize(),
+            mappedUsers.getTotalElements(),
+            mappedUsers.getTotalPages(),
+            mappedUsers.isFirst(),
+            mappedUsers.isLast(),
+            stats
         );
     }
 

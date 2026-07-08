@@ -47,9 +47,18 @@ export function ConfirmationModal({
 
   async function handleConfirm() {
 
-    await onConfirm();
+    try {
 
-    onClose();
+        await onConfirm();
+
+        onClose();
+
+    } catch {
+
+        // Si ocurre un error, dejamos el modal abierto.
+        // El toast mostrará el mensaje correspondiente.
+
+    }
 
   }
 

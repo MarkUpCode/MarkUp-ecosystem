@@ -16,7 +16,9 @@ public record PagedUsersResponse(
 
         boolean first,
 
-        boolean last
+        boolean last,
+
+        UserStatsResponse stats
 
 ) {
 }

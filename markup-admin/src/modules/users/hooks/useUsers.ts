@@ -11,6 +11,7 @@ import type {
   UserListItem,
   UsersPageResponse,
   InviteUserRequest,
+  UserStats,
 } from "../types/user";
 
 export function useUsers() {
@@ -18,6 +19,13 @@ export function useUsers() {
   const toast = useToast();
   
   const [users, setUsers] = useState<UserListItem[]>([]);
+
+  const [stats, setStats] = useState<UserStats>({
+    total: 0,
+    active: 0,
+    pending: 0,
+    disabled: 0,
+});
 
   const [loading, setLoading] = useState(false);
 
@@ -43,6 +51,8 @@ export function useUsers() {
         await getUsers(page, size);
 
       setUsers(response.content);
+
+      setStats(response.stats);
 
       setTotalPages(response.totalPages);
 
@@ -108,13 +118,45 @@ export function useUsers() {
   const updateStatus = async (
     id: number,
     active: boolean
-  ) => {
+    ) => {
 
-    await changeUserStatus(id, { active });
+    try {
 
-    await loadUsers();
+        await changeUserStatus(id, { active });
 
-  };
+        toast.success(
+        active
+            ? "Usuario habilitado"
+            : "Usuario deshabilitado",
+        active
+            ? "El usuario ya puede acceder nuevamente."
+            : "El usuario ya no podrá iniciar sesión."
+        );
+
+        await loadUsers();
+
+    } catch (error: any) {
+
+        console.log("ERROR COMPLETO");
+        console.log(error);
+
+        console.log("RESPONSE");
+        console.log(error.response);
+
+        console.log("DATA");
+        console.log(error.response?.data);
+
+        toast.error(
+        "No se pudo actualizar el estado",
+        error?.response?.data?.message ??
+        "Ha ocurrido un error inesperado."
+        );
+
+        throw error;
+
+    }
+
+    };
 
   return {
 
@@ -150,6 +192,7 @@ export function useUsers() {
 
     setStatus,
 
+    stats,
     
 
 };

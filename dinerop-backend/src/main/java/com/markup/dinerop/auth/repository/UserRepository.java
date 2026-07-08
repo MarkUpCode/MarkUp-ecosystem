@@ -22,6 +22,8 @@ public interface UserRepository extends JpaRepository<User, Long>,
 
     long countByActive(Boolean active);
 
+    long countByStatus(String status);
+
     List<User> findTop10ByOrderByCreatedAtDesc();
 
     Page<User> findAll(Pageable pageable);

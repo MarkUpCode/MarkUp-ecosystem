@@ -9,6 +9,7 @@ import { UsersFilters } from "../components/UsersFilters";
 import { InviteUserModal } from "../components/InviteUserModal";
 import { ConfirmationModal } from "@/components/ui/ConfirmationModal";
 import type { UserListItem } from "../types/user";
+import { UsersPagination } from "../components/UsersPagination";
 
 export function UsersPage() {
 
@@ -41,8 +42,31 @@ export function UsersPage() {
       setStatus,
 
       reload,
+      
+      updateStatus,
+
+      page,
+
+      size,
+
+      totalPages,
+
+      totalElements,
+
+      setPage,
+
+      stats,
+
 
   } = useUsers();
+
+  function handleToggleStatus(user: UserListItem) {
+
+    setSelectedUser(user);
+
+    setConfirmOpen(true);
+
+  }
 
   return (
 
@@ -53,10 +77,10 @@ export function UsersPage() {
       />
 
       <UsersStats
-        total={users.length}
-        active={users.filter(u => u.status === "ACTIVE").length}
-        pending={users.filter(u => u.status === "PENDING_ACTIVATION").length}
-        disabled={users.filter(u => u.status === "DISABLED").length}
+          total={stats.total}
+          active={stats.active}
+          pending={stats.pending}
+          disabled={stats.disabled}
       />
 
       <UsersFilters
@@ -79,9 +103,23 @@ export function UsersPage() {
 
       ) : (
 
-        <UsersTable users={users} />
+        <UsersTable
+            users={users}
+            onToggleStatus={handleToggleStatus}
+            
+        />
+
+        
 
       )}
+      
+      <UsersPagination
+          page={page}
+          size={size}
+          totalPages={totalPages}
+          totalElements={totalElements}
+          onPageChange={setPage}
+      />
 
       <InviteUserModal
 
@@ -94,6 +132,42 @@ export function UsersPage() {
           onSubmit={createUser}
 
       />
+      <ConfirmationModal
+        open={confirmOpen}
+        title={
+            selectedUser?.active
+                ? "Deshabilitar usuario"
+                : "Habilitar usuario"
+        }
+        message={
+            selectedUser?.active
+                ? `¿Está seguro de deshabilitar a ${selectedUser.email}?`
+                : `¿Está seguro de habilitar a ${selectedUser?.email}?`
+        }
+        danger={selectedUser?.active}
+        confirmText={
+            selectedUser?.active
+                ? "Deshabilitar"
+                : "Habilitar"
+        }
+        onClose={() => {
+            setConfirmOpen(false);
+            setSelectedUser(null);
+        }}
+        onConfirm={async () => {
+
+            if (!selectedUser) return;
+
+            await updateStatus(
+
+                selectedUser.id,
+
+                !selectedUser.active
+
+            );
+
+        }}
+    />
 
     </div>
 
