@@ -84,4 +84,16 @@ public class CooperativeAdminController {
 
     }
 
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteCooperative(
+
+            @PathVariable Long id
+
+    ) {
+
+        cooperativeAdminService.deleteCooperative(id);
+
+    }
+
 }

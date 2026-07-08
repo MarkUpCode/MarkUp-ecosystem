@@ -102,4 +102,14 @@ public class CooperativeAdminService {
 
     }
 
+    public void deleteCooperative(Long id) {
+
+        Cooperative cooperative = cooperativeRepository
+                .findById(id)
+                .orElseThrow(() -> new CooperativeNotFoundException(id));
+
+        cooperativeRepository.delete(cooperative);
+
+    }
+
 }
