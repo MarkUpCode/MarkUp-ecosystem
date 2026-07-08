@@ -3,7 +3,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 
-interface UsersPaginationProps {
+interface PaginationProps {
 
   page: number;
 
@@ -17,7 +17,7 @@ interface UsersPaginationProps {
 
 }
 
-export function UsersPagination({
+export function Pagination({
 
   page,
 
@@ -29,7 +29,7 @@ export function UsersPagination({
 
   onPageChange,
 
-}: UsersPaginationProps) {
+}: PaginationProps) {
 
   if (totalPages <= 1) return null;
 

@@ -9,7 +9,7 @@ import { UsersFilters } from "../components/UsersFilters";
 import { InviteUserModal } from "../components/InviteUserModal";
 import { ConfirmationModal } from "@/components/ui/ConfirmationModal";
 import type { UserListItem } from "../types/user";
-import { UsersPagination } from "../components/UsersPagination";
+import { Pagination } from "@/components/ui/Pagination";
 
 export function UsersPage() {
 
@@ -113,7 +113,7 @@ export function UsersPage() {
 
       )}
       
-      <UsersPagination
+      <Pagination
           page={page}
           size={size}
           totalPages={totalPages}
