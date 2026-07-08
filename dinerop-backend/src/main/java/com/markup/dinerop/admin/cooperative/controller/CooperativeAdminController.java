@@ -27,13 +27,31 @@ public class CooperativeAdminController {
             int page,
 
             @RequestParam(defaultValue = "10")
-            int size
+            int size,
+
+            @RequestParam(required = false)
+            String search,
+
+            @RequestParam(required = false)
+            String city,
+
+            @RequestParam(required = false)
+            String province
 
     ) {
 
         return cooperativeAdminService.getCooperatives(
+
                 page,
-                size
+
+                size,
+
+                search,
+
+                city,
+
+                province
+
         );
 
     }

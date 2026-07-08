@@ -14,6 +14,8 @@ import org.springframework.stereotype.Service;
 import com.markup.dinerop.admin.cooperative.dto.request.CreateCooperativeRequest;
 import com.markup.dinerop.admin.cooperative.exception.CooperativeNotFoundException;
 import com.markup.dinerop.admin.cooperative.dto.request.UpdateCooperativeRequest;
+import com.markup.dinerop.admin.cooperative.specification.CooperativeSpecification;
+import org.springframework.data.jpa.domain.Specification;
 
 @Service
 @RequiredArgsConstructor
@@ -24,12 +26,32 @@ public class CooperativeAdminService {
     private final CooperativeAdminMapper mapper;
 
     public PagedCooperativesResponse getCooperatives(
+
             int page,
-            int size
+
+            int size,
+
+            String search,
+
+            String city,
+
+            String province
+
     ) {
 
+        Specification<Cooperative> specification =
+
+                Specification
+                        .where(CooperativeSpecification.hasSearch(search))
+                        .and(CooperativeSpecification.hasCity(city))
+                        .and(CooperativeSpecification.hasProvince(province));
+
         Page<Cooperative> cooperatives =
+
                 cooperativeRepository.findAll(
+
+                        specification,
+
                         PageRequest.of(page, size)
                 );
 

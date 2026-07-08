@@ -5,10 +5,13 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import java.math.BigDecimal;
 import java.util.List;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 
 @Repository
-public interface CooperativeRepository extends JpaRepository<Cooperative, Long> {
+public interface CooperativeRepository extends
+        JpaRepository<Cooperative, Long>,
+        JpaSpecificationExecutor<Cooperative> {
 
     List<Cooperative> findByCiudadIgnoreCase(String ciudad);
 
