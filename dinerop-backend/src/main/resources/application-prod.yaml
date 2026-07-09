@@ -47,8 +47,8 @@ jwt:
 
 logging:
   level:
-    root: info
-    com.markup.dinerop: info
+    root: warn
+    com.markup.dinerop: warn
     org.hibernate: warn
     com.zaxxer.hikari: warn
     org.springframework: warn

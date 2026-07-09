@@ -77,19 +77,11 @@ public class NotificationService {
 
         // Desarrollo
         if (!emailEnabled) {
-            log.info("");
-            log.info("====================================================");
-            log.info("        MODO DESARROLLO - ACTIVACIÓN");
-            log.info("====================================================");
-            log.info("Usuario : {}", to);
-            log.info("");
-            log.info("LINK DE ACTIVACIÓN:");
-            log.info(activationLink);
-            log.info("");
-            log.info("TOKEN:");
-            log.info(activationToken);
-            log.info("====================================================");
-            log.info("");
+            log.warn("");
+            log.warn("====================================================");
+            log.warn("MODO DESARROLLO - Link de activación: {}", activationLink);
+            log.warn("====================================================");
+            log.warn("");
 
             return;
         }
