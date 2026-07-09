@@ -2,7 +2,6 @@ import { useState } from "react";
 
 import { useCooperatives } from "../hooks/useCooperatives";
 
-import { CooperativesHeader } from "../components/CooperativesHeader";
 
 import { CooperativesStats } from "../components/CooperativesStats";
 
@@ -11,6 +10,10 @@ import { CooperativesFilters } from "../components/CooperativesFilters";
 import { CooperativesTable } from "../components/CooperativesTable";
 
 import { Pagination } from "@/components/ui/Pagination";
+
+import { Building2 } from "lucide-react";
+import { PageHeader } from "@/components/ui/PageHeader";
+
 
 export function CooperativesPage() {
 
@@ -52,9 +55,17 @@ export function CooperativesPage() {
 
     <div className="space-y-6">
 
-      <CooperativesHeader
+      <PageHeader
 
-        onCreate={() => setCreateOpen(true)}
+          title="Cooperativas"
+
+          subtitle="Administración de cooperativas."
+
+          icon={<Building2 size={30}/>}
+
+          actionLabel="Nueva cooperativa"
+
+          onAction={() => setCreateOpen(true)}
 
       />
 

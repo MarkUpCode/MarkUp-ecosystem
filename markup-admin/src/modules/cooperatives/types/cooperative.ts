@@ -84,3 +84,6 @@ export interface CreateCooperativeRequest {
 
 export interface UpdateCooperativeRequest
     extends CreateCooperativeRequest {}
+
+export interface CooperativeFormData
+  extends CreateCooperativeRequest {}

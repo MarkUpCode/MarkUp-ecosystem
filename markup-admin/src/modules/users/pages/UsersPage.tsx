@@ -1,6 +1,5 @@
 import { useState } from "react";
 
-import { UsersHeader } from "../components/UsersHeader";
 import { UsersTable } from "../components/UsersTable";
 
 import { useUsers } from "../hooks/useUsers";
@@ -10,6 +9,9 @@ import { InviteUserModal } from "../components/InviteUserModal";
 import { ConfirmationModal } from "@/components/ui/ConfirmationModal";
 import type { UserListItem } from "../types/user";
 import { Pagination } from "@/components/ui/Pagination";
+import { Users } from "lucide-react";
+import { PageHeader } from "@/components/ui/PageHeader";
+
 
 export function UsersPage() {
 
@@ -72,9 +74,19 @@ export function UsersPage() {
 
     <div>
 
-      <UsersHeader
-        onInvite={() => setInviteOpen(true)}
-      />
+      <PageHeader
+
+            title="Usuarios"
+
+            subtitle="Administración de usuarios del sistema."
+
+            icon={<Users size={30}/>}
+
+            actionLabel="Invitar usuario"
+
+            onAction={() => setInviteOpen(true)}
+
+        />
 
       <UsersStats
           total={stats.total}
