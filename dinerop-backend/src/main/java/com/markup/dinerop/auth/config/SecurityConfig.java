@@ -29,7 +29,7 @@ public class SecurityConfig {
     private final CustomUserDetailsService userDetailsService;
     private final PasswordEncoder passwordEncoder;
 
-    @Value("${CORS_ALLOWED_ORIGINS:http://localhost:5173,http://localhost:5174,https://www.dinerop.com,https://dinerop.com,https://markup-landing.vercel.app,https://dinerup-app.vercel.app}")
+    @Value("${CORS_ALLOWED_ORIGINS:http://localhost:5173,http://localhost:5174,https://www.dinerop.com,https://dinerop.com,https://markup-landing.vercel.app,https://dinerup-app.vercel.app,http://markup-ecosystem-production.up.railway.app,https://markup-ecosystem-production.up.railway.app/}")
     private String allowedOriginsRaw;
 
     // Dominio desde el que Railway lanza el healthcheck — debe estar permitido
