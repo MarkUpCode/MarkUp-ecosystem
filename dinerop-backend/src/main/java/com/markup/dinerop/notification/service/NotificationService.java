@@ -76,8 +76,7 @@ public class NotificationService {
                 frontendUrl + "/activate?token=" + activationToken;
 
         // Desarrollo
-        //if (!emailEnabled) {
-        if (true) {
+        if (!emailEnabled) {
             log.info("");
             log.info("====================================================");
             log.info("        MODO DESARROLLO - ACTIVACIÓN");
