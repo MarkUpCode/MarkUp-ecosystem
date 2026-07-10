@@ -54,7 +54,17 @@ logging:
     org.springframework: warn
 
 cors:
-  allowed-origins: https://www.dinerop.com,https://dinerop.com,https://markup-landing.vercel.app,https://dinerup-app.vercel.app
+  allowed-origins: >
+    https://markupusers.vercel.app,
+    https://markupadmin-tau.vercel.app,
+    https://markupusers-8919qrktg-mark-up.vercel.app,
+    https://markupadmin-8p5d0s9sd-mark-up.vercel.app,
+    http://localhost:5173,
+    http://localhost:5174,
+    https://www.dinerop.com,
+    https://dinerop.com,
+    http://markup-ecosystem-production.up.railway.app,
+    https://markup-ecosystem-production.up.railway.app
 
 resend:
   api-key: ${RESEND_API_KEY}
