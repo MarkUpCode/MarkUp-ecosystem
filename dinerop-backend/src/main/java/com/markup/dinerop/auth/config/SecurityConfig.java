@@ -29,7 +29,7 @@ public class SecurityConfig {
     private final CustomUserDetailsService userDetailsService;
     private final PasswordEncoder passwordEncoder;
 
-    @Value("${cors.allowed-origins}")
+    @Value("${CORS_ALLOWED_ORIGINS:https://markupusers.vercel.app,http://localhost:5173}")
     private String allowedOriginsRaw;
 
     // Dominio desde el que Railway lanza el healthcheck — debe estar permitido
