@@ -25,6 +25,10 @@ public class NotificationService {
     @Value("${app.email-enabled:true}")
     private boolean emailEnabled;
 
+    private final ActivationEmailBuilder activationEmailBuilder;
+
+    private final EmailTemplateEngine emailTemplateEngine;
+
     // =========================================================
     // GENERIC EMAIL
     // =========================================================
@@ -70,39 +74,23 @@ public class NotificationService {
     // =========================================================
     // ACTIVATION EMAIL
     // =========================================================
-    public void sendActivationEmail(String to, String activationToken) {
+    public void sendActivationEmail(
+            String to,
+            String activationToken
+    ) {
 
         String activationLink =
                 frontendUrl + "/activate?token=" + activationToken;
 
-        String html = """
-                <!DOCTYPE html>
-                <html lang="es">
-                <head><meta charset="UTF-8"></head>
-                <body style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 40px;">
-                  <div style="max-width: 600px; margin: auto; background: #ffffff; border-radius: 8px; padding: 40px;">
-                    <h2 style="color: #333333;">Activa tu cuenta en Dinerop</h2>
-                    <p style="color: #555555;">Gracias por registrarte. Haz clic en el siguiente botón para activar tu cuenta:</p>
+        EmailTemplate template =
+                activationEmailBuilder.build(
+                        activationLink
+                );
 
-                    <a href="%s"
-                       style="display:inline-block;
-                              margin-top:20px;
-                              padding:12px 24px;
-                              background:#4F46E5;
-                              color:white;
-                              text-decoration:none;
-                              border-radius:6px;
-                              font-weight:bold;">
-                        Activar cuenta
-                    </a>
-
-                    <p style="margin-top:30px;font-size:12px;color:#999;">
-                        Este enlace expira en 24 horas.
-                    </p>
-                  </div>
-                </body>
-                </html>
-                """.formatted(activationLink);
+        String html =
+                emailTemplateEngine.render(
+                        template
+                );
 
         sendEmail(
                 SendEmailDto.builder()
@@ -111,8 +99,9 @@ public class NotificationService {
                         .htmlContent(html)
                         .build()
         );
-    }
 
+    }
+    
     public void sendTestEmail(String to) {
 
         String html = """

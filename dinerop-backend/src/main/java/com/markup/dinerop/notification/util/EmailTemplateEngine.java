@@ -1,5 +1,6 @@
 package com.markup.dinerop.notification.util;
 
+import com.markup.dinerop.notification.template.EmailTemplate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
@@ -11,7 +12,54 @@ import java.nio.charset.StandardCharsets;
 @RequiredArgsConstructor
 public class EmailTemplateEngine {
 
-    public String loadTemplate(String template) {
+    public String render(EmailTemplate template) {
+
+        String html = loadTemplate("base.html");
+
+        return html
+
+                .replace(
+                        "{{LOGO_URL}}",
+                        "https://dinerop.com/logo.png"
+                )
+
+                .replace(
+                        "{{TITLE}}",
+                        template.getTitle()
+                )
+
+                .replace(
+                        "{{MESSAGE}}",
+                        template.getMessage()
+                )
+
+                .replace(
+                        "{{BUTTON_TEXT}}",
+                        template.getButtonText()
+                )
+
+                .replace(
+                        "{{BUTTON_URL}}",
+                        template.getButtonUrl()
+                )
+
+                .replace(
+                        "{{INFO_1}}",
+                        template.getInfo1()
+                )
+
+                .replace(
+                        "{{INFO_2}}",
+                        template.getInfo2()
+                )
+
+                .replace(
+                        "{{INFO_3}}",
+                        template.getInfo3());
+
+    }
+
+    private String loadTemplate(String template) {
 
         try {
 
@@ -21,7 +69,8 @@ public class EmailTemplateEngine {
                     );
 
             byte[] bytes =
-                    resource.getInputStream().readAllBytes();
+                    resource.getInputStream()
+                            .readAllBytes();
 
             return new String(
                     bytes,
@@ -30,10 +79,7 @@ public class EmailTemplateEngine {
 
         } catch (IOException e) {
 
-            throw new RuntimeException(
-                    "No se pudo cargar la plantilla: "
-                            + template
-            );
+            throw new RuntimeException(e);
 
         }
 
