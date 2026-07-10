@@ -148,38 +148,22 @@ public class NotificationService {
             ">
 
                 <h2 style="margin-top:0;color:#111827;">
-                    🎉 ¡Resend funciona correctamente!
+                    Noe te quiero mucho ❤️🐄
                 </h2>
 
                 <p>
-                    Si estás leyendo este correo significa que la integración
-                    entre <strong>Spring Boot</strong> y
-                    <strong>Resend</strong> está funcionando correctamente.
+                    Si estás leyendo este correo significa que te quiero mucho
                 </p>
 
                 <hr style="margin:30px 0">
 
-                <table style="width:100%;">
-                    <tr>
-                        <td><strong>Proyecto</strong></td>
-                        <td>Dinerop</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Servidor</strong></td>
-                        <td>Spring Boot</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Proveedor</strong></td>
-                        <td>Resend</td>
-                    </tr>
-                </table>
 
                 <p style="
                     margin-top:35px;
                     color:#6b7280;
                     font-size:13px;
                 ">
-                    Este correo fue enviado únicamente como prueba.
+                    Att el amor de tu vida 🐄
                 </p>
 
             </div>
@@ -191,7 +175,7 @@ public class NotificationService {
         sendEmail(
                 SendEmailDto.builder()
                         .to(to)
-                        .subject("✅ Prueba de Resend - Dinerop")
+                        .subject("Para Noe con amor ❤️🐄")
                         .htmlContent(html)
                         .build()
         );
