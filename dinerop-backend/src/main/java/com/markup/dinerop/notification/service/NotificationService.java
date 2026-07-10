@@ -75,17 +75,6 @@ public class NotificationService {
         String activationLink =
                 frontendUrl + "/activate?token=" + activationToken;
 
-        // Desarrollo
-        if (!emailEnabled) {
-            log.warn("");
-            log.warn("====================================================");
-            log.warn("MODO DESARROLLO - Link de activación: {}", activationLink);
-            log.warn("====================================================");
-            log.warn("");
-
-            return;
-        }
-
         String html = """
                 <!DOCTYPE html>
                 <html lang="es">
