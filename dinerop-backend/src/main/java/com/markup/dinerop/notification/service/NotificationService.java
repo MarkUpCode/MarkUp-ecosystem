@@ -124,6 +124,79 @@ public class NotificationService {
         );
     }
 
+    public void sendTestEmail(String to) {
+
+        String html = """
+            <!DOCTYPE html>
+            <html lang="es">
+            <head>
+                <meta charset="UTF-8">
+            </head>
+            <body style="
+                font-family: Arial, sans-serif;
+                background:#f4f7fb;
+                padding:40px;
+            ">
+
+            <div style="
+                max-width:600px;
+                margin:auto;
+                background:white;
+                border-radius:12px;
+                padding:40px;
+                box-shadow:0 8px 20px rgba(0,0,0,.08);
+            ">
+
+                <h2 style="margin-top:0;color:#111827;">
+                    🎉 ¡Resend funciona correctamente!
+                </h2>
+
+                <p>
+                    Si estás leyendo este correo significa que la integración
+                    entre <strong>Spring Boot</strong> y
+                    <strong>Resend</strong> está funcionando correctamente.
+                </p>
+
+                <hr style="margin:30px 0">
+
+                <table style="width:100%;">
+                    <tr>
+                        <td><strong>Proyecto</strong></td>
+                        <td>Dinerop</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Servidor</strong></td>
+                        <td>Spring Boot</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Proveedor</strong></td>
+                        <td>Resend</td>
+                    </tr>
+                </table>
+
+                <p style="
+                    margin-top:35px;
+                    color:#6b7280;
+                    font-size:13px;
+                ">
+                    Este correo fue enviado únicamente como prueba.
+                </p>
+
+            </div>
+
+            </body>
+            </html>
+            """;
+
+        sendEmail(
+                SendEmailDto.builder()
+                        .to(to)
+                        .subject("✅ Prueba de Resend - Dinerop")
+                        .htmlContent(html)
+                        .build()
+        );
+    }
+
     // =========================================================
     // RESET PASSWORD EMAIL
     // =========================================================
