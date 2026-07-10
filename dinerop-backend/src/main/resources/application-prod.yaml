@@ -61,8 +61,8 @@ resend:
   from-email: "Dinerop <noreply@dinerop.com>"
 
 app:
-  frontend-url: ${FRONTEND_URL:https://www.dinerop.com}
-  email-enabled: true
+  frontend-url: ${FRONTEND_URL:https://dinerop.com}
+  email-enabled: ${EMAIL_ENABLED:true}
 
 management:
   endpoints:
