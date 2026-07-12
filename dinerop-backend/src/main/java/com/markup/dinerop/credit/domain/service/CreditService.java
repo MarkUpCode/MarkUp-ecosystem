@@ -15,7 +15,8 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
+import com.markup.dinerop.auth.dto.PublicRegistrationRequest;
+import com.markup.dinerop.auth.entity.Role;
 
 
 
@@ -41,34 +42,87 @@ public class CreditService {
     @Transactional
     public Long createPublicRequest(PublicCreditRequestDto dto) {
 
-        // 1. Validar que no exista solicitud activa
+        // =========================
+        // 1. NORMALIZAR EMAIL
+        // =========================
+
+        String normalizedEmail = dto.getEmail()
+                .toLowerCase()
+                .trim();
+
+        // =========================
+        // 2. VALIDAR SOLICITUD ACTIVA
+        // =========================
+
         boolean exists =
                 creditRequestRepository.existsByEmailAndEstado(
-                        dto.getEmail(),
+                        normalizedEmail,
                         CreditRequestStatus.CREADA
                 );
 
         if (exists) {
-            throw new IllegalStateException("EXISTING_ACTIVE_REQUEST");
+                throw new IllegalStateException(
+                        "EXISTING_ACTIVE_REQUEST"
+                );
         }
 
-        // 2. Validaciones de dominio
-        if (dto.getType() == CreditRequestType.CREDITO && dto.getCreditType() == null) {
-            throw new IllegalArgumentException("CREDIT_TYPE_REQUIRED_FOR_CREDITO");
+        // =========================
+        // 3. VALIDACIONES DE DOMINIO
+        // =========================
+
+        if (dto.getType() == CreditRequestType.CREDITO
+                && dto.getCreditType() == null) {
+
+                throw new IllegalArgumentException(
+                        "CREDIT_TYPE_REQUIRED_FOR_CREDITO"
+                );
         }
 
-        if (dto.getType() == CreditRequestType.INVERSION && dto.getCreditType() != null) {
-            throw new IllegalArgumentException("CREDIT_TYPE_NOT_ALLOWED_FOR_INVERSION");
+        if (dto.getType() == CreditRequestType.INVERSION
+                && dto.getCreditType() != null) {
+
+                throw new IllegalArgumentException(
+                        "CREDIT_TYPE_NOT_ALLOWED_FOR_INVERSION"
+                );
         }
 
-        if (dto.getPlazoMeses() != null &&
-                (dto.getPlazoMeses() < 1 || dto.getPlazoMeses() > 360)) {
-            throw new IllegalArgumentException("INVALID_PLAZO_MESES");
+        if (dto.getPlazoMeses() != null
+                && (
+                        dto.getPlazoMeses() < 1
+                        || dto.getPlazoMeses() > 360
+                )) {
+
+                throw new IllegalArgumentException(
+                        "INVALID_PLAZO_MESES"
+                );
         }
 
-        // 3. Persistir solicitud_credito (SOLO campos de la tabla)
+        // =========================
+        // 4. GUARDAR PREREGISTRO
+        // =========================
+
+        PublicRegistrationRequest registrationRequest =
+                PublicRegistrationRequest.builder()
+                        .email(normalizedEmail)
+                        .firstName(dto.getFirstName())
+                        .lastName(dto.getLastName())
+                        .identification(dto.getIdentification())
+                        .phone(dto.getPhone())
+                        .province(dto.getProvince())
+                        .city(dto.getCity())
+                        .build();
+
+        User user = authService.preRegisterClient(
+                registrationRequest
+        );
+
+        // =========================
+        // 5. GUARDAR SOLICITUD
+        // =========================
+
         CreditRequest request = CreditRequest.builder()
-                .email(dto.getEmail())
+                .clientId(user.getIdUser())
+                .email(normalizedEmail)
                 .identification(dto.getIdentification())
                 .amount(dto.getAmount())
                 .province(dto.getProvince())
@@ -85,12 +139,16 @@ public class CreditService {
 
         creditRequestRepository.save(request);
 
-        // 4. Pre-registro en auth-service (datos personales/contacto)
-        authService.preRegister(dto.getEmail(), Role.CLIENT, null);
-
+        log.info(
+                "[CREDIT] Solicitud pública creada | " +
+                "requestId={} userId={} email={}",
+                request.getId(),
+                user.getIdUser(),
+                normalizedEmail
+        );
 
         return request.getId();
-    }
+        }
 
 
     // =========================

@@ -141,6 +141,60 @@ public class AuthService {
     }
 
     @Transactional
+    public User preRegisterClient(PublicRegistrationRequest request) {
+
+        String normalizedEmail = request.getEmail()
+                .toLowerCase()
+                .trim();
+
+        log.info(
+                "[PRE_REGISTER_CLIENT] Inicio | email={}",
+                normalizedEmail
+        );
+
+        // 1. Crear usuario pendiente + token + enviar correo
+        preRegister(
+                normalizedEmail,
+                Role.CLIENT,
+                null
+        );
+
+        // 2. Recuperar usuario creado o existente
+        User user = userRepository
+                .findByEmail(normalizedEmail)
+                .orElseThrow(() ->
+                        new RuntimeException("USER_NOT_FOUND")
+                );
+
+        // 3. Buscar preregistro existente o crear uno nuevo
+        UserPreRegistration preReg = userPreRegistrationRepository
+                .findByUserId(user.getIdUser())
+                .orElseGet(() ->
+                        UserPreRegistration.builder()
+                                .userId(user.getIdUser())
+                                .build()
+                );
+
+        // 4. Guardar los datos personales
+        preReg.setFirstName(request.getFirstName());
+        preReg.setLastName(request.getLastName());
+        preReg.setIdentification(request.getIdentification());
+        preReg.setPhone(request.getPhone());
+        preReg.setProvince(request.getProvince());
+        preReg.setCity(request.getCity());
+
+        userPreRegistrationRepository.save(preReg);
+
+        log.info(
+                "[PRE_REGISTER_CLIENT] Datos guardados | userId={} email={}",
+                user.getIdUser(),
+                normalizedEmail
+        );
+
+        return user;
+    }
+
+    @Transactional
     public User inviteUser(InviteUserRequest request) {
 
         Role role = request.role();
@@ -175,36 +229,32 @@ public class AuthService {
     // REGISTRO PÚBLICO SIN CRÉDITO
     // =========================================================
     @Transactional
-    public PublicRegistrationResponse publicRegister(PublicRegistrationRequest request) {
+    public PublicRegistrationResponse publicRegister(
+            PublicRegistrationRequest request
+    ) {
 
-        String normalizedEmail = request.getEmail().toLowerCase().trim();
-        log.info("[PUBLIC_REGISTER] Inicio | email={}", normalizedEmail);
+        String normalizedEmail = request.getEmail()
+                .toLowerCase()
+                .trim();
 
-        // Reutiliza toda la lógica: crear user PENDING_ACTIVATION + token + correo
-        preRegister(normalizedEmail, Role.CLIENT, null);
+        log.info(
+                "[PUBLIC_REGISTER] Inicio | email={}",
+                normalizedEmail
+        );
 
-        User user = userRepository.findByEmail(normalizedEmail)
-                .orElseThrow(() -> new RuntimeException("USER_NOT_FOUND"));
+        User user = preRegisterClient(request);
 
-        // UPSERT del perfil de pre-registro
-        UserPreRegistration preReg = userPreRegistrationRepository
-                .findByUserId(user.getIdUser())
-                .orElse(UserPreRegistration.builder().userId(user.getIdUser()).build());
-
-        preReg.setFirstName(request.getFirstName());
-        preReg.setLastName(request.getLastName());
-        preReg.setIdentification(request.getIdentification());
-        preReg.setPhone(request.getPhone());
-        preReg.setProvince(request.getProvince());
-        preReg.setCity(request.getCity());
-
-        userPreRegistrationRepository.save(preReg);
-
-        log.info("[PUBLIC_REGISTER] OK | userId={} email={}", user.getIdUser(), normalizedEmail);
+        log.info(
+                "[PUBLIC_REGISTER] OK | userId={} email={}",
+                user.getIdUser(),
+                normalizedEmail
+        );
 
         return PublicRegistrationResponse.builder()
                 .email(normalizedEmail)
-                .message("Registro iniciado. Revisa tu correo para activar la cuenta.")
+                .message(
+                        "Registro iniciado. Revisa tu correo para activar la cuenta."
+                )
                 .build();
     }
 
