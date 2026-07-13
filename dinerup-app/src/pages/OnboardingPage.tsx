@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/useAuth";
 
@@ -12,6 +12,7 @@ import SuccessOnboardingModal from "../components/onboarding/SuccessOnboardingMo
 
 import {
   submitOnboarding,
+  getPreRegistrationData,
   type OnboardingPayload,
   type SolicitanteData,
 } from "../api/onboarding.api";
@@ -60,7 +61,7 @@ const EMPTY_SOLICITANTE: SolicitanteData = {
 export default function OnboardingPage() {
   const { user, updateUser } = useAuth();
   const navigate = useNavigate();
-
+  const [isLoadingPreRegistration, setIsLoadingPreRegistration] = useState(true);
   const [step, setStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
@@ -75,6 +76,69 @@ export default function OnboardingPage() {
     solicitante: { ...EMPTY_SOLICITANTE },
     conyuge: null as SolicitanteData | null,
   });
+
+  useEffect(() => {
+    const loadPreRegistration = async () => {
+      try {
+        setIsLoadingPreRegistration(true);
+        setError("");
+
+        const preRegistration = await getPreRegistrationData();
+
+        setFormData((current) => ({
+          ...current,
+          solicitante: {
+            ...current.solicitante,
+
+            nombres:
+              preRegistration.firstName ||
+              current.solicitante.nombres,
+
+            apellidos:
+              preRegistration.lastName ||
+              current.solicitante.apellidos,
+
+            cedula:
+              preRegistration.identification ||
+              current.solicitante.cedula,
+
+            telefono:
+              preRegistration.phone ||
+              current.solicitante.telefono,
+
+            email:
+              preRegistration.email ||
+              current.solicitante.email,
+
+            direccion: {
+              ...current.solicitante.direccion,
+
+              provincia:
+                preRegistration.province ||
+                current.solicitante.direccion.provincia,
+
+              canton:
+                preRegistration.city ||
+                current.solicitante.direccion.canton,
+            },
+          },
+        }));
+      } catch (err) {
+        console.error(
+          "No se pudieron cargar los datos del preregistro:",
+          err,
+        );
+
+        setError(
+          "No se pudieron cargar tus datos anteriores. Puedes continuar completando el formulario manualmente.",
+        );
+      } finally {
+        setIsLoadingPreRegistration(false);
+      }
+    };
+
+    loadPreRegistration();
+  }, []);
 
   const hasSpouse = formData.solicitante.tieneConyuge;
 
@@ -136,6 +200,18 @@ export default function OnboardingPage() {
       navigate("/dashboard-client");
     }, 300);
   };
+
+  if (isLoadingPreRegistration) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-200 flex items-center justify-center">
+        <div className="bg-white px-8 py-6 rounded-2xl shadow-lg border border-gray-100">
+          <p className="text-gray-700 font-medium">
+            Cargando tu información...
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-200 px-4 py-10 flex justify-center">

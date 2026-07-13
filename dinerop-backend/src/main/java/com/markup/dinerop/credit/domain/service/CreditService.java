@@ -1,6 +1,7 @@
 package com.markup.dinerop.credit.domain.service;
 
 import com.markup.dinerop.auth.entity.Role;
+import com.markup.dinerop.auth.entity.User;
 import com.markup.dinerop.auth.service.AuthService;
 import com.markup.dinerop.credit.domain.model.CreditRequest;
 import com.markup.dinerop.credit.domain.model.SolicitudCooperativa;

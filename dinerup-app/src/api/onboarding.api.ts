@@ -106,6 +106,26 @@ export interface GuaranteeOnboardingResponse {
   fechaCreacion: string;
 }
 
+export interface PreRegistrationData {
+  firstName: string;
+  lastName: string;
+  identification: string;
+  phone: string;
+  email: string;
+  province: string;
+  city: string;
+}
+
+export async function getPreRegistrationData(): Promise<PreRegistrationData> {
+  return httpClient<PreRegistrationData>(
+    "/api/onboarding/cliente/pre-registration",
+    {
+      method: "GET",
+      auth: true,
+    },
+  );
+}
+
 export async function submitGuaranteeOnboarding(
   payload: OnboardingPayload,
 ): Promise<GuaranteeOnboardingResponse> {

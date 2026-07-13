@@ -4,6 +4,7 @@ import com.markup.dinerop.onboarding.domain.entity.SolicitudOnboarding;
 import com.markup.dinerop.onboarding.dto.request.PersonaOnboardingRequest;
 import com.markup.dinerop.onboarding.dto.request.SolicitudOnboardingRequest;
 import com.markup.dinerop.onboarding.dto.response.FormularioClienteStatusResponse;
+import com.markup.dinerop.onboarding.dto.response.PreRegistrationDataResponse;
 
 public interface OnboardingService {
 
@@ -22,4 +23,6 @@ public interface OnboardingService {
     SolicitudOnboarding obtenerOnboardingUnificado(Long solicitudId);
 
     FormularioClienteStatusResponse getFormularioClienteStatus(Long usuarioId);
+
+    PreRegistrationDataResponse getPreRegistrationData(Long userId);
 }

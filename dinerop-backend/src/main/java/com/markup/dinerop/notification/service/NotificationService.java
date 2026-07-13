@@ -85,15 +85,39 @@ public class NotificationService {
         String activationLink =
                 frontendUrl + "/activate?token=" + activationToken;
 
+        // =====================================================
+        // MODO DESARROLLO
+        // No enviamos correo real, mostramos el link en consola
+        // =====================================================
+        if (!emailEnabled) {
+
+            log.warn("");
+            log.warn("========================================================");
+            log.warn("        MODO DESARROLLO - ACTIVACIÓN DE CUENTA");
+            log.warn("========================================================");
+            log.warn("Usuario : {}", to);
+            log.warn("");
+            log.warn("LINK DE ACTIVACIÓN:");
+            log.warn("{}", activationLink);
+            log.warn("");
+            log.warn("TOKEN:");
+            log.warn("{}", activationToken);
+            log.warn("========================================================");
+            log.warn("");
+
+            return;
+        }
+
+        // =====================================================
+        // MODO PRODUCCIÓN
+        // Construimos y enviamos el correo real
+        // =====================================================
+
         EmailTemplate template =
-                activationEmailBuilder.build(
-                        activationLink
-                );
+                activationEmailBuilder.build(activationLink);
 
         String html =
-                emailTemplateEngine.render(
-                        template
-                );
+                emailTemplateEngine.render(template);
 
         sendEmail(
                 SendEmailDto.builder()
@@ -102,7 +126,6 @@ public class NotificationService {
                         .htmlContent(html)
                         .build()
         );
-
     }
     
     public void sendTestEmail(String to) {
@@ -173,19 +196,19 @@ public class NotificationService {
         // Desarrollo
         if (!emailEnabled) {
 
-            log.info("");
-            log.info("====================================================");
-            log.info("      MODO DESARROLLO - RESET PASSWORD");
-            log.info("====================================================");
-            log.info("Usuario : {}", to);
-            log.info("");
-            log.info("LINK RESET:");
-            log.info(resetLink);
-            log.info("");
-            log.info("TOKEN:");
-            log.info(resetToken);
-            log.info("====================================================");
-            log.info("");
+            log.warn("");
+            log.warn("====================================================");
+            log.warn("      MODO DESARROLLO - RESET PASSWORD");
+            log.warn("====================================================");
+            log.warn("Usuario : {}", to);
+            log.warn("");
+            log.warn("LINK RESET:");
+            log.warn(resetLink);
+            log.warn("");
+            log.warn("TOKEN:");
+            log.warn(resetToken);
+            log.warn("====================================================");
+            log.warn("");
 
             return;
         }

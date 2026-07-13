@@ -17,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import com.markup.dinerop.onboarding.dto.response.PreRegistrationDataResponse;
 
 @Slf4j
 @RestController
@@ -73,4 +74,19 @@ public class OnboardingClienteController {
     ) {
         return onboardingService.getFormularioClienteStatus(user.getIdUser());
     }
+
+    @GetMapping("/pre-registration")
+    @PreAuthorize("hasRole('CLIENT')")
+    public PreRegistrationDataResponse getPreRegistrationData(
+        @AuthenticationPrincipal User user
+    ) {
+        log.info(
+                "[ONBOARDING] Obtener datos de preregistro | clientId={}",
+                user.getIdUser()
+        );
+
+        return onboardingService.getPreRegistrationData(
+                user.getIdUser()
+        );
+     }
 }

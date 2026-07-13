@@ -17,6 +17,11 @@ import com.markup.dinerop.onboarding.infrastructure.repository.SolicitudOnboardi
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.markup.dinerop.auth.entity.User;
+import com.markup.dinerop.auth.entity.UserPreRegistration;
+import com.markup.dinerop.auth.repository.UserRepository;
+import com.markup.dinerop.auth.repository.UserPreRegistrationRepository;
+import com.markup.dinerop.onboarding.dto.response.PreRegistrationDataResponse;
 
 import java.util.List;
 
@@ -29,6 +34,8 @@ public class OnboardingServiceImpl implements OnboardingService {
     private final PersonaOnboardingRepository personaRepo;
     private final CreditService creditService;
     private final OnboardingMapper mapper;
+    private final UserRepository userRepository;
+    private final UserPreRegistrationRepository userPreRegistrationRepository;
 
     @Override
     public SolicitudOnboarding crearSolicitudConSolicitante(
@@ -182,4 +189,35 @@ public class OnboardingServiceImpl implements OnboardingService {
             persona.setReferencias(referencias);
         }
     }
+    @Override
+    @Transactional
+    public PreRegistrationDataResponse getPreRegistrationData(Long userId) {
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() ->
+                        new RuntimeException("USER_NOT_FOUND")
+                );
+
+        UserPreRegistration preRegistration =
+                userPreRegistrationRepository
+                        .findByUserId(userId)
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "PRE_REGISTRATION_NOT_FOUND"
+                                )
+                        );
+
+        return PreRegistrationDataResponse.builder()
+                .firstName(preRegistration.getFirstName())
+                .lastName(preRegistration.getLastName())
+                .identification(preRegistration.getIdentification())
+                .phone(preRegistration.getPhone())
+                .email(user.getEmail())
+                .province(preRegistration.getProvince())
+                .city(preRegistration.getCity())
+                .build();
+    }
+
+
+
 }
