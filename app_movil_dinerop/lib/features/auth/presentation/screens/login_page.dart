@@ -35,18 +35,32 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     if (!_formKey.currentState!.validate()) return;
     final controller = ref.read(authControllerProvider);
     try {
-      final response = await controller.login(_emailController.text.trim(), _passwordController.text);
+      final response = await controller.login(
+        _emailController.text.trim(),
+        _passwordController.text,
+      );
       if (!mounted) return;
       if (response.user.status == AppUserStatus.pendingActivation) {
-        context.go('/pending-activation');
-      } else if (controller.requiresOnboarding) {
-        context.go('/onboarding');
+        context.go(
+          '/pending-activation?email=${Uri.encodeComponent(_emailController.text.trim())}',
+        );
       } else {
         context.go('/dashboard');
       }
     } catch (error) {
+      if (error is AppException &&
+          error.message.toLowerCase().contains('no activada')) {
+        if (mounted) {
+          context.go(
+            '/pending-activation?email=${Uri.encodeComponent(_emailController.text.trim())}',
+          );
+        }
+        return;
+      }
       setState(() {
-        _localError = error is AppException ? error.message : AppErrorMessages.generic;
+        _localError = error is AppException
+            ? error.message
+            : AppErrorMessages.generic;
       });
     }
   }
@@ -69,25 +83,49 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                   gradient: const LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
-                    colors: [Color(0xFF1E3A8A), Color(0xFF3730A3), Color(0xFF0F172A)],
+                    colors: [
+                      Color(0xFF1E3A8A),
+                      Color(0xFF3730A3),
+                      Color(0xFF0F172A),
+                    ],
                   ),
                   borderRadius: BorderRadius.circular(32),
                 ),
                 child: const Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Icon(Icons.trending_up_rounded, color: Colors.white, size: 36),
+                    Icon(
+                      Icons.trending_up_rounded,
+                      color: Colors.white,
+                      size: 36,
+                    ),
                     SizedBox(height: 16),
-                    Text('DINEROP', style: TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.w800)),
+                    Text(
+                      'DINEROP',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 28,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
                     SizedBox(height: 8),
-                    Text('Tu app financiera para crédito, onboarding y seguimiento de solicitudes.', style: TextStyle(color: Colors.white70, height: 1.4)),
+                    Text(
+                      'Tu app financiera para crédito, onboarding y seguimiento de solicitudes.',
+                      style: TextStyle(color: Colors.white70, height: 1.4),
+                    ),
                   ],
                 ),
               ),
               const SizedBox(height: 28),
-              Text('Iniciar sesión', style: Theme.of(context).textTheme.headlineSmall),
+              Text(
+                'Iniciar sesión',
+                style: Theme.of(context).textTheme.headlineSmall,
+              ),
               const SizedBox(height: 8),
-              Text('Accede con tus credenciales para continuar.', style: Theme.of(context).textTheme.bodyMedium),
+              Text(
+                'Accede con tus credenciales para continuar.',
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
               const SizedBox(height: 24),
               AppCard(
                 child: Form(
@@ -100,7 +138,10 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                         hint: 'tu@email.com',
                         keyboardType: TextInputType.emailAddress,
                         prefixIcon: Icons.email_outlined,
-                        validator: (value) => value == null || value.trim().isEmpty ? 'Ingresa tu correo' : null,
+                        validator: (value) =>
+                            value == null || value.trim().isEmpty
+                            ? 'Ingresa tu correo'
+                            : null,
                       ),
                       const SizedBox(height: 16),
                       AppTextField(
@@ -108,19 +149,35 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                         label: 'Contraseña',
                         obscureText: !_showPassword,
                         prefixIcon: Icons.lock_outline,
-                        suffixIcon: _showPassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
-                        onSuffixTap: () => setState(() => _showPassword = !_showPassword),
-                        validator: (value) => value == null || value.isEmpty ? 'Ingresa tu contraseña' : null,
+                        suffixIcon: _showPassword
+                            ? Icons.visibility_off_outlined
+                            : Icons.visibility_outlined,
+                        onSuffixTap: () =>
+                            setState(() => _showPassword = !_showPassword),
+                        validator: (value) => value == null || value.isEmpty
+                            ? 'Ingresa tu contraseña'
+                            : null,
                       ),
                       const SizedBox(height: 20),
                       if (_localError != null) ...[
                         AppErrorView(message: _localError!, onRetry: _submit),
                         const SizedBox(height: 20),
                       ],
-                      AppButton(label: 'Entrar', icon: Icons.login_rounded, isLoading: controller.isBusy, onPressed: _submit),
+                      AppButton(
+                        label: 'Entrar',
+                        icon: Icons.login_rounded,
+                        isLoading: controller.isBusy,
+                        onPressed: _submit,
+                      ),
                       const SizedBox(height: 12),
-                      TextButton(onPressed: () => context.go('/forgot-password'), child: const Text('¿Olvidaste tu contraseña?')),
-                      TextButton(onPressed: () => context.go('/register'), child: const Text('Crear cuenta nueva')),
+                      TextButton(
+                        onPressed: () => context.go('/forgot-password'),
+                        child: const Text('¿Olvidaste tu contraseña?'),
+                      ),
+                      TextButton(
+                        onPressed: () => context.go('/register'),
+                        child: const Text('Solicitar un crÃ©dito'),
+                      ),
                     ],
                   ),
                 ),

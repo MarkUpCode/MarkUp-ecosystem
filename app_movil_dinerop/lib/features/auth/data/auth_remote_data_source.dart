@@ -14,17 +14,22 @@ class AuthRemoteDataSource {
       method: 'POST',
       authenticated: false,
       body: {'email': email, 'password': password},
-      parser: (data) => LoginResponse.fromJson(Map<String, dynamic>.from(data as Map)),
+      parser: (data) =>
+          LoginResponse.fromJson(Map<String, dynamic>.from(data as Map)),
     );
   }
 
-  Future<PublicRegistrationResponse> register(PublicRegistrationRequest request) {
+  Future<PublicRegistrationResponse> register(
+    PublicRegistrationRequest request,
+  ) {
     return _client.request<PublicRegistrationResponse>(
-      '/api/auth/register',
+      '/api/credits/public-request',
       method: 'POST',
       authenticated: false,
       body: request.toJson(),
-      parser: (data) => PublicRegistrationResponse.fromJson(Map<String, dynamic>.from(data as Map)),
+      parser: (data) => PublicRegistrationResponse.fromJson(
+        Map<String, dynamic>.from(data as Map),
+      ),
     );
   }
 
@@ -38,7 +43,10 @@ class AuthRemoteDataSource {
     );
   }
 
-  Future<String> completeRegistration({required String email, required String password}) {
+  Future<String> completeRegistration({
+    required String email,
+    required String password,
+  }) {
     return _client.request<String>(
       '/api/auth/complete-registration',
       method: 'POST',
@@ -58,7 +66,10 @@ class AuthRemoteDataSource {
     );
   }
 
-  Future<String> resetPassword({required String token, required String newPassword}) {
+  Future<String> resetPassword({
+    required String token,
+    required String newPassword,
+  }) {
     return _client.request<String>(
       '/api/auth/password/reset',
       method: 'POST',

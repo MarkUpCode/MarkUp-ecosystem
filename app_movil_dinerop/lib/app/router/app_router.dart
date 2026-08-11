@@ -57,9 +57,6 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             : '/pending-activation';
       }
 
-      if (authController.requiresOnboarding) {
-        return location == '/onboarding' ? null : '/onboarding';
-      }
 
       if (location == '/login' ||
           location == '/register' ||
@@ -98,7 +95,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/pending-activation',
-        builder: (context, state) => const PendingActivationPage(),
+        builder: (context, state) =>
+            PendingActivationPage(email: state.uri.queryParameters['email']),
       ),
       GoRoute(
         path: '/onboarding',

@@ -5,7 +5,9 @@ import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_card.dart';
 
 class PendingActivationPage extends StatelessWidget {
-  const PendingActivationPage({super.key});
+  const PendingActivationPage({super.key, this.email});
+
+  final String? email;
 
   @override
   Widget build(BuildContext context) {
@@ -18,13 +20,29 @@ class PendingActivationPage extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.mark_email_unread_rounded, size: 64, color: Theme.of(context).colorScheme.primary),
+                Icon(
+                  Icons.mark_email_unread_rounded,
+                  size: 64,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
                 const SizedBox(height: 16),
-                Text('Revisa tu correo', style: Theme.of(context).textTheme.headlineSmall, textAlign: TextAlign.center),
+                Text(
+                  'Revisa tu correo',
+                  style: Theme.of(context).textTheme.headlineSmall,
+                  textAlign: TextAlign.center,
+                ),
                 const SizedBox(height: 10),
-                Text('Tu cuenta todavía necesita activación. Usa el enlace que recibiste por correo y luego completa el registro.', style: Theme.of(context).textTheme.bodyMedium, textAlign: TextAlign.center),
+                Text(
+                  'Tu cuenta todavía necesita activación. Usa el enlace que recibiste por correo y luego completa el registro.',
+                  style: Theme.of(context).textTheme.bodyMedium,
+                  textAlign: TextAlign.center,
+                ),
                 const SizedBox(height: 24),
-                AppButton(label: 'Ir a iniciar sesión', icon: Icons.login_rounded, onPressed: () => context.go('/login')),
+                AppButton(
+                  label: 'Ir a iniciar sesión',
+                  icon: Icons.login_rounded,
+                  onPressed: () => context.go('/login'),
+                ),
               ],
             ),
           ),

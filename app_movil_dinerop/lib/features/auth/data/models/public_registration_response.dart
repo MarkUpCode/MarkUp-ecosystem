@@ -1,12 +1,15 @@
 class PublicRegistrationResponse {
-  const PublicRegistrationResponse({required this.email, required this.message});
+  const PublicRegistrationResponse({
+    required this.requestId,
+    required this.message,
+  });
 
-  final String email;
+  final int? requestId;
   final String message;
 
   factory PublicRegistrationResponse.fromJson(Map<String, dynamic> json) {
     return PublicRegistrationResponse(
-      email: (json['email'] ?? '').toString(),
+      requestId: (json['requestId'] as num?)?.toInt(),
       message: (json['message'] ?? '').toString(),
     );
   }
