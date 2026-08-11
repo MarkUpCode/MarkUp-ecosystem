@@ -139,7 +139,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                         keyboardType: TextInputType.emailAddress,
                         prefixIcon: Icons.email_outlined,
                         validator: (value) =>
-                            value == null || value.trim().isEmpty
+                        value == null || value.trim().isEmpty
                             ? 'Ingresa tu correo'
                             : null,
                       ),
@@ -176,7 +176,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                       ),
                       TextButton(
                         onPressed: () => context.go('/register'),
-                        child: const Text('Solicitar un crÃ©dito'),
+                        child: const Text('Solicitar un credito'),
                       ),
                     ],
                   ),
@@ -189,3 +189,5 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     );
   }
 }
+
+
