@@ -76,7 +76,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const SizedBox(height: 20),
+              const SizedBox(height: 12),
               Container(
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
@@ -84,49 +84,92 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
-                      Color(0xFF1E3A8A),
-                      Color(0xFF3730A3),
+                      Color(0xFF0F3A7D),
+                      Color(0xFF1E52A4),
                       Color(0xFF0F172A),
                     ],
                   ),
-                  borderRadius: BorderRadius.circular(32),
+                  borderRadius: BorderRadius.circular(28),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFF0F3A7D).withValues(alpha: 0.2),
+                      blurRadius: 16,
+                      offset: const Offset(0, 6),
+                    ),
+                  ],
                 ),
-                child: const Column(
+                child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Icon(
-                      Icons.trending_up_rounded,
-                      color: Colors.white,
-                      size: 36,
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.15),
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                          child: const Icon(
+                            Icons.account_balance_rounded,
+                            color: Colors.white,
+                            size: 28,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        const Text(
+                          'DINEROP',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 24,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                      ],
                     ),
-                    SizedBox(height: 16),
-                    Text(
-                      'DINEROP',
+                    const SizedBox(height: 16),
+                    const Text(
+                      'Conectamos tus metas con las mejores cooperativas de ahorro y crédito.',
                       style: TextStyle(
                         color: Colors.white,
-                        fontSize: 28,
-                        fontWeight: FontWeight.w800,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        height: 1.35,
                       ),
                     ),
-                    SizedBox(height: 8),
-                    Text(
-                      'Tu app financiera para crédito, onboarding y seguimiento de solicitudes.',
-                      style: TextStyle(color: Colors.white70, height: 1.4),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.verified_user_outlined,
+                          color: Colors.white.withValues(alpha: 0.8),
+                          size: 16,
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          'Gestión segura, clara y transparente',
+                          style: TextStyle(
+                            color: Colors.white.withValues(alpha: 0.8),
+                            fontSize: 12.5,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 28),
+              const SizedBox(height: 24),
               Text(
                 'Iniciar sesión',
                 style: Theme.of(context).textTheme.headlineSmall,
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 6),
               Text(
-                'Accede con tus credenciales para continuar.',
+                'Ingresa con tu correo registrado para continuar.',
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 20),
               AppCard(
                 child: Form(
                   key: _formKey,
@@ -139,9 +182,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                         keyboardType: TextInputType.emailAddress,
                         prefixIcon: Icons.email_outlined,
                         validator: (value) =>
-                        value == null || value.trim().isEmpty
-                            ? 'Ingresa tu correo'
-                            : null,
+                            value == null || value.trim().isEmpty
+                                ? 'Ingresa tu correo'
+                                : null,
                       ),
                       const SizedBox(height: 16),
                       AppTextField(
@@ -164,18 +207,17 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                         const SizedBox(height: 20),
                       ],
                       AppButton(
-                        label: 'Entrar',
+                        label: 'Entrar a mi cuenta',
                         icon: Icons.login_rounded,
                         isLoading: controller.isBusy,
                         onPressed: _submit,
                       ),
-
                       const SizedBox(height: 12),
                       TextButton(
                         onPressed: () => context.go('/forgot-password'),
                         child: const Text('¿Olvidaste tu contraseña?'),
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 12),
                       _CreditRequestCTA(
                         onPressed: () => context.go('/register'),
                       ),
@@ -198,103 +240,88 @@ class _CreditRequestCTA extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Row(
           children: [
-            Expanded(child: Divider(color: Colors.grey.shade300)),
+            Expanded(child: Divider(color: theme.colorScheme.outline)),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12),
               child: Text(
                 '¿Aún no tienes una cuenta?',
                 style: TextStyle(
-                  color: Colors.grey.shade600,
+                  color: theme.colorScheme.onSurfaceVariant,
                   fontSize: 13,
                   fontWeight: FontWeight.w500,
                 ),
               ),
             ),
-            Expanded(child: Divider(color: Colors.grey.shade300)),
+            Expanded(child: Divider(color: theme.colorScheme.outline)),
           ],
         ),
-        const SizedBox(height: 14),
-        Material(
-          color: const Color(0xFF0F172A),
-          borderRadius: BorderRadius.circular(20),
-          child: InkWell(
-            onTap: onPressed,
-            borderRadius: BorderRadius.circular(20),
-            splashColor: Colors.white.withOpacity(0.08),
-            highlightColor: Colors.white.withOpacity(0.04),
-            child: Ink(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: const Color(0xFF3730A3), width: 1),
+        const SizedBox(height: 16),
+        AppCard(
+          color: isDark
+              ? theme.colorScheme.primaryContainer
+              : theme.colorScheme.primaryContainer.withValues(alpha: 0.6),
+          borderColor: theme.colorScheme.primary.withValues(alpha: 0.3),
+          onTap: onPressed,
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.primary,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(
+                  Icons.credit_score_rounded,
+                  color: Colors.white,
+                  size: 24,
+                ),
               ),
-              padding: const EdgeInsets.symmetric(
-                horizontal: 16,
-                vertical: 14,
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'Solicitar mi crédito',
+                      style: TextStyle(
+                        color: theme.colorScheme.onSurface,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      'Inicia tu solicitud en minutos',
+                      style: TextStyle(
+                        color: theme.colorScheme.onSurfaceVariant,
+                        fontSize: 12.5,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              child: Row(
-                children: [
-                  Container(
-                    width: 44,
-                    height: 44,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF3730A3),
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    child: const Icon(
-                      Icons.credit_score_rounded,
-                      color: Colors.white,
-                      size: 24,
-                    ),
-                  ),
-                  const SizedBox(width: 14),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Text(
-                          'Solicitar mi crédito',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 15,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          'Inicia tu solicitud en minutos',
-                          style: TextStyle(
-                            color: Colors.white.withOpacity(0.7),
-                            fontSize: 12.5,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Container(
-                    padding: const EdgeInsets.all(6),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.1),
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      Icons.arrow_forward_rounded,
-                      color: Colors.white,
-                      size: 18,
-                    ),
-                  ),
-                ],
+              const SizedBox(width: 8),
+              Icon(
+                Icons.arrow_forward_rounded,
+                color: theme.colorScheme.primary,
+                size: 20,
               ),
-            ),
+            ],
           ),
         ),
       ],
     );
   }
 }
+

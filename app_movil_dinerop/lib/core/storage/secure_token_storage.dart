@@ -24,7 +24,22 @@ class SecureTokenStorage {
   static const String _tokenKey = 'dinerop_access_token';
   static const String _userKey = 'dinerop_user';
   static const String _onboardingKey = 'dinerop_onboarding_complete';
+  static const String _themeKey = 'dinerop_theme_mode';
   static const _operationTimeout = Duration(seconds: 8);
+
+  Future<void> saveThemeMode(String mode) async {
+    await _storage
+        .write(key: _themeKey, value: mode)
+        .timeout(_operationTimeout);
+  }
+
+  Future<String?> readThemeMode() async {
+    try {
+      return await _storage.read(key: _themeKey).timeout(_operationTimeout);
+    } catch (_) {
+      return null;
+    }
+  }
 
   Future<void> saveSession({
     required String token,
@@ -69,3 +84,4 @@ class SecureTokenStorage {
 
   Future<void> clear() => _storage.deleteAll().timeout(_operationTimeout);
 }
+

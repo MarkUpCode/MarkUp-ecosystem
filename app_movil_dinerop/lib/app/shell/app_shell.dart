@@ -33,19 +33,43 @@ class AppShell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final location = GoRouterState.of(context).uri.path;
+    final theme = Theme.of(context);
 
     return Scaffold(
       body: child,
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: _selectedIndex(location),
-        onDestinationSelected: (index) => _navigate(context, index),
-        destinations: const [
-          NavigationDestination(icon: Icon(Icons.dashboard_outlined), selectedIcon: Icon(Icons.dashboard_rounded), label: 'Inicio'),
-          NavigationDestination(icon: Icon(Icons.receipt_long_outlined), selectedIcon: Icon(Icons.receipt_long_rounded), label: 'Solicitudes'),
-          NavigationDestination(icon: Icon(Icons.apartment_outlined), selectedIcon: Icon(Icons.apartment_rounded), label: 'Cooperativas'),
-          NavigationDestination(icon: Icon(Icons.person_outline), selectedIcon: Icon(Icons.person_rounded), label: 'Perfil'),
-        ],
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          border: Border(
+            top: BorderSide(color: theme.colorScheme.outline, width: 1),
+          ),
+        ),
+        child: NavigationBar(
+          selectedIndex: _selectedIndex(location),
+          onDestinationSelected: (index) => _navigate(context, index),
+          destinations: const [
+            NavigationDestination(
+              icon: Icon(Icons.dashboard_outlined),
+              selectedIcon: Icon(Icons.dashboard_rounded),
+              label: 'Inicio',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.receipt_long_outlined),
+              selectedIcon: Icon(Icons.receipt_long_rounded),
+              label: 'Solicitudes',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.apartment_outlined),
+              selectedIcon: Icon(Icons.apartment_rounded),
+              label: 'Cooperativas',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.person_outline),
+              selectedIcon: Icon(Icons.person_rounded),
+              label: 'Perfil',
+            ),
+          ],
+        ),
       ),
     );
   }
-}
+}

@@ -13,38 +13,78 @@ class SplashPage extends ConsumerWidget {
     final bootstrapError = ref.watch(
       authControllerProvider.select((auth) => auth.bootstrapErrorMessage),
     );
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [Color(0xFF0F172A), Color(0xFF1E3A8A), Color(0xFF10B981)],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: isDark
+                ? [const Color(0xFF070B12), const Color(0xFF0F172A)]
+                : [const Color(0xFF0A2540), const Color(0xFF0F3A7D)],
           ),
         ),
         child: SafeArea(
           child: Center(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                _BrandMark(),
-                SizedBox(height: 24),
-                if (bootstrapError == null)
-                  const AppLoader(label: 'Preparando tu experiencia DINEROP')
-                else ...[
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 32),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const _BrandMark(),
+                  const SizedBox(height: 28),
                   const Text(
-                    'No pudimos conectar con el almacenamiento seguro.',
+                    'DINEROP',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 32,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 1.2,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Conexión crediticia con cooperativas de ahorro y crédito',
                     textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.white),
+                    style: TextStyle(
+                      color: Colors.white.withValues(alpha: 0.75),
+                      fontSize: 14,
+                      height: 1.4,
+                    ),
                   ),
-                  const SizedBox(height: 16),
-                  FilledButton(
-                    onPressed: () =>
-                        ref.read(authControllerProvider).retryBootstrap(),
-                    child: const Text('Reintentar'),
-                  ),
+                  const SizedBox(height: 36),
+                  if (bootstrapError == null)
+                    const AppLoader(label: 'Iniciando conexión segura...')
+                  else ...[
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.08),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: Colors.white.withValues(alpha: 0.15)),
+                      ),
+                      child: Text(
+                        bootstrapError,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(color: Colors.white, fontSize: 13),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    FilledButton(
+                      style: FilledButton.styleFrom(
+                        backgroundColor: AppColors.darkPrimary,
+                        foregroundColor: Colors.white,
+                      ),
+                      onPressed: () =>
+                          ref.read(authControllerProvider).retryBootstrap(),
+                      child: const Text('Reintentar conexión'),
+                    ),
+                  ],
                 ],
-              ],
+              ),
             ),
           ),
         ),
@@ -59,18 +99,26 @@ class _BrandMark extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 112,
-      height: 112,
+      width: 100,
+      height: 100,
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(32),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
+        color: Colors.white.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(28),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.25), width: 1.5),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.2),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
+          ),
+        ],
       ),
       child: const Icon(
-        Icons.account_balance_wallet_rounded,
-        color: AppColors.accentSoft,
-        size: 58,
+        Icons.account_balance_rounded,
+        color: Colors.white,
+        size: 52,
       ),
     );
   }
 }
+
