@@ -14,7 +14,10 @@ import '../data/models/login_response.dart';
 import '../data/models/public_registration_request.dart';
 
 class AuthController extends ChangeNotifier {
-  AuthController(this._authRepository, this._onboardingRepository) {
+  AuthController(
+    this._authRepository,
+    this._onboardingRepository,
+  ) {
     unawaited(_bootstrap());
   }
 
@@ -58,6 +61,7 @@ class AuthController extends ChangeNotifier {
         debugPrint('[BOOT 11] Auth state updated: unauthenticated');
         return;
       }
+
 
       debugPrint('[BOOT 8] Restoring session');
       _token = session.token;
@@ -313,3 +317,4 @@ final authControllerProvider = ChangeNotifierProvider<AuthController>((ref) {
     ref.watch(onboardingRepositoryProvider),
   );
 });
+

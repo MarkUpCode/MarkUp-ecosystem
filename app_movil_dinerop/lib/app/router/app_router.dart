@@ -11,16 +11,42 @@ import '../../features/auth/presentation/screens/pending_activation_page.dart';
 import '../../features/auth/presentation/screens/register_page.dart';
 import '../../features/auth/presentation/screens/reset_password_page.dart';
 import '../../features/auth/presentation/screens/splash_page.dart';
+import '../../features/cooperative/presentation/cooperatives_page.dart';
 import '../../features/credit/presentation/request_credit_page.dart';
 import '../../features/dashboard/presentation/dashboard_page.dart';
-import '../../features/cooperative/presentation/cooperatives_page.dart';
 import '../../features/onboarding/presentation/onboarding_page.dart';
 import '../../features/profile/presentation/profile_page.dart';
 import '../../features/requests/presentation/requests_page.dart';
+import '../../features/welcome/presentation/welcome_page.dart';
 import '../shell/app_shell.dart';
 
+CustomTransitionPage<void> _fadePage({
+  required GoRouterState state,
+  required Widget child,
+}) {
+  return CustomTransitionPage<void>(
+    key: state.pageKey,
+    child: child,
+    transitionDuration: const Duration(milliseconds: 280),
+    reverseTransitionDuration: const Duration(milliseconds: 220),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      final fade = CurvedAnimation(parent: animation, curve: Curves.easeOut);
+      return FadeTransition(
+        opacity: fade,
+        child: SlideTransition(
+          position: Tween<Offset>(
+            begin: const Offset(0.02, 0),
+            end: Offset.zero,
+          ).animate(fade),
+          child: child,
+        ),
+      );
+    },
+  );
+}
+
 final appRouterProvider = Provider<GoRouter>((ref) {
-  final authController = ref.watch(authControllerProvider);
+  final authController = ref.read(authControllerProvider);
   debugPrint('[BOOT] Creating router');
 
   return GoRouter(
@@ -30,6 +56,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       final location = state.matchedLocation;
       final isPublicRoute = <String>{
         '/splash',
+        '/welcome',
         '/login',
         '/register',
         '/activate',
@@ -42,13 +69,12 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         return location == '/splash' ? null : '/splash';
       }
 
+      if (location == '/splash') {
+        return '/welcome';
+      }
+
       if (!authController.isAuthenticated) {
-        // Splash is only public while bootstrap is still running. Once it has
-        // resolved without a session, keeping this route would leave the user
-        // on the loading screen forever.
-        return location == '/splash'
-            ? '/login'
-            : (isPublicRoute ? null : '/login');
+        return isPublicRoute ? null : '/login';
       }
 
       if (authController.requiresActivation) {
@@ -56,7 +82,6 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             ? null
             : '/pending-activation';
       }
-
 
       if (location == '/login' ||
           location == '/register' ||
@@ -68,8 +93,21 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       return null;
     },
     routes: [
-      GoRoute(path: '/splash', builder: (context, state) => const SplashPage()),
-      GoRoute(path: '/login', builder: (context, state) => const LoginPage()),
+      GoRoute(
+        path: '/splash',
+        pageBuilder: (context, state) =>
+        _fadePage(state: state, child: const SplashPage()),
+      ),
+      GoRoute(
+        path: '/welcome',
+        pageBuilder: (context, state) =>
+        _fadePage(state: state, child: const WelcomePage()),
+      ),
+      GoRoute(
+        path: '/login',
+        pageBuilder: (context, state) =>
+        _fadePage(state: state, child: const LoginPage()),
+      ),
       GoRoute(
         path: '/register',
         builder: (context, state) => const RegisterPage(),
@@ -111,7 +149,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         routes: [
           GoRoute(
             path: '/dashboard',
-            builder: (context, state) => const DashboardPage(),
+            pageBuilder: (context, state) =>
+                _fadePage(state: state, child: const DashboardPage()),
           ),
           GoRoute(
             path: '/requests',
@@ -130,3 +169,4 @@ final appRouterProvider = Provider<GoRouter>((ref) {
     ],
   );
 });
+

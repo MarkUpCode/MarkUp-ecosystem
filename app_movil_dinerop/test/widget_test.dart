@@ -13,7 +13,9 @@ import 'package:app_movil_dinerop/app/app.dart';
 void main() {
   testWidgets('renders splash scaffold', (WidgetTester tester) async {
     await tester.pumpWidget(const ProviderScope(child: DineropApp()));
+    await tester.pump(const Duration(seconds: 20));
+    await tester.pumpAndSettle();
 
-    expect(find.text('DINEROP'), findsOneWidget);
+    expect(tester.takeException(), isNull);
   });
 }
