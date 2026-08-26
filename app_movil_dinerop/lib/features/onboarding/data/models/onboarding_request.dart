@@ -79,6 +79,7 @@ class OnboardingPersonRequest {
     required this.cedula,
     required this.fechaNacimiento,
     required this.estadoCivil,
+    required this.email,
     required this.tieneConyuge,
     required this.direccion,
     required this.ingresoEgreso,
@@ -94,6 +95,7 @@ class OnboardingPersonRequest {
   final String cedula;
   final DateTime fechaNacimiento;
   final String estadoCivil;
+  final String email;
   final String? ocupacion;
   final String? empresaTrabajo;
   final String? telefono;
@@ -109,6 +111,7 @@ class OnboardingPersonRequest {
         'cedula': cedula,
         'fechaNacimiento': fechaNacimiento.toIso8601String().split('T').first,
         'estadoCivil': estadoCivil,
+        'email': email,
         'ocupacion': ocupacion,
         'empresaTrabajo': empresaTrabajo,
         'telefono': telefono,
