@@ -308,14 +308,10 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
     );
 
     try {
-      final response = await ref.read(authControllerProvider).register(request);
+      await ref.read(authControllerProvider).register(request);
 
       if (mounted) {
-        context.go(
-          '/pending-activation?email=${Uri.encodeComponent(
-            request.email,
-          )}&message=${Uri.encodeComponent(response.message)}',
-        );
+        await _showSuccessDialog(request.email);
       }
     } catch (error) {
       if (!mounted) {
@@ -328,6 +324,192 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
             : AppErrorMessages.generic,
       );
     }
+  }
+
+  Future<void> _showSuccessDialog(String email) async {
+    await showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) {
+        final theme = Theme.of(dialogContext);
+        final colorScheme = theme.colorScheme;
+
+        return Dialog(
+          insetPadding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 24,
+          ),
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 520, maxHeight: 720),
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: colorScheme.primaryContainer,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          Icons.check_rounded,
+                          size: 32,
+                          color: colorScheme.primary,
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              '¡Solicitud enviada!',
+                              style: theme.textTheme.headlineSmall?.copyWith(
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                            const SizedBox(height: 6),
+                            Text(
+                              'Tu registro fue exitoso y tu solicitud de crédito fue registrada correctamente.',
+                              style: theme.textTheme.bodyMedium,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 24),
+                  AppCard(
+                    color: colorScheme.primaryContainer.withValues(alpha: 0.35),
+                    borderColor: colorScheme.primary.withValues(alpha: 0.25),
+                    padding: const EdgeInsets.all(16),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Icon(Icons.mark_email_read_outlined, color: colorScheme.primary),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text.rich(
+                            TextSpan(
+                              style: theme.textTheme.bodyMedium,
+                              children: [
+                                const TextSpan(text: 'Enviamos un correo de confirmación a:\n'),
+                                TextSpan(
+                                  text: email,
+                                  style: const TextStyle(fontWeight: FontWeight.w700),
+                                ),
+                                const TextSpan(text: '\n\nRevisa también tu carpeta de spam o promociones.'),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  Text(
+                    'Siguientes pasos',
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  ...[
+                    ('Revisa tu correo', 'Te enviamos un email para activar tu cuenta.', Icons.mail_outline_rounded),
+                    ('Crea tu contraseña', 'Completa tu registro con una contraseña segura.', Icons.person_add_alt_1_rounded),
+                    ('Inicia sesión', 'Accede a tu panel personal.', Icons.login_rounded),
+                    ('Completa tu perfil', 'Agrega información adicional para finalizar el proceso.', Icons.description_outlined),
+                    ('Monitorea tu solicitud', 'Consulta el estado de tu crédito en tiempo real.', Icons.visibility_outlined),
+                  ].map(
+                    (step) => Padding(
+                      padding: const EdgeInsets.only(bottom: 16),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Icon(step.$3, color: colorScheme.primary),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  step.$1,
+                                  style: theme.textTheme.titleSmall?.copyWith(
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                                const SizedBox(height: 2),
+                                Text(step.$2, style: theme.textTheme.bodySmall),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  AppCard(
+                    color: colorScheme.surfaceContainerHighest,
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '¿Qué podrás hacer dentro de la plataforma?',
+                          style: theme.textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        for (final benefit in [
+                          'Ver respuestas de cooperativas en tiempo real',
+                          'Comparar múltiples ofertas',
+                          'Recibir notificaciones automáticas',
+                          'Gestionar tus solicitudes desde un solo panel',
+                        ])
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 6),
+                            child: Text('• $benefit', style: theme.textTheme.bodySmall),
+                          ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: AppButton(
+                          label: 'Cerrar',
+                          variant: AppButtonVariant.outlined,
+                          onPressed: () {
+                            Navigator.of(dialogContext).pop();
+                            context.go('/login');
+                          },
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: AppButton(
+                          label: 'Activar mi cuenta',
+                          icon: Icons.arrow_forward_rounded,
+                          onPressed: () {
+                            Navigator.of(dialogContext).pop();
+                            context.go('/login');
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
   }
 
   // ============================================================
