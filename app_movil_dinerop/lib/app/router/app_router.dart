@@ -12,6 +12,8 @@ import '../../features/auth/presentation/screens/register_page.dart';
 import '../../features/auth/presentation/screens/reset_password_page.dart';
 import '../../features/auth/presentation/screens/splash_page.dart';
 import '../../features/cooperative/presentation/cooperatives_page.dart';
+import '../../features/credit/presentation/credit_simulator_page.dart';
+import '../../features/credit/presentation/investment_simulator_page.dart';
 import '../../features/credit/presentation/request_credit_page.dart';
 import '../../features/dashboard/presentation/dashboard_page.dart';
 import '../../features/onboarding/presentation/onboarding_page.dart';
@@ -63,6 +65,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         '/complete-registration',
         '/forgot-password',
         '/reset-password',
+        '/simulate-credit',
+        '/simulate-investment',
       }.contains(location);
 
       if (authController.isBootstrapping) {
@@ -102,6 +106,15 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: '/welcome',
         pageBuilder: (context, state) =>
         _fadePage(state: state, child: const WelcomePage()),
+      ),
+      GoRoute(
+        path: '/simulate-credit',
+        builder: (context, state) => const CreditSimulatorPage(),
+      ),
+
+      GoRoute(
+        path: '/simulate-investment',
+        builder: (context, state) => const InvestmentSimulatorPage(),
       ),
       GoRoute(
         path: '/login',

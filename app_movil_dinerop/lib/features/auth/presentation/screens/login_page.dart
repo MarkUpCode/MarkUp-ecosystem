@@ -22,6 +22,8 @@ import '../auth_controller.dart';
 /// La solicitud de crédito ya es funcional.
 /// La inversión está presente visualmente, pero todavía no
 /// ejecuta ninguna acción.
+///
+/// Cada servicio cuenta además con su propio simulador.
 class LoginPage extends ConsumerWidget {
   const LoginPage({super.key});
 
@@ -84,13 +86,18 @@ class LoginPage extends ConsumerWidget {
 
               _CreditServiceCard(
                 onPressed: () => context.go('/register'),
+                onSimulationPressed: () =>
+                    context.push('/simulate-credit'),
               ),
 
               const SizedBox(height: 16),
 
-              const _InvestmentServiceCard(),
+              _InvestmentServiceCard(
+                onSimulationPressed: () =>
+                    context.push('/simulate-investment'),
+              ),
 
-              const SizedBox(height: 56),
+              const SizedBox(height: 48),
 
               // ─────────────────────────────────────────────
               // LOGIN SECUNDARIO
@@ -114,14 +121,17 @@ class LoginPage extends ConsumerWidget {
 class _CreditServiceCard extends StatelessWidget {
   const _CreditServiceCard({
     required this.onPressed,
+    required this.onSimulationPressed,
   });
 
   final VoidCallback onPressed;
+  final VoidCallback onSimulationPressed;
 
   @override
   Widget build(BuildContext context) {
     return _ServiceCard(
       onPressed: onPressed,
+      onSimulationPressed: onSimulationPressed,
       gradient: const LinearGradient(
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
@@ -137,10 +147,11 @@ class _CreditServiceCard extends StatelessWidget {
       title: 'Solicitar mi crédito',
       description:
       'Completa una sola solicitud y conecta con cooperativas aliadas.',
-      buttonText: 'Comenzar mi solicitud',
+      buttonText: 'Solicitar',
+      simulationText: 'Simulador',
       buttonBackground: Colors.white,
-      buttonTextColor: Color(0xFF0F172A),
-      buttonIconColor: Color(0xFF0F3A7D),
+      buttonTextColor: const Color(0xFF0F172A),
+      buttonIconColor: const Color(0xFF0F3A7D),
       shadowColor: const Color(0xFF0F3A7D),
     );
   }
@@ -151,14 +162,20 @@ class _CreditServiceCard extends StatelessWidget {
 // ═══════════════════════════════════════════════════════════
 
 class _InvestmentServiceCard extends StatelessWidget {
-  const _InvestmentServiceCard();
+  const _InvestmentServiceCard({
+    required this.onSimulationPressed,
+  });
+
+  final VoidCallback onSimulationPressed;
 
   @override
   Widget build(BuildContext context) {
     return _ServiceCard(
-      // Visualmente tiene exactamente el mismo protagonismo
-      // que la tarjeta de crédito.
+      // La inversión mantiene el mismo protagonismo visual
+      // que el crédito, pero su acción principal todavía
+      // no ejecuta ninguna funcionalidad.
       onPressed: null,
+      onSimulationPressed: onSimulationPressed,
       gradient: const LinearGradient(
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
@@ -173,11 +190,12 @@ class _InvestmentServiceCard extends StatelessWidget {
       iconColor: Colors.white,
       title: 'Invertir con cooperativas',
       description:
-      'Encuentra oportunidades de inversión y elige entre cooperativas aliadas.',
-      buttonText: 'Explorar opciones',
+      'Encuentra oportunidades de inversión entre cooperativas aliadas.',
+      buttonText: 'Invertir',
+      simulationText: 'Simulador',
       buttonBackground: Colors.white,
-      buttonTextColor: Color(0xFF063D35),
-      buttonIconColor: Color(0xFF0B6B57),
+      buttonTextColor: const Color(0xFF063D35),
+      buttonIconColor: const Color(0xFF0B6B57),
       shadowColor: const Color(0xFF0B6B57),
     );
   }
@@ -190,6 +208,7 @@ class _InvestmentServiceCard extends StatelessWidget {
 class _ServiceCard extends StatelessWidget {
   const _ServiceCard({
     required this.onPressed,
+    required this.onSimulationPressed,
     required this.gradient,
     required this.iconBackground,
     required this.icon,
@@ -197,6 +216,7 @@ class _ServiceCard extends StatelessWidget {
     required this.title,
     required this.description,
     required this.buttonText,
+    required this.simulationText,
     required this.buttonBackground,
     required this.buttonTextColor,
     required this.buttonIconColor,
@@ -204,6 +224,7 @@ class _ServiceCard extends StatelessWidget {
   });
 
   final VoidCallback? onPressed;
+  final VoidCallback onSimulationPressed;
   final Gradient gradient;
   final Color iconBackground;
   final IconData icon;
@@ -211,6 +232,7 @@ class _ServiceCard extends StatelessWidget {
   final String title;
   final String description;
   final String buttonText;
+  final String simulationText;
   final Color buttonBackground;
   final Color buttonTextColor;
   final Color buttonIconColor;
@@ -218,117 +240,179 @@ class _ServiceCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onPressed,
+    return Container(
+      height: 255,
+      padding: const EdgeInsets.all(22),
+      decoration: BoxDecoration(
+        gradient: gradient,
         borderRadius: BorderRadius.circular(26),
-        child: Ink(
-          // Aumentamos ligeramente la altura para evitar el
-          // overflow cuando el título ocupa dos líneas.
-          height: 230,
-          padding: const EdgeInsets.all(22),
-          decoration: BoxDecoration(
-            gradient: gradient,
-            borderRadius: BorderRadius.circular(26),
-            boxShadow: [
-              BoxShadow(
-                color: shadowColor.withValues(alpha: 0.24),
-                blurRadius: 24,
-                offset: const Offset(0, 10),
-              ),
-            ],
+        boxShadow: [
+          BoxShadow(
+            color: shadowColor.withValues(alpha: 0.24),
+            blurRadius: 24,
+            offset: const Offset(0, 10),
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Icon
-              Container(
-                width: 46,
-                height: 46,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: iconBackground,
-                ),
-                child: Icon(
-                  icon,
-                  color: iconColor,
-                  size: 24,
-                ),
-              ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // ─────────────────────────────────────────────
+          // ICON
+          // ─────────────────────────────────────────────
 
-              const SizedBox(height: 14),
+          Container(
+            width: 46,
+            height: 46,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: iconBackground,
+            ),
+            child: Icon(
+              icon,
+              color: iconColor,
+              size: 24,
+            ),
+          ),
 
-              // Title
-              Text(
-                title,
+          const SizedBox(height: 13),
+
+          // ─────────────────────────────────────────────
+          // TITLE
+          // ─────────────────────────────────────────────
+
+          Text(
+            title,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 22,
+              fontWeight: FontWeight.w900,
+              height: 1.08,
+              letterSpacing: -0.4,
+            ),
+          ),
+
+          const SizedBox(height: 6),
+
+          // ─────────────────────────────────────────────
+          // DESCRIPTION
+          // ─────────────────────────────────────────────
+
+          Expanded(
+            child: Align(
+              alignment: Alignment.topLeft,
+              child: Text(
+                description,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 23,
-                  fontWeight: FontWeight.w900,
-                  height: 1.08,
-                  letterSpacing: -0.4,
+                style: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.82),
+                  fontSize: 13.5,
+                  fontWeight: FontWeight.w500,
+                  height: 1.35,
                 ),
               ),
+            ),
+          ),
 
-              const SizedBox(height: 6),
+          const SizedBox(height: 10),
 
-              // Description
+          // ─────────────────────────────────────────────
+          // ACTIONS
+          // ─────────────────────────────────────────────
+
+          Row(
+            children: [
               Expanded(
-                child: Text(
-                  description,
-                  maxLines: 3,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.82),
-                    fontSize: 13.5,
-                    fontWeight: FontWeight.w500,
-                    height: 1.35,
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 12),
-
-              // CTA
-              SizedBox(
-                width: double.infinity,
-                height: 44,
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: buttonBackground,
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Flexible(
-                        child: Text(
-                          buttonText,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            color: buttonTextColor,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w800,
-                          ),
+                child: SizedBox(
+                  height: 46,
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      onTap: onPressed,
+                      borderRadius: BorderRadius.circular(13),
+                      child: Ink(
+                        decoration: BoxDecoration(
+                          color: buttonBackground,
+                          borderRadius: BorderRadius.circular(13),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Flexible(
+                              child: Text(
+                                buttonText,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  color: buttonTextColor,
+                                  fontSize: 13.5,
+                                  fontWeight: FontWeight.w800,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 6),
+                            Icon(
+                              Icons.arrow_forward_rounded,
+                              color: buttonIconColor,
+                              size: 17,
+                            ),
+                          ],
                         ),
                       ),
-                      const SizedBox(width: 8),
-                      Icon(
-                        Icons.arrow_forward_rounded,
-                        color: buttonIconColor,
-                        size: 18,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: SizedBox(
+                  height: 46,
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      onTap: onSimulationPressed,
+                      borderRadius: BorderRadius.circular(13),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.14),
+                          borderRadius: BorderRadius.circular(13),
+                          border: Border.all(
+                            color: Colors.white.withValues(alpha: 0.38),
+                            width: 1,
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(
+                              Icons.calculate_outlined,
+                              color: Colors.white,
+                              size: 17,
+                            ),
+                            const SizedBox(width: 6),
+                            Text(
+                              simulationText,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 13.5,
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ],
+                    ),
                   ),
                 ),
               ),
             ],
           ),
-        ),
+        ],
       ),
     );
   }

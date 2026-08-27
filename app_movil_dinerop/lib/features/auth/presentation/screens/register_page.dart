@@ -347,7 +347,18 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Solicitar credito'),
+        leading: IconButton(
+          onPressed: auth.isBusy
+              ? null
+              : () {
+            context.go('/login');
+          },
+          icon: const Icon(
+            Icons.arrow_back_rounded,
+          ),
+          tooltip: 'Volver',
+        ),
+        title: const Text('Solicitar crédito'),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -417,7 +428,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                               _localError = null;
                             });
                           },
-                          child: const Text('Atras'),
+                          child: const Text('Atrás'),
                         ),
                       ),
 
