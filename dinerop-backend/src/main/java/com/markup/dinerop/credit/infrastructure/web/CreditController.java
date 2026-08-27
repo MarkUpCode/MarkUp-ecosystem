@@ -37,12 +37,18 @@ public class CreditController {
     public ResponseEntity<Map<String, Object>> createPublicRequest(
             @Valid @RequestBody PublicCreditRequestDto dto
     ) {
-        Long requestId = creditService.createPublicRequest(dto);
+        CreditService.PublicCreditRequestResult result = creditService.createPublicRequest(dto);
         return ResponseEntity.ok(
-                Map.of(
-                        "requestId", requestId,
-                        "message", "Solicitud enviada correctamente"
-                )
+                result.requestId() == null
+                        ? Map.of(
+                                "message", result.message(),
+                                "status", result.status()
+                        )
+                        : Map.of(
+                                "requestId", result.requestId(),
+                                "message", result.message(),
+                                "status", result.status()
+                        )
         );
     }
 

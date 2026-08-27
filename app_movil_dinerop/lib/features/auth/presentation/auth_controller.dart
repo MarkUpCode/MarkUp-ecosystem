@@ -12,6 +12,7 @@ import '../data/auth_repository.dart';
 import '../data/models/app_user.dart';
 import '../data/models/login_response.dart';
 import '../data/models/public_registration_request.dart';
+import '../data/models/public_registration_response.dart';
 
 class AuthController extends ChangeNotifier {
   AuthController(
@@ -188,12 +189,13 @@ class AuthController extends ChangeNotifier {
     }
   }
 
-  Future<void> register(PublicRegistrationRequest request) async {
+  Future<PublicRegistrationResponse> register(PublicRegistrationRequest request) async {
     _setBusy(true);
     _errorMessage = null;
     try {
-      await _authRepository.register(request);
+      final response = await _authRepository.register(request);
       _lastEmail = request.email;
+      return response;
     } catch (error) {
       _errorMessage = error.toString();
       rethrow;

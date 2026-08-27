@@ -41,6 +41,18 @@ public class GlobalExceptionHandler {
 
     }
 
+    @ExceptionHandler(AccountDisabledException.class)
+    public ResponseEntity<?> handleAccountDisabled(
+            AccountDisabledException ex,
+            HttpServletRequest request
+    ) {
+        return buildResponse(
+                HttpStatus.FORBIDDEN,
+                ex.getMessage(),
+                request
+        );
+    }
+
     @ExceptionHandler(CooperativeNotFoundException.class)
     public ResponseEntity<?> handleCooperativeNotFound(
             CooperativeNotFoundException ex,

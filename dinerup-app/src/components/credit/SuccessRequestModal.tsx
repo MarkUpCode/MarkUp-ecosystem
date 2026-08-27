@@ -14,6 +14,7 @@ interface SuccessRequestModalProps {
   onClose: () => void;
   type: "CREDITO" | "INVERSION";
   email: string;
+  message: string;
 }
 
 export default function SuccessRequestModal({
@@ -21,6 +22,7 @@ export default function SuccessRequestModal({
   onClose,
   type,
   email,
+  message,
 }: SuccessRequestModalProps) {
   if (!open) return null;
 
@@ -76,7 +78,7 @@ export default function SuccessRequestModal({
                 ¡Solicitud enviada!
               </h2>
               <p className="text-gray-600 mt-1">
-                Tu {type === "CREDITO" ? "crédito" : "inversión"} fue registrado correctamente.
+                {message}
               </p>
               <span className="inline-block mt-3 px-3 py-1 text-xs font-semibold bg-gray-100 text-gray-700 rounded-full">
                 Próximo paso: Activa tu cuenta

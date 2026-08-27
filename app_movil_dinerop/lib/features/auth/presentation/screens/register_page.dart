@@ -308,13 +308,13 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
     );
 
     try {
-      await ref.read(authControllerProvider).register(request);
+      final response = await ref.read(authControllerProvider).register(request);
 
       if (mounted) {
         context.go(
           '/pending-activation?email=${Uri.encodeComponent(
             request.email,
-          )}',
+          )}&message=${Uri.encodeComponent(response.message)}',
         );
       }
     } catch (error) {

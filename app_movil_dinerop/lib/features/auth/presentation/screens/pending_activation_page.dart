@@ -5,9 +5,10 @@ import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_card.dart';
 
 class PendingActivationPage extends StatelessWidget {
-  const PendingActivationPage({super.key, this.email});
+  const PendingActivationPage({super.key, this.email, this.message});
 
   final String? email;
+  final String? message;
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +34,7 @@ class PendingActivationPage extends StatelessWidget {
                 ),
                 const SizedBox(height: 10),
                 Text(
-                  'Tu cuenta todavía necesita activación. Usa el enlace que recibiste por correo y luego completa el registro.',
+                  message ?? 'Tu cuenta todavía necesita activación. Usa el enlace que recibiste por correo y luego completa el registro.',
                   style: Theme.of(context).textTheme.bodyMedium,
                   textAlign: TextAlign.center,
                 ),

@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { X, Loader, User, MapPin, Wallet } from "lucide-react";
 import { httpClient } from "../../api/httpClient";
+import { getErrorMessage } from "../../api/errors";
 import SuccessRequestModal from "./SuccessRequestModal";
 import { ecuadorProvinces } from "../../data/ecuadorProvinces";
 
@@ -143,6 +144,7 @@ export default function PublicCreditRequestModal({
   const [errors, setErrors] = useState<FormErrors>({});
   const [isLoading, setIsLoading] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
 
   const resetForm = () => {
     setFormData(getInitialFormState(type));
@@ -275,7 +277,7 @@ export default function PublicCreditRequestModal({
     setIsLoading(true);
 
     try {
-      await httpClient("/api/credits/public-request", {
+      const result = await httpClient<{ message?: string }>("/api/credits/public-request", {
         method: "POST",
         body: {
           ...formData,
@@ -287,10 +289,11 @@ export default function PublicCreditRequestModal({
         auth: false,
       });
 
+      setSuccessMessage(result.message ?? "Solicitud enviada correctamente.");
       setShowSuccessModal(true);
-    } catch {
+    } catch (error) {
       setErrors({
-        submit: "Error al enviar. Intenta nuevamente.",
+        submit: getErrorMessage(error, "Error al enviar. Intenta nuevamente."),
       });
     } finally {
       setIsLoading(false);
@@ -636,6 +639,7 @@ export default function PublicCreditRequestModal({
         }}
         type={type}
         email={formData.email}
+        message={successMessage}
       />
     </div>
   );

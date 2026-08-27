@@ -12,6 +12,7 @@ import com.markup.dinerop.credit.dto.ClientCreditRequestDto;
 import com.markup.dinerop.credit.dto.PublicCreditRequestDto;
 import com.markup.dinerop.credit.infrastructure.repository.CreditRequestRepository;
 import com.markup.dinerop.credit.infrastructure.repository.SolicitudCooperativaRepository;
+import com.markup.dinerop.auth.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +24,7 @@ import com.markup.dinerop.auth.entity.Role;
 
 
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -33,6 +35,7 @@ public class CreditService {
     private final AuthService authService;
     private final CreditDistributionService creditDistributionService;
     private final SolicitudCooperativaRepository solicitudCooperativaRepository;
+        private final UserRepository userRepository;
 
 
 
@@ -41,7 +44,7 @@ public class CreditService {
     // =========================
 
     @Transactional
-    public Long createPublicRequest(PublicCreditRequestDto dto) {
+        public PublicCreditRequestResult createPublicRequest(PublicCreditRequestDto dto) {
 
         // =========================
         // 1. NORMALIZAR EMAIL
@@ -50,6 +53,28 @@ public class CreditService {
         String normalizedEmail = dto.getEmail()
                 .toLowerCase()
                 .trim();
+
+        Optional<User> existingUser = userRepository.findByEmail(normalizedEmail);
+
+        if (existingUser.isPresent()) {
+                User user = authService.preRegisterClient(
+                        PublicRegistrationRequest.builder()
+                                .email(normalizedEmail)
+                                .firstName(dto.getFirstName())
+                                .lastName(dto.getLastName())
+                                .identification(dto.getIdentification())
+                                .phone(dto.getPhone())
+                                .province(dto.getProvince())
+                                .city(dto.getCity())
+                                .build()
+                );
+
+                return new PublicCreditRequestResult(
+                        null,
+                        user.getStatus(),
+                        "Ya existe un registro pendiente de activación. Hemos reenviado el correo de activación."
+                );
+        }
 
         // =========================
         // 2. VALIDAR SOLICITUD ACTIVA
@@ -148,8 +173,18 @@ public class CreditService {
                 normalizedEmail
         );
 
-        return request.getId();
+        return new PublicCreditRequestResult(
+                request.getId(),
+                "PENDING_ACTIVATION",
+                "Solicitud enviada correctamente. Revisa tu correo para activar tu cuenta."
+        );
         }
+
+    public record PublicCreditRequestResult(
+            Long requestId,
+            String status,
+            String message
+    ) {}
 
 
     // =========================

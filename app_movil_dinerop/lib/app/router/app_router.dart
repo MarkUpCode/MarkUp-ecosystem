@@ -147,7 +147,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/pending-activation',
         builder: (context, state) =>
-            PendingActivationPage(email: state.uri.queryParameters['email']),
+            PendingActivationPage(
+              email: state.uri.queryParameters['email'],
+              message: state.uri.queryParameters['message'],
+            ),
       ),
       GoRoute(
         path: '/onboarding',

@@ -7,6 +7,7 @@ import com.markup.dinerop.auth.entity.ActivationToken;
 import com.markup.dinerop.auth.entity.Role;
 import com.markup.dinerop.auth.entity.User;
 import com.markup.dinerop.auth.exception.AccountNotActiveException;
+import com.markup.dinerop.auth.exception.AccountDisabledException;
 import com.markup.dinerop.auth.repository.ActivationTokenRepository;
 import com.markup.dinerop.auth.repository.UserRepository;
 import com.markup.dinerop.auth.entity.UserPreRegistration;
@@ -72,45 +73,35 @@ public class AuthService {
         if (existingOpt.isPresent()) {
             User existing = existingOpt.get();
 
-            // Ya activo â†’ no hacemos nada
             if ("ACTIVE".equals(existing.getStatus())) {
                 throw new UserAlreadyActiveException(existing.getEmail());
             }
 
-            // Buscar token vÃ¡lido
+                        if ("DISABLED".equals(existing.getStatus())) {
+                                throw new AccountDisabledException();
+                        }
+
             Optional<ActivationToken> tokenOpt =
                     activationTokenRepository.findByUser_IdUserAndUsedFalse(existing.getIdUser());
 
             if (tokenOpt.isPresent()) {
-                ActivationToken token = tokenOpt.get();
-
-                // Token aÃºn vÃ¡lido â†’ reutilizar
-                if (token.getExpiresAt().isAfter(Instant.now())) {
-                    //publishActivationEvent(existing, token.getToken());
-                    return token.getToken();
-                }
-
-                // Token expirado â†’ marcar como usado
-                token.markAsUsed();
-                activationTokenRepository.save(token);
+                                tokenOpt.get().markAsUsed();
+                                activationTokenRepository.save(tokenOpt.get());
             }
-            // Si no hay token o estaba expirado â†’ cae y genera uno nuevo
         }
 
-        // =============================
-        // CREAR USUARIO NUEVO
-        // =============================
-        User user = User.builder()
-                .email(normalizedEmail)
-                .role(role)
-                .cooperativaId(cooperativaId)
-                .status("PENDING_ACTIVATION")
-                .active(false)
-                .build();
+                User savedUser = existingOpt.orElseGet(() -> {
+                        User user = User.builder()
+                                        .email(normalizedEmail)
+                                        .role(role)
+                                        .cooperativaId(cooperativaId)
+                                        .status("PENDING_ACTIVATION")
+                                        .active(false)
+                                        .build();
 
-        log.info("Pre-register request for {}", normalizedEmail);
-
-        User savedUser = userRepository.save(user);
+                        log.info("Pre-register request for {}", normalizedEmail);
+                        return userRepository.save(user);
+                });
 
         // =============================
         // GENERAR NUEVO TOKEN
