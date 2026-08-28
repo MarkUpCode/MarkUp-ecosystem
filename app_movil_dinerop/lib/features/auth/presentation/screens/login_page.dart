@@ -7,6 +7,8 @@ import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_error_view.dart';
 import '../../../../shared/widgets/app_text_field.dart';
 import '../../data/models/app_user.dart';
+import '../../../welcome/data/models/cooperative_partner.dart';
+import '../../../welcome/presentation/widgets/cooperative_logo_card.dart';
 import '../auth_controller.dart';
 
 /// ═══════════════════════════════════════════════════════════
@@ -51,7 +53,6 @@ class LoginPage extends ConsumerWidget {
               // ─────────────────────────────────────────────
               // BRAND
               // ─────────────────────────────────────────────
-
               Row(
                 children: [
                   Container(
@@ -78,23 +79,24 @@ class LoginPage extends ConsumerWidget {
                 ],
               ),
 
-              const SizedBox(height: 44),
+              const SizedBox(height: 16),
+
+              const _CooperativeMarquee(),
+
+              const SizedBox(height: 28),
 
               // ─────────────────────────────────────────────
               // SERVICIOS PRINCIPALES
               // ─────────────────────────────────────────────
-
               _CreditServiceCard(
                 onPressed: () => context.go('/register'),
-                onSimulationPressed: () =>
-                    context.push('/simulate-credit'),
+                onSimulationPressed: () => context.push('/simulate-credit'),
               ),
 
               const SizedBox(height: 16),
 
               _InvestmentServiceCard(
-                onSimulationPressed: () =>
-                    context.push('/simulate-investment'),
+                onSimulationPressed: () => context.push('/simulate-investment'),
               ),
 
               const SizedBox(height: 48),
@@ -102,15 +104,113 @@ class LoginPage extends ConsumerWidget {
               // ─────────────────────────────────────────────
               // LOGIN SECUNDARIO
               // ─────────────────────────────────────────────
-
-              _LoginLink(
-                onTap: () => _openLoginSheet(context),
-              ),
+              _LoginLink(onTap: () => _openLoginSheet(context)),
             ],
           ),
         ),
       ),
     );
+  }
+}
+
+class _CooperativeMarquee extends StatefulWidget {
+  const _CooperativeMarquee();
+
+  @override
+  State<_CooperativeMarquee> createState() => _CooperativeMarqueeState();
+}
+
+class _CooperativeMarqueeState extends State<_CooperativeMarquee>
+    with SingleTickerProviderStateMixin {
+  // Ancho de cada logo
+  static const double _logoWidth = 132.0;
+
+  // Separación entre logos
+  static const double _logoGap = 12.0;
+
+  // Más bajo = más rápido
+  static const Duration _animationDuration = Duration(seconds: 4);
+
+  late final AnimationController _controller;
+
+  List<CooperativePartner> get _partners =>
+      CooperativePartner.initialPartners;
+
+  double get _sequenceWidth =>
+      _partners.length * (_logoWidth + _logoGap);
+
+  @override
+  void initState() {
+    super.initState();
+
+    _controller = AnimationController(
+      vsync: this,
+      duration: _animationDuration,
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final totalWidth = _sequenceWidth * 2;
+
+    return SizedBox(
+      height: 76,
+      width: double.infinity,
+      child: ClipRect(
+        child: AnimatedBuilder(
+          animation: _controller,
+          builder: (context, child) {
+            final offset = -_sequenceWidth * _controller.value;
+
+            return OverflowBox(
+              alignment: Alignment.centerLeft,
+              minWidth: 0,
+              maxWidth: double.infinity,
+              child: Transform.translate(
+                offset: Offset(offset, 0),
+                child: SizedBox(
+                  width: totalWidth,
+                  height: 76,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      ..._buildLogoSet(),
+                      ..._buildLogoSet(),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  List<Widget> _buildLogoSet() {
+    return [
+      for (final partner in _partners)
+        Padding(
+          padding: const EdgeInsets.only(right: _logoGap),
+          child: SizedBox(
+            width: _logoWidth,
+            child: CooperativeLogoCard(
+              partner: partner,
+              height: 64,
+              padding: const EdgeInsets.symmetric(
+                horizontal: 14,
+                vertical: 10,
+              ),
+            ),
+          ),
+        ),
+    ];
   }
 }
 
@@ -135,18 +235,14 @@ class _CreditServiceCard extends StatelessWidget {
       gradient: const LinearGradient(
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
-        colors: [
-          Color(0xFF0F3A7D),
-          Color(0xFF16407F),
-          Color(0xFF0B1220),
-        ],
+        colors: [Color(0xFF0F3A7D), Color(0xFF16407F), Color(0xFF0B1220)],
       ),
       iconBackground: Colors.white.withValues(alpha: 0.14),
       icon: Icons.credit_score_rounded,
       iconColor: Colors.white,
       title: 'Solicitar mi crédito',
       description:
-      'Completa una sola solicitud y conecta con cooperativas aliadas.',
+          'Completa una sola solicitud y conecta con cooperativas aliadas.',
       buttonText: 'Solicitar',
       simulationText: 'Simulador',
       buttonBackground: Colors.white,
@@ -162,9 +258,7 @@ class _CreditServiceCard extends StatelessWidget {
 // ═══════════════════════════════════════════════════════════
 
 class _InvestmentServiceCard extends StatelessWidget {
-  const _InvestmentServiceCard({
-    required this.onSimulationPressed,
-  });
+  const _InvestmentServiceCard({required this.onSimulationPressed});
 
   final VoidCallback onSimulationPressed;
 
@@ -179,18 +273,14 @@ class _InvestmentServiceCard extends StatelessWidget {
       gradient: const LinearGradient(
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
-        colors: [
-          Color(0xFF0B6B57),
-          Color(0xFF087F68),
-          Color(0xFF063D35),
-        ],
+        colors: [Color(0xFF0B6B57), Color(0xFF087F68), Color(0xFF063D35)],
       ),
       iconBackground: Colors.white.withValues(alpha: 0.14),
       icon: Icons.trending_up_rounded,
       iconColor: Colors.white,
       title: 'Invertir con cooperativas',
       description:
-      'Encuentra oportunidades de inversión entre cooperativas aliadas.',
+          'Encuentra oportunidades de inversión entre cooperativas aliadas.',
       buttonText: 'Invertir',
       simulationText: 'Simulador',
       buttonBackground: Colors.white,
@@ -260,7 +350,6 @@ class _ServiceCard extends StatelessWidget {
           // ─────────────────────────────────────────────
           // ICON
           // ─────────────────────────────────────────────
-
           Container(
             width: 46,
             height: 46,
@@ -268,11 +357,7 @@ class _ServiceCard extends StatelessWidget {
               shape: BoxShape.circle,
               color: iconBackground,
             ),
-            child: Icon(
-              icon,
-              color: iconColor,
-              size: 24,
-            ),
+            child: Icon(icon, color: iconColor, size: 24),
           ),
 
           const SizedBox(height: 13),
@@ -280,7 +365,6 @@ class _ServiceCard extends StatelessWidget {
           // ─────────────────────────────────────────────
           // TITLE
           // ─────────────────────────────────────────────
-
           Text(
             title,
             maxLines: 2,
@@ -299,7 +383,6 @@ class _ServiceCard extends StatelessWidget {
           // ─────────────────────────────────────────────
           // DESCRIPTION
           // ─────────────────────────────────────────────
-
           Expanded(
             child: Align(
               alignment: Alignment.topLeft,
@@ -322,7 +405,6 @@ class _ServiceCard extends StatelessWidget {
           // ─────────────────────────────────────────────
           // ACTIONS
           // ─────────────────────────────────────────────
-
           Row(
             children: [
               Expanded(
@@ -423,9 +505,7 @@ class _ServiceCard extends StatelessWidget {
 // ═══════════════════════════════════════════════════════════
 
 class _LoginLink extends StatelessWidget {
-  const _LoginLink({
-    required this.onTap,
-  });
+  const _LoginLink({required this.onTap});
 
   final VoidCallback onTap;
 
@@ -442,9 +522,7 @@ class _LoginLink extends StatelessWidget {
               color: theme.colorScheme.onSurfaceVariant,
             ),
             children: [
-              const TextSpan(
-                text: '¿Ya tienes una cuenta? ',
-              ),
+              const TextSpan(text: '¿Ya tienes una cuenta? '),
               TextSpan(
                 text: 'Iniciar sesión',
                 style: TextStyle(
@@ -503,9 +581,7 @@ class _LoginSheetState extends ConsumerState<_LoginSheet> {
         Navigator.of(context).pop();
 
         context.go(
-          '/pending-activation?email=${Uri.encodeComponent(
-            _emailController.text.trim(),
-          )}',
+          '/pending-activation?email=${Uri.encodeComponent(_emailController.text.trim())}',
         );
       } else {
         Navigator.of(context).pop();
@@ -518,9 +594,7 @@ class _LoginSheetState extends ConsumerState<_LoginSheet> {
           Navigator.of(context).pop();
 
           context.go(
-            '/pending-activation?email=${Uri.encodeComponent(
-              _emailController.text.trim(),
-            )}',
+            '/pending-activation?email=${Uri.encodeComponent(_emailController.text.trim())}',
           );
         }
 
@@ -548,9 +622,7 @@ class _LoginSheetState extends ConsumerState<_LoginSheet> {
       child: Container(
         decoration: BoxDecoration(
           color: theme.colorScheme.surface,
-          borderRadius: const BorderRadius.vertical(
-            top: Radius.circular(28),
-          ),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
         ),
         padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
         child: SingleChildScrollView(
@@ -635,10 +707,7 @@ class _LoginSheetState extends ConsumerState<_LoginSheet> {
                 const SizedBox(height: 18),
 
                 if (_localError != null) ...[
-                  AppErrorView(
-                    message: _localError!,
-                    onRetry: _submit,
-                  ),
+                  AppErrorView(message: _localError!, onRetry: _submit),
                   const SizedBox(height: 18),
                 ],
 
@@ -658,9 +727,7 @@ class _LoginSheetState extends ConsumerState<_LoginSheet> {
                       Navigator.of(context).pop();
                       context.go('/forgot-password');
                     },
-                    child: const Text(
-                      '¿Olvidaste tu contraseña?',
-                    ),
+                    child: const Text('¿Olvidaste tu contraseña?'),
                   ),
                 ),
               ],
