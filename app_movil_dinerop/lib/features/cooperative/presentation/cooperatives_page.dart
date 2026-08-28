@@ -16,7 +16,6 @@ class CooperativesPage extends ConsumerWidget {
     final cooperativesAsync = ref.watch(cooperativesProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Cooperativas')),
       body: SafeArea(
         child: cooperativesAsync.when(
           data: (items) {
@@ -36,23 +35,41 @@ class CooperativesPage extends ConsumerWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(cooperative.nombre, style: Theme.of(context).textTheme.titleLarge),
+                      Text(
+                        cooperative.nombre,
+                        style: Theme.of(context).textTheme.titleLarge,
+                      ),
                       const SizedBox(height: 6),
-                      Text('${cooperative.ciudad ?? '-'}, ${cooperative.provincia ?? '-'}', style: Theme.of(context).textTheme.bodyMedium),
+                      Text(
+                        '${cooperative.ciudad ?? '-'}, ${cooperative.provincia ?? '-'}',
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
                       const SizedBox(height: 10),
-                      Text(cooperative.direccion ?? '-', style: Theme.of(context).textTheme.bodySmall),
+                      Text(
+                        cooperative.direccion ?? '-',
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
                       const SizedBox(height: 10),
                       Row(
                         children: [
                           if (cooperative.calificacion != null)
-                            Text('${cooperative.calificacion!.toStringAsFixed(1)} / 5', style: Theme.of(context).textTheme.labelLarge),
+                            Text(
+                              '${cooperative.calificacion!.toStringAsFixed(1)} / 5',
+                              style: Theme.of(context).textTheme.labelLarge,
+                            ),
                           const Spacer(),
-                          Text(cooperative.telefono ?? '-', style: Theme.of(context).textTheme.labelLarge),
+                          Text(
+                            cooperative.telefono ?? '-',
+                            style: Theme.of(context).textTheme.labelLarge,
+                          ),
                         ],
                       ),
                       if (cooperative.paginaWeb != null) ...[
                         const SizedBox(height: 10),
-                        Text(cooperative.paginaWeb!, style: Theme.of(context).textTheme.bodySmall),
+                        Text(
+                          cooperative.paginaWeb!,
+                          style: Theme.of(context).textTheme.bodySmall,
+                        ),
                       ],
                     ],
                   ),
@@ -63,7 +80,11 @@ class CooperativesPage extends ConsumerWidget {
             );
           },
           loading: () => const AppLoader(label: 'Cargando cooperativas...'),
-          error: (error, stackTrace) => AppErrorView(message: error is AppException ? error.message : AppErrorMessages.generic),
+          error: (error, stackTrace) => AppErrorView(
+            message: error is AppException
+                ? error.message
+                : AppErrorMessages.generic,
+          ),
         ),
       ),
     );

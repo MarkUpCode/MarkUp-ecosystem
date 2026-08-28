@@ -18,9 +18,15 @@ import '../../credit/data/models/credit_enums.dart';
 class RequestsPage extends ConsumerWidget {
   const RequestsPage({super.key});
 
-  Future<void> _showDetails(BuildContext context, WidgetRef ref, ClientCreditRequestSummary request) async {
+  Future<void> _showDetails(
+    BuildContext context,
+    WidgetRef ref,
+    ClientCreditRequestSummary request,
+  ) async {
     final repo = ref.read(creditRepositoryProvider);
-    final cooperatives = await repo.loadPreApprovedCooperatives(request.solicitudId);
+    final cooperatives = await repo.loadPreApprovedCooperatives(
+      request.solicitudId,
+    );
 
     if (!context.mounted) return;
 
@@ -39,18 +45,28 @@ class RequestsPage extends ConsumerWidget {
               child: ListView(
                 controller: scrollController,
                 children: [
-                  Text('Solicitud #${request.solicitudId}', style: Theme.of(context).textTheme.titleLarge),
+                  Text(
+                    'Solicitud #${request.solicitudId}',
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
                   const SizedBox(height: 8),
-                  Text(formatCurrency(request.monto), style: Theme.of(context).textTheme.headlineSmall),
+                  Text(
+                    formatCurrency(request.monto),
+                    style: Theme.of(context).textTheme.headlineSmall,
+                  ),
                   const SizedBox(height: 12),
                   AppBadge(label: request.estado.name.toUpperCase()),
                   const SizedBox(height: 20),
-                  Text('Cooperativas notificadas', style: Theme.of(context).textTheme.titleMedium),
+                  Text(
+                    'Cooperativas notificadas',
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
                   const SizedBox(height: 12),
                   if (cooperatives.isEmpty)
                     const AppEmptyState(
                       title: 'Sin cooperativas aún',
-                      message: 'El backend todavía no devolvió cooperativas para esta solicitud.',
+                      message:
+                          'El backend todavía no devolvió cooperativas para esta solicitud.',
                       icon: Icons.apartment_outlined,
                     )
                   else
@@ -59,9 +75,13 @@ class RequestsPage extends ConsumerWidget {
                         padding: const EdgeInsets.only(bottom: 12),
                         child: _CooperativeStatusCard(
                           item: item,
-                          onAccept: item.estado == CreditRequestStatus.preAprobada
+                          onAccept:
+                              item.estado == CreditRequestStatus.preAprobada
                               ? () async {
-                                  await repo.acceptCooperative(solicitudId: request.solicitudId, cooperativaId: item.cooperativaId);
+                                  await repo.acceptCooperative(
+                                    solicitudId: request.solicitudId,
+                                    cooperativaId: item.cooperativaId,
+                                  );
                                   if (!context.mounted) return;
                                   Navigator.of(context).pop();
                                   ref.invalidate(requestsProvider);
@@ -84,14 +104,14 @@ class RequestsPage extends ConsumerWidget {
     final requestsAsync = ref.watch(requestsProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Mis solicitudes')),
       body: SafeArea(
         child: requestsAsync.when(
           data: (requests) {
             if (requests.isEmpty) {
               return AppEmptyState(
                 title: 'Todavía no tienes solicitudes',
-                message: 'Crea tu primera solicitud para ver el seguimiento aquí.',
+                message:
+                    'Crea tu primera solicitud para ver el seguimiento aquí.',
                 actionLabel: 'Solicitar crédito',
                 onAction: () => context.push('/request-credit'),
                 icon: Icons.receipt_long_outlined,
@@ -114,14 +134,23 @@ class RequestsPage extends ConsumerWidget {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text(formatCurrency(request.monto), style: Theme.of(context).textTheme.headlineSmall),
+                            Text(
+                              formatCurrency(request.monto),
+                              style: Theme.of(context).textTheme.headlineSmall,
+                            ),
                             AppBadge(label: request.estado.name.toUpperCase()),
                           ],
                         ),
                         const SizedBox(height: 8),
-                        Text(request.tipo, style: Theme.of(context).textTheme.bodyMedium),
+                        Text(
+                          request.tipo,
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        ),
                         const SizedBox(height: 4),
-                        Text(formatDate(request.fechaSolicitud), style: Theme.of(context).textTheme.bodySmall),
+                        Text(
+                          formatDate(request.fechaSolicitud),
+                          style: Theme.of(context).textTheme.bodySmall,
+                        ),
                       ],
                     ),
                   ),
@@ -130,7 +159,11 @@ class RequestsPage extends ConsumerWidget {
             );
           },
           loading: () => const AppLoader(label: 'Cargando solicitudes...'),
-          error: (error, stackTrace) => AppErrorView(message: error is AppException ? error.message : AppErrorMessages.generic),
+          error: (error, stackTrace) => AppErrorView(
+            message: error is AppException
+                ? error.message
+                : AppErrorMessages.generic,
+          ),
         ),
       ),
     );
@@ -149,19 +182,48 @@ class _CooperativeStatusCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(item.nombreCooperativa, style: Theme.of(context).textTheme.titleLarge),
+          Text(
+            item.nombreCooperativa,
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
           const SizedBox(height: 8),
           AppBadge(label: item.estado.name.toUpperCase()),
           const SizedBox(height: 10),
-          Text('Monto: ${formatCurrency(item.monto)}', style: Theme.of(context).textTheme.bodySmall),
-          Text('Plazo: ${item.plazoMeses ?? '-'} meses', style: Theme.of(context).textTheme.bodySmall),
-          if (item.tasaAnual != null) Text('Tasa: ${item.tasaAnual!.toStringAsFixed(2)}%', style: Theme.of(context).textTheme.bodySmall),
-          if (item.cuotaMensual != null) Text('Cuota: ${formatCurrency(item.cuotaMensual!)}', style: Theme.of(context).textTheme.bodySmall),
-          if (item.totalPagar != null) Text('Total: ${formatCurrency(item.totalPagar!)}', style: Theme.of(context).textTheme.bodySmall),
-          if (item.interesTotal != null) Text('Interés: ${formatCurrency(item.interesTotal!)}', style: Theme.of(context).textTheme.bodySmall),
+          Text(
+            'Monto: ${formatCurrency(item.monto)}',
+            style: Theme.of(context).textTheme.bodySmall,
+          ),
+          Text(
+            'Plazo: ${item.plazoMeses ?? '-'} meses',
+            style: Theme.of(context).textTheme.bodySmall,
+          ),
+          if (item.tasaAnual != null)
+            Text(
+              'Tasa: ${item.tasaAnual!.toStringAsFixed(2)}%',
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
+          if (item.cuotaMensual != null)
+            Text(
+              'Cuota: ${formatCurrency(item.cuotaMensual!)}',
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
+          if (item.totalPagar != null)
+            Text(
+              'Total: ${formatCurrency(item.totalPagar!)}',
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
+          if (item.interesTotal != null)
+            Text(
+              'Interés: ${formatCurrency(item.interesTotal!)}',
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
           if (onAccept != null) ...[
             const SizedBox(height: 12),
-            AppButton(label: 'Aceptar cooperativa', icon: Icons.check_circle_rounded, onPressed: onAccept),
+            AppButton(
+              label: 'Aceptar cooperativa',
+              icon: Icons.check_circle_rounded,
+              onPressed: onAccept,
+            ),
           ],
         ],
       ),

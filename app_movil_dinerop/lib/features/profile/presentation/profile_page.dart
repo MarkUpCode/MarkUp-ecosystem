@@ -18,7 +18,6 @@ class ProfilePage extends ConsumerWidget {
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Mi Perfil')),
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.all(24),
@@ -71,7 +70,8 @@ class ProfilePage extends ConsumerWidget {
                         style: theme.textTheme.bodyMedium,
                       ),
                       AppBadge(
-                        label: auth.user?.status.name.toUpperCase() ?? 'UNKNOWN',
+                        label:
+                            auth.user?.status.name.toUpperCase() ?? 'UNKNOWN',
                       ),
                     ],
                   ),
@@ -96,10 +96,7 @@ class ProfilePage extends ConsumerWidget {
             const SizedBox(height: 24),
 
             // Appearance & Theme Selector
-            Text(
-              'Apariencia y Tema',
-              style: theme.textTheme.titleLarge,
-            ),
+            Text('Apariencia y Tema', style: theme.textTheme.titleLarge),
             const SizedBox(height: 8),
             Text(
               'Personaliza cómo se ve la aplicación en tu dispositivo. Tu preferencia quedará guardada.',
@@ -225,17 +222,16 @@ class _ThemeOptionTile extends StatelessWidget {
                   Text(
                     title,
                     style: theme.textTheme.titleMedium?.copyWith(
-                      fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
+                      fontWeight: isSelected
+                          ? FontWeight.w700
+                          : FontWeight.w600,
                       color: isSelected
                           ? theme.colorScheme.primary
                           : theme.colorScheme.onSurface,
                     ),
                   ),
                   const SizedBox(height: 2),
-                  Text(
-                    subtitle,
-                    style: theme.textTheme.bodySmall,
-                  ),
+                  Text(subtitle, style: theme.textTheme.bodySmall),
                 ],
               ),
             ),
@@ -245,7 +241,9 @@ class _ThemeOptionTile extends StatelessWidget {
               height: 22,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: isSelected ? theme.colorScheme.primary : Colors.transparent,
+                color: isSelected
+                    ? theme.colorScheme.primary
+                    : Colors.transparent,
                 border: Border.all(
                   color: isSelected
                       ? theme.colorScheme.primary
@@ -267,4 +265,3 @@ class _ThemeOptionTile extends StatelessWidget {
     );
   }
 }
-

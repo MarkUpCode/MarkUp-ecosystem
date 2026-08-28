@@ -25,16 +25,6 @@ class DashboardPage extends ConsumerWidget {
     final onboardingAsync = ref.watch(dashboardOnboardingStatusProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('DINEROP'),
-        actions: [
-          IconButton(
-            onPressed: () => context.push('/request-credit'),
-            icon: const Icon(Icons.add_card_rounded),
-            tooltip: 'Solicitar crédito',
-          ),
-        ],
-      ),
       body: SafeArea(
         child: RefreshIndicator(
           onRefresh: () async {
@@ -49,20 +39,20 @@ class DashboardPage extends ConsumerWidget {
               // ------------------------------------------------------------
               // HEADER
               // ------------------------------------------------------------
-              AppHeader(
-                title:
-                    'Hola, ${authState.user?.email.split('@').first ?? 'cliente'}',
-                subtitle:
-                    'Gestiona tu crédito y consulta el estado de tus solicitudes.',
-              ),
-
-              const SizedBox(height: 20),
-
               const CooperativeLogoMarquee(
                 height: 64,
                 speed: 80,
                 logoSize: 112,
                 gap: 16,
+              ),
+
+              const SizedBox(height: 20),
+
+              AppHeader(
+                title:
+                    'Hola, ${authState.user?.email ?? 'cliente'}',
+                subtitle:
+                    'Gestiona tu crédito y consulta el estado de tus solicitudes.',
               ),
 
               const SizedBox(height: 20),

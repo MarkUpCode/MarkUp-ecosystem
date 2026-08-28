@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../shared/widgets/app_authenticated_header.dart';
+
 class AppShell extends StatelessWidget {
   const AppShell({super.key, required this.child});
 
@@ -36,14 +38,19 @@ class AppShell extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Scaffold(
+      appBar: const AppAuthenticatedHeader(),
       body: child,
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
           border: Border(
-            top: BorderSide(color: theme.colorScheme.outline, width: 1),
+            top: BorderSide(color: theme.colorScheme.primary, width: 2),
           ),
         ),
         child: NavigationBar(
+          height: 70,
+          elevation: 0,
+          backgroundColor: theme.colorScheme.surface,
+          indicatorColor: theme.colorScheme.primaryContainer,
           selectedIndex: _selectedIndex(location),
           onDestinationSelected: (index) => _navigate(context, index),
           destinations: const [
@@ -72,4 +79,4 @@ class AppShell extends StatelessWidget {
       ),
     );
   }
-}
+}
