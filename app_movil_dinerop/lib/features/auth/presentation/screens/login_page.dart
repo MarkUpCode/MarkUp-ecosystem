@@ -7,8 +7,7 @@ import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_error_view.dart';
 import '../../../../shared/widgets/app_text_field.dart';
 import '../../data/models/app_user.dart';
-import '../../../welcome/data/models/cooperative_partner.dart';
-import '../../../welcome/presentation/widgets/cooperative_logo_card.dart';
+import '../../../../core/widgets/cooperative_logo_marquee.dart';
 import '../auth_controller.dart';
 
 /// ═══════════════════════════════════════════════════════════
@@ -81,7 +80,7 @@ class LoginPage extends ConsumerWidget {
 
               const SizedBox(height: 16),
 
-              const _CooperativeMarquee(),
+              const CooperativeLogoMarquee(),
 
               const SizedBox(height: 28),
 
@@ -110,107 +109,6 @@ class LoginPage extends ConsumerWidget {
         ),
       ),
     );
-  }
-}
-
-class _CooperativeMarquee extends StatefulWidget {
-  const _CooperativeMarquee();
-
-  @override
-  State<_CooperativeMarquee> createState() => _CooperativeMarqueeState();
-}
-
-class _CooperativeMarqueeState extends State<_CooperativeMarquee>
-    with SingleTickerProviderStateMixin {
-  // Ancho de cada logo
-  static const double _logoWidth = 132.0;
-
-  // Separación entre logos
-  static const double _logoGap = 12.0;
-
-  // Más bajo = más rápido
-  static const Duration _animationDuration = Duration(seconds: 4);
-
-  late final AnimationController _controller;
-
-  List<CooperativePartner> get _partners =>
-      CooperativePartner.initialPartners;
-
-  double get _sequenceWidth =>
-      _partners.length * (_logoWidth + _logoGap);
-
-  @override
-  void initState() {
-    super.initState();
-
-    _controller = AnimationController(
-      vsync: this,
-      duration: _animationDuration,
-    )..repeat();
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final totalWidth = _sequenceWidth * 2;
-
-    return SizedBox(
-      height: 76,
-      width: double.infinity,
-      child: ClipRect(
-        child: AnimatedBuilder(
-          animation: _controller,
-          builder: (context, child) {
-            final offset = -_sequenceWidth * _controller.value;
-
-            return OverflowBox(
-              alignment: Alignment.centerLeft,
-              minWidth: 0,
-              maxWidth: double.infinity,
-              child: Transform.translate(
-                offset: Offset(offset, 0),
-                child: SizedBox(
-                  width: totalWidth,
-                  height: 76,
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      ..._buildLogoSet(),
-                      ..._buildLogoSet(),
-                    ],
-                  ),
-                ),
-              ),
-            );
-          },
-        ),
-      ),
-    );
-  }
-
-  List<Widget> _buildLogoSet() {
-    return [
-      for (final partner in _partners)
-        Padding(
-          padding: const EdgeInsets.only(right: _logoGap),
-          child: SizedBox(
-            width: _logoWidth,
-            child: CooperativeLogoCard(
-              partner: partner,
-              height: 64,
-              padding: const EdgeInsets.symmetric(
-                horizontal: 14,
-                vertical: 10,
-              ),
-            ),
-          ),
-        ),
-    ];
   }
 }
 
