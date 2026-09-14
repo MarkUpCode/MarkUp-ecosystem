@@ -530,8 +530,8 @@ class _OfferCardState extends ConsumerState<_OfferCard> {
                 ),
                 const SizedBox(height: 16),
                 if (needsGuarantor)
-                  _GuarantorNotice(color: color, soft: soft)
-                else ...[
+                  _GuarantorNotice(color: color, soft: soft),
+                if (needsGuarantor) const SizedBox(height: 12),
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.symmetric(vertical: 17),
@@ -601,7 +601,6 @@ class _OfferCardState extends ConsumerState<_OfferCard> {
                       ),
                     ],
                   ),
-                ],
                 const SizedBox(height: 16),
                 SizedBox(
                   width: double.infinity,

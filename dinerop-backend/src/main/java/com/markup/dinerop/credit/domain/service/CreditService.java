@@ -5,12 +5,15 @@ import com.markup.dinerop.auth.entity.User;
 import com.markup.dinerop.auth.service.AuthService;
 import com.markup.dinerop.credit.domain.model.CreditRequest;
 import com.markup.dinerop.credit.domain.model.SolicitudCooperativa;
+import com.markup.dinerop.credit.domain.model.SolicitudCooperativaCotizacion;
 import com.markup.dinerop.credit.domain.model.enums.CreditRequestStatus;
 import com.markup.dinerop.credit.domain.model.enums.CreditRequestType;
 import com.markup.dinerop.credit.domain.model.enums.SolicitudCooperativaStatus;
+import com.markup.dinerop.credit.domain.service.calculation.LoanCalculator;
 import com.markup.dinerop.credit.dto.ClientCreditRequestDto;
 import com.markup.dinerop.credit.dto.PublicCreditRequestDto;
 import com.markup.dinerop.credit.infrastructure.repository.CreditRequestRepository;
+import com.markup.dinerop.credit.infrastructure.repository.SolicitudCooperativaCotizacionRepository;
 import com.markup.dinerop.credit.infrastructure.repository.SolicitudCooperativaRepository;
 import com.markup.dinerop.auth.repository.UserRepository;
 import com.markup.dinerop.cooperative.domain.service.CooperativeService;
@@ -27,6 +30,7 @@ import com.markup.dinerop.auth.entity.Role;
 
 import java.util.List;
 import java.util.Optional;
+import java.math.BigDecimal;
 
 @Slf4j
 @Service
@@ -37,6 +41,7 @@ public class CreditService {
     private final AuthService authService;
     private final CreditDistributionService creditDistributionService;
     private final SolicitudCooperativaRepository solicitudCooperativaRepository;
+        private final SolicitudCooperativaCotizacionRepository cotizacionRepository;
     private final UserRepository userRepository;
     private final CooperativeService cooperativeService;
     private final NotificationService notificationService;
@@ -436,6 +441,38 @@ public class CreditService {
             throw new IllegalStateException(
                     "No se puede solicitar garante desde el estado " + sc.getEstado()
             );
+        }
+
+        CreditRequest creditRequest = sc.getCreditRequest();
+        if (creditRequest == null || creditRequest.getAmount() == null
+                || creditRequest.getCreditType() == null
+                || creditRequest.getPlazoMeses() == null
+                || creditRequest.getPlazoMeses() <= 0) {
+            throw new IllegalStateException("La solicitud no tiene datos suficientes para calcular la oferta");
+        }
+
+        if (cotizacionRepository.findBySolicitudCooperativaId(sc.getId()).isEmpty()) {
+            BigDecimal tasaAnual = BigDecimal.valueOf(
+                    cooperativeService.getActiveRate(cooperativaId, creditRequest.getCreditType())
+            );
+            var calculation = LoanCalculator.calculate(
+                    creditRequest.getAmount(),
+                    tasaAnual,
+                    creditRequest.getPlazoMeses()
+            );
+
+            var cotizacion = SolicitudCooperativaCotizacion.builder()
+                    .solicitudCooperativaId(sc.getId())
+                    .monto(creditRequest.getAmount())
+                    .plazoMeses(creditRequest.getPlazoMeses())
+                    .tipoCredito(creditRequest.getCreditType())
+                    .tasaAnual(tasaAnual)
+                    .tasaMensual(calculation.tasaMensual())
+                    .cuotaMensual(calculation.cuotaMensual())
+                    .totalPagar(calculation.totalPagar())
+                    .interesTotal(calculation.interesTotal())
+                    .build();
+            cotizacionRepository.save(cotizacion);
         }
 
         sc.setEstado(SolicitudCooperativaStatus.SOLICITANDO_GARANTE);
