@@ -10,10 +10,12 @@ import {
   getMyCooperativeRequests,
   decideCreditRequest,
   requestGuaranteeForCreditRequest,
+  getCooperativeOfferDefaults,
 } from "../api/creditRequests.api";
+import { getOnboardingForCooperative, type OnboardingCooperativeDetail } from "../api/onboarding.api";
 import { getErrorMessage } from "../api/errors";
 
-import type { CooperativeCreditRequest } from "../types/credit";
+import type { CooperativeCreditRequest, CooperativeOfferDefaults } from "../types/credit";
 import { CreditEstado } from "../types/creditEstado";
 import { CreditDecision } from "../types/creditDecision";
 
@@ -40,6 +42,10 @@ export default function DashboardCooperative() {
   const [showPreApprovalModal, setShowPreApprovalModal] = useState(false);
   const [selectedRequest, setSelectedRequest] =
     useState<CooperativeCreditRequest | null>(null);
+  const [offerDefaults, setOfferDefaults] = useState<CooperativeOfferDefaults | null>(null);
+  const [loadingOfferDefaults, setLoadingOfferDefaults] = useState(false);
+  const [applicantDetail, setApplicantDetail] = useState<OnboardingCooperativeDetail | null>(null);
+  const [loadingApplicant, setLoadingApplicant] = useState(false);
 
   useEffect(() => {
     void loadRequests();
@@ -63,11 +69,12 @@ export default function DashboardCooperative() {
   const handleDecision = async (
     solicitudId: number,
     decision: CreditDecision,
+    offer?: { tasaAnual: number; plazoMeses: number },
   ) => {
     try {
       setProcessingId(solicitudId);
       setActionError("");
-      await decideCreditRequest(solicitudId, decision);
+      await decideCreditRequest(solicitudId, decision, offer);
       await loadRequests();
     } catch (error) {
       setActionError(
@@ -79,18 +86,43 @@ export default function DashboardCooperative() {
     }
   };
 
-  const handleOpenPreApprovalModal = (request: CooperativeCreditRequest) => {
+  const handleOpenPreApprovalModal = async (request: CooperativeCreditRequest) => {
     setSelectedRequest(request);
     setShowPreApprovalModal(true);
+    setOfferDefaults(null);
+    setLoadingOfferDefaults(true);
+    try {
+      setOfferDefaults(await getCooperativeOfferDefaults(request.solicitudId));
+    } catch (error) {
+      setActionError(getErrorMessage(error, "No se pudo cargar la tasa estándar de la cooperativa."));
+    } finally {
+      setLoadingOfferDefaults(false);
+    }
   };
 
   const handleClosePreApprovalModal = () => {
     setShowPreApprovalModal(false);
     setSelectedRequest(null);
+    setOfferDefaults(null);
   };
 
-  const handleApproveWithoutGuarantee = async (solicitudId: number) => {
-    await handleDecision(solicitudId, CreditDecision.PRE_APROBAR);
+  const handleApproveWithoutGuarantee = async (
+    solicitudId: number,
+    offer: { tasaAnual: number; plazoMeses: number },
+  ) => {
+    await handleDecision(solicitudId, CreditDecision.PRE_APROBAR, offer);
+  };
+
+  const handleViewApplicant = async (solicitudId: number) => {
+    setLoadingApplicant(true);
+    setActionError("");
+    try {
+      setApplicantDetail(await getOnboardingForCooperative(solicitudId));
+    } catch (error) {
+      setActionError(getErrorMessage(error, "No se pudo cargar la información del solicitante."));
+    } finally {
+      setLoadingApplicant(false);
+    }
   };
 
   const handleApproveWithGuarantee = async (solicitudId: number) => {
@@ -251,7 +283,7 @@ export default function DashboardCooperative() {
 
                     <div className="bg-gray-50 rounded-lg p-4 flex gap-4">
                       <User className="w-10 h-10 text-gray-400" />
-                      <div>
+                      <div className="flex-1">
                         <p className="font-semibold text-gray-800 text-sm mb-2">
                           Informacion del solicitante
                         </p>
@@ -262,10 +294,11 @@ export default function DashboardCooperative() {
                           </span>
                         </p>
                         <button
-                          disabled
-                          className="text-blue-600 text-sm mt-2 cursor-not-allowed"
+                          onClick={() => void handleViewApplicant(r.solicitudId)}
+                          disabled={loadingApplicant}
+                          className="text-blue-600 text-sm mt-2 hover:underline disabled:cursor-wait disabled:opacity-50"
                         >
-                          Ver informacion completa
+                          {loadingApplicant ? "Cargando información..." : "Ver información completa"}
                         </button>
                       </div>
                     </div>
@@ -273,7 +306,7 @@ export default function DashboardCooperative() {
 
                   <div className="lg:w-64 flex flex-col justify-center gap-3">
                     <button
-                      onClick={() => handleOpenPreApprovalModal(r)}
+                      onClick={() => void handleOpenPreApprovalModal(r)}
                       disabled={
                         r.estado !== CreditEstado.ENVIADA ||
                         processingId === r.solicitudId
@@ -325,15 +358,56 @@ export default function DashboardCooperative() {
           solicitudId={selectedRequest.solicitudId}
           monto={selectedRequest.montoSolicitado}
           tipo={selectedRequest.tipo}
+          defaults={offerDefaults}
+          loadingDefaults={loadingOfferDefaults}
           onApproveWithoutGuarantee={handleApproveWithoutGuarantee}
           onApproveWithGuarantee={handleApproveWithGuarantee}
           isLoading={processingId === selectedRequest.solicitudId}
         />
       )}
 
+      {applicantDetail && (
+        <ApplicantDetailModal detail={applicantDetail} onClose={() => setApplicantDetail(null)} />
+      )}
+
       <Footer />
     </div>
   );
+}
+
+function ApplicantDetailModal({
+  detail,
+  onClose,
+}: {
+  detail: OnboardingCooperativeDetail;
+  onClose: () => void;
+}) {
+  const applicant = detail.personas.find((person) => person.rol === "SOLICITANTE") ?? detail.personas[0];
+  if (!applicant) return null;
+  const money = (value?: number) => value == null ? "—" : `$${value.toLocaleString("es-EC", { minimumFractionDigits: 2 })}`;
+
+  return (
+    <div className="fixed inset-0 z-[80] flex items-center justify-center bg-black/50 p-4">
+      <div className="max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-2xl bg-white p-6 shadow-2xl">
+        <div className="mb-6 flex items-start justify-between"><div><h2 className="text-2xl font-bold text-gray-900">Información del solicitante</h2><p className="text-sm text-gray-600">Solicitud #{detail.solicitudId}</p></div><button onClick={onClose} className="rounded-lg px-3 py-2 text-gray-600 hover:bg-gray-100">Cerrar</button></div>
+        <div className="grid gap-4 md:grid-cols-2">
+          <DetailSection title="Datos personales"><Detail label="Nombre" value={`${applicant.nombres} ${applicant.apellidos}`} /><Detail label="Cédula" value={applicant.cedula} /><Detail label="Fecha de nacimiento" value={applicant.fechaNacimiento} /><Detail label="Estado civil" value={applicant.estadoCivil} /><Detail label="Teléfono" value={applicant.telefono} /></DetailSection>
+          <DetailSection title="Trabajo"><Detail label="Ocupación" value={applicant.ocupacion} /><Detail label="Empresa" value={applicant.empresaTrabajo} /><Detail label="Negocio" value={applicant.actividadEconomica?.nombreNegocio} /><Detail label="Tiempo de actividad" value={applicant.actividadEconomica?.tiempoActividad} /></DetailSection>
+          <DetailSection title="Dirección"><Detail label="Provincia" value={applicant.direccion?.provincia} /><Detail label="Cantón" value={applicant.direccion?.canton} /><Detail label="Barrio" value={applicant.direccion?.barrio} /><Detail label="Dirección" value={[applicant.direccion?.callePrincipal, applicant.direccion?.numero].filter(Boolean).join(" ")} /><Detail label="Vivienda" value={applicant.direccion?.tipoVivienda} /></DetailSection>
+          <DetailSection title="Situación económica"><Detail label="Ingreso mensual" value={money(applicant.ingresoEgreso?.ingresoMensual)} /><Detail label="Egreso mensual" value={money(applicant.ingresoEgreso?.egresoMensual)} /><Detail label="Teléfono del negocio" value={applicant.actividadEconomica?.telefonoNegocio} /></DetailSection>
+        </div>
+        {applicant.referencias && applicant.referencias.length > 0 && <DetailSection title="Referencias"><div className="space-y-2">{applicant.referencias.map((reference, index) => <p key={`${reference.telefono}-${index}`} className="text-sm text-gray-700">{reference.nombreCompleto} · {reference.tipo} · {reference.telefono}</p>)}</div></DetailSection>}
+      </div>
+    </div>
+  );
+}
+
+function DetailSection({ title, children }: { title: string; children: ReactNode }) {
+  return <section className="rounded-xl border border-gray-200 p-4"><h3 className="mb-3 font-semibold text-gray-900">{title}</h3>{children}</section>;
+}
+
+function Detail({ label, value }: { label: string; value?: string }) {
+  return <p className="mb-2 text-sm"><span className="text-gray-500">{label}: </span><span className="font-medium text-gray-800">{value || "—"}</span></p>;
 }
 
 function StatCard({ label, value, icon }: StatCardProps) {

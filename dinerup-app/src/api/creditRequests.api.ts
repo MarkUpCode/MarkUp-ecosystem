@@ -2,6 +2,7 @@ import { httpClient } from "./httpClient";
 import type {
   CreditRequest,
   CooperativeCreditRequest,
+  CooperativeOfferDefaults,
   CreditRequestCooperative,
 } from "../types/credit";
 import { CreditDecision } from "../types/creditDecision";
@@ -42,14 +43,24 @@ export const getMyCooperativeRequests = async (): Promise<
 export const decideCreditRequest = async (
   solicitudId: number,
   decision: CreditDecision,
+  offer?: { tasaAnual: number; plazoMeses: number },
 ): Promise<void> => {
   await httpClient<void>(
     `/api/credits/cooperative/me/requests/${solicitudId}/decision`,
     {
       method: "PUT",
       auth: true,
-      body: { decision },
+      body: { decision, ...offer },
     },
+  );
+};
+
+export const getCooperativeOfferDefaults = async (
+  solicitudId: number,
+): Promise<CooperativeOfferDefaults> => {
+  return httpClient<CooperativeOfferDefaults>(
+    `/api/credits/cooperative/me/requests/${solicitudId}/offer-defaults`,
+    { auth: true },
   );
 };
 

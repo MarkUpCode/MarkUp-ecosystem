@@ -6,6 +6,7 @@ import com.markup.dinerop.credit.domain.model.SolicitudCooperativa;
 import com.markup.dinerop.credit.domain.model.SolicitudCooperativaCotizacion;
 import com.markup.dinerop.credit.domain.model.enums.SolicitudCooperativaStatus;
 import com.markup.dinerop.credit.domain.service.calculation.LoanCalculator;
+import com.markup.dinerop.credit.dto.CooperativeOfferDefaultsDto;
 import com.markup.dinerop.credit.infrastructure.repository.SolicitudCooperativaCotizacionRepository;
 import com.markup.dinerop.credit.infrastructure.repository.SolicitudCooperativaRepository;
 import jakarta.transaction.Transactional;
@@ -27,7 +28,9 @@ public class CooperativeCreditDecisionService {
     public void decide(
             Long solicitudId,
             Long cooperativaId,
-            String decision
+            String decision,
+            BigDecimal tasaAnual,
+            Integer plazoMeses
     ) {
 
         SolicitudCooperativa sc = repository
@@ -47,22 +50,25 @@ public class CooperativeCreditDecisionService {
 
         if ("PRE_APROBAR".equalsIgnoreCase(decision)) {
 
-            Double rate = cooperativeService.getActiveRate(cooperativaId, cr.getCreditType());
-
             if (cr.getCreditType() == null) {
                 throw new IllegalStateException("Tipo de credito no definido");
             }
             if (cr.getAmount() == null || cr.getAmount().signum() <= 0) {
                 throw new IllegalStateException("Monto invalido");
             }
-            if (cr.getPlazoMeses() == null || cr.getPlazoMeses() <= 0) {
+            int plazoFinal = plazoMeses != null ? plazoMeses : safePlazo(cr);
+            if (plazoFinal <= 0) {
                 throw new IllegalStateException("Plazo invalido");
             }
 
+            BigDecimal tasaFinal = tasaAnual != null
+                    ? tasaAnual
+                    : BigDecimal.valueOf(cooperativeService.getActiveRate(cooperativaId, cr.getCreditType()));
+
             var calc = LoanCalculator.calculate(
                     cr.getAmount(),
-                    BigDecimal.valueOf(rate),
-                    cr.getPlazoMeses()
+                    tasaFinal,
+                    plazoFinal
             );
 
             var cotizacion = cotizacionRepository
@@ -71,9 +77,9 @@ public class CooperativeCreditDecisionService {
 
             cotizacion.setSolicitudCooperativaId(sc.getId());
             cotizacion.setMonto(cr.getAmount());
-            cotizacion.setPlazoMeses(cr.getPlazoMeses());
+            cotizacion.setPlazoMeses(plazoFinal);
             cotizacion.setTipoCredito(cr.getCreditType());
-            cotizacion.setTasaAnual(BigDecimal.valueOf(rate));
+            cotizacion.setTasaAnual(tasaFinal);
             cotizacion.setTasaMensual(calc.tasaMensual());
             cotizacion.setCuotaMensual(calc.cuotaMensual());
             cotizacion.setTotalPagar(calc.totalPagar());
@@ -92,5 +98,35 @@ public class CooperativeCreditDecisionService {
         } else {
             throw new IllegalArgumentException("Decision invalida");
         }
+    }
+
+    @Transactional
+    public CooperativeOfferDefaultsDto getOfferDefaults(Long solicitudId, Long cooperativaId) {
+        SolicitudCooperativa sc = findPendingRequest(solicitudId, cooperativaId);
+        CreditRequest cr = sc.getCreditRequest();
+
+        if (cr.getCreditType() == null) {
+            throw new IllegalStateException("La solicitud no es de crédito");
+        }
+
+        return new CooperativeOfferDefaultsDto(
+                cr.getAmount(),
+                safePlazo(cr),
+                BigDecimal.valueOf(cooperativeService.getActiveRate(cooperativaId, cr.getCreditType()))
+        );
+    }
+
+    private SolicitudCooperativa findPendingRequest(Long solicitudId, Long cooperativaId) {
+        SolicitudCooperativa sc = repository
+                .findBySolicitudIdAndCooperativaId(solicitudId, cooperativaId)
+                .orElseThrow(() -> new AccessDeniedException("Solicitud no pertenece a esta cooperativa"));
+        if (sc.getEstado() != SolicitudCooperativaStatus.ENVIADA) {
+            throw new IllegalStateException("La solicitud ya fue procesada");
+        }
+        return sc;
+    }
+
+    private int safePlazo(CreditRequest creditRequest) {
+        return creditRequest.getPlazoMeses() == null ? 0 : creditRequest.getPlazoMeses();
     }
 }

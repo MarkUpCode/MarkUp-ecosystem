@@ -59,6 +59,36 @@ export interface OnboardingSubmitResponse {
   fechaCreacion: string;
 }
 
+export interface OnboardingCooperativeDetail {
+  solicitudId: number;
+  destinoCredito: string;
+  estado: string;
+  personas: Array<{
+    rol: string;
+    nombres: string;
+    apellidos: string;
+    cedula: string;
+    fechaNacimiento?: string;
+    estadoCivil?: string;
+    ocupacion?: string;
+    empresaTrabajo?: string;
+    telefono?: string;
+    direccion?: Partial<DireccionData>;
+    actividadEconomica?: Partial<ActividadEconomicaData>;
+    ingresoEgreso?: Partial<IngresoEgresoData>;
+    referencias?: ReferenciaData[];
+  }>;
+}
+
+export function getOnboardingForCooperative(
+  solicitudId: number,
+): Promise<OnboardingCooperativeDetail> {
+  return httpClient<OnboardingCooperativeDetail>(
+    `/api/onboarding/cooperativa/${solicitudId}`,
+    { method: "GET", auth: true },
+  );
+}
+
 export interface ClientePerfilUbicacion {
   provincia: string;
   ciudad: string;

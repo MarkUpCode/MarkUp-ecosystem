@@ -5,6 +5,7 @@ import com.markup.dinerop.onboarding.domain.enums.RolPersona;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Getter
 @Setter
@@ -22,4 +23,8 @@ public class PersonaOnboardingResponse {
     private String ocupacion;
     private String empresaTrabajo;
     private String telefono;
+    private DireccionOnboardingResponse direccion;
+    private ActividadEconomicaResponse actividadEconomica;
+    private IngresoEgresoResponse ingresoEgreso;
+    private List<ReferenciaPersonalResponse> referencias;
 }

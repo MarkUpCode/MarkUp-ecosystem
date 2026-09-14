@@ -43,6 +43,16 @@ public interface OnboardingMapper {
 
     PersonaOnboardingResponse toPersonaResponse(PersonaOnboarding entity);
 
+    DireccionOnboardingResponse toDireccionResponse(DireccionOnboarding entity);
+
+    ActividadEconomicaResponse toActividadEconomicaResponse(ActividadEconomica entity);
+
+    IngresoEgresoResponse toIngresoEgresoResponse(IngresoEgreso entity);
+
+    ReferenciaPersonalResponse toReferenciaResponse(ReferenciaPersonal entity);
+
+    List<ReferenciaPersonalResponse> toReferenciasResponse(List<ReferenciaPersonal> entities);
+
     List<PersonaOnboardingResponse> toPersonasResponse(List<PersonaOnboarding> entities);
 
     @Mapping(source = "id", target = "solicitudId")

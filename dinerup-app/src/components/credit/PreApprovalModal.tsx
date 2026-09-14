@@ -1,4 +1,6 @@
 import { AlertCircle, CheckCircle, Shield, X } from "lucide-react";
+import { useEffect, useState } from "react";
+import type { CooperativeOfferDefaults } from "../../types/credit";
 
 interface PreApprovalModalProps {
   open: boolean;
@@ -6,7 +8,12 @@ interface PreApprovalModalProps {
   solicitudId: number;
   monto: number;
   tipo: string;
-  onApproveWithoutGuarantee: (solicitudId: number) => Promise<void>;
+  defaults: CooperativeOfferDefaults | null;
+  loadingDefaults: boolean;
+  onApproveWithoutGuarantee: (
+    solicitudId: number,
+    offer: { tasaAnual: number; plazoMeses: number },
+  ) => Promise<void>;
   onApproveWithGuarantee: (solicitudId: number) => Promise<void>;
   isLoading: boolean;
 }
@@ -17,15 +24,41 @@ export default function PreApprovalModal({
   solicitudId,
   monto,
   tipo,
+  defaults,
+  loadingDefaults,
   onApproveWithoutGuarantee,
   onApproveWithGuarantee,
   isLoading,
 }: PreApprovalModalProps) {
+  const [tasaAnual, setTasaAnual] = useState("");
+  const [plazoMeses, setPlazoMeses] = useState("");
+  const [formError, setFormError] = useState("");
+
+  useEffect(() => {
+    if (open && defaults) {
+      setTasaAnual(String(defaults.tasaAnual));
+      setPlazoMeses(String(defaults.plazoMeses));
+      setFormError("");
+    }
+  }, [open, defaults]);
+
   if (!open) return null;
 
   const handleWithoutGuarantee = async () => {
+    const tasa = Number(tasaAnual);
+    const plazo = Number(plazoMeses);
+    if (
+      !Number.isFinite(tasa) || tasa <= 0 || tasa > 100 ||
+      !Number.isInteger(plazo) || plazo < 1 || plazo > 360
+    ) {
+      setFormError("Ingresa una tasa entre 0.001% y 100%, y un plazo entre 1 y 360 meses.");
+      return;
+    }
     try {
-      await onApproveWithoutGuarantee(solicitudId);
+      await onApproveWithoutGuarantee(solicitudId, {
+        tasaAnual: tasa,
+        plazoMeses: plazo,
+      });
       onClose();
     } catch {
       return;
@@ -93,6 +126,28 @@ export default function PreApprovalModal({
             </div>
           </div>
 
+          <div className="mb-6 rounded-xl border border-gray-200 p-5">
+            <h3 className="font-semibold text-gray-900">Oferta para el cliente</h3>
+            <p className="mt-1 text-sm text-gray-600">
+              Se precarga la tasa estándar de tu cooperativa. Puedes cambiar tasa y plazo solo para esta solicitud.
+            </p>
+            {loadingDefaults ? (
+              <p className="mt-4 text-sm text-gray-600">Cargando tasa estándar...</p>
+            ) : (
+              <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
+                <label className="text-sm font-medium text-gray-700">
+                  Tasa anual (%)
+                  <input type="number" min="0.001" max="100" step="0.001" value={tasaAnual} onChange={(event) => setTasaAnual(event.target.value)} className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2" />
+                </label>
+                <label className="text-sm font-medium text-gray-700">
+                  Plazo (meses)
+                  <input type="number" min="1" max="360" step="1" value={plazoMeses} onChange={(event) => setPlazoMeses(event.target.value)} className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2" />
+                </label>
+              </div>
+            )}
+            {formError && <p className="mt-3 text-sm text-red-600">{formError}</p>}
+          </div>
+
           <div className="mb-8">
             <p className="text-sm font-semibold text-gray-700 mb-4">
               Requiere garante para esta aprobacion?
@@ -101,7 +156,7 @@ export default function PreApprovalModal({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <button
                 onClick={handleWithoutGuarantee}
-                disabled={isLoading}
+                disabled={isLoading || loadingDefaults || !defaults}
                 className="relative group p-6 rounded-xl border-2 border-gray-200 hover:border-green-400 transition-all hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed text-left"
               >
                 <div className="absolute -top-3 -right-3">

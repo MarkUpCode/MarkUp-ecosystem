@@ -26,6 +26,12 @@ export interface CooperativeCreditRequest extends BaseCreditRequest {
   montoSolicitado: number;
 }
 
+export interface CooperativeOfferDefaults {
+  monto: number;
+  plazoMeses: number;
+  tasaAnual: number;
+}
+
 /**
  * CLIENTE
  * GET /api/credits/me/{solicitudId}/pre-approved

@@ -103,7 +103,7 @@ public class CreditController {
     @PreAuthorize("hasRole('COOPERATIVE')")
     public ResponseEntity<Map<String, Object>> decideRequest(
             @PathVariable Long solicitudId,
-            @RequestBody CooperativeDecisionRequestDto dto,
+            @Valid @RequestBody CooperativeDecisionRequestDto dto,
             @AuthenticationPrincipal User user
     ) {
         Long cooperativaId = user.getCooperativaId();
@@ -111,11 +111,27 @@ public class CreditController {
         cooperativeCreditDecisionService.decide(
                 solicitudId,
                 cooperativaId,
-                dto.decision()
+                dto.decision(),
+                dto.tasaAnual(),
+                dto.plazoMeses()
         );
 
         return ResponseEntity.ok(
                 Map.of("message", "Decisión registrada correctamente")
+        );
+    }
+
+    @GetMapping("/cooperative/me/requests/{solicitudId}/offer-defaults")
+    @PreAuthorize("hasRole('COOPERATIVE')")
+    public ResponseEntity<com.markup.dinerop.credit.dto.CooperativeOfferDefaultsDto> getOfferDefaults(
+            @PathVariable Long solicitudId,
+            @AuthenticationPrincipal User user
+    ) {
+        return ResponseEntity.ok(
+                cooperativeCreditDecisionService.getOfferDefaults(
+                        solicitudId,
+                        user.getCooperativaId()
+                )
         );
     }
     //----------------------------------------------------------------------------------------
