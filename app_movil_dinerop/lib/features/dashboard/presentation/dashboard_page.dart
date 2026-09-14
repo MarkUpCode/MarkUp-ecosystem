@@ -5,11 +5,13 @@ import 'package:go_router/go_router.dart';
 import '../../../app/providers.dart';
 import '../../../core/errors/app_exception.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/utils/formatters.dart';
 import '../../../shared/widgets/app_empty_state.dart';
 import '../../../shared/widgets/app_error_view.dart';
 import '../../../shared/widgets/app_loader.dart';
 import '../../auth/presentation/auth_controller.dart';
-import '../../credit/presentation/widgets/credit_request_card.dart';
+import '../../credit/data/models/client_credit_request.dart';
+import '../../credit/data/models/credit_enums.dart';
 
 class DashboardPage extends ConsumerWidget {
   const DashboardPage({super.key});
@@ -20,7 +22,6 @@ class DashboardPage extends ConsumerWidget {
     final profile = ref.watch(clientProfileProvider);
     final requests = ref.watch(dashboardCreditRequestsProvider);
     final onboarding = ref.watch(dashboardOnboardingStatusProvider);
-    final theme = Theme.of(context);
 
     return Scaffold(
       body: SafeArea(
@@ -63,23 +64,6 @@ class DashboardPage extends ConsumerWidget {
                 ),
               ),
               const SizedBox(height: 24),
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      'Tu actividad',
-                      style: theme.textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                  ),
-                  TextButton(
-                    onPressed: () => context.go('/requests'),
-                    child: const Text('Ver todas'),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
               requests.when(
                 data: (items) {
                   if (items.isEmpty) {
@@ -92,20 +76,9 @@ class DashboardPage extends ConsumerWidget {
                       icon: Icons.account_balance_wallet_outlined,
                     );
                   }
-                  return Column(
-                    children: items
-                        .take(2)
-                        .map(
-                          (item) => Padding(
-                            padding: const EdgeInsets.only(bottom: 14),
-                            child: CreditRequestCard(
-                              request: item,
-                              compact: true,
-                              onTap: () => context.go('/requests'),
-                            ),
-                          ),
-                        )
-                        .toList(),
+                  return _DashboardOverview(
+                    requests: items,
+                    onViewRequests: () => context.go('/requests'),
                   );
                 },
                 loading: () =>
@@ -182,6 +155,230 @@ class DashboardPage extends ConsumerWidget {
       ),
     );
   }
+}
+
+class _DashboardOverview extends StatelessWidget {
+  const _DashboardOverview({
+    required this.requests,
+    required this.onViewRequests,
+  });
+
+  final List<ClientCreditRequestSummary> requests;
+  final VoidCallback onViewRequests;
+
+  @override
+  Widget build(BuildContext context) {
+    final active = requests
+        .where((request) => request.estado != CreditRequestStatus.rechazada)
+        .length;
+    final approved = requests
+        .where(
+          (request) =>
+              request.estado == CreditRequestStatus.preAprobada ||
+              request.estado == CreditRequestStatus.aceptada,
+        )
+        .length;
+    final total = requests.fold<double>(
+      0,
+      (sum, request) => sum + request.monto,
+    );
+    final theme = Theme.of(context);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: Text(
+                'Tu panorama',
+                style: theme.textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ),
+            TextButton(
+              onPressed: onViewRequests,
+              child: const Text('Ver solicitudes'),
+            ),
+          ],
+        ),
+        const SizedBox(height: 10),
+        Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              colors: [AppColors.primary, Color(0xFF1769AA)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(24),
+            boxShadow: const [
+              BoxShadow(
+                color: Color(0x261D4ED8),
+                blurRadius: 18,
+                offset: Offset(0, 9),
+              ),
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  const Icon(
+                    Icons.insights_rounded,
+                    color: Color(0xB3FFFFFF),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Resumen de solicitudes',
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: const Color(0xDFFFFFFF),
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Text(
+                formatCurrency(total),
+                style: theme.textTheme.headlineMedium?.copyWith(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+              const SizedBox(height: 3),
+              const Text(
+                'monto total solicitado',
+                style: TextStyle(color: Color(0xB3FFFFFF), fontSize: 13),
+              ),
+              const SizedBox(height: 20),
+              Row(
+                children: [
+                  Expanded(
+                    child: _OverviewMetric(
+                      icon: Icons.pending_actions_rounded,
+                      value: '$active',
+                      label: 'En seguimiento',
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _OverviewMetric(
+                      icon: Icons.verified_rounded,
+                      value: '$approved',
+                      label: 'Pre aprobadas',
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _OverviewMetric(
+                      icon: Icons.description_rounded,
+                      value: '${requests.length}',
+                      label: 'Solicitudes',
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 16),
+        Row(
+          children: [
+            Expanded(
+              child: _QuickAction(
+                icon: Icons.add_circle_outline_rounded,
+                label: 'Nueva solicitud',
+                onTap: () => context.push('/request-credit'),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: _QuickAction(
+                icon: Icons.manage_search_rounded,
+                label: 'Buscar solicitud',
+                onTap: onViewRequests,
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+class _OverviewMetric extends StatelessWidget {
+  const _OverviewMetric({
+    required this.icon,
+    required this.value,
+    required this.label,
+  });
+
+  final IconData icon;
+  final String value;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Icon(icon, color: const Color(0xB3FFFFFF), size: 19),
+      const SizedBox(height: 5),
+      Text(
+        value,
+        style: const TextStyle(
+          color: Colors.white,
+          fontSize: 19,
+          fontWeight: FontWeight.w900,
+        ),
+      ),
+      Text(
+        label,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: const TextStyle(color: Color(0xB3FFFFFF), fontSize: 11),
+      ),
+    ],
+  );
+}
+
+class _QuickAction extends StatelessWidget {
+  const _QuickAction({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) => Material(
+    color: Theme.of(context).colorScheme.surface,
+    borderRadius: BorderRadius.circular(17),
+    child: InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(17),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 15),
+        child: Row(
+          children: [
+            Icon(icon, color: AppColors.primary, size: 21),
+            const SizedBox(width: 9),
+            Expanded(
+              child: Text(
+                label,
+                style: const TextStyle(fontWeight: FontWeight.w700),
+              ),
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
 }
 
 class _WelcomeHeader extends StatelessWidget {

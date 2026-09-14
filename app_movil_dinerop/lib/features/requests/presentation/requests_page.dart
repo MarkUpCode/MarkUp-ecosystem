@@ -14,8 +14,24 @@ import '../../credit/data/models/credit_cooperative_status.dart';
 import '../../credit/data/models/credit_enums.dart';
 import '../../credit/presentation/widgets/credit_request_card.dart';
 
-class RequestsPage extends ConsumerWidget {
+class RequestsPage extends ConsumerStatefulWidget {
   const RequestsPage({super.key});
+
+  @override
+  ConsumerState<RequestsPage> createState() => _RequestsPageState();
+}
+
+class _RequestsPageState extends ConsumerState<RequestsPage> {
+  final _searchController = TextEditingController();
+  String _searchQuery = '';
+  CreditRequestStatus? _statusFilter;
+  String? _typeFilter;
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   Future<void> _showDetails(
     BuildContext context,
@@ -45,14 +61,33 @@ class RequestsPage extends ConsumerWidget {
     }
   }
 
+  List<ClientCreditRequestSummary> _filteredRequests(
+    List<ClientCreditRequestSummary> requests,
+  ) {
+    final query = _searchQuery.trim().toLowerCase();
+    return requests.where((request) {
+      final matchesSearch = query.isEmpty ||
+          request.solicitudId.toString().contains(query) ||
+          request.monto.toString().contains(query);
+      final matchesStatus =
+          _statusFilter == null || request.estado == _statusFilter;
+      final matchesType = _typeFilter == null ||
+          request.tipo.toUpperCase() == _typeFilter;
+      return matchesSearch && matchesStatus && matchesType;
+    }).toList();
+  }
+
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
+    final ref = this.ref;
     final requests = ref.watch(requestsProvider);
     final theme = Theme.of(context);
     return Scaffold(
       body: SafeArea(
         child: requests.when(
-          data: (items) => RefreshIndicator(
+          data: (items) {
+            final filteredItems = _filteredRequests(items);
+            return RefreshIndicator(
             onRefresh: () async => ref.invalidate(requestsProvider),
             child: items.isEmpty
                 ? ListView(
@@ -71,35 +106,145 @@ class RequestsPage extends ConsumerWidget {
                 : ListView.separated(
                     physics: const AlwaysScrollableScrollPhysics(),
                     padding: const EdgeInsets.fromLTRB(20, 22, 20, 32),
-                    itemCount: items.length + 1,
+                    itemCount: filteredItems.length + 1,
                     separatorBuilder: (_, __) => const SizedBox(height: 14),
                     itemBuilder: (context, index) {
                       if (index == 0) {
                         return Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              'Mis solicitudes',
-                              style: theme.textTheme.headlineSmall?.copyWith(
-                                fontWeight: FontWeight.w900,
-                              ),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    'Mis solicitudes',
+                                    style: theme.textTheme.headlineSmall
+                                        ?.copyWith(
+                                          fontWeight: FontWeight.w900,
+                                        ),
+                                  ),
+                                ),
+                                Text(
+                                  '${filteredItems.length}/${items.length}',
+                                  style: theme.textTheme.bodySmall?.copyWith(
+                                    fontWeight: FontWeight.w700,
+                                    color: AppColors.primary,
+                                  ),
+                                ),
+                              ],
                             ),
                             const SizedBox(height: 5),
                             Text(
                               'Revisa tus avances, respuestas y ofertas.',
                               style: theme.textTheme.bodyMedium,
                             ),
+                            const SizedBox(height: 16),
+                            TextField(
+                              controller: _searchController,
+                              onChanged: (value) =>
+                                  setState(() => _searchQuery = value),
+                              decoration: InputDecoration(
+                                hintText: 'Buscar por número o monto',
+                                prefixIcon: const Icon(Icons.search_rounded),
+                                suffixIcon: _searchQuery.isEmpty
+                                    ? null
+                                    : IconButton(
+                                        onPressed: () {
+                                          _searchController.clear();
+                                          setState(() => _searchQuery = '');
+                                        },
+                                        icon: const Icon(Icons.close_rounded),
+                                      ),
+                                filled: true,
+                                fillColor: theme.colorScheme.surface,
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: Row(
+                                children: [
+                                  FilterChip(
+                                    label: const Text('Todos'),
+                                    selected: _statusFilter == null &&
+                                        _typeFilter == null,
+                                    onSelected: (_) => setState(() {
+                                      _statusFilter = null;
+                                      _typeFilter = null;
+                                    }),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  ...[
+                                    (
+                                      label: 'Enviadas',
+                                      value: CreditRequestStatus.enviada,
+                                    ),
+                                    (
+                                      label: 'Pre aprobadas',
+                                      value: CreditRequestStatus.preAprobada,
+                                    ),
+                                    (
+                                      label: 'Rechazadas',
+                                      value: CreditRequestStatus.rechazada,
+                                    ),
+                                  ].map(
+                                    (filter) => Padding(
+                                      padding: const EdgeInsets.only(right: 8),
+                                      child: FilterChip(
+                                        label: Text(filter.label),
+                                        selected: _statusFilter == filter.value,
+                                        onSelected: (_) => setState(() {
+                                          _typeFilter = null;
+                                          _statusFilter =
+                                              _statusFilter == filter.value
+                                                  ? null
+                                                  : filter.value;
+                                        }),
+                                      ),
+                                    ),
+                                  ),
+                                  FilterChip(
+                                    label: const Text('Créditos'),
+                                    selected: _typeFilter == 'CREDITO',
+                                    onSelected: (_) => setState(() {
+                                      _statusFilter = null;
+                                      _typeFilter = _typeFilter == 'CREDITO'
+                                          ? null
+                                          : 'CREDITO';
+                                    }),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  FilterChip(
+                                    label: const Text('Inversiones'),
+                                    selected: _typeFilter == 'INVERSION',
+                                    onSelected: (_) => setState(() {
+                                      _statusFilter = null;
+                                      _typeFilter = _typeFilter == 'INVERSION'
+                                          ? null
+                                          : 'INVERSION';
+                                    }),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            if (filteredItems.isEmpty) ...[
+                              const SizedBox(height: 30),
+                              const Center(
+                                child: Text('No hay solicitudes con esos filtros.'),
+                              ),
+                            ],
                           ],
                         );
                       }
-                      final item = items[index - 1];
+                      final item = filteredItems[index - 1];
                       return CreditRequestCard(
                         request: item,
                         onTap: () => _showDetails(context, ref, item),
                       );
                     },
                   ),
-          ),
+            );
+          },
           loading: () => const AppLoader(label: 'Cargando solicitudes...'),
           error: (error, _) => AppErrorView(
             message: error is AppException
