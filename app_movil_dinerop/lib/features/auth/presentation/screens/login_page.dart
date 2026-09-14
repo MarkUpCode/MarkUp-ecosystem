@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../shared/widgets/app_authenticated_header.dart';
 import '../../../../core/errors/app_exception.dart';
 import '../../../../shared/widgets/app_button.dart';
 import '../../../../shared/widgets/app_error_view.dart';
@@ -39,9 +40,8 @@ class LoginPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final theme = Theme.of(context);
-
     return Scaffold(
+      appBar: const AppAuthenticatedHeader(),
       body: SafeArea(
         child: SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
@@ -49,37 +49,6 @@ class LoginPage extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // ─────────────────────────────────────────────
-              // BRAND
-              // ─────────────────────────────────────────────
-              Row(
-                children: [
-                  Container(
-                    width: 42,
-                    height: 42,
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.primaryContainer,
-                      borderRadius: BorderRadius.circular(13),
-                    ),
-                    child: Icon(
-                      Icons.account_balance_rounded,
-                      color: theme.colorScheme.primary,
-                      size: 23,
-                    ),
-                  ),
-                  const SizedBox(width: 11),
-                  Text(
-                    'DINEROP',
-                    style: theme.textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: 1.1,
-                    ),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 16),
-
               const CooperativeLogoMarquee(),
 
               const SizedBox(height: 28),
@@ -98,13 +67,68 @@ class LoginPage extends ConsumerWidget {
                 onSimulationPressed: () => context.push('/simulate-investment'),
               ),
 
-              const SizedBox(height: 48),
-
-              // ─────────────────────────────────────────────
-              // LOGIN SECUNDARIO
-              // ─────────────────────────────────────────────
-              _LoginLink(onTap: () => _openLoginSheet(context)),
+              const SizedBox(height: 16),
             ],
+          ),
+        ),
+      ),
+      bottomNavigationBar: _LoginNavigationBar(
+        onPressed: () => _openLoginSheet(context),
+      ),
+    );
+  }
+}
+
+class _LoginNavigationBar extends StatelessWidget {
+  const _LoginNavigationBar({required this.onPressed});
+
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Container(
+      decoration: BoxDecoration(
+        border: Border(
+          top: BorderSide(color: theme.colorScheme.primary, width: 2),
+        ),
+      ),
+      child: BottomAppBar(
+        height: 70,
+        elevation: 0,
+        color: theme.colorScheme.surface,
+        padding: EdgeInsets.zero,
+        child: SafeArea(
+          top: false,
+          child: Center(
+            child: InkWell(
+              onTap: onPressed,
+              borderRadius: BorderRadius.circular(14),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 10,
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.login_rounded,
+                      color: theme.colorScheme.primary,
+                    ),
+                    const SizedBox(width: 10),
+                    Text(
+                      'Iniciar sesión',
+                      style: theme.textTheme.labelLarge?.copyWith(
+                        color: theme.colorScheme.primary,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
           ),
         ),
       ),
@@ -143,7 +167,7 @@ class _CreditServiceCard extends StatelessWidget {
           'Completa una sola solicitud y conecta con cooperativas aliadas.',
       buttonText: 'Solicitar',
       simulationText: 'Simulador',
-      buttonBackground: Colors.white,
+      buttonBackground: const Color(0xFFEAF2FF),
       buttonTextColor: const Color(0xFF0F172A),
       buttonIconColor: const Color(0xFF0F3A7D),
       shadowColor: const Color(0xFF0F3A7D),
@@ -393,44 +417,6 @@ class _ServiceCard extends StatelessWidget {
             ],
           ),
         ],
-      ),
-    );
-  }
-}
-
-// ═══════════════════════════════════════════════════════════
-// LOGIN LINK
-// ═══════════════════════════════════════════════════════════
-
-class _LoginLink extends StatelessWidget {
-  const _LoginLink({required this.onTap});
-
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Center(
-      child: TextButton(
-        onPressed: onTap,
-        child: RichText(
-          text: TextSpan(
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
-            ),
-            children: [
-              const TextSpan(text: '¿Ya tienes una cuenta? '),
-              TextSpan(
-                text: 'Iniciar sesión',
-                style: TextStyle(
-                  color: theme.colorScheme.primary,
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-            ],
-          ),
-        ),
       ),
     );
   }

@@ -16,10 +16,10 @@ class ApiConfig {
     }
 
     if (Platform.isAndroid) {
-      return 'https://markup-ecosystem-production-ec11.up.railway.app';
+      return 'https://markup-ecosystem-production-5dc8.up.railway.app';
     }
 
-    return 'https://markup-ecosystem-production-ec11.up.railway.app';
+    return 'https://markup-ecosystem-production-5dc8.up.railway.app';
   }
 
   static String _normalize(String value) => value.replaceAll(RegExp(r'/+$'), '');
