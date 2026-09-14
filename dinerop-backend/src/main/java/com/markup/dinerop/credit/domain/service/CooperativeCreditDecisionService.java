@@ -9,6 +9,7 @@ import com.markup.dinerop.credit.domain.service.calculation.LoanCalculator;
 import com.markup.dinerop.credit.dto.CooperativeOfferDefaultsDto;
 import com.markup.dinerop.credit.infrastructure.repository.SolicitudCooperativaCotizacionRepository;
 import com.markup.dinerop.credit.infrastructure.repository.SolicitudCooperativaRepository;
+import com.markup.dinerop.notification.service.NotificationService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
@@ -23,6 +24,7 @@ public class CooperativeCreditDecisionService {
     private final SolicitudCooperativaRepository repository;
     private final CooperativeService cooperativeService;
     private final SolicitudCooperativaCotizacionRepository cotizacionRepository;
+    private final NotificationService notificationService;
 
     @Transactional
     public void decide(
@@ -89,6 +91,15 @@ public class CooperativeCreditDecisionService {
 
             sc.setEstado(SolicitudCooperativaStatus.PRE_APROBADA);
             repository.save(sc);
+
+            notificationService.sendCreditOfferEmail(
+                    cr.getEmail(),
+                    cooperativeService.getById(cooperativaId).getNombre(),
+                    cotizacion.getMonto(),
+                    cotizacion.getTasaAnual(),
+                    cotizacion.getPlazoMeses(),
+                    cotizacion.getCuotaMensual()
+            );
 
         } else if ("RECHAZAR".equalsIgnoreCase(decision)) {
 

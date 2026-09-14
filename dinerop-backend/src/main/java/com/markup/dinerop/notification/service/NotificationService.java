@@ -9,8 +9,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import com.markup.dinerop.notification.template.ActivationEmailBuilder;
+import com.markup.dinerop.notification.template.CreditOfferEmailBuilder;
 import com.markup.dinerop.notification.template.EmailTemplate;
 import com.markup.dinerop.notification.util.EmailTemplateEngine;
+
+import java.math.BigDecimal;
 
 @Slf4j
 @Service
@@ -29,6 +32,8 @@ public class NotificationService {
     private boolean emailEnabled;
 
     private final ActivationEmailBuilder activationEmailBuilder;
+
+    private final CreditOfferEmailBuilder creditOfferEmailBuilder;
 
     private final EmailTemplateEngine emailTemplateEngine;
 
@@ -252,6 +257,47 @@ public class NotificationService {
                         .htmlContent(html)
                         .build()
         );
+    }
+
+    public void sendCreditOfferEmail(
+            String to,
+            String cooperativeName,
+            BigDecimal amount,
+            BigDecimal annualRate,
+            Integer termMonths,
+            BigDecimal monthlyPayment
+    ) {
+        EmailTemplate template = creditOfferEmailBuilder.buildPreApproved(
+                cooperativeName,
+                amount,
+                annualRate,
+                termMonths,
+                monthlyPayment,
+                clientDashboardUrl()
+        );
+        sendEmail(SendEmailDto.builder()
+                .to(to)
+                .subject("Nueva oferta de crédito de " + cooperativeName)
+                .htmlContent(emailTemplateEngine.render(template))
+                .build());
+    }
+
+    public void sendGuaranteeRequiredEmail(String to, String cooperativeName) {
+        EmailTemplate template = creditOfferEmailBuilder.buildGuaranteeRequired(
+                cooperativeName,
+                clientDashboardUrl()
+        );
+        sendEmail(SendEmailDto.builder()
+                .to(to)
+                .subject("" + cooperativeName + " solicita un garante")
+                .htmlContent(emailTemplateEngine.render(template))
+                .build());
+    }
+
+    private String clientDashboardUrl() {
+        return frontendUrl.endsWith("/")
+                ? frontendUrl + "dashboard-client"
+                : frontendUrl + "/dashboard-client";
     }
 
 }

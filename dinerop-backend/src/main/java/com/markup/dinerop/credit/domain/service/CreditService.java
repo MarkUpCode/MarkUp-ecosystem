@@ -13,6 +13,8 @@ import com.markup.dinerop.credit.dto.PublicCreditRequestDto;
 import com.markup.dinerop.credit.infrastructure.repository.CreditRequestRepository;
 import com.markup.dinerop.credit.infrastructure.repository.SolicitudCooperativaRepository;
 import com.markup.dinerop.auth.repository.UserRepository;
+import com.markup.dinerop.cooperative.domain.service.CooperativeService;
+import com.markup.dinerop.notification.service.NotificationService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,7 +37,9 @@ public class CreditService {
     private final AuthService authService;
     private final CreditDistributionService creditDistributionService;
     private final SolicitudCooperativaRepository solicitudCooperativaRepository;
-        private final UserRepository userRepository;
+    private final UserRepository userRepository;
+    private final CooperativeService cooperativeService;
+    private final NotificationService notificationService;
 
 
 
@@ -435,6 +439,10 @@ public class CreditService {
         }
 
         sc.setEstado(SolicitudCooperativaStatus.SOLICITANDO_GARANTE);
+        notificationService.sendGuaranteeRequiredEmail(
+                sc.getCreditRequest().getEmail(),
+                cooperativeService.getById(cooperativaId).getNombre()
+        );
     }
 
 
