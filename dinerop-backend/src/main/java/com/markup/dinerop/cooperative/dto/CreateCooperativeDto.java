@@ -16,6 +16,7 @@ public class CreateCooperativeDto {
     private String logoUrl;
     private Double calificacion;
     private BigDecimal montoMaximoCredito;
+    private BigDecimal tasaAnual;
 
 }
 

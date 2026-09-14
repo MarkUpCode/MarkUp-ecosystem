@@ -14,4 +14,10 @@ public interface CooperativeRateRepository
             Long cooperativaId,
             CreditType tipoCredito
     );
+
+    Optional<CooperativeRate>
+    findByCooperativaIdAndTipoCredito(
+            Long cooperativaId,
+            CreditType tipoCredito
+    );
 }

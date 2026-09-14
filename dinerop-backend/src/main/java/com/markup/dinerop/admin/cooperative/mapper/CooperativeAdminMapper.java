@@ -3,6 +3,7 @@ package com.markup.dinerop.admin.cooperative.mapper;
 import com.markup.dinerop.admin.cooperative.dto.response.CooperativeDetailResponse;
 import com.markup.dinerop.admin.cooperative.dto.response.CooperativeListItemResponse;
 import com.markup.dinerop.cooperative.domain.entity.Cooperative;
+import java.math.BigDecimal;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 import com.markup.dinerop.admin.cooperative.dto.request.CreateCooperativeRequest;
@@ -34,7 +35,10 @@ public class CooperativeAdminMapper {
 
     }
 
-    public CooperativeDetailResponse toDetail(Cooperative cooperative) {
+    public CooperativeDetailResponse toDetail(
+            Cooperative cooperative,
+            BigDecimal tasaAnual
+    ) {
 
         return new CooperativeDetailResponse(
 
@@ -58,7 +62,9 @@ public class CooperativeAdminMapper {
 
                 cooperative.getCalificacion(),
 
-                cooperative.getMontoMaximoCredito()
+                cooperative.getMontoMaximoCredito(),
+
+                tasaAnual
 
         );
 

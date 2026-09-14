@@ -12,6 +12,7 @@ import com.markup.dinerop.cooperative.dto.InternalCooperativeDto;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -53,7 +54,10 @@ public class CooperativeService {
         return toDto(getById(id));
     }
 
+    @Transactional
     public CooperativeDto create(CreateCooperativeDto dto) {
+        validateAnnualRate(dto.getTasaAnual());
+
         Cooperative cooperative = new Cooperative();
         cooperative.setNombre(dto.getNombre());
         cooperative.setCiudad(dto.getCiudad());
@@ -67,7 +71,10 @@ public class CooperativeService {
                 dto.getMontoMaximoCredito() != null ? dto.getMontoMaximoCredito() : BigDecimal.ZERO
         );
 
-        return toDto(cooperativeRepository.save(cooperative));
+        cooperative = cooperativeRepository.save(cooperative);
+        createDefaultRates(cooperative.getId(), dto.getTasaAnual());
+
+        return toDto(cooperative);
     }
 
     public List<InternalCooperativeDto> findInternalByCity(String city) {
@@ -146,6 +153,26 @@ public class CooperativeService {
                         "No existe tasa activa para cooperativaId=" + cooperativeId +
                                 " y tipoCredito=" + creditType
                 ));
+    }
+
+    private void createDefaultRates(Long cooperativeId, BigDecimal tasaAnual) {
+        for (CreditType creditType : CreditType.values()) {
+            cooperativeRateRepository.save(
+                    CooperativeRate.builder()
+                            .cooperativaId(cooperativeId)
+                            .tipoCredito(creditType)
+                            .tasaAnual(tasaAnual)
+                            .activa(true)
+                            .build()
+            );
+        }
+    }
+
+    private void validateAnnualRate(BigDecimal tasaAnual) {
+        if (tasaAnual == null || tasaAnual.compareTo(BigDecimal.ZERO) <= 0
+                || tasaAnual.compareTo(BigDecimal.valueOf(100)) > 0) {
+            throw new IllegalArgumentException("La tasa anual debe estar entre 0 y 100");
+        }
     }
 
     private CooperativeDto toDto(Cooperative cooperative) {

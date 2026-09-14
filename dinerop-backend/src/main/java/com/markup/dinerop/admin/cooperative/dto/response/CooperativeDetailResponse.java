@@ -24,7 +24,9 @@ public record CooperativeDetailResponse(
 
         Double calificacion,
 
-        BigDecimal montoMaximoCredito
+        BigDecimal montoMaximoCredito,
+
+        BigDecimal tasaAnual
 
 ) {
 }

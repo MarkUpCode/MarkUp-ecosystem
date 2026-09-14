@@ -21,6 +21,8 @@ import com.markup.dinerop.admin.cooperative.dto.request.UpdateCooperativeRequest
 import com.markup.dinerop.admin.cooperative.specification.CooperativeSpecification;
 import org.springframework.data.jpa.domain.Specification;
 
+import java.math.BigDecimal;
+
 @Service
 @RequiredArgsConstructor
 public class CooperativeAdminService {
@@ -94,7 +96,7 @@ public class CooperativeAdminService {
                             new CooperativeNotFoundException(id)
                     );
 
-        return mapper.toDetail(cooperative);
+        return mapper.toDetail(cooperative, getStandardRate(cooperative.getId()));
 
     }
 
@@ -109,7 +111,7 @@ public class CooperativeAdminService {
 
         createDefaultRates(cooperative.getId(), request.tasaAnual());
 
-        return mapper.toDetail(cooperative);
+        return mapper.toDetail(cooperative, request.tasaAnual());
 
     }
 
@@ -129,7 +131,7 @@ public class CooperativeAdminService {
 
         cooperative = cooperativeRepository.save(cooperative);
 
-        return mapper.toDetail(cooperative);
+        return mapper.toDetail(cooperative, getStandardRate(cooperative.getId()));
 
     }
 
@@ -143,7 +145,7 @@ public class CooperativeAdminService {
 
     }
 
-    private void createDefaultRates(Long cooperativeId, java.math.BigDecimal tasaAnual) {
+    private void createDefaultRates(Long cooperativeId, BigDecimal tasaAnual) {
         for (CreditType creditType : CreditType.values()) {
             cooperativeRateRepository.save(
                     CooperativeRate.builder()
@@ -154,6 +156,16 @@ public class CooperativeAdminService {
                             .build()
             );
         }
+    }
+
+    private BigDecimal getStandardRate(Long cooperativeId) {
+        return cooperativeRateRepository
+                .findByCooperativaIdAndTipoCreditoAndActivaTrue(
+                        cooperativeId,
+                        CreditType.MICROCREDITO
+                )
+                .map(CooperativeRate::getTasaAnual)
+                .orElse(null);
     }
 
 }
