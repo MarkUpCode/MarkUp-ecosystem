@@ -100,12 +100,12 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/splash',
         pageBuilder: (context, state) =>
-        _fadePage(state: state, child: const SplashPage()),
+            _fadePage(state: state, child: const SplashPage()),
       ),
       GoRoute(
         path: '/welcome',
         pageBuilder: (context, state) =>
-        _fadePage(state: state, child: const WelcomePage()),
+            _fadePage(state: state, child: const WelcomePage()),
       ),
       GoRoute(
         path: '/simulate-credit',
@@ -119,7 +119,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/login',
         pageBuilder: (context, state) =>
-        _fadePage(state: state, child: const LoginPage()),
+            _fadePage(state: state, child: const LoginPage()),
       ),
       GoRoute(
         path: '/register',
@@ -146,15 +146,18 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/pending-activation',
-        builder: (context, state) =>
-            PendingActivationPage(
-              email: state.uri.queryParameters['email'],
-              message: state.uri.queryParameters['message'],
-            ),
+        builder: (context, state) => PendingActivationPage(
+          email: state.uri.queryParameters['email'],
+          message: state.uri.queryParameters['message'],
+        ),
       ),
       GoRoute(
         path: '/onboarding',
         builder: (context, state) => const OnboardingPage(),
+      ),
+      GoRoute(
+        path: '/guarantor-onboarding',
+        builder: (context, state) => const OnboardingPage(isGuarantor: true),
       ),
       GoRoute(
         path: '/request-credit',
@@ -185,4 +188,3 @@ final appRouterProvider = Provider<GoRouter>((ref) {
     ],
   );
 });
-

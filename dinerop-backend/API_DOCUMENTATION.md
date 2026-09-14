@@ -218,7 +218,8 @@ Crea una nueva cooperativa.
   "paginaWeb": "https://ejemplo.com",
   "logoUrl": "https://cdn.ejemplo.com/logo.png",
   "calificacion": 4.5,
-  "montoMaximoCredito": 50000.00
+  "montoMaximoCredito": 50000.00,
+  "tasaAnual": 16.50
 }
 ```
 

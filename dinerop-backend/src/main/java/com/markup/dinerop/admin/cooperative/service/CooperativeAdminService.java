@@ -5,12 +5,16 @@ import com.markup.dinerop.admin.cooperative.dto.response.CooperativeListItemResp
 import com.markup.dinerop.admin.cooperative.dto.response.PagedCooperativesResponse;
 import com.markup.dinerop.admin.cooperative.mapper.CooperativeAdminMapper;
 import com.markup.dinerop.cooperative.domain.entity.Cooperative;
+import com.markup.dinerop.cooperative.domain.entity.CooperativeRate;
+import com.markup.dinerop.cooperative.domain.entity.enums.CreditType;
+import com.markup.dinerop.cooperative.domain.repository.CooperativeRateRepository;
 import com.markup.dinerop.cooperative.domain.repository.CooperativeRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import com.markup.dinerop.admin.cooperative.dto.request.CreateCooperativeRequest;
 import com.markup.dinerop.admin.cooperative.exception.CooperativeNotFoundException;
 import com.markup.dinerop.admin.cooperative.dto.request.UpdateCooperativeRequest;
@@ -22,6 +26,8 @@ import org.springframework.data.jpa.domain.Specification;
 public class CooperativeAdminService {
 
     private final CooperativeRepository cooperativeRepository;
+
+    private final CooperativeRateRepository cooperativeRateRepository;
 
     private final CooperativeAdminMapper mapper;
 
@@ -92,6 +98,7 @@ public class CooperativeAdminService {
 
     }
 
+    @Transactional
     public CooperativeDetailResponse createCooperative(
         CreateCooperativeRequest request
     ) {
@@ -99,6 +106,8 @@ public class CooperativeAdminService {
         Cooperative cooperative = mapper.toEntity(request);
 
         cooperative = cooperativeRepository.save(cooperative);
+
+        createDefaultRates(cooperative.getId(), request.tasaAnual());
 
         return mapper.toDetail(cooperative);
 
@@ -132,6 +141,19 @@ public class CooperativeAdminService {
 
         cooperativeRepository.delete(cooperative);
 
+    }
+
+    private void createDefaultRates(Long cooperativeId, java.math.BigDecimal tasaAnual) {
+        for (CreditType creditType : CreditType.values()) {
+            cooperativeRateRepository.save(
+                    CooperativeRate.builder()
+                            .cooperativaId(cooperativeId)
+                            .tipoCredito(creditType)
+                            .tasaAnual(tasaAnual)
+                            .activa(true)
+                            .build()
+            );
+        }
     }
 
 }

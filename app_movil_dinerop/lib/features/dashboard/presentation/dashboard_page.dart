@@ -4,249 +4,298 @@ import 'package:go_router/go_router.dart';
 
 import '../../../app/providers.dart';
 import '../../../core/errors/app_exception.dart';
-import '../../../core/utils/formatters.dart';
-import '../../../core/widgets/cooperative_logo_marquee.dart';
-import '../../../shared/widgets/app_badge.dart';
-import '../../../shared/widgets/app_button.dart';
-import '../../../shared/widgets/app_card.dart';
+import '../../../core/theme/app_colors.dart';
 import '../../../shared/widgets/app_empty_state.dart';
 import '../../../shared/widgets/app_error_view.dart';
-import '../../../shared/widgets/app_header.dart';
 import '../../../shared/widgets/app_loader.dart';
 import '../../auth/presentation/auth_controller.dart';
+import '../../credit/presentation/widgets/credit_request_card.dart';
 
 class DashboardPage extends ConsumerWidget {
   const DashboardPage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final authState = ref.watch(authControllerProvider);
-    final requestsAsync = ref.watch(dashboardCreditRequestsProvider);
-    final onboardingAsync = ref.watch(dashboardOnboardingStatusProvider);
+    final auth = ref.watch(authControllerProvider);
+    final profile = ref.watch(clientProfileProvider);
+    final requests = ref.watch(dashboardCreditRequestsProvider);
+    final onboarding = ref.watch(dashboardOnboardingStatusProvider);
+    final theme = Theme.of(context);
 
     return Scaffold(
       body: SafeArea(
         child: RefreshIndicator(
           onRefresh: () async {
+            ref.invalidate(clientProfileProvider);
             ref.invalidate(dashboardCreditRequestsProvider);
             ref.invalidate(dashboardOnboardingStatusProvider);
-
-            await authState.refreshOnboardingState();
+            await auth.refreshOnboardingState();
           },
           child: ListView(
-            padding: const EdgeInsets.all(24),
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: const EdgeInsets.fromLTRB(20, 22, 20, 32),
             children: [
-              // ------------------------------------------------------------
-              // HEADER
-              // ------------------------------------------------------------
-              const CooperativeLogoMarquee(
-                height: 64,
-                speed: 80,
-                logoSize: 112,
-                gap: 16,
+              profile.when(
+                data: (data) => _WelcomeHeader(
+                  name: data.firstName?.trim().isNotEmpty == true
+                      ? data.firstName!.trim()
+                      : 'cliente',
+                ),
+                loading: () => const _WelcomeHeader(name: 'cliente'),
+                error: (_, _) => const _WelcomeHeader(name: 'cliente'),
               ),
-
               const SizedBox(height: 20),
-
-              AppHeader(
-                title:
-                    'Hola, ${authState.user?.email ?? 'cliente'}',
-                subtitle:
-                    'Gestiona tu crédito y consulta el estado de tus solicitudes.',
-              ),
-
-              const SizedBox(height: 20),
-
-              // ------------------------------------------------------------
-              // ONBOARDING
-              // ------------------------------------------------------------
-              onboardingAsync.when(
-                data: (status) {
-                  final isComplete = status.formularioCompleto;
-
-                  return AppCard(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(10),
-                              decoration: BoxDecoration(
-                                color: isComplete
-                                    ? Theme.of(context).colorScheme.secondary
-                                          .withValues(alpha: 0.12)
-                                    : Theme.of(context).colorScheme.primary
-                                          .withValues(alpha: 0.12),
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Icon(
-                                isComplete
-                                    ? Icons.check_circle_outline_rounded
-                                    : Icons.person_outline_rounded,
-                                color: isComplete
-                                    ? Theme.of(context).colorScheme.secondary
-                                    : Theme.of(context).colorScheme.primary,
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    isComplete
-                                        ? 'Perfil completo'
-                                        : 'Completa tu perfil',
-                                    style: Theme.of(
-                                      context,
-                                    ).textTheme.titleMedium,
-                                  ),
-                                  const SizedBox(height: 6),
-                                  Text(
-                                    isComplete
-                                        ? 'Tu información está lista para la evaluación.'
-                                        : 'Agrega información para que las cooperativas puedan evaluar mejor tu solicitud.',
-                                    style: Theme.of(
-                                      context,
-                                    ).textTheme.bodyMedium,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-
-                        // --------------------------------------------------
-                        // BOTÓN SOLO SI EL PERFIL ESTÁ PENDIENTE
-                        // --------------------------------------------------
-                        if (!isComplete) ...[
-                          const SizedBox(height: 16),
-                          SizedBox(
-                            width: double.infinity,
-                            child: AppButton(
-                              label: 'Completar mi perfil',
-                              icon: Icons.arrow_forward_rounded,
-                              onPressed: () {
-                                context.push('/onboarding');
-                              },
-                            ),
-                          ),
-                        ],
-                      ],
-                    ),
-                  );
-                },
-                loading: () =>
-                    const AppLoader(label: 'Cargando estado del perfil...'),
-                error: (error, stackTrace) => AppErrorView(
+              onboarding.when(
+                data: (status) => _ProfileProgressCard(
+                  complete: status.formularioCompleto,
+                  onTap: status.formularioCompleto
+                      ? null
+                      : () => context.push('/onboarding'),
+                ),
+                loading: () => const SizedBox(
+                  height: 88,
+                  child: AppLoader(label: 'Verificando tu perfil...'),
+                ),
+                error: (error, _) => AppErrorView(
                   message: error is AppException
                       ? error.message
                       : AppErrorMessages.generic,
                 ),
               ),
-
-              const SizedBox(height: 20),
-
-              // ------------------------------------------------------------
-              // ACCIÓN PRINCIPAL
-              // ------------------------------------------------------------
-              SizedBox(
-                width: double.infinity,
-                child: AppButton(
-                  label: 'Solicitar crédito',
-                  icon: Icons.add_circle_outline_rounded,
-                  onPressed: () {
-                    context.push('/request-credit');
-                  },
-                ),
-              ),
-
               const SizedBox(height: 24),
-
-              // ------------------------------------------------------------
-              // SOLICITUDES
-              // ------------------------------------------------------------
-              Text(
-                'Solicitudes recientes',
-                style: Theme.of(context).textTheme.titleLarge,
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      'Tu actividad',
+                      style: theme.textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () => context.go('/requests'),
+                    child: const Text('Ver todas'),
+                  ),
+                ],
               ),
-
-              const SizedBox(height: 12),
-
-              requestsAsync.when(
-                data: (requests) {
-                  if (requests.isEmpty) {
+              const SizedBox(height: 8),
+              requests.when(
+                data: (items) {
+                  if (items.isEmpty) {
                     return AppEmptyState(
                       title: 'Aún no tienes solicitudes',
                       message:
-                          'Cuando envíes una solicitud de crédito aparecerá aquí su seguimiento.',
+                          'Cuando envíes una solicitud de crédito, podrás seguirla desde aquí.',
                       actionLabel: 'Solicitar crédito',
-                      onAction: () {
-                        context.push('/request-credit');
-                      },
-                      icon: Icons.receipt_long_outlined,
+                      onAction: () => context.push('/request-credit'),
+                      icon: Icons.account_balance_wallet_outlined,
                     );
                   }
-
                   return Column(
-                    children: requests.take(3).map((request) {
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 12),
-                        child: AppCard(
+                    children: items
+                        .take(2)
+                        .map(
+                          (item) => Padding(
+                            padding: const EdgeInsets.only(bottom: 14),
+                            child: CreditRequestCard(
+                              request: item,
+                              compact: true,
+                              onTap: () => context.go('/requests'),
+                            ),
+                          ),
+                        )
+                        .toList(),
+                  );
+                },
+                loading: () =>
+                    const AppLoader(label: 'Cargando tu actividad...'),
+                error: (error, _) => AppErrorView(
+                  message: error is AppException
+                      ? error.message
+                      : AppErrorMessages.generic,
+                ),
+              ),
+              const SizedBox(height: 22),
+              DecoratedBox(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(22),
+                  gradient: const LinearGradient(
+                    colors: [AppColors.primary, Color(0xFF1E5CB7)],
+                  ),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Color(0x260F3A7D),
+                      blurRadius: 18,
+                      offset: Offset(0, 9),
+                    ),
+                  ],
+                ),
+                child: InkWell(
+                  onTap: () => context.push('/request-credit'),
+                  borderRadius: BorderRadius.circular(22),
+                  child: const Padding(
+                    padding: EdgeInsets.all(20),
+                    child: Row(
+                      children: [
+                        CircleAvatar(
+                          radius: 25,
+                          backgroundColor: Color(0x24FFFFFF),
+                          child: Icon(
+                            Icons.add_chart_rounded,
+                            color: Colors.white,
+                          ),
+                        ),
+                        SizedBox(width: 14),
+                        Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Expanded(
-                                    child: Text(
-                                      formatCurrency(request.monto),
-                                      style: Theme.of(
-                                        context,
-                                      ).textTheme.headlineSmall,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 12),
-                                  AppBadge(
-                                    label: request.estado.name.toUpperCase(),
-                                  ),
-                                ],
-                              ),
-
-                              const SizedBox(height: 8),
-
                               Text(
-                                request.tipo,
-                                style: Theme.of(context).textTheme.bodyMedium,
+                                'Nueva solicitud',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w800,
+                                  fontSize: 17,
+                                ),
                               ),
-
-                              const SizedBox(height: 4),
-
+                              SizedBox(height: 4),
                               Text(
-                                formatDate(request.fechaSolicitud),
-                                style: Theme.of(context).textTheme.bodySmall,
+                                'Encuentra opciones entre cooperativas.',
+                                style: TextStyle(
+                                  color: Color(0xDFFFFFFF),
+                                  fontSize: 13,
+                                ),
                               ),
                             ],
                           ),
                         ),
-                      );
-                    }).toList(),
-                  );
-                },
-                loading: () =>
-                    const AppLoader(label: 'Cargando solicitudes...'),
-                error: (error, stackTrace) => AppErrorView(
-                  message: error is AppException
-                      ? error.message
-                      : AppErrorMessages.generic,
+                        Icon(Icons.arrow_forward_rounded, color: Colors.white),
+                      ],
+                    ),
+                  ),
                 ),
               ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _WelcomeHeader extends StatelessWidget {
+  const _WelcomeHeader({required this.name});
+  final String name;
+
+  @override
+  Widget build(BuildContext context) => Row(
+    children: [
+      Container(
+        width: 50,
+        height: 50,
+        decoration: const BoxDecoration(
+          color: AppColors.primaryContainer,
+          shape: BoxShape.circle,
+        ),
+        alignment: Alignment.center,
+        child: Text(
+          name.substring(0, 1).toUpperCase(),
+          style: const TextStyle(
+            color: AppColors.primary,
+            fontWeight: FontWeight.w900,
+            fontSize: 20,
+          ),
+        ),
+      ),
+      const SizedBox(width: 13),
+      Expanded(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Hola, $name',
+              style: Theme.of(
+                context,
+              ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w900),
+            ),
+            const SizedBox(height: 3),
+            Text(
+              'Tu centro de crédito personal',
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
+          ],
+        ),
+      ),
+      IconButton(
+        onPressed: () {},
+        icon: const Icon(Icons.notifications_none_rounded),
+      ),
+    ],
+  );
+}
+
+class _ProfileProgressCard extends StatelessWidget {
+  const _ProfileProgressCard({required this.complete, this.onTap});
+  final bool complete;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final color = complete ? AppColors.success : AppColors.warning;
+    final soft = complete ? AppColors.successSoft : AppColors.warningSoft;
+    return Material(
+      color: soft,
+      borderRadius: BorderRadius.circular(20),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(20),
+        child: Padding(
+          padding: const EdgeInsets.all(17),
+          child: Row(
+            children: [
+              Container(
+                width: 42,
+                height: 42,
+                decoration: BoxDecoration(
+                  color: color.withValues(alpha: .14),
+                  borderRadius: BorderRadius.circular(13),
+                ),
+                child: Icon(
+                  complete
+                      ? Icons.verified_rounded
+                      : Icons.assignment_ind_rounded,
+                  color: color,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      complete
+                          ? 'Perfil listo para evaluación'
+                          : 'Completa tu perfil',
+                      style: TextStyle(
+                        color: color,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      complete
+                          ? 'Tu información está al día.'
+                          : 'Mejora tus opciones con las cooperativas.',
+                      style: TextStyle(
+                        color: color.withValues(alpha: .92),
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              if (!complete) Icon(Icons.arrow_forward_rounded, color: color),
             ],
           ),
         ),

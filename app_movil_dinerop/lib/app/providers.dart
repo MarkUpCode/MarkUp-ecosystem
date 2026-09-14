@@ -25,7 +25,9 @@ final dashboardOnboardingStatusProvider = FutureProvider.autoDispose((ref) {
 /// Personal data captured at registration. The login response intentionally
 /// contains only authentication data, so client-facing screens use this
 /// authenticated endpoint for the person's name and contact details.
-final clientProfileProvider = FutureProvider.autoDispose<PreRegistrationData>((ref) {
+final clientProfileProvider = FutureProvider.autoDispose<PreRegistrationData>((
+  ref,
+) {
   return ref.watch(onboardingRepositoryProvider).loadPreRegistrationData();
 });
 

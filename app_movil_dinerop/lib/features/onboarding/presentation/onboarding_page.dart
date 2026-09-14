@@ -17,7 +17,11 @@ import '../../auth/presentation/auth_controller.dart';
 import '../data/models/onboarding_request.dart';
 
 class OnboardingPage extends ConsumerStatefulWidget {
-  const OnboardingPage({super.key});
+  const OnboardingPage({super.key, this.isGuarantor = false});
+
+  /// The guarantor has the same five information steps as the web app, but
+  /// never includes a spouse and is sent to its dedicated endpoint.
+  final bool isGuarantor;
 
   @override
   ConsumerState<OnboardingPage> createState() => _OnboardingPageState();
@@ -115,7 +119,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
     super.dispose();
   }
 
-  int get _totalSteps => _tieneConyuge ? 6 : 5;
+  int get _totalSteps => widget.isGuarantor ? 5 : (_tieneConyuge ? 6 : 5);
 
   bool get _isLastStep => _step == _totalSteps - 1;
 
@@ -123,20 +127,28 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
       ecuadorProvincias.map((province) => province.provincia).toList();
 
   Future<void> _loadInitialData() async {
+    if (widget.isGuarantor) {
+      if (mounted) setState(() => _isLoading = false);
+      return;
+    }
     try {
-      final data = await ref.read(onboardingRepositoryProvider).loadPreRegistrationData();
+      final data = await ref
+          .read(onboardingRepositoryProvider)
+          .loadPreRegistrationData();
       _nombresController.text = data.firstName ?? '';
       _apellidosController.text = data.lastName ?? '';
       _cedulaController.text = data.identification ?? '';
       _telefonoController.text = data.phone ?? '';
       _preRegistrationEmail = data.email;
-      _emailController.text = data.email ?? ref.read(authControllerProvider).user?.email ?? '';
+      _emailController.text =
+          data.email ?? ref.read(authControllerProvider).user?.email ?? '';
       _selectedProvince = data.province;
       _selectedCanton = data.city;
       _provinciaController.text = data.province ?? '';
       _cantonController.text = data.city ?? '';
     } catch (_) {
-      _emailController.text = ref.read(authControllerProvider).user?.email ?? '';
+      _emailController.text =
+          ref.read(authControllerProvider).user?.email ?? '';
     } finally {
       if (mounted) {
         setState(() => _isLoading = false);
@@ -157,7 +169,10 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
   List<String> _availableParishes([String? canton]) {
     final provinceName = _selectedProvince;
     final cantonName = canton ?? _selectedCanton;
-    if (provinceName == null || provinceName.isEmpty || cantonName == null || cantonName.isEmpty) {
+    if (provinceName == null ||
+        provinceName.isEmpty ||
+        cantonName == null ||
+        cantonName.isEmpty) {
       return const [];
     }
 
@@ -180,9 +195,74 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
   }
 
   void _goNext() {
+    final validationMessage = _currentStepValidationMessage();
+    if (validationMessage != null) {
+      setState(() => _error = validationMessage);
+      return;
+    }
     setState(() {
+      _error = null;
       _step = math.min(_step + 1, _totalSteps - 1);
     });
+  }
+
+  String? _currentStepValidationMessage() {
+    bool empty(TextEditingController controller) =>
+        controller.text.trim().isEmpty;
+
+    switch (_step) {
+      case 0:
+        if (empty(_cedulaController) ||
+            empty(_nombresController) ||
+            empty(_apellidosController) ||
+            _fechaNacimiento == null) {
+          return 'Completa cédula, nombres, apellidos y fecha de nacimiento.';
+        }
+        break;
+      case 1:
+        if (empty(_telefonoController) ||
+            empty(_ocupacionController) ||
+            empty(_empresaController)) {
+          return 'Completa teléfono, ocupación y empresa o negocio.';
+        }
+        break;
+      case 2:
+        if (_selectedProvince == null ||
+            _selectedCanton == null ||
+            _selectedParish == null ||
+            empty(_calleController) ||
+            empty(_numeroController)) {
+          return 'Completa provincia, cantón, parroquia, calle y número.';
+        }
+        break;
+      case 3:
+        if (double.tryParse(_ingresoController.text.replaceAll(',', '.')) ==
+                null ||
+            double.tryParse(_egresoController.text.replaceAll(',', '.')) ==
+                null) {
+          return 'Ingresa los valores de ingreso y egreso mensuales.';
+        }
+        if (_references.any(
+          (reference) =>
+              empty(reference.nombreCompletoController) ||
+              empty(reference.telefonoController),
+        )) {
+          return 'Completa el nombre y teléfono de cada referencia.';
+        }
+        break;
+      case 4:
+        if (!widget.isGuarantor && _tieneConyuge) {
+          if (empty(_conyugeCedulaController) ||
+              empty(_conyugeNombresController) ||
+              empty(_conyugeApellidosController) ||
+              _conyugeFechaNacimiento == null ||
+              empty(_conyugeTelefonoController)) {
+            return 'Completa los datos obligatorios del cónyuge.';
+          }
+        }
+        break;
+    }
+    return null;
   }
 
   void _goPrevious() {
@@ -243,7 +323,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
   void _updateEstadoCivil(String value) {
     setState(() {
       _estadoCivil = value;
-      _tieneConyuge = value == 'CASADO';
+      _tieneConyuge = !widget.isGuarantor && value == 'CASADO';
 
       if (_tieneConyuge) {
         _ensureSpouseFields();
@@ -330,10 +410,15 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
           telefonoNegocio: _telefonoNegocioController.text.trim(),
         ),
         ingresoEgreso: OnboardingIncomeRequest(
-          ingresoMensual: double.tryParse(_ingresoController.text.replaceAll(',', '.')) ?? 0,
-          egresoMensual: double.tryParse(_egresoController.text.replaceAll(',', '.')) ?? 0,
+          ingresoMensual:
+              double.tryParse(_ingresoController.text.replaceAll(',', '.')) ??
+              0,
+          egresoMensual:
+              double.tryParse(_egresoController.text.replaceAll(',', '.')) ?? 0,
         ),
-        referencias: _references.map((reference) => reference.toRequest()).toList(),
+        referencias: _references
+            .map((reference) => reference.toRequest())
+            .toList(),
       );
 
       final conyuge = _tieneConyuge
@@ -371,15 +456,23 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
             )
           : null;
 
-      final response = await ref.read(onboardingRepositoryProvider).submitClientOnboarding(
-            OnboardingClientRequest(
-              destinoCredito: _destinoController.text.trim(),
-              solicitante: solicitante,
-              conyuge: conyuge,
-            ),
-          );
+      final response = widget.isGuarantor
+          ? await ref
+                .read(onboardingRepositoryProvider)
+                .submitGuarantorOnboarding(solicitante)
+          : await ref
+                .read(onboardingRepositoryProvider)
+                .submitClientOnboarding(
+                  OnboardingClientRequest(
+                    destinoCredito: _destinoController.text.trim(),
+                    solicitante: solicitante,
+                    conyuge: conyuge,
+                  ),
+                );
 
-      await ref.read(authControllerProvider).refreshOnboardingState();
+      if (!widget.isGuarantor) {
+        await ref.read(authControllerProvider).refreshOnboardingState();
+      }
       if (!mounted) return;
 
       await _showSuccessDialog(
@@ -389,11 +482,18 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
       );
 
       if (mounted) {
-        context.go('/dashboard');
+        if (widget.isGuarantor) {
+          context.pop(true);
+        } else {
+          context.go('/dashboard');
+        }
       }
     } on AppException catch (error) {
       final alreadyCompleted =
-          error.statusCode == 400 && error.message.contains('ya ha completado el formulario de onboarding');
+          error.statusCode == 400 &&
+          error.message.contains(
+            'ya ha completado el formulario de onboarding',
+          );
       if (alreadyCompleted) {
         setState(() {
           _showAlreadyCompleted = true;
@@ -403,7 +503,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
           responseId: null,
           responseEstado: null,
         );
-        if (mounted) {
+        if (mounted && !widget.isGuarantor) {
           context.go('/dashboard');
         }
         return;
@@ -433,17 +533,30 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
       barrierDismissible: false,
       builder: (dialogContext) {
         final isSuccess = !alreadyCompleted;
-        final title = isSuccess ? '¡Formulario Guardado!' : 'Formulario Ya Completado';
+        final title = isSuccess
+            ? widget.isGuarantor
+                  ? '¡Garante registrado!'
+                  : '¡Formulario Guardado!'
+            : 'Formulario Ya Completado';
         final subtitle = isSuccess
-            ? 'Tu información ha sido registrada exitosamente'
+            ? widget.isGuarantor
+                  ? 'La información del garante fue registrada exitosamente'
+                  : 'Tu información ha sido registrada exitosamente'
             : 'Tu información ya está registrada en nuestro sistema';
         final mainMessage = isSuccess
-            ? 'Tu información personal y económica ha sido guardada. Ahora puedes solicitar créditos en cooperativas aliadas.'
+            ? widget.isGuarantor
+                  ? 'La cooperativa podrá revisar esta información para continuar con la solicitud de crédito.'
+                  : 'Tu información personal y económica ha sido guardada. Ahora puedes solicitar créditos en cooperativas aliadas.'
             : 'Ya tienes un formulario de onboarding completado. Puedes acceder a tu panel para explorar opciones de crédito.';
 
         return Dialog(
-          insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+          insetPadding: const EdgeInsets.symmetric(
+            horizontal: 20,
+            vertical: 24,
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(24),
+          ),
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 460),
             child: Column(
@@ -454,9 +567,14 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
                     color: isSuccess
-                        ? Theme.of(dialogContext).colorScheme.primaryContainer.withValues(alpha: 0.35)
-                        : Theme.of(dialogContext).colorScheme.secondaryContainer.withValues(alpha: 0.35),
-                    borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+                        ? Theme.of(
+                            dialogContext,
+                          ).colorScheme.primaryContainer.withValues(alpha: 0.35)
+                        : Theme.of(dialogContext).colorScheme.secondaryContainer
+                              .withValues(alpha: 0.35),
+                    borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(24),
+                    ),
                   ),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -465,12 +583,18 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
                           color: isSuccess
-                              ? Theme.of(dialogContext).colorScheme.primary.withValues(alpha: 0.1)
-                              : Theme.of(dialogContext).colorScheme.secondary.withValues(alpha: 0.1),
+                              ? Theme.of(
+                                  dialogContext,
+                                ).colorScheme.primary.withValues(alpha: 0.1)
+                              : Theme.of(
+                                  dialogContext,
+                                ).colorScheme.secondary.withValues(alpha: 0.1),
                           shape: BoxShape.circle,
                         ),
                         child: Icon(
-                          isSuccess ? Icons.check_circle_outline_rounded : Icons.info_outline_rounded,
+                          isSuccess
+                              ? Icons.check_circle_outline_rounded
+                              : Icons.info_outline_rounded,
                           color: isSuccess
                               ? Theme.of(dialogContext).colorScheme.primary
                               : Theme.of(dialogContext).colorScheme.secondary,
@@ -484,14 +608,17 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
                           children: [
                             Text(
                               title,
-                              style: Theme.of(dialogContext).textTheme.titleLarge?.copyWith(
-                                    fontWeight: FontWeight.w800,
-                                  ),
+                              style: Theme.of(dialogContext)
+                                  .textTheme
+                                  .titleLarge
+                                  ?.copyWith(fontWeight: FontWeight.w800),
                             ),
                             const SizedBox(height: 4),
                             Text(
                               subtitle,
-                              style: Theme.of(dialogContext).textTheme.bodyMedium,
+                              style: Theme.of(
+                                dialogContext,
+                              ).textTheme.bodyMedium,
                             ),
                           ],
                         ),
@@ -512,19 +639,26 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
                           color: isSuccess
-                              ? Theme.of(dialogContext).colorScheme.primaryContainer.withValues(alpha: 0.22)
-                              : Theme.of(dialogContext).colorScheme.secondaryContainer.withValues(alpha: 0.22),
+                              ? Theme.of(dialogContext)
+                                    .colorScheme
+                                    .primaryContainer
+                                    .withValues(alpha: 0.22)
+                              : Theme.of(dialogContext)
+                                    .colorScheme
+                                    .secondaryContainer
+                                    .withValues(alpha: 0.22),
                           borderRadius: BorderRadius.circular(16),
                           border: Border.all(
-                            color: Theme.of(dialogContext).colorScheme.outlineVariant.withValues(alpha: 0.6),
+                            color: Theme.of(
+                              dialogContext,
+                            ).colorScheme.outlineVariant.withValues(alpha: 0.6),
                           ),
                         ),
                         child: Text(
                           mainMessage,
                           textAlign: TextAlign.center,
-                          style: Theme.of(dialogContext).textTheme.bodyMedium?.copyWith(
-                                fontWeight: FontWeight.w600,
-                              ),
+                          style: Theme.of(dialogContext).textTheme.bodyMedium
+                              ?.copyWith(fontWeight: FontWeight.w600),
                         ),
                       ),
                       if (responseId != null || responseEstado != null) ...[
@@ -532,7 +666,8 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
                         Text(
                           [
                             if (responseId != null) 'Solicitud #$responseId',
-                            if (responseEstado != null) 'Estado: $responseEstado',
+                            if (responseEstado != null)
+                              'Estado: $responseEstado',
                           ].join(' · '),
                           textAlign: TextAlign.center,
                           style: Theme.of(dialogContext).textTheme.bodySmall,
@@ -542,7 +677,10 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
                       Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: Theme.of(dialogContext).colorScheme.surfaceContainerHighest.withValues(alpha: 0.45),
+                          color: Theme.of(dialogContext)
+                              .colorScheme
+                              .surfaceContainerHighest
+                              .withValues(alpha: 0.45),
                           borderRadius: BorderRadius.circular(16),
                         ),
                         child: Column(
@@ -550,14 +688,24 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
                           children: [
                             Text(
                               'Lo que puedes hacer ahora:',
-                              style: Theme.of(dialogContext).textTheme.titleMedium?.copyWith(
-                                    fontWeight: FontWeight.w700,
-                                  ),
+                              style: Theme.of(dialogContext)
+                                  .textTheme
+                                  .titleMedium
+                                  ?.copyWith(fontWeight: FontWeight.w700),
                             ),
                             const SizedBox(height: 12),
-                            _buildBenefit(dialogContext, 'Solicitar créditos a cooperativas aliadas'),
-                            _buildBenefit(dialogContext, 'Ver el estado de tus solicitudes en tiempo real'),
-                            _buildBenefit(dialogContext, 'Comparar ofertas de diferentes cooperativas'),
+                            _buildBenefit(
+                              dialogContext,
+                              'Solicitar créditos a cooperativas aliadas',
+                            ),
+                            _buildBenefit(
+                              dialogContext,
+                              'Ver el estado de tus solicitudes en tiempo real',
+                            ),
+                            _buildBenefit(
+                              dialogContext,
+                              'Comparar ofertas de diferentes cooperativas',
+                            ),
                           ],
                         ),
                       ),
@@ -591,31 +739,33 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
           ),
           const SizedBox(width: 10),
           Expanded(
-            child: Text(
-              text,
-              style: Theme.of(context).textTheme.bodyMedium,
-            ),
+            child: Text(text, style: Theme.of(context).textTheme.bodyMedium),
           ),
         ],
       ),
     );
   }
 
-  String _formatDate(DateTime dateTime) => DateFormat('yyyy-MM-dd').format(dateTime);
+  String _formatDate(DateTime dateTime) =>
+      DateFormat('yyyy-MM-dd').format(dateTime);
 
   Widget _buildHeader(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Text(
-          'Completar Información',
-          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                fontWeight: FontWeight.w800,
-              ),
+          widget.isGuarantor
+              ? 'Información del garante'
+              : 'Completar Información',
+          style: Theme.of(
+            context,
+          ).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.w800),
         ),
         const SizedBox(height: 8),
         Text(
-          'Este formulario se llena una sola vez. Luego podras solicitar creditos sin volver a ingresar tus datos.',
+          widget.isGuarantor
+              ? 'Registra los datos del garante solicitados por la cooperativa. Este formulario se llena una sola vez.'
+              : 'Este formulario se llena una sola vez. Luego podras solicitar creditos sin volver a ingresar tus datos.',
           style: Theme.of(context).textTheme.bodyLarge,
         ),
       ],
@@ -633,7 +783,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
       case 3:
         return _buildEconomicStep(context);
       case 4:
-        if (_tieneConyuge) {
+        if (!widget.isGuarantor && _tieneConyuge) {
           return _buildSpouseStep(context);
         }
         return _buildReviewStep(context);
@@ -650,8 +800,12 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
-            'Identidad del Cliente',
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
+            widget.isGuarantor
+                ? 'Identidad del Garante'
+                : 'Identidad del Cliente',
+            style: Theme.of(
+              context,
+            ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
           ),
           const SizedBox(height: 18),
           AppTextField(
@@ -692,7 +846,10 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
               DropdownMenuItem(value: 'CASADO', child: Text('CASADO')),
               DropdownMenuItem(value: 'DIVORCIADO', child: Text('DIVORCIADO')),
               DropdownMenuItem(value: 'VIUDO', child: Text('VIUDO')),
-              DropdownMenuItem(value: 'UNIÓN LIBRE', child: Text('UNIÓN LIBRE')),
+              DropdownMenuItem(
+                value: 'UNIÓN LIBRE',
+                child: Text('UNIÓN LIBRE'),
+              ),
             ],
             onChanged: (value) {
               if (value != null) {
@@ -712,16 +869,20 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
         children: [
           Text(
             'Datos Personales',
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
+            style: Theme.of(
+              context,
+            ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
           ),
           const SizedBox(height: 18),
-          AppTextField(
-            controller: _emailController,
-            label: 'Correo precargado',
-            prefixIcon: Icons.email_outlined,
-            readOnly: true,
-          ),
-          const SizedBox(height: 12),
+          if (!widget.isGuarantor) ...[
+            AppTextField(
+              controller: _emailController,
+              label: 'Correo precargado',
+              prefixIcon: Icons.email_outlined,
+              readOnly: true,
+            ),
+            const SizedBox(height: 12),
+          ],
           AppTextField(
             controller: _telefonoController,
             label: 'Teléfono *',
@@ -757,14 +918,19 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
         children: [
           Text(
             'Domicilio',
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
+            style: Theme.of(
+              context,
+            ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
           ),
           const SizedBox(height: 18),
           DropdownButtonFormField<String>(
             initialValue: _selectedProvince,
             decoration: const InputDecoration(labelText: 'Provincia *'),
             items: _provinceNames
-                .map((province) => DropdownMenuItem(value: province, child: Text(province)))
+                .map(
+                  (province) =>
+                      DropdownMenuItem(value: province, child: Text(province)),
+                )
                 .toList(),
             onChanged: _updateProvince,
           ),
@@ -773,7 +939,10 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
             initialValue: _selectedCanton,
             decoration: const InputDecoration(labelText: 'Cantón *'),
             items: cantons
-                .map((canton) => DropdownMenuItem(value: canton, child: Text(canton)))
+                .map(
+                  (canton) =>
+                      DropdownMenuItem(value: canton, child: Text(canton)),
+                )
                 .toList(),
             onChanged: _selectedProvince == null ? null : _updateCanton,
           ),
@@ -782,7 +951,10 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
             initialValue: _selectedParish,
             decoration: const InputDecoration(labelText: 'Parroquia *'),
             items: parishes
-                .map((parish) => DropdownMenuItem(value: parish, child: Text(parish)))
+                .map(
+                  (parish) =>
+                      DropdownMenuItem(value: parish, child: Text(parish)),
+                )
                 .toList(),
             onChanged: _selectedCanton == null ? null : _updateParish,
           ),
@@ -834,7 +1006,9 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
         children: [
           Text(
             'Información Económica',
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
+            style: Theme.of(
+              context,
+            ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
           ),
           const SizedBox(height: 18),
           AppCard(
@@ -844,7 +1018,9 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
               children: [
                 Text(
                   'Actividad Económica',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
                 const SizedBox(height: 12),
                 AppTextField(
@@ -885,7 +1061,9 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
               children: [
                 Text(
                   'Ingresos y Egresos Mensuales',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
                 const SizedBox(height: 12),
                 AppTextField(
@@ -893,7 +1071,9 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
                   label: 'Ingreso Mensual (USD) *',
                   hint: 'Ej: 1500',
                   prefixIcon: Icons.south_west_outlined,
-                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  keyboardType: const TextInputType.numberWithOptions(
+                    decimal: true,
+                  ),
                 ),
                 const SizedBox(height: 12),
                 AppTextField(
@@ -901,7 +1081,9 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
                   label: 'Egreso Mensual (USD) *',
                   hint: 'Ej: 1000',
                   prefixIcon: Icons.north_east_outlined,
-                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  keyboardType: const TextInputType.numberWithOptions(
+                    decimal: true,
+                  ),
                 ),
               ],
             ),
@@ -917,7 +1099,9 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
                   children: [
                     Text(
                       'Referencias Personales',
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
                     TextButton.icon(
                       onPressed: () {
@@ -949,11 +1133,22 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
                           const SizedBox(height: 12),
                           DropdownButtonFormField<String>(
                             initialValue: reference.tipo,
-                            decoration: const InputDecoration(labelText: 'Tipo de Referencia *'),
+                            decoration: const InputDecoration(
+                              labelText: 'Tipo de Referencia *',
+                            ),
                             items: const [
-                              DropdownMenuItem(value: 'PERSONAL', child: Text('PERSONAL')),
-                              DropdownMenuItem(value: 'LABORAL', child: Text('LABORAL')),
-                              DropdownMenuItem(value: 'COMERCIAL', child: Text('COMERCIAL')),
+                              DropdownMenuItem(
+                                value: 'PERSONAL',
+                                child: Text('PERSONAL'),
+                              ),
+                              DropdownMenuItem(
+                                value: 'LABORAL',
+                                child: Text('LABORAL'),
+                              ),
+                              DropdownMenuItem(
+                                value: 'COMERCIAL',
+                                child: Text('COMERCIAL'),
+                              ),
                             ],
                             onChanged: (value) {
                               setState(() {
@@ -1010,7 +1205,9 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
         children: [
           Text(
             'Información del Cónyuge',
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
+            style: Theme.of(
+              context,
+            ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
           ),
           const SizedBox(height: 18),
           AppTextField(
@@ -1069,7 +1266,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
   }
 
   Widget _buildReviewStep(BuildContext context) {
-    final hasSpouse = _tieneConyuge;
+    final hasSpouse = !widget.isGuarantor && _tieneConyuge;
 
     return AppCard(
       child: Column(
@@ -1077,7 +1274,9 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
         children: [
           Text(
             'Confirmación Final',
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
+            style: Theme.of(
+              context,
+            ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
           ),
           const SizedBox(height: 16),
           AppCard(
@@ -1087,7 +1286,9 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
               children: [
                 Text(
                   'Resumen de tu Información',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
                 const SizedBox(height: 16),
                 _buildReviewSection(
@@ -1150,7 +1351,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
                     ],
                   ),
                 ],
-                if (_preRegistrationEmail != null) ...[
+                if (!widget.isGuarantor && _preRegistrationEmail != null) ...[
                   const SizedBox(height: 16),
                   Text(
                     'Correo precargado: ${_preRegistrationEmail!}',
@@ -1167,21 +1368,29 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
           ),
           const SizedBox(height: 16),
           InkWell(
-            onTap: () => setState(() => _acceptedDeclaration = !_acceptedDeclaration),
+            onTap: () =>
+                setState(() => _acceptedDeclaration = !_acceptedDeclaration),
             borderRadius: BorderRadius.circular(12),
             child: Container(
               padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.45),
+                color: Theme.of(
+                  context,
+                ).colorScheme.surfaceContainerHighest.withValues(alpha: 0.45),
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: 0.5)),
+                border: Border.all(
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.outlineVariant.withValues(alpha: 0.5),
+                ),
               ),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Checkbox(
                     value: _acceptedDeclaration,
-                    onChanged: (value) => setState(() => _acceptedDeclaration = value ?? false),
+                    onChanged: (value) =>
+                        setState(() => _acceptedDeclaration = value ?? false),
                   ),
                   const SizedBox(width: 8),
                   Expanded(
@@ -1209,7 +1418,9 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
       children: [
         Text(
           title,
-          style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
+          style: Theme.of(
+            context,
+          ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
         ),
         const SizedBox(height: 8),
         ...lines.map(
@@ -1260,7 +1471,9 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
                       switchInCurve: Curves.easeOut,
                       switchOutCurve: Curves.easeIn,
                       child: SingleChildScrollView(
-                        key: ValueKey('step_${_step}_${_tieneConyuge ? 'spouse' : 'no_spouse'}'),
+                        key: ValueKey(
+                          'step_${_step}_${_tieneConyuge ? 'spouse' : 'no_spouse'}',
+                        ),
                         padding: const EdgeInsets.only(bottom: 16),
                         child: _buildStepContent(context),
                       ),
@@ -1280,8 +1493,12 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
                       const SizedBox(width: 12),
                       Expanded(
                         child: AppButton(
-                          label: _isLastStep ? 'Finalizar y Enviar' : 'Siguiente',
-                          icon: _isLastStep ? Icons.check_rounded : Icons.arrow_forward_rounded,
+                          label: _isLastStep
+                              ? 'Finalizar y Enviar'
+                              : 'Siguiente',
+                          icon: _isLastStep
+                              ? Icons.check_rounded
+                              : Icons.arrow_forward_rounded,
                           isLoading: _isSubmitting,
                           onPressed: _isLastStep
                               ? (_acceptedDeclaration ? _submit : null)
@@ -1292,9 +1509,13 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    'Este formulario se llena una sola vez. Luego podras solicitar creditos sin volver a ingresar tus datos.',
+                    widget.isGuarantor
+                        ? 'Esta información será revisada por la cooperativa para continuar con la solicitud.'
+                        : 'Este formulario se llena una sola vez. Luego podras solicitar creditos sin volver a ingresar tus datos.',
                     textAlign: TextAlign.center,
-                    style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
                   ),
                 ],
               ),
@@ -1309,12 +1530,12 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
 class _ReferenceDraft {
   _ReferenceDraft({
     String nombreCompleto = '',
-    String this.tipo = 'PERSONAL',
     String parentesco = '',
     String telefono = '',
-  })  : nombreCompletoController = TextEditingController(text: nombreCompleto),
-        parentescoController = TextEditingController(text: parentesco),
-        telefonoController = TextEditingController(text: telefono);
+  }) : tipo = 'PERSONAL',
+       nombreCompletoController = TextEditingController(text: nombreCompleto),
+       parentescoController = TextEditingController(text: parentesco),
+       telefonoController = TextEditingController(text: telefono);
 
   final TextEditingController nombreCompletoController;
   final TextEditingController parentescoController;
