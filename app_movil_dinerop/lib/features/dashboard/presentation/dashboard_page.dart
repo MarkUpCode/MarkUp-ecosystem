@@ -6,7 +6,6 @@ import '../../../app/providers.dart';
 import '../../../core/errors/app_exception.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/formatters.dart';
-import '../../../shared/widgets/app_empty_state.dart';
 import '../../../shared/widgets/app_error_view.dart';
 import '../../../shared/widgets/app_loader.dart';
 import '../../auth/presentation/auth_controller.dart';
@@ -23,8 +22,7 @@ class DashboardPage extends ConsumerWidget {
     final profile = ref.watch(clientProfileProvider);
     final requests = ref.watch(dashboardCreditRequestsProvider);
     final onboarding = ref.watch(dashboardOnboardingStatusProvider);
-    final profileComplete =
-        onboarding.valueOrNull?.formularioCompleto == true;
+    final profileComplete = onboarding.valueOrNull?.formularioCompleto == true;
 
     return Scaffold(
       body: SafeArea(
@@ -89,9 +87,8 @@ class DashboardPage extends ConsumerWidget {
                         onViewRequests: () => context.go('/requests'),
                         onRequestCredit: () => context.push('/request-credit'),
                       ),
-                      loading: () => const AppLoader(
-                        label: 'Cargando tu actividad...',
-                      ),
+                      loading: () =>
+                          const AppLoader(label: 'Cargando tu actividad...'),
                       error: (error, _) => AppErrorView(
                         message: error is AppException
                             ? error.message
@@ -146,9 +143,9 @@ class _DashboardContent extends StatelessWidget {
         const SizedBox(height: 22),
         Text(
           'Acciones',
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.w800,
-          ),
+          style: Theme.of(
+            context,
+          ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800),
         ),
         const SizedBox(height: 10),
         Row(
@@ -345,8 +342,8 @@ class _ProgressStage extends StatelessWidget {
               active && !current
                   ? Icons.check_rounded
                   : current
-                      ? Icons.circle
-                      : Icons.circle_outlined,
+                  ? Icons.circle
+                  : Icons.circle_outlined,
               size: current ? 10 : 15,
               color: color,
             ),
@@ -430,7 +427,9 @@ class _CurrentStatusCard extends StatelessWidget {
                       tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                     ),
                     icon: const Icon(Icons.arrow_forward_rounded, size: 16),
-                    label: Text(request == null ? 'Solicitar crédito' : 'Ver seguimiento'),
+                    label: Text(
+                      request == null ? 'Solicitar crédito' : 'Ver seguimiento',
+                    ),
                   ),
                 ],
               ),
@@ -443,7 +442,12 @@ class _CurrentStatusCard extends StatelessWidget {
 }
 
 class _StatusPresentation {
-  const _StatusPresentation(this.title, this.description, this.color, this.icon);
+  const _StatusPresentation(
+    this.title,
+    this.description,
+    this.color,
+    this.icon,
+  );
 
   final String title;
   final String description;
@@ -514,8 +518,11 @@ class _RecentRequests extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final recent = [...requests]
-      ..sort((a, b) => (b.fechaSolicitud ?? DateTime(0))
-          .compareTo(a.fechaSolicitud ?? DateTime(0)));
+      ..sort(
+        (a, b) => (b.fechaSolicitud ?? DateTime(0)).compareTo(
+          a.fechaSolicitud ?? DateTime(0),
+        ),
+      );
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -553,13 +560,12 @@ class _RecentRequests extends StatelessWidget {
             ),
           )
         else
-          ...recent.take(3).map(
+          ...recent
+              .take(3)
+              .map(
                 (request) => Padding(
                   padding: const EdgeInsets.only(bottom: 10),
-                  child: _RequestTile(
-                    request: request,
-                    onTap: onViewRequests,
-                  ),
+                  child: _RequestTile(request: request, onTap: onViewRequests),
                 ),
               ),
       ],
@@ -679,9 +685,7 @@ class _SurfacePanel extends StatelessWidget {
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: Theme.of(context).colorScheme.outlineVariant,
-        ),
+        border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
       ),
       child: child,
     );
@@ -689,7 +693,11 @@ class _SurfacePanel extends StatelessWidget {
 }
 
 class _QuickAction extends StatelessWidget {
-  const _QuickAction({required this.icon, required this.label, required this.onTap});
+  const _QuickAction({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+  });
 
   final IconData icon;
   final String label;
@@ -776,115 +784,99 @@ class _DelayedFadeState extends State<_DelayedFade> {
 }
 
 class _WelcomeHeader extends StatelessWidget {
-  const _WelcomeHeader({
-    required this.name,
-    this.profileComplete = false,
-  });
+  const _WelcomeHeader({required this.name, this.profileComplete = false});
 
   final String name;
   final bool profileComplete;
 
   @override
   Widget build(BuildContext context) => Row(
-        children: [
-          Container(
-            width: 50,
-            height: 50,
-            decoration: const BoxDecoration(
-              color: AppColors.primaryContainer,
-              shape: BoxShape.circle,
-            ),
-            alignment: Alignment.center,
-            child: Text(
-              name.substring(0, 1).toUpperCase(),
-              style: const TextStyle(
-                color: AppColors.primary,
-                fontWeight: FontWeight.w900,
-                fontSize: 20,
-              ),
-            ),
-          ),
-
-          const SizedBox(width: 13),
-
-          Expanded(
-            child: Column(
-  crossAxisAlignment: CrossAxisAlignment.start,
-  children: [
-    Text(
-      'Hola, $name',
-      overflow: TextOverflow.ellipsis,
-      style: Theme.of(context)
-          .textTheme
-          .headlineSmall
-          ?.copyWith(
+    children: [
+      Container(
+        width: 50,
+        height: 50,
+        decoration: const BoxDecoration(
+          color: AppColors.primaryContainer,
+          shape: BoxShape.circle,
+        ),
+        alignment: Alignment.center,
+        child: Text(
+          name.substring(0, 1).toUpperCase(),
+          style: const TextStyle(
+            color: AppColors.primary,
             fontWeight: FontWeight.w900,
+            fontSize: 20,
           ),
-    ),
+        ),
+      ),
 
-    if (profileComplete) ...[
-      const SizedBox(height: 3),
-      Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Icon(
-            Icons.check_circle_rounded,
-            color: AppColors.success,
-            size: 17,
-          ),
-          const SizedBox(width: 4),
-          Text(
-            'Perfil completo',
-            overflow: TextOverflow.ellipsis,
-            style: Theme.of(context)
-                .textTheme
-                .labelSmall
-                ?.copyWith(
-                  color: AppColors.success,
-                  fontWeight: FontWeight.w700,
-                ),
-          ),
-        ],
+      const SizedBox(width: 13),
+
+      Expanded(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Hola, $name',
+              overflow: TextOverflow.ellipsis,
+              style: Theme.of(
+                context,
+              ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w900),
+            ),
+
+            if (profileComplete) ...[
+              const SizedBox(height: 3),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(
+                    Icons.check_circle_rounded,
+                    color: AppColors.success,
+                    size: 17,
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    'Perfil completo',
+                    overflow: TextOverflow.ellipsis,
+                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                      color: AppColors.success,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+
+            const SizedBox(height: 3),
+
+            Text(
+              'Tu centro de crédito personal',
+              overflow: TextOverflow.ellipsis,
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
+          ],
+        ),
+      ),
+
+      IconButton(
+        onPressed: () {},
+        icon: const Icon(Icons.notifications_none_rounded),
       ),
     ],
-
-    const SizedBox(height: 3),
-
-    Text(
-      'Tu centro de crédito personal',
-      overflow: TextOverflow.ellipsis,
-      style: Theme.of(context).textTheme.bodyMedium,
-    ),
-  ],
-),
-          ),
-
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(
-              Icons.notifications_none_rounded,
-            ),
-          ),
-        ],
-      );
+  );
 }
 
 class _ProfileProgressCard extends StatelessWidget {
-  const _ProfileProgressCard({
-    required this.complete,
-    this.onTap,
-  });
+  const _ProfileProgressCard({required this.complete, this.onTap});
 
   final bool complete;
   final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
-    final color =
-        complete ? AppColors.success : AppColors.warning;
+    final color = complete ? AppColors.success : AppColors.warning;
 
-    final soft =
-        complete ? AppColors.successSoft : AppColors.warningSoft;
+    final soft = complete ? AppColors.successSoft : AppColors.warningSoft;
 
     return Material(
       color: soft,
@@ -915,8 +907,7 @@ class _ProfileProgressCard extends StatelessWidget {
 
               Expanded(
                 child: Column(
-                  crossAxisAlignment:
-                      CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       complete
@@ -943,11 +934,7 @@ class _ProfileProgressCard extends StatelessWidget {
                 ),
               ),
 
-              if (!complete)
-                Icon(
-                  Icons.arrow_forward_rounded,
-                  color: color,
-                ),
+              if (!complete) Icon(Icons.arrow_forward_rounded, color: color),
             ],
           ),
         ),
