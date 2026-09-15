@@ -5,7 +5,6 @@ import 'package:go_router/go_router.dart';
 import '../../../../shared/widgets/app_authenticated_header.dart';
 import '../../../../core/errors/app_exception.dart';
 import '../../../../shared/widgets/app_button.dart';
-import '../../../../shared/widgets/app_error_view.dart';
 import '../../../../shared/widgets/app_text_field.dart';
 import '../../data/models/app_user.dart';
 import '../../../../core/widgets/cooperative_logo_marquee.dart';
@@ -590,10 +589,28 @@ class _LoginSheetState extends ConsumerState<_LoginSheet> {
 
                 const SizedBox(height: 18),
 
-                if (_localError != null) ...[
-                  AppErrorView(message: _localError!, onRetry: _submit),
-                  const SizedBox(height: 18),
-                ],
+                AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 360),
+                  switchInCurve: Curves.easeOutCubic,
+                  switchOutCurve: Curves.easeInCubic,
+                  transitionBuilder: (child, animation) {
+                    return FadeTransition(
+                      opacity: animation,
+                      child: SizeTransition(
+                        sizeFactor: animation,
+                        axisAlignment: -1,
+                        child: child,
+                      ),
+                    );
+                  },
+                  child: _localError == null
+                      ? const SizedBox.shrink(key: ValueKey('no-login-error'))
+                      : Padding(
+                          key: ValueKey(_localError),
+                          padding: const EdgeInsets.only(bottom: 18),
+                          child: _LoginErrorBanner(message: _localError!),
+                        ),
+                ),
 
                 // Login button
                 AppButton(
@@ -618,6 +635,44 @@ class _LoginSheetState extends ConsumerState<_LoginSheet> {
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _LoginErrorBanner extends StatelessWidget {
+  const _LoginErrorBanner({required this.message});
+
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final errorColor = theme.colorScheme.error;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      decoration: BoxDecoration(
+        color: errorColor.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: errorColor.withValues(alpha: 0.2)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(Icons.info_outline_rounded, color: errorColor, size: 20),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              message,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: errorColor,
+                fontWeight: FontWeight.w600,
+                height: 1.35,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

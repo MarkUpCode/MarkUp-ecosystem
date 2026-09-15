@@ -56,37 +56,119 @@ class SplashPage extends ConsumerWidget {
                     ),
                   ),
                   const SizedBox(height: 36),
-                  if (bootstrapError == null)
-                    const AppLoader(label: 'Iniciando conexión segura...')
-                  else ...[
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.08),
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: Colors.white.withValues(alpha: 0.15)),
-                      ),
-                      child: Text(
-                        bootstrapError,
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(color: Colors.white, fontSize: 13),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    FilledButton(
-                      style: FilledButton.styleFrom(
-                        backgroundColor: AppColors.darkPrimary,
-                        foregroundColor: Colors.white,
-                      ),
-                      onPressed: () =>
-                          ref.read(authControllerProvider).retryBootstrap(),
-                      child: const Text('Reintentar conexión'),
-                    ),
-                  ],
+                  AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 450),
+                    switchInCurve: Curves.easeOutCubic,
+                    switchOutCurve: Curves.easeInCubic,
+                    transitionBuilder: (child, animation) {
+                      return FadeTransition(
+                        opacity: animation,
+                        child: ScaleTransition(
+                          scale: Tween<double>(begin: 0.94, end: 1).animate(animation),
+                          child: child,
+                        ),
+                      );
+                    },
+                    child: bootstrapError == null
+                        ? const AppLoader(
+                            key: ValueKey('splash-loader'),
+                            label: 'Iniciando conexión segura...',
+                          )
+                        : _BootstrapError(
+                            key: const ValueKey('splash-error'),
+                            message: bootstrapError,
+                            onRetry: () => ref
+                                .read(authControllerProvider)
+                                .retryBootstrap(),
+                          ),
+                  ),
                 ],
               ),
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _BootstrapError extends StatelessWidget {
+  const _BootstrapError({
+    super.key,
+    required this.message,
+    required this.onRetry,
+  });
+
+  final String message;
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: 360),
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(14, 14, 10, 10),
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.18)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.12),
+              blurRadius: 24,
+              offset: const Offset(0, 10),
+            ),
+          ],
+        ),
+        child: Column(
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  width: 34,
+                  height: 34,
+                  decoration: BoxDecoration(
+                    color: AppColors.error.withValues(alpha: 0.18),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.cloud_off_rounded,
+                    color: Color(0xFFFFB4AB),
+                    size: 19,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 2),
+                    child: Text(
+                      message,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 13,
+                        height: 1.35,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            Align(
+              alignment: Alignment.centerRight,
+              child: TextButton.icon(
+                onPressed: onRetry,
+                icon: const Icon(Icons.refresh_rounded, size: 17),
+                label: const Text('Reintentar'),
+                style: TextButton.styleFrom(
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  minimumSize: const Size(0, 36),
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
