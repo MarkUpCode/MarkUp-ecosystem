@@ -182,7 +182,9 @@ class AuthController extends ChangeNotifier {
       notifyListeners();
       return response;
     } catch (error) {
-      _errorMessage = error.toString();
+      _errorMessage = error is AppException
+          ? error.message
+          : AppErrorMessages.generic;
       rethrow;
     } finally {
       _setBusy(false);

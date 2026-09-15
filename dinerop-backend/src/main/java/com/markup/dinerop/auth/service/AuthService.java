@@ -34,6 +34,7 @@ import com.markup.dinerop.cooperative.domain.repository.CooperativeRepository;
 import com.markup.dinerop.auth.exception.UserAlreadyActiveException;
 import com.markup.dinerop.auth.exception.CooperativeNotFoundException;
 
+import org.springframework.security.authentication.BadCredentialsException;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -270,7 +271,9 @@ public class AuthService {
 
 
         User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new RuntimeException("Credenciales invalidas"));
+                .orElseThrow(() ->
+                        new BadCredentialsException("Correo o contraseña incorrectos.")
+                );
 
 
         if (!user.isEnabled()) {

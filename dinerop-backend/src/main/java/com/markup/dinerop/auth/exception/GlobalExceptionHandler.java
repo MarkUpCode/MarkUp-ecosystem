@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.security.authentication.BadCredentialsException;
 
 import java.time.Instant;
 import java.util.LinkedHashMap;
@@ -40,6 +41,18 @@ public class GlobalExceptionHandler {
         );
 
     }
+
+    @ExceptionHandler(BadCredentialsException.class)
+        public ResponseEntity<?> handleBadCredentials(
+                BadCredentialsException ex,
+                HttpServletRequest request
+        ) {
+        return buildResponse(
+                HttpStatus.UNAUTHORIZED,
+                "Correo o contraseña incorrectos.",
+                request
+        );
+        }
 
     @ExceptionHandler(AccountDisabledException.class)
     public ResponseEntity<?> handleAccountDisabled(

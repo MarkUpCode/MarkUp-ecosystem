@@ -108,13 +108,19 @@ class ApiClient {
         error.type == DioExceptionType.sendTimeout ||
         error.type == DioExceptionType.connectionError) {
       message = AppErrorMessages.network;
-    } else if (statusCode == 401) {
-      message = AppErrorMessages.unauthorized;
     } else if (responseData is Map<String, dynamic>) {
-      message = (responseData['message'] ?? responseData['error'] ?? message)
-          .toString();
+      final backendMessage = responseData['message'];
+      if (backendMessage is String && backendMessage.trim().isNotEmpty) {
+        message = backendMessage;
+      } else if (statusCode == 401) {
+        message = AppErrorMessages.unauthorized;
+      } else {
+        message = (responseData['error'] ?? message).toString();
+      }
     } else if (responseData is String && responseData.trim().isNotEmpty) {
       message = responseData;
+    } else if (statusCode == 401) {
+      message = AppErrorMessages.unauthorized;
     }
 
     return AppException(message, statusCode: statusCode);
