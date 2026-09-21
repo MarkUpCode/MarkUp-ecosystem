@@ -80,6 +80,38 @@ public class GlobalExceptionHandler {
 
     }
 
+    @ExceptionHandler(OtpInvalidException.class)
+    public ResponseEntity<?> handleOtpInvalid(
+            OtpInvalidException ex,
+            HttpServletRequest request
+    ) {
+        return buildResponse(HttpStatus.UNAUTHORIZED, ex.getMessage(), request);
+    }
+
+    @ExceptionHandler(OtpExpiredException.class)
+    public ResponseEntity<?> handleOtpExpired(
+            OtpExpiredException ex,
+            HttpServletRequest request
+    ) {
+        return buildResponse(HttpStatus.UNAUTHORIZED, ex.getMessage(), request);
+    }
+
+    @ExceptionHandler(OtpAttemptsExceededException.class)
+    public ResponseEntity<?> handleOtpAttemptsExceeded(
+            OtpAttemptsExceededException ex,
+            HttpServletRequest request
+    ) {
+        return buildResponse(HttpStatus.TOO_MANY_REQUESTS, ex.getMessage(), request);
+    }
+
+    @ExceptionHandler(OtpRateLimitException.class)
+    public ResponseEntity<?> handleOtpRateLimit(
+            OtpRateLimitException ex,
+            HttpServletRequest request
+    ) {
+        return buildResponse(HttpStatus.TOO_MANY_REQUESTS, ex.getMessage(), request);
+    }
+
     private ResponseEntity<Map<String, Object>> buildResponse(
             HttpStatus status,
             String message,

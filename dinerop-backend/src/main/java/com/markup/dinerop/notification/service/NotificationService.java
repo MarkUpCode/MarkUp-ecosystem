@@ -193,6 +193,42 @@ public class NotificationService {
     // =========================================================
     // RESET PASSWORD EMAIL
     // =========================================================
+    public void sendRegistrationOtpEmail(String to, String code) {
+        if (!emailEnabled) {
+            log.warn("====================================================");
+            log.warn("      MODO DESARROLLO - OTP DE VERIFICACIÓN");
+            log.warn("====================================================");
+            log.warn("Usuario : {}", to);
+            log.warn("Código  : {}", code);
+            log.warn("====================================================");
+            return;
+        }
+
+        String html = """
+                <!DOCTYPE html>
+                <html lang="es">
+                <head><meta charset="UTF-8"></head>
+                <body style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 40px;">
+                  <div style="max-width: 600px; margin: auto; background: #ffffff; border-radius: 8px; padding: 40px;">
+                    <h2 style="color: #333333;">Tu código de verificación DINEROP</h2>
+                    <p style="color:#555;">Utiliza el siguiente código para verificar tu correo electrónico:</p>
+                    <div style="margin: 24px 0; padding: 20px; background:#f3f4f6; border-radius:8px; font-size: 32px; letter-spacing: 8px; text-align:center; font-weight:700; color:#111827;">%s</div>
+                    <p style="color:#555;">Este código expirará en 10 minutos.</p>
+                    <p style="margin-top:30px;font-size:12px;color:#999;">Si tú no solicitaste esta verificación, puedes ignorar este correo.</p>
+                  </div>
+                </body>
+                </html>
+                """.formatted(code);
+
+        sendEmail(
+                SendEmailDto.builder()
+                        .to(to)
+                        .subject("Tu código de verificación DINEROP")
+                        .htmlContent(html)
+                        .build()
+        );
+    }
+
     public void sendResetPasswordEmail(String to, String resetToken) {
 
         String resetLink =

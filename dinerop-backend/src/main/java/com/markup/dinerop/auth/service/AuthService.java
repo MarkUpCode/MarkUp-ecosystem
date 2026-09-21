@@ -4,11 +4,17 @@ import com.markup.dinerop.admin.users.exception.CooperativeRequiredException;
 import com.markup.dinerop.auth.dto.*;
 
 import com.markup.dinerop.auth.entity.ActivationToken;
+import com.markup.dinerop.auth.entity.EmailVerificationOtp;
 import com.markup.dinerop.auth.entity.Role;
 import com.markup.dinerop.auth.entity.User;
 import com.markup.dinerop.auth.exception.AccountNotActiveException;
 import com.markup.dinerop.auth.exception.AccountDisabledException;
+import com.markup.dinerop.auth.exception.OtpAttemptsExceededException;
+import com.markup.dinerop.auth.exception.OtpExpiredException;
+import com.markup.dinerop.auth.exception.OtpInvalidException;
+import com.markup.dinerop.auth.exception.OtpRateLimitException;
 import com.markup.dinerop.auth.repository.ActivationTokenRepository;
+import com.markup.dinerop.auth.repository.EmailVerificationOtpRepository;
 import com.markup.dinerop.auth.repository.UserRepository;
 import com.markup.dinerop.auth.entity.UserPreRegistration;
 import com.markup.dinerop.auth.repository.UserPreRegistrationRepository;
@@ -56,6 +62,12 @@ public class AuthService {
     private final NotificationService notificationService;
     private final UserPreRegistrationRepository userPreRegistrationRepository;
     private final CooperativeRepository cooperativeRepository;
+    private final EmailVerificationOtpRepository emailVerificationOtpRepository;
+
+    private static final int OTP_LENGTH = 6;
+    private static final int OTP_TTL_SECONDS = 600;
+    private static final int OTP_MAX_ATTEMPTS = 5;
+    private static final int OTP_RESEND_SECONDS = 45;
 
 
     // =========================================================
@@ -224,30 +236,192 @@ public class AuthService {
     public PublicRegistrationResponse publicRegister(
             PublicRegistrationRequest request
     ) {
+        return startRegistrationOtp(request).toLegacyResponse();
+    }
 
-        String normalizedEmail = request.getEmail()
-                .toLowerCase()
-                .trim();
+    @Transactional
+    public OtpRegistrationStartResponse startRegistrationOtp(PublicRegistrationRequest request) {
+        String normalizedEmail = normalizeEmail(request.getEmail());
 
-        log.info(
-                "[PUBLIC_REGISTER] Inicio | email={}",
-                normalizedEmail
-        );
+        Optional<User> existingUser = userRepository.findByEmail(normalizedEmail);
+        User user = existingUser.orElseGet(() -> createPendingUser(normalizedEmail, Role.CLIENT));
 
-        User user = preRegisterClient(request);
+        if (existingUser.isPresent() && "ACTIVE".equals(user.getStatus()) && user.getPassword() != null) {
+            throw new UserAlreadyActiveException(normalizedEmail);
+        }
 
-        log.info(
-                "[PUBLIC_REGISTER] OK | userId={} email={}",
-                user.getIdUser(),
-                normalizedEmail
-        );
+        if (user.getCooperativaId() == null && request.getFirstName() != null) {
+            upsertPreRegistration(user, request);
+        }
 
-        return PublicRegistrationResponse.builder()
+        EmailVerificationOtp latest = emailVerificationOtpRepository
+                .findTopByEmailAndUsedFalseAndRevokedFalseOrderByCreatedAtDesc(normalizedEmail)
+                .orElse(null);
+
+        if (latest != null && latest.getCreatedAt().plusSeconds(OTP_RESEND_SECONDS).isAfter(Instant.now())) {
+            throw new OtpRateLimitException("Puedes solicitar un nuevo código en 45 s.");
+        }
+
+        emailVerificationOtpRepository.findTopByEmailOrderByCreatedAtDesc(normalizedEmail)
+                .ifPresent(oldOtp -> {
+                    oldOtp.setUsed(true);
+                    oldOtp.setRevoked(true);
+                    emailVerificationOtpRepository.save(oldOtp);
+                });
+
+        String rawCode = generateCode();
+        EmailVerificationOtp otp = EmailVerificationOtp.builder()
                 .email(normalizedEmail)
-                .message(
-                        "Registro iniciado. Revisa tu correo para activar la cuenta."
-                )
+                .otpHash(hashOtp(rawCode))
+                .expiresAt(Instant.now().plusSeconds(OTP_TTL_SECONDS))
+                .attempts(0)
+                .used(false)
+                .revoked(false)
                 .build();
+
+        emailVerificationOtpRepository.save(otp);
+        notificationService.sendRegistrationOtpEmail(normalizedEmail, rawCode);
+
+        return OtpRegistrationStartResponse.builder()
+                .email(normalizedEmail)
+                .message("Verificación enviada. Revisa tu correo.")
+                .requiresVerification(true)
+                .build();
+    }
+
+    @Transactional
+    public void verifyRegistrationOtp(String email, String rawCode) {
+        String normalizedEmail = normalizeEmail(email);
+        String normalizedCode = rawCode == null ? "" : rawCode.trim();
+
+        EmailVerificationOtp otp = emailVerificationOtpRepository
+                .findTopByEmailAndUsedFalseAndRevokedFalseOrderByCreatedAtDesc(normalizedEmail)
+                .orElseThrow(() -> new OtpInvalidException("El código no es correcto. Verifica e inténtalo nuevamente."));
+
+        if (otp.isExpired()) {
+            otp.setRevoked(true);
+            emailVerificationOtpRepository.save(otp);
+            throw new OtpExpiredException("Este código ha expirado. Solicita uno nuevo.");
+        }
+
+        if (otp.getAttempts() >= OTP_MAX_ATTEMPTS) {
+            otp.setRevoked(true);
+            emailVerificationOtpRepository.save(otp);
+            throw new OtpAttemptsExceededException("Has superado el número de intentos permitidos. Solicita un nuevo código.");
+        }
+
+        if (!hashOtp(normalizedCode).equals(otp.getOtpHash())) {
+            otp.setAttempts(otp.getAttempts() + 1);
+            emailVerificationOtpRepository.save(otp);
+            int remaining = Math.max(0, OTP_MAX_ATTEMPTS - otp.getAttempts());
+            if (remaining == 0) {
+                otp.setRevoked(true);
+                emailVerificationOtpRepository.save(otp);
+                throw new OtpAttemptsExceededException("Has superado el número de intentos permitidos. Solicita un nuevo código.");
+            }
+            throw new OtpInvalidException("El código no es correcto. Verifica e inténtalo nuevamente.");
+        }
+
+        otp.setUsed(true);
+        emailVerificationOtpRepository.save(otp);
+
+        userRepository.findByEmail(normalizedEmail)
+                .ifPresent(user -> {
+                    user.setStatus("ACTIVE");
+                    user.setActive(true);
+                    userRepository.save(user);
+                });
+    }
+
+    @Transactional
+    public OtpRegistrationStartResponse resendRegistrationOtp(String email) {
+        String normalizedEmail = normalizeEmail(email);
+        Optional<User> existingUser = userRepository.findByEmail(normalizedEmail);
+        if (existingUser.isEmpty()) {
+            User user = createPendingUser(normalizedEmail, Role.CLIENT);
+            existingUser = Optional.of(user);
+        }
+
+        if (existingUser.get().getPassword() != null && "ACTIVE".equals(existingUser.get().getStatus())) {
+            throw new UserAlreadyActiveException(normalizedEmail);
+        }
+
+        EmailVerificationOtp activeOtp = emailVerificationOtpRepository
+                .findTopByEmailAndUsedFalseAndRevokedFalseOrderByCreatedAtDesc(normalizedEmail)
+                .orElse(null);
+
+        if (activeOtp != null && activeOtp.getCreatedAt().plusSeconds(OTP_RESEND_SECONDS).isAfter(Instant.now())) {
+            throw new OtpRateLimitException("Puedes solicitar un nuevo código en 45 s.");
+        }
+
+        return startRegistrationOtp(PublicRegistrationRequest.builder().email(normalizedEmail).build());
+    }
+
+    @Transactional
+    public OtpRegistrationStartResponse changeRegistrationEmail(PublicRegistrationRequest request) {
+        String normalizedEmail = normalizeEmail(request.getEmail());
+        if (userRepository.existsByEmail(normalizedEmail)) {
+            throw new UserAlreadyActiveException(normalizedEmail);
+        }
+
+        User user = userRepository.findByEmail(normalizedEmail)
+                .orElseGet(() -> createPendingUser(normalizedEmail, Role.CLIENT));
+
+        if (user.getPassword() != null && "ACTIVE".equals(user.getStatus())) {
+            throw new UserAlreadyActiveException(normalizedEmail);
+        }
+
+        if (request.getFirstName() != null) {
+            upsertPreRegistration(user, request);
+        }
+
+        return startRegistrationOtp(request);
+    }
+
+    private User createPendingUser(String email, Role role) {
+        User user = User.builder()
+                .email(email)
+                .role(role)
+                .status("PENDING_ACTIVATION")
+                .active(false)
+                .cooperativaId(null)
+                .build();
+        return userRepository.save(user);
+    }
+
+    private void upsertPreRegistration(User user, PublicRegistrationRequest request) {
+        UserPreRegistration preReg = userPreRegistrationRepository.findByUserId(user.getIdUser())
+                .orElseGet(() -> UserPreRegistration.builder().userId(user.getIdUser()).build());
+
+        preReg.setFirstName(request.getFirstName());
+        preReg.setLastName(request.getLastName());
+        preReg.setIdentification(request.getIdentification());
+        preReg.setPhone(request.getPhone());
+        preReg.setProvince(request.getProvince());
+        preReg.setCity(request.getCity());
+        userPreRegistrationRepository.save(preReg);
+    }
+
+    private String normalizeEmail(String email) {
+        return email == null ? "" : email.trim().toLowerCase();
+    }
+
+    private String generateCode() {
+        return String.format("%06d", new java.security.SecureRandom().nextInt(1_000_000));
+    }
+
+    private String hashOtp(String rawCode) {
+        try {
+            java.security.MessageDigest digest = java.security.MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(rawCode.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+            StringBuilder builder = new StringBuilder();
+            for (byte b : hash) {
+                builder.append(String.format("%02x", b));
+            }
+            return builder.toString();
+        } catch (java.security.NoSuchAlgorithmException e) {
+            throw new IllegalStateException("SHA-256 not available", e);
+        }
     }
 
     @Transactional

@@ -70,6 +70,44 @@ public class AuthController {
         return ResponseEntity.ok("Registro completado correctamente");
     }
 
+    @PostMapping("/registration/start")
+    public ResponseEntity<OtpRegistrationStartResponse> startRegistration(
+            @Valid @RequestBody PublicRegistrationRequest request
+    ) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(authService.startRegistrationOtp(request));
+    }
+
+    @PostMapping("/registration/verify-code")
+    public ResponseEntity<String> verifyRegistrationCode(
+            @Valid @RequestBody OtpVerificationRequest request
+    ) {
+        authService.verifyRegistrationOtp(request.getEmail(), request.getCode());
+        return ResponseEntity.ok("Correo verificado correctamente");
+    }
+
+    @PostMapping("/registration/resend-code")
+    public ResponseEntity<OtpRegistrationStartResponse> resendRegistrationCode(
+            @Valid @RequestBody OtpResendRequest request
+    ) {
+        return ResponseEntity.ok(authService.resendRegistrationOtp(request.getEmail()));
+    }
+
+    @PostMapping("/registration/change-email")
+    public ResponseEntity<OtpRegistrationStartResponse> changeRegistrationEmail(
+            @Valid @RequestBody PublicRegistrationRequest request
+    ) {
+        return ResponseEntity.ok(authService.changeRegistrationEmail(request));
+    }
+
+    @PostMapping("/registration/set-password")
+    public ResponseEntity<String> setRegistrationPassword(
+            @Valid @RequestBody CompleteRegistrationRequest request
+    ) {
+        authService.completeRegistration(request.getEmail(), request.getPassword());
+        return ResponseEntity.ok("Contraseña creada correctamente");
+    }
+
     // =========================================================
     // FORGOT PASSWORD
     // =========================================================
