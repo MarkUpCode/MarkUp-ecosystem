@@ -1,14 +1,21 @@
-export default function Step5Spouse({ data, setData, nextStep, prevStep }) {
+type Step5SpouseProps = {
+  data: any;
+  setData: React.Dispatch<React.SetStateAction<any>>;
+  nextStep: () => void;
+  prevStep: () => void;
+};
+
+export default function Step5Spouse({ data, setData, nextStep, prevStep }: Step5SpouseProps) {
   const conyuge = data.conyuge;
 
   if (!conyuge) {
     return null;
   }
 
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
 
-    setData((prev) => {
+    setData((prev: any) => {
       if (!prev.conyuge) return prev;
 
       return {
@@ -110,7 +117,13 @@ export default function Step5Spouse({ data, setData, nextStep, prevStep }) {
    COMPONENTE INPUT
 ====================== */
 
-function Input({ label, value, ...props }) {
+type InputProps = {
+  label: string;
+  value: string | number;
+  [key: string]: any;
+};
+
+function Input({ label, value, ...props }: InputProps) {
   return (
     <div>
       <label className="text-gray-700 font-medium mb-1">{label}</label>

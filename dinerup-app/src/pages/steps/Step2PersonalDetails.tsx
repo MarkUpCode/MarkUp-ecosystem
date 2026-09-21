@@ -1,15 +1,22 @@
+type Step2PersonalDetailsProps = {
+  data: any;
+  setData: React.Dispatch<React.SetStateAction<any>>;
+  nextStep: () => void;
+  prevStep: () => void;
+};
+
 export default function Step2PersonalDetails({
   data,
   setData,
   nextStep,
   prevStep,
-}) {
+}: Step2PersonalDetailsProps) {
   const solicitante = data.solicitante;
 
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
 
-    setData((prev) => ({
+    setData((prev: any) => ({
       ...prev,
       solicitante: {
         ...prev.solicitante,
@@ -74,7 +81,13 @@ export default function Step2PersonalDetails({
    COMPONENTE INPUT
 ====================== */
 
-function Input({ label, value, ...props }) {
+type InputProps = {
+  label: string;
+  value: string | number;
+  [key: string]: any;
+};
+
+function Input({ label, value, ...props }: InputProps) {
   return (
     <div>
       <label className="text-gray-700 font-medium mb-1">{label}</label>

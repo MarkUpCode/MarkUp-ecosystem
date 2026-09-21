@@ -1,7 +1,14 @@
 import { useState } from "react";
 import { CheckCircle } from "lucide-react";
 
-export default function Step4Review({ data, prevStep, onSubmit, isLoading }) {
+type Step4ReviewProps = {
+  data: any;
+  prevStep: () => void;
+  onSubmit: () => void;
+  isLoading: boolean;
+};
+
+export default function Step4Review({ data, prevStep, onSubmit, isLoading }: Step4ReviewProps) {
   const [accepted, setAccepted] = useState(false);
 
   const solicitante = data.solicitante;

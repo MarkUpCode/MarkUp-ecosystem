@@ -1,10 +1,16 @@
-export default function Step1Identity({ data, setData, nextStep }) {
+type Step1IdentityProps = {
+  data: any;
+  setData: React.Dispatch<React.SetStateAction<any>>;
+  nextStep: () => void;
+};
+
+export default function Step1Identity({ data, setData, nextStep }: Step1IdentityProps) {
   const solicitante = data.solicitante;
 
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
 
-    setData((prev) => ({
+    setData((prev: any) => ({
       ...prev,
       solicitante: {
         ...prev.solicitante,
@@ -13,11 +19,11 @@ export default function Step1Identity({ data, setData, nextStep }) {
     }));
   };
 
-  const handleEstadoCivilChange = (e) => {
+  const handleEstadoCivilChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const estadoCivil = e.target.value;
     const tieneConyuge = estadoCivil === "CASADO";
 
-    setData((prev) => {
+    setData((prev: any) => {
       const newData = {
         ...prev,
         solicitante: {
@@ -140,7 +146,13 @@ export default function Step1Identity({ data, setData, nextStep }) {
    COMPONENTES UI
 ====================== */
 
-function Input({ label, value, ...props }) {
+type InputProps = {
+  label: string;
+  value: string | number;
+  [key: string]: any;
+};
+
+function Input({ label, value, ...props }: InputProps) {
   return (
     <div>
       <label className="text-gray-700 font-medium mb-1">{label}</label>
@@ -153,7 +165,14 @@ function Input({ label, value, ...props }) {
   );
 }
 
-function Select({ label, value, options, ...props }) {
+type SelectProps = {
+  label: string;
+  value: string;
+  options: string[];
+  [key: string]: any;
+};
+
+function Select({ label, value, options, ...props }: SelectProps) {
   return (
     <div>
       <label className="text-gray-700 font-medium mb-1">{label}</label>

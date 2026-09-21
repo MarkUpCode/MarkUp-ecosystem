@@ -37,7 +37,7 @@ function ProtectedRoute({ allowedRole }: { allowedRole?: string }) {
 }
 
 function PublicOnlyRoute() {
-  const { isAuthenticated, isLoading, user } = useAuth();
+  const { isLoading } = useAuth();
 
   if (isLoading) {
     return <AuthLoadingScreen />;

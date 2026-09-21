@@ -1,14 +1,21 @@
 import { ecuadorProvinces } from "../../data/ecuadorProvinces";
 
-export default function Step3Address({ data, setData, nextStep, prevStep }) {
+type Step3AddressProps = {
+  data: any;
+  setData: React.Dispatch<React.SetStateAction<any>>;
+  nextStep: () => void;
+  prevStep: () => void;
+};
+
+export default function Step3Address({ data, setData, nextStep, prevStep }: Step3AddressProps) {
   const direccion = data.solicitante.direccion;
 
   const provinces = ecuadorProvinces.Ecuador;
 
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
 
-    setData((prev) => {
+    setData((prev: any) => {
       const newDireccion = {
         ...prev.solicitante.direccion,
         [name]: value,
@@ -144,7 +151,13 @@ export default function Step3Address({ data, setData, nextStep, prevStep }) {
    COMPONENTES UI
 ====================== */
 
-function Input({ label, value, ...props }) {
+type InputProps = {
+  label: string;
+  value: string | number;
+  [key: string]: any;
+};
+
+function Input({ label, value, ...props }: InputProps) {
   return (
     <div>
       <label className="text-gray-700 font-medium mb-1">{label}</label>
@@ -158,7 +171,16 @@ function Input({ label, value, ...props }) {
   );
 }
 
-function Select({ label, value, options, disabled, placeholder, ...props }) {
+type SelectProps = {
+  label: string;
+  value: string;
+  options: string[];
+  disabled?: boolean;
+  placeholder?: string;
+  [key: string]: any;
+};
+
+function Select({ label, value, options, disabled, placeholder, ...props }: SelectProps) {
   return (
     <div>
       <label className="text-gray-700 font-medium mb-1">{label}</label>

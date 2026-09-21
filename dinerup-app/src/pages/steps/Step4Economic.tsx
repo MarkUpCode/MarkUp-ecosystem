@@ -1,6 +1,13 @@
-export default function Step4Economic({ data, setData, nextStep, prevStep }) {
-  const handleActivityChange = (index, field, value) => {
-    setData((prev) => ({
+type Step4EconomicProps = {
+  data: any;
+  setData: React.Dispatch<React.SetStateAction<any>>;
+  nextStep: () => void;
+  prevStep: () => void;
+};
+
+export default function Step4Economic({ data, setData, nextStep, prevStep }: Step4EconomicProps) {
+  const handleActivityChange = (field: string, value: string) => {
+    setData((prev: any) => ({
       ...prev,
       solicitante: {
         ...prev.solicitante,
@@ -12,8 +19,8 @@ export default function Step4Economic({ data, setData, nextStep, prevStep }) {
     }));
   };
 
-  const handleIncomeChange = (field, value) => {
-    setData((prev) => ({
+  const handleIncomeChange = (field: string, value: number) => {
+    setData((prev: any) => ({
       ...prev,
       solicitante: {
         ...prev.solicitante,
@@ -25,8 +32,8 @@ export default function Step4Economic({ data, setData, nextStep, prevStep }) {
     }));
   };
 
-  const handleReferenceChange = (index, field, value) => {
-    setData((prev) => {
+  const handleReferenceChange = (index: number, field: string, value: string) => {
+    setData((prev: any) => {
       const newReferencias = [...prev.solicitante.referencias];
       newReferencias[index] = { ...newReferencias[index], [field]: value };
       return {
@@ -40,7 +47,7 @@ export default function Step4Economic({ data, setData, nextStep, prevStep }) {
   };
 
   const addReference = () => {
-    setData((prev) => ({
+    setData((prev: any) => ({
       ...prev,
       solicitante: {
         ...prev.solicitante,
@@ -52,12 +59,12 @@ export default function Step4Economic({ data, setData, nextStep, prevStep }) {
     }));
   };
 
-  const removeReference = (index) => {
-    setData((prev) => ({
+  const removeReference = (index: number) => {
+    setData((prev: any) => ({
       ...prev,
       solicitante: {
         ...prev.solicitante,
-        referencias: prev.solicitante.referencias.filter((_, i) => i !== index),
+        referencias: prev.solicitante.referencias.filter((_: any, i: number) => i !== index),
       },
     }));
   };
@@ -75,25 +82,25 @@ export default function Step4Economic({ data, setData, nextStep, prevStep }) {
           <Input
             label="Nombre del Negocio"
             value={solicitante.actividadEconomica.nombreNegocio}
-            onChange={(e) => handleActivityChange(0, "nombreNegocio", e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleActivityChange("nombreNegocio", e.target.value)}
             placeholder="Ej: Tienda de abarrotes"
           />
           <Input
             label="Dirección del Negocio"
             value={solicitante.actividadEconomica.direccionNegocio}
-            onChange={(e) => handleActivityChange(0, "direccionNegocio", e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleActivityChange("direccionNegocio", e.target.value)}
             placeholder="Ej: Calle Principal 123"
           />
           <Input
             label="Tiempo de Actividad"
             value={solicitante.actividadEconomica.tiempoActividad}
-            onChange={(e) => handleActivityChange(0, "tiempoActividad", e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleActivityChange("tiempoActividad", e.target.value)}
             placeholder="Ej: 5 años"
           />
           <Input
             label="Teléfono del Negocio"
             value={solicitante.actividadEconomica.telefonoNegocio}
-            onChange={(e) => handleActivityChange(0, "telefonoNegocio", e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleActivityChange("telefonoNegocio", e.target.value)}
             placeholder="Ej: 0987654321"
             maxLength={10}
           />
@@ -108,7 +115,7 @@ export default function Step4Economic({ data, setData, nextStep, prevStep }) {
             label="Ingreso Mensual (USD) *"
             type="number"
             value={solicitante.ingresoEgreso.ingresoMensual}
-            onChange={(e) => handleIncomeChange("ingresoMensual", parseFloat(e.target.value) || 0)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleIncomeChange("ingresoMensual", parseFloat(e.target.value) || 0)}
             placeholder="Ej: 1500"
             min={0}
           />
@@ -116,7 +123,7 @@ export default function Step4Economic({ data, setData, nextStep, prevStep }) {
             label="Egreso Mensual (USD) *"
             type="number"
             value={solicitante.ingresoEgreso.egresoMensual}
-            onChange={(e) => handleIncomeChange("egresoMensual", parseFloat(e.target.value) || 0)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleIncomeChange("egresoMensual", parseFloat(e.target.value) || 0)}
             placeholder="Ej: 1000"
             min={0}
           />
@@ -135,31 +142,31 @@ export default function Step4Economic({ data, setData, nextStep, prevStep }) {
           </button>
         </div>
 
-        {solicitante.referencias.map((ref, index) => (
+        {solicitante.referencias.map((ref: any, index: number) => (
           <div key={index} className="mb-6 p-4 border rounded-lg bg-white">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-4">
               <Input
                 label="Nombre Completo *"
                 value={ref.nombreCompleto}
-                onChange={(e) => handleReferenceChange(index, "nombreCompleto", e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleReferenceChange(index, "nombreCompleto", e.target.value)}
                 placeholder="Ej: María García"
               />
               <Select
                 label="Tipo de Referencia *"
                 value={ref.tipo}
-                onChange={(e) => handleReferenceChange(index, "tipo", e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLSelectElement>) => handleReferenceChange(index, "tipo", e.target.value)}
                 options={["PERSONAL", "LABORAL", "COMERCIAL"]}
               />
               <Input
                 label="Parentesco/Relación"
                 value={ref.parentesco}
-                onChange={(e) => handleReferenceChange(index, "parentesco", e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleReferenceChange(index, "parentesco", e.target.value)}
                 placeholder="Ej: Amigo"
               />
               <Input
                 label="Teléfono *"
                 value={ref.telefono}
-                onChange={(e) => handleReferenceChange(index, "telefono", e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleReferenceChange(index, "telefono", e.target.value)}
                 placeholder="Ej: 0987654321"
                 maxLength={10}
               />
@@ -190,7 +197,13 @@ export default function Step4Economic({ data, setData, nextStep, prevStep }) {
   );
 }
 
-function Input({ label, value, ...props }) {
+type InputProps = {
+  label: string;
+  value: string | number;
+  [key: string]: any;
+};
+
+function Input({ label, value, ...props }: InputProps) {
   return (
     <div>
       <label className="text-gray-700 font-medium mb-1">{label}</label>
@@ -203,7 +216,14 @@ function Input({ label, value, ...props }) {
   );
 }
 
-function Select({ label, value, options, ...props }) {
+type SelectProps = {
+  label: string;
+  value: string;
+  options: string[];
+  [key: string]: any;
+};
+
+function Select({ label, value, options, ...props }: SelectProps) {
   return (
     <div>
       <label className="text-gray-700 font-medium mb-1">{label}</label>

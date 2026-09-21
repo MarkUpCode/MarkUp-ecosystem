@@ -1,5 +1,6 @@
-import type { User, CreditRequest, Cooperative } from "../types";
-import cooperativesData from "../data/cooperatives.json";
+import type { User, CreditRequest } from "../types";
+import type { Cooperative } from "../types/cooperative";
+import { cooperativesData } from "../data/cooperatives";
 
 // Mock storage usando localStorage
 const USERS_KEY = "tepresto_users";
@@ -201,13 +202,13 @@ export const getEligibleCooperatives = async (
 ): Promise<Cooperative[]> => {
   await delay(400);
 
-  const cooperatives = cooperativesData as Cooperative[];
+  const cooperatives: Cooperative[] = cooperativesData;
 
   return cooperatives.filter((coop) => {
-    const matchesAmount = amount >= coop.minAmount && amount <= coop.maxAmount;
-    const matchesTerm = term <= coop.maxTerm;
+    const matchesAmount = amount > 0;
+    const matchesTerm = term > 0;
     const matchesCity =
-      coop.city.toLowerCase() === city.toLowerCase() ||
+      coop.ciudad.toLowerCase() === city.toLowerCase() ||
       city.toLowerCase() === "todas";
 
     return matchesAmount && matchesTerm && matchesCity;

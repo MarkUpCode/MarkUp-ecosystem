@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -30,17 +30,6 @@ export default function Login() {
 
   const navigate = useNavigate();
   const { login: authLogin } = useAuth();
-
-  useEffect(() => {
-    const justActivated = localStorage.getItem("just_activated") === "true";
-    if (justActivated) {
-      const activatedEmail = localStorage.getItem("activated_email") ?? "";
-      if (activatedEmail) loginForm.setValue("email", activatedEmail);
-      setShowCompleteRegistration(true);
-      localStorage.removeItem("just_activated");
-      localStorage.removeItem("activated_email");
-    }
-  }, []);
 
   const loginForm = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
@@ -271,10 +260,21 @@ export default function Login() {
                 placeholder="••••••••"
               />
 
-              <div className="text-right" style={{ marginTop: 2 }}>
+              <div className="flex items-center justify-between gap-3 text-sm" style={{ marginTop: 2 }}>
+                <button
+                  type="button"
+                  onClick={() => setShowCompleteRegistration(true)}
+                  className="font-semibold transition-colors"
+                  style={{ color: "#4f46e5" }}
+                  onMouseOver={(e) => (e.currentTarget.style.color = "#3730a3")}
+                  onMouseOut={(e) => (e.currentTarget.style.color = "#4f46e5")}
+                >
+                  Crear cuenta
+                </button>
+
                 <a
                   href="/forgot-password"
-                  className="text-sm font-semibold transition-colors"
+                  className="font-semibold transition-colors"
                   style={{ color: "#4f46e5" }}
                   onMouseOver={(e) => (e.currentTarget.style.color = "#3730a3")}
                   onMouseOut={(e) => (e.currentTarget.style.color = "#4f46e5")}
@@ -339,7 +339,7 @@ export default function Login() {
           onClose={() => setShowCompleteRegistration(false)}
           onCompleted={() => {
             setShowCompleteRegistration(false);
-            setError("Registro completado. Ahora puedes iniciar sesión.");
+            setError("Registro completado. Ya puedes iniciar sesión con tu nueva contraseña.");
           }}
         />
       )}

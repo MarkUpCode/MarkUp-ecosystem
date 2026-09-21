@@ -19,6 +19,11 @@ const statusMap: Record<
     bgColor: string;
   }
 > = {
+  [CreditEstado.CREADA]: {
+    label: "Creada",
+    color: "text-gray-700",
+    bgColor: "bg-gray-100",
+  },
   [CreditEstado.ENVIADA]: {
     label: "Enviada",
     color: "text-blue-700",
