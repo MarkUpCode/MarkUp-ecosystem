@@ -28,8 +28,6 @@ class _WelcomePageState extends ConsumerState<WelcomePage>
   bool _isFinishing = false;
   bool _isPageChanging = false;
 
-  DateTime? _pageStartedAt;
-
   static const int _pageCount = 3;
 
   static const List<Duration> _screenDurations = [
@@ -41,8 +39,6 @@ class _WelcomePageState extends ConsumerState<WelcomePage>
   @override
   void initState() {
     super.initState();
-
-    _pageStartedAt = DateTime.now();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
@@ -61,8 +57,6 @@ class _WelcomePageState extends ConsumerState<WelcomePage>
     if (!mounted || _isPaused || _isFinishing) {
       return;
     }
-
-    _pageStartedAt = DateTime.now();
 
     _autoPlayTimer = Timer(
       _screenDurations[_currentPage],
@@ -147,8 +141,6 @@ class _WelcomePageState extends ConsumerState<WelcomePage>
       return;
     }
 
-    _pageStartedAt = DateTime.now();
-
     _startAutoPlay();
   }
 
@@ -208,8 +200,6 @@ class _WelcomePageState extends ConsumerState<WelcomePage>
     if (_isFinishing || _isPaused) {
       return;
     }
-
-    _pageStartedAt = DateTime.now();
 
     _startAutoPlay();
   }
