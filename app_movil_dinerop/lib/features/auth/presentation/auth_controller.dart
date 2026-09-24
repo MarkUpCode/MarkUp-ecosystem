@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/di.dart';
 import '../../../core/errors/app_exception.dart';
+import '../../../core/notifications/push_notification_service.dart';
 import '../../onboarding/data/models/onboarding_status_response.dart';
 import '../../onboarding/data/onboarding_repository.dart';
 import '../data/auth_remote_data_source.dart';
@@ -18,12 +19,14 @@ class AuthController extends ChangeNotifier {
   AuthController(
     this._authRepository,
     this._onboardingRepository,
+    this._pushNotificationService,
   ) {
     unawaited(_bootstrap());
   }
 
   final AuthRepository _authRepository;
   final OnboardingRepository _onboardingRepository;
+  final PushNotificationService _pushNotificationService;
 
   bool _isBootstrapping = true;
   bool _isBusy = false;
@@ -62,7 +65,6 @@ class AuthController extends ChangeNotifier {
         debugPrint('[BOOT 11] Auth state updated: unauthenticated');
         return;
       }
-
 
       debugPrint('[BOOT 8] Restoring session');
       _token = session.token;
@@ -179,6 +181,7 @@ class AuthController extends ChangeNotifier {
       }
 
       await _persistCurrentSession();
+      unawaited(_pushNotificationService.initializeAndRegister());
       notifyListeners();
       return response;
     } catch (error) {
@@ -191,7 +194,9 @@ class AuthController extends ChangeNotifier {
     }
   }
 
-  Future<PublicRegistrationResponse> register(PublicRegistrationRequest request) async {
+  Future<PublicRegistrationResponse> register(
+    PublicRegistrationRequest request,
+  ) async {
     _setBusy(true);
     _errorMessage = null;
     try {
@@ -248,7 +253,9 @@ class AuthController extends ChangeNotifier {
     try {
       await _authRepository.verifyRegistrationCode(email: email, code: code);
     } catch (error) {
-      _errorMessage = error is AppException ? error.message : AppErrorMessages.generic;
+      _errorMessage = error is AppException
+          ? error.message
+          : AppErrorMessages.generic;
       rethrow;
     } finally {
       _setBusy(false);
@@ -261,7 +268,9 @@ class AuthController extends ChangeNotifier {
     try {
       await _authRepository.resendRegistrationCode(email);
     } catch (error) {
-      _errorMessage = error is AppException ? error.message : AppErrorMessages.generic;
+      _errorMessage = error is AppException
+          ? error.message
+          : AppErrorMessages.generic;
       rethrow;
     } finally {
       _setBusy(false);
@@ -280,7 +289,9 @@ class AuthController extends ChangeNotifier {
         newEmail: newEmail,
       );
     } catch (error) {
-      _errorMessage = error is AppException ? error.message : AppErrorMessages.generic;
+      _errorMessage = error is AppException
+          ? error.message
+          : AppErrorMessages.generic;
       rethrow;
     } finally {
       _setBusy(false);
@@ -294,9 +305,14 @@ class AuthController extends ChangeNotifier {
     _setBusy(true);
     _errorMessage = null;
     try {
-      await _authRepository.setRegistrationPassword(email: email, password: password);
+      await _authRepository.setRegistrationPassword(
+        email: email,
+        password: password,
+      );
     } catch (error) {
-      _errorMessage = error is AppException ? error.message : AppErrorMessages.generic;
+      _errorMessage = error is AppException
+          ? error.message
+          : AppErrorMessages.generic;
       rethrow;
     } finally {
       _setBusy(false);
@@ -383,6 +399,6 @@ final authControllerProvider = ChangeNotifierProvider<AuthController>((ref) {
   return AuthController(
     ref.watch(authRepositoryProvider),
     ref.watch(onboardingRepositoryProvider),
+    PushNotificationService(ref.watch(apiClientProvider)),
   );
 });
-

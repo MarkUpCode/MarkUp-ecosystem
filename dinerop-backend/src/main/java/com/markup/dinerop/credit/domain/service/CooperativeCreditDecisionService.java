@@ -10,6 +10,7 @@ import com.markup.dinerop.credit.dto.CooperativeOfferDefaultsDto;
 import com.markup.dinerop.credit.infrastructure.repository.SolicitudCooperativaCotizacionRepository;
 import com.markup.dinerop.credit.infrastructure.repository.SolicitudCooperativaRepository;
 import com.markup.dinerop.notification.service.NotificationService;
+import com.markup.dinerop.notification.service.PushNotificationService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
@@ -25,6 +26,7 @@ public class CooperativeCreditDecisionService {
     private final CooperativeService cooperativeService;
     private final SolicitudCooperativaCotizacionRepository cotizacionRepository;
     private final NotificationService notificationService;
+    private final PushNotificationService pushNotificationService;
 
     @Transactional
     public void decide(
@@ -100,6 +102,15 @@ public class CooperativeCreditDecisionService {
                     cotizacion.getPlazoMeses(),
                     cotizacion.getCuotaMensual()
             );
+
+                    if (cr.getClientId() != null) {
+                    pushNotificationService.sendCreditAccepted(
+                        cr.getClientId(),
+                        "Nueva oferta de crédito",
+                        "Una cooperativa ha preaprobado tu solicitud. Revisa los detalles.",
+                        cr.getId()
+                    );
+                    }
 
         } else if ("RECHAZAR".equalsIgnoreCase(decision)) {
 

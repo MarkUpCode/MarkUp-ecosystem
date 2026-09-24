@@ -3,6 +3,7 @@ package com.markup.dinerop.credit.domain.service;
 import com.markup.dinerop.credit.domain.model.SolicitudCooperativa;
 import com.markup.dinerop.credit.domain.model.enums.SolicitudCooperativaStatus;
 import com.markup.dinerop.credit.infrastructure.repository.SolicitudCooperativaRepository;
+import com.markup.dinerop.notification.service.PushNotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,6 +15,7 @@ import java.time.LocalDateTime;
 public class ClientCreditAcceptanceService {
 
     private final SolicitudCooperativaRepository solicitudCooperativaRepository;
+    private final PushNotificationService pushNotificationService;
 
     @Transactional
     public void acceptPreApproved(Long clientId, Long solicitudId, Long cooperativaId) {
@@ -42,6 +44,13 @@ public class ClientCreditAcceptanceService {
 
         // 5) Guardar
         solicitudCooperativaRepository.save(sc);
+
+        pushNotificationService.sendCreditAccepted(
+            clientId,
+            "Crédito aceptado",
+            "Tu solicitud fue aceptada por la cooperativa. Revisa los siguientes pasos.",
+            solicitudId
+        );
     }
 }
 
