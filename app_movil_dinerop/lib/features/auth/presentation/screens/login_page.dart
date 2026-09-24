@@ -78,6 +78,10 @@ class LoginPage extends ConsumerWidget {
   }
 }
 
+// ═══════════════════════════════════════════════════════════
+// BOTTOM LOGIN BAR
+// ═══════════════════════════════════════════════════════════
+
 class _LoginNavigationBar extends StatelessWidget {
   const _LoginNavigationBar({required this.onPressed});
 
@@ -89,42 +93,64 @@ class _LoginNavigationBar extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        border: Border(
-          top: BorderSide(color: theme.colorScheme.primary, width: 2),
-        ),
-      ),
-      child: BottomAppBar(
-        height: 70,
-        elevation: 0,
         color: theme.colorScheme.surface,
-        padding: EdgeInsets.zero,
-        child: SafeArea(
-          top: false,
-          child: Center(
-            child: InkWell(
-              onTap: onPressed,
-              borderRadius: BorderRadius.circular(14),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 10,
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Icons.login_rounded,
-                      color: theme.colorScheme.primary,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.18),
+            blurRadius: 16,
+            offset: const Offset(0, -4),
+          ),
+        ],
+      ),
+      child: SafeArea(
+        top: false,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(24, 12, 24, 12),
+          child: SizedBox(
+            height: 52,
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: onPressed,
+                borderRadius: BorderRadius.circular(16),
+                child: Ink(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.centerLeft,
+                      end: Alignment.centerRight,
+                      colors: [
+                        theme.colorScheme.primary,
+                        theme.colorScheme.primary.withValues(alpha: 0.86),
+                      ],
                     ),
-                    const SizedBox(width: 10),
-                    Text(
-                      'Iniciar sesión',
-                      style: theme.textTheme.labelLarge?.copyWith(
-                        color: theme.colorScheme.primary,
-                        fontWeight: FontWeight.w700,
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: theme.colorScheme.primary.withValues(alpha: 0.35),
+                        blurRadius: 16,
+                        offset: const Offset(0, 6),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(
+                        Icons.login_rounded,
+                        color: Colors.white,
+                        size: 20,
+                      ),
+                      const SizedBox(width: 10),
+                      Text(
+                        'Iniciar sesión',
+                        style: theme.textTheme.labelLarge?.copyWith(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 0.1,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -252,76 +278,73 @@ class _ServiceCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 255,
-      padding: const EdgeInsets.all(22),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         gradient: gradient,
-        borderRadius: BorderRadius.circular(26),
+        borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
             color: shadowColor.withValues(alpha: 0.24),
-            blurRadius: 24,
-            offset: const Offset(0, 10),
+            blurRadius: 22,
+            offset: const Offset(0, 9),
           ),
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         children: [
           // ─────────────────────────────────────────────
-          // ICON
+          // ICON + TITLE (misma fila)
           // ─────────────────────────────────────────────
-          Container(
-            width: 46,
-            height: 46,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: iconBackground,
-            ),
-            child: Icon(icon, color: iconColor, size: 24),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: iconBackground,
+                ),
+                child: Icon(icon, color: iconColor, size: 22),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Text(
+                  title,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 18.5,
+                    fontWeight: FontWeight.w900,
+                    height: 1.12,
+                    letterSpacing: -0.3,
+                  ),
+                ),
+              ),
+            ],
           ),
 
-          const SizedBox(height: 13),
-
-          // ─────────────────────────────────────────────
-          // TITLE
-          // ─────────────────────────────────────────────
-          Text(
-            title,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 22,
-              fontWeight: FontWeight.w900,
-              height: 1.08,
-              letterSpacing: -0.4,
-            ),
-          ),
-
-          const SizedBox(height: 6),
+          const SizedBox(height: 12),
 
           // ─────────────────────────────────────────────
           // DESCRIPTION
           // ─────────────────────────────────────────────
-          Expanded(
-            child: Align(
-              alignment: Alignment.topLeft,
-              child: Text(
-                description,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.82),
-                  fontSize: 13.5,
-                  fontWeight: FontWeight.w500,
-                  height: 1.35,
-                ),
-              ),
+          Text(
+            description,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              color: Colors.white.withValues(alpha: 0.82),
+              fontSize: 13,
+              fontWeight: FontWeight.w500,
+              height: 1.35,
             ),
           ),
 
-          const SizedBox(height: 10),
+          const SizedBox(height: 16),
 
           // ─────────────────────────────────────────────
           // ACTIONS
@@ -330,7 +353,7 @@ class _ServiceCard extends StatelessWidget {
             children: [
               Expanded(
                 child: SizedBox(
-                  height: 46,
+                  height: 44,
                   child: Material(
                     color: Colors.transparent,
                     child: InkWell(
@@ -372,7 +395,7 @@ class _ServiceCard extends StatelessWidget {
               const SizedBox(width: 10),
               Expanded(
                 child: SizedBox(
-                  height: 46,
+                  height: 44,
                   child: Material(
                     color: Colors.transparent,
                     child: InkWell(
