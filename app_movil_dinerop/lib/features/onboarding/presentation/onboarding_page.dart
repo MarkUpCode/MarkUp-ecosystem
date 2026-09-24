@@ -210,6 +210,9 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
     bool empty(TextEditingController controller) =>
         controller.text.trim().isEmpty;
 
+    bool isTenDigits(TextEditingController controller) =>
+        RegExp(r'^\d{10}$').hasMatch(controller.text.trim());
+
     switch (_step) {
       case 0:
         if (empty(_cedulaController) ||
@@ -218,12 +221,18 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
             _fechaNacimiento == null) {
           return 'Completa cédula, nombres, apellidos y fecha de nacimiento.';
         }
+        if (!isTenDigits(_cedulaController)) {
+          return 'La cédula debe tener exactamente 10 dígitos.';
+        }
         break;
       case 1:
         if (empty(_telefonoController) ||
             empty(_ocupacionController) ||
             empty(_empresaController)) {
           return 'Completa teléfono, ocupación y empresa o negocio.';
+        }
+        if (!isTenDigits(_telefonoController)) {
+          return 'El teléfono debe tener exactamente 10 dígitos.';
         }
         break;
       case 2:
@@ -236,10 +245,13 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
         }
         break;
       case 3:
-        if (double.tryParse(_ingresoController.text.replaceAll(',', '.')) ==
-                null ||
-            double.tryParse(_egresoController.text.replaceAll(',', '.')) ==
-                null) {
+        final ingreso = double.tryParse(
+          _ingresoController.text.replaceAll(',', '.'),
+        );
+        final egreso = double.tryParse(
+          _egresoController.text.replaceAll(',', '.'),
+        );
+        if (ingreso == null || egreso == null || ingreso < 0 || egreso < 0) {
           return 'Ingresa los valores de ingreso y egreso mensuales.';
         }
         if (_references.any(
@@ -985,8 +997,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
             decoration: const InputDecoration(labelText: 'Tipo de Vivienda *'),
             items: const [
               DropdownMenuItem(value: 'PROPIA', child: Text('PROPIA')),
-              DropdownMenuItem(value: 'ALQUILADA', child: Text('ALQUILADA')),
-              DropdownMenuItem(value: 'FAMILIAR', child: Text('FAMILIAR')),
+              DropdownMenuItem(value: 'ARRENDADA', child: Text('ALQUILADA')),
             ],
             onChanged: (value) {
               if (value != null) {

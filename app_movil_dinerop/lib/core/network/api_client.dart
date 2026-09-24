@@ -115,7 +115,22 @@ class ApiClient {
       } else if (statusCode == 401) {
         message = AppErrorMessages.unauthorized;
       } else {
-        message = (responseData['error'] ?? message).toString();
+        final backendError = responseData['error'];
+        if (backendError is String && backendError.trim().isNotEmpty) {
+          message = backendError;
+        } else {
+          final fieldErrors = responseData.entries
+              .where(
+                (entry) =>
+                    entry.value is String &&
+                    (entry.value as String).trim().isNotEmpty,
+              )
+              .map((entry) => '${_fieldLabel(entry.key)}: ${entry.value}')
+              .toList();
+          if (fieldErrors.isNotEmpty) {
+            message = fieldErrors.join('\n');
+          }
+        }
       }
     } else if (responseData is String && responseData.trim().isNotEmpty) {
       message = responseData;
@@ -124,5 +139,25 @@ class ApiClient {
     }
 
     return AppException(message, statusCode: statusCode);
+  }
+
+  String _fieldLabel(String field) {
+    final normalized = field.split('.').last;
+    const labels = {
+      'destinoCredito': 'Destino del crédito',
+      'nombres': 'Nombres',
+      'apellidos': 'Apellidos',
+      'cedula': 'Cédula',
+      'fechaNacimiento': 'Fecha de nacimiento',
+      'estadoCivil': 'Estado civil',
+      'tieneConyuge': 'Cónyuge',
+      'direccion': 'Dirección',
+      'provincia': 'Provincia',
+      'canton': 'Cantón',
+      'ingresoEgreso': 'Ingresos y egresos',
+      'tipoVivienda': 'Tipo de vivienda',
+      'referencias': 'Referencias',
+    };
+    return labels[normalized] ?? normalized;
   }
 }
