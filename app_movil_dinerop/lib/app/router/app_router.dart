@@ -64,6 +64,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         '/register',
         '/activate',
         '/complete-registration',
+        '/verify-registration',
         '/forgot-password',
         '/reset-password',
         '/simulate-credit',

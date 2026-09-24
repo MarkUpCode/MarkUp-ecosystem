@@ -95,7 +95,8 @@ class _RegistrationVerificationPageState
             email: _email,
             password: password,
           );
-      if (mounted) context.go('/login');
+      await ref.read(authControllerProvider).login(_email, password);
+      if (mounted) context.go('/dashboard');
     } catch (error) {
       if (mounted) {
         setState(() => _error = error is AppException
