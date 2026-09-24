@@ -38,6 +38,14 @@ class AuthRepository {
     Future<String> resendRegistrationCode(String email) =>
       _remote.resendRegistrationCode(email);
 
+    Future<String> changeRegistrationEmail({
+      required String currentEmail,
+      required String newEmail,
+    }) => _remote.changeRegistrationEmail(
+          currentEmail: currentEmail,
+          newEmail: newEmail,
+        );
+
     Future<String> setRegistrationPassword({required String email, required String password}) =>
       _remote.setRegistrationPassword(email: email, password: password);
 

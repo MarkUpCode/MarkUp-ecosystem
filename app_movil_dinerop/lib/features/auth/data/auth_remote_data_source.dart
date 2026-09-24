@@ -79,6 +79,19 @@ class AuthRemoteDataSource {
     );
   }
 
+  Future<String> changeRegistrationEmail({
+    required String currentEmail,
+    required String newEmail,
+  }) {
+    return _client.request<String>(
+      '/api/auth/registration/change-email',
+      method: 'POST',
+      authenticated: false,
+      body: {'currentEmail': currentEmail, 'newEmail': newEmail},
+      parser: (data) => data is Map ? (data['message'] ?? '').toString() : data.toString(),
+    );
+  }
+
   Future<String> setRegistrationPassword({
     required String email,
     required String password,

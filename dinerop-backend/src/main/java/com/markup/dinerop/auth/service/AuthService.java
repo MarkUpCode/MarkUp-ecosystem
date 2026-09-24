@@ -355,23 +355,45 @@ public class AuthService {
 
     @Transactional
     public OtpRegistrationStartResponse changeRegistrationEmail(PublicRegistrationRequest request) {
-        String normalizedEmail = normalizeEmail(request.getEmail());
-        if (userRepository.existsByEmail(normalizedEmail)) {
-            throw new UserAlreadyActiveException(normalizedEmail);
-        }
-
-        User user = userRepository.findByEmail(normalizedEmail)
-                .orElseGet(() -> createPendingUser(normalizedEmail, Role.CLIENT));
-
-        if (user.getPassword() != null && "ACTIVE".equals(user.getStatus())) {
-            throw new UserAlreadyActiveException(normalizedEmail);
-        }
-
-        if (request.getFirstName() != null) {
-            upsertPreRegistration(user, request);
-        }
-
         return startRegistrationOtp(request);
+    }
+
+    @Transactional
+    public OtpRegistrationStartResponse changeRegistrationEmail(
+            String currentEmail,
+            String newEmail
+    ) {
+        String normalizedCurrentEmail = normalizeEmail(currentEmail);
+        String normalizedNewEmail = normalizeEmail(newEmail);
+
+        if (normalizedCurrentEmail.equals(normalizedNewEmail)) {
+            throw new IllegalArgumentException("El nuevo correo debe ser diferente al actual.");
+        }
+
+        if (userRepository.existsByEmail(normalizedNewEmail)) {
+            throw new UserAlreadyActiveException(normalizedNewEmail);
+        }
+
+        User user = userRepository.findByEmail(normalizedCurrentEmail)
+                .orElseThrow(() -> new OtpInvalidException("No existe un registro pendiente para ese correo."));
+
+        if (user.getPassword() != null || "ACTIVE".equals(user.getStatus())) {
+            throw new UserAlreadyActiveException(normalizedCurrentEmail);
+        }
+
+        emailVerificationOtpRepository.findTopByEmailOrderByCreatedAtDesc(normalizedCurrentEmail)
+                .ifPresent(oldOtp -> {
+                    oldOtp.setUsed(true);
+                    oldOtp.setRevoked(true);
+                    emailVerificationOtpRepository.save(oldOtp);
+                });
+
+        user.setEmail(normalizedNewEmail);
+        userRepository.save(user);
+
+        return startRegistrationOtp(PublicRegistrationRequest.builder()
+                .email(normalizedNewEmail)
+                .build());
     }
 
     private User createPendingUser(String email, Role role) {

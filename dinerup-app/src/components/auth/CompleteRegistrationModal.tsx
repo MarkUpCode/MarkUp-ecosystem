@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { X } from "lucide-react";
 import {
+  changeRegistrationEmailOnly,
   resendRegistrationOtp,
   setRegistrationPassword,
   startRegistrationOtp,
@@ -23,6 +24,7 @@ export default function CompleteRegistrationModal({
 }: Props) {
   const [step, setStep] = useState<"profile" | "verify" | "password">(initialStep);
   const [email, setEmail] = useState(defaultEmail);
+  const [newEmail, setNewEmail] = useState(defaultEmail);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [identification, setIdentification] = useState("");
@@ -35,6 +37,7 @@ export default function CompleteRegistrationModal({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [countdown, setCountdown] = useState(45);
+  const [editingEmail, setEditingEmail] = useState(false);
 
   useEffect(() => {
     if (step !== "verify" || countdown <= 0) return;
@@ -113,6 +116,32 @@ export default function CompleteRegistrationModal({
       setCode("");
     } catch (e) {
       setError(getErrorMessage(e, "No se pudo reenviar el código."));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleChangeEmail = async () => {
+    setError(null);
+    const trimmedNewEmail = newEmail.trim();
+    if (!/^\S+@\S+\.\S+$/.test(trimmedNewEmail)) {
+      setError("Ingresa un correo electrónico válido.");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      await changeRegistrationEmailOnly({
+        currentEmail: email.trim(),
+        newEmail: trimmedNewEmail,
+      });
+      setEmail(trimmedNewEmail);
+      setNewEmail(trimmedNewEmail);
+      setEditingEmail(false);
+      setCode("");
+      setCountdown(45);
+    } catch (e) {
+      setError(getErrorMessage(e, "No se pudo cambiar el correo."));
     } finally {
       setLoading(false);
     }
@@ -216,9 +245,30 @@ export default function CompleteRegistrationModal({
 
         {step === "verify" && (
           <div className="space-y-4">
-            <p className="text-sm text-neutral-600">
-              Te enviamos un código a <span className="font-semibold text-neutral-800">{email}</span>.
-            </p>
+            {editingEmail ? (
+              <div className="space-y-3">
+                <Field label="Nuevo correo electrónico">
+                  <input
+                    type="email"
+                    value={newEmail}
+                    onChange={(e) => setNewEmail(e.target.value)}
+                    className="input-base"
+                  />
+                </Field>
+                <div className="flex justify-end gap-3 text-sm">
+                  <button type="button" onClick={() => setEditingEmail(false)} className="text-neutral-500">
+                    Cancelar
+                  </button>
+                  <button type="button" onClick={handleChangeEmail} disabled={loading} className="font-semibold text-indigo-600 disabled:opacity-50">
+                    Enviar código al nuevo correo
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <p className="text-sm text-neutral-600">
+                Te enviamos un código a <span className="font-semibold text-neutral-800">{email}</span>.
+              </p>
+            )}
 
             <Field label="Código de verificación">
               <input
@@ -234,7 +284,10 @@ export default function CompleteRegistrationModal({
             <div className="flex items-center justify-between gap-3 text-sm">
               <button
                 type="button"
-                onClick={() => setStep("profile")}
+                onClick={() => {
+                  setNewEmail(email);
+                  setEditingEmail(true);
+                }}
                 className="font-medium text-indigo-600 hover:text-indigo-700"
               >
                 Cambiar email

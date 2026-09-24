@@ -268,6 +268,25 @@ class AuthController extends ChangeNotifier {
     }
   }
 
+  Future<void> changeRegistrationEmail({
+    required String currentEmail,
+    required String newEmail,
+  }) async {
+    _setBusy(true);
+    _errorMessage = null;
+    try {
+      await _authRepository.changeRegistrationEmail(
+        currentEmail: currentEmail,
+        newEmail: newEmail,
+      );
+    } catch (error) {
+      _errorMessage = error is AppException ? error.message : AppErrorMessages.generic;
+      rethrow;
+    } finally {
+      _setBusy(false);
+    }
+  }
+
   Future<void> setRegistrationPassword({
     required String email,
     required String password,

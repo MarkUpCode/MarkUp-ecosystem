@@ -92,6 +92,20 @@ export async function changeRegistrationEmail(payload: RegistrationStartPayload)
   );
 }
 
+export async function changeRegistrationEmailOnly(payload: {
+  currentEmail: string;
+  newEmail: string;
+}) {
+  return httpClient<{ email: string; message: string; requiresVerification: boolean }>(
+    "/api/auth/registration/change-email",
+    {
+      method: "POST",
+      body: payload,
+      auth: false,
+    },
+  );
+}
+
 export async function setRegistrationPassword(payload: RegistrationPasswordPayload) {
   return httpClient<string>("/api/auth/registration/set-password", {
     method: "POST",

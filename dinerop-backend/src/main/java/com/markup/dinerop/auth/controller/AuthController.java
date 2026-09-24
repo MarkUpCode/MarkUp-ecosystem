@@ -95,9 +95,12 @@ public class AuthController {
 
     @PostMapping("/registration/change-email")
     public ResponseEntity<OtpRegistrationStartResponse> changeRegistrationEmail(
-            @Valid @RequestBody PublicRegistrationRequest request
+            @Valid @RequestBody ChangeRegistrationEmailRequest request
     ) {
-        return ResponseEntity.ok(authService.changeRegistrationEmail(request));
+        return ResponseEntity.ok(authService.changeRegistrationEmail(
+                request.getCurrentEmail(),
+                request.getNewEmail()
+        ));
     }
 
     @PostMapping("/registration/set-password")
