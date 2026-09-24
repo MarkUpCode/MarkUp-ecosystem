@@ -81,7 +81,7 @@ public class CreditService {
                 return new PublicCreditRequestResult(
                         null,
                         user.getStatus(),
-                        "Ya existe un registro pendiente de activación. Hemos reenviado el correo de activación."
+                        "Ya existe un registro pendiente. Hemos enviado un nuevo código de verificación."
                 );
         }
 

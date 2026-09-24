@@ -32,6 +32,15 @@ class AuthRepository {
   Future<String> completeRegistration({required String email, required String password}) =>
       _remote.completeRegistration(email: email, password: password);
 
+    Future<String> verifyRegistrationCode({required String email, required String code}) =>
+      _remote.verifyRegistrationCode(email: email, code: code);
+
+    Future<String> resendRegistrationCode(String email) =>
+      _remote.resendRegistrationCode(email);
+
+    Future<String> setRegistrationPassword({required String email, required String password}) =>
+      _remote.setRegistrationPassword(email: email, password: password);
+
   Future<String> forgotPassword(String email) => _remote.forgotPassword(email);
 
   Future<String> resetPassword({required String token, required String newPassword}) =>

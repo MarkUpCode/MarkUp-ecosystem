@@ -156,12 +156,8 @@ public class AuthService {
                 normalizedEmail
         );
 
-        // 1. Crear usuario pendiente + token + enviar correo
-        preRegister(
-                normalizedEmail,
-                Role.CLIENT,
-                null
-        );
+        // 1. Crear usuario pendiente + OTP + enviar código
+        startRegistrationOtp(request);
 
         // 2. Recuperar usuario creado o existente
         User user = userRepository

@@ -10,16 +10,18 @@ import { getErrorMessage } from "../../api/errors";
 
 type Props = {
   defaultEmail?: string;
+  initialStep?: "profile" | "verify" | "password";
   onCompleted: () => void;
   onClose: () => void;
 };
 
 export default function CompleteRegistrationModal({
   defaultEmail = "",
+  initialStep = "profile",
   onCompleted,
   onClose,
 }: Props) {
-  const [step, setStep] = useState<"profile" | "verify" | "password">("profile");
+  const [step, setStep] = useState<"profile" | "verify" | "password">(initialStep);
   const [email, setEmail] = useState(defaultEmail);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");

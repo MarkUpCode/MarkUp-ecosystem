@@ -56,6 +56,42 @@ class AuthRemoteDataSource {
     );
   }
 
+  Future<String> verifyRegistrationCode({
+    required String email,
+    required String code,
+  }) {
+    return _client.request<String>(
+      '/api/auth/registration/verify-code',
+      method: 'POST',
+      authenticated: false,
+      body: {'email': email, 'code': code},
+      parser: (data) => data.toString(),
+    );
+  }
+
+  Future<String> resendRegistrationCode(String email) {
+    return _client.request<String>(
+      '/api/auth/registration/resend-code',
+      method: 'POST',
+      authenticated: false,
+      body: {'email': email},
+      parser: (data) => data is Map ? (data['message'] ?? '').toString() : data.toString(),
+    );
+  }
+
+  Future<String> setRegistrationPassword({
+    required String email,
+    required String password,
+  }) {
+    return _client.request<String>(
+      '/api/auth/registration/set-password',
+      method: 'POST',
+      authenticated: false,
+      body: {'email': email, 'password': password},
+      parser: (data) => data.toString(),
+    );
+  }
+
   Future<String> forgotPassword(String email) {
     return _client.request<String>(
       '/api/auth/password/forgot',

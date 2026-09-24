@@ -29,8 +29,8 @@ export default function SuccessRequestModal({
   const steps = [
     {
       icon: Mail,
-      title: "Revisa tu correo",
-      description: "Te enviamos un email para activar tu cuenta.",
+      title: "Verifica tu correo",
+      description: "Te enviamos un código de 6 dígitos para verificar tu cuenta.",
     },
     {
       icon: UserCheck,
@@ -81,7 +81,7 @@ export default function SuccessRequestModal({
                 {message}
               </p>
               <span className="inline-block mt-3 px-3 py-1 text-xs font-semibold bg-gray-100 text-gray-700 rounded-full">
-                Próximo paso: Activa tu cuenta
+                Registro y correo verificados
               </span>
             </div>
           </div>

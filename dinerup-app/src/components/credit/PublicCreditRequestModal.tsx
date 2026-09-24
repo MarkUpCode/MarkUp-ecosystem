@@ -3,6 +3,7 @@ import { X, Loader, User, MapPin, Wallet } from "lucide-react";
 import { httpClient } from "../../api/httpClient";
 import { getErrorMessage } from "../../api/errors";
 import SuccessRequestModal from "./SuccessRequestModal";
+import CompleteRegistrationModal from "../auth/CompleteRegistrationModal";
 import { ecuadorProvinces } from "../../data/ecuadorProvinces";
 
 interface PublicCreditRequestModalProps {
@@ -144,6 +145,7 @@ export default function PublicCreditRequestModal({
   const [errors, setErrors] = useState<FormErrors>({});
   const [isLoading, setIsLoading] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showRegistrationVerification, setShowRegistrationVerification] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
 
   const resetForm = () => {
@@ -290,7 +292,7 @@ export default function PublicCreditRequestModal({
       });
 
       setSuccessMessage(result.message ?? "Solicitud enviada correctamente.");
-      setShowSuccessModal(true);
+      setShowRegistrationVerification(true);
     } catch (error) {
       setErrors({
         submit: getErrorMessage(error, "Error al enviar. Intenta nuevamente."),
@@ -641,6 +643,17 @@ export default function PublicCreditRequestModal({
         email={formData.email}
         message={successMessage}
       />
+      {showRegistrationVerification && (
+        <CompleteRegistrationModal
+          defaultEmail={formData.email}
+          initialStep="verify"
+          onClose={() => setShowRegistrationVerification(false)}
+          onCompleted={() => {
+            setShowRegistrationVerification(false);
+            setShowSuccessModal(true);
+          }}
+        />
+      )}
     </div>
   );
 }

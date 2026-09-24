@@ -71,10 +71,10 @@ public class NotificationService {
 
         } catch (ResendException e) {
 
-            // No detenemos la aplicación por un fallo del proveedor de correo
-            log.error("No se pudo enviar el correo.");
+            log.error("No se pudo enviar el correo a {}.", dto.getTo());
             log.error("Destino : {}", dto.getTo());
             log.error("Motivo  : {}", e.getMessage());
+            throw new IllegalStateException("No se pudo enviar el correo de verificación.", e);
 
         }
     }

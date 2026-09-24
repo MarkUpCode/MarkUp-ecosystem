@@ -311,7 +311,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
       await ref.read(authControllerProvider).register(request);
 
       if (mounted) {
-        await _showSuccessDialog(request.email);
+        context.go('/verify-registration?email=${Uri.encodeComponent(request.email)}');
       }
     } catch (error) {
       if (!mounted) {
@@ -326,6 +326,8 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
     }
   }
 
+  // Legacy dialog retained for older deep links; new registrations use OTP verification.
+  // ignore: unused_element
   Future<void> _showSuccessDialog(String email) async {
     await showDialog<void>(
       context: context,
