@@ -31,6 +31,8 @@ import com.markup.dinerop.auth.entity.Role;
 import java.util.List;
 import java.util.Optional;
 import java.math.BigDecimal;
+import com.markup.dinerop.credit.service.CreditRequirementService;
+import com.markup.dinerop.credit.dto.CreditRequirementDto;
 
 @Slf4j
 @Service
@@ -45,6 +47,7 @@ public class CreditService {
     private final UserRepository userRepository;
     private final CooperativeService cooperativeService;
     private final NotificationService notificationService;
+        private final CreditRequirementService creditRequirementService;
 
 
 
@@ -421,9 +424,15 @@ public class CreditService {
     // Actualizar solicitud a solicitando garante nueva funcionalidad solo desde credit service
     // =========================
     @Transactional
+        public void solicitarGarante(Long solicitudId, Long cooperativaId) {
+                solicitarGarante(solicitudId, cooperativaId, null);
+        }
+
+        @Transactional
     public void solicitarGarante(
             Long solicitudId,
-            Long cooperativaId
+            Long cooperativaId,
+            List<CreditRequirementDto> requisitos
     ) {
         SolicitudCooperativa sc = solicitudCooperativaRepository
                 .findBySolicitudIdAndCooperativaId(solicitudId, cooperativaId)
@@ -476,6 +485,7 @@ public class CreditService {
         }
 
         sc.setEstado(SolicitudCooperativaStatus.SOLICITANDO_GARANTE);
+        creditRequirementService.replaceForOffer(sc.getId(), requisitos);
         notificationService.sendGuaranteeRequiredEmail(
                 sc.getCreditRequest().getEmail(),
                 cooperativeService.getById(cooperativaId).getNombre()

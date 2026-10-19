@@ -9,6 +9,8 @@ import com.markup.dinerop.credit.dto.CooperativeStatusItemDto;
 import com.markup.dinerop.credit.infrastructure.repository.SolicitudCooperativaCotizacionRepository;
 import com.markup.dinerop.credit.infrastructure.repository.SolicitudCooperativaRepository;
 import lombok.RequiredArgsConstructor;
+import com.markup.dinerop.credit.service.CreditRequirementService;
+import com.markup.dinerop.credit.dto.CreditRequirementDto;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,6 +22,7 @@ public class ClientCreditCooperativeStatusService {
     private final SolicitudCooperativaRepository solicitudCooperativaRepository;
     private final SolicitudCooperativaCotizacionRepository cotizacionRepository;
     private final CooperativeService cooperativeService;
+        private final CreditRequirementService requirementService;
 
     public List<CooperativeStatusItemDto> getPreApprovedCooperatives(Long clientId, Long solicitudId) {
 
@@ -38,6 +41,10 @@ public class ClientCreditCooperativeStatusService {
                 var cotizacion = cotizacionRepository.findBySolicitudCooperativaId(sc.getId())
                     .orElseGet(() -> createMissingQuotation(sc));
 
+            var requirements = requirementService.findForOffer(sc.getId()).stream().map(item -> new CreditRequirementDto(
+                    item.getTitle(), item.getDescription(), item.getCategory(), item.isMandatory(), item.getDisplayOrder()
+            )).toList();
+
             return CooperativeStatusItemDto.builder()
                     .cooperativaId(sc.getCooperativaId())
                     .nombreCooperativa(coop != null ? coop.getNombre() : "-")
@@ -50,6 +57,9 @@ public class ClientCreditCooperativeStatusService {
                     .cuotaMensual(cotizacion != null ? cotizacion.getCuotaMensual() : null)
                     .totalPagar(cotizacion != null ? cotizacion.getTotalPagar() : null)
                     .interesTotal(cotizacion != null ? cotizacion.getInteresTotal() : null)
+                    .direccion(coop.getDireccion())
+                    .mapsUrl(coop.getPaginaWeb())
+                    .requisitos(requirements)
                     .build();
 
         }).toList();

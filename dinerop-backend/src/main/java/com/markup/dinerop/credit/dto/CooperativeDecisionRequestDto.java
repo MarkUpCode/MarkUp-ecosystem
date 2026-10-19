@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 public record CooperativeDecisionRequestDto(
         String decision,   // PRE_APROBAR | RECHAZAR
@@ -16,5 +17,7 @@ public record CooperativeDecisionRequestDto(
 
         @Min(value = 1, message = "El plazo debe ser de al menos un mes")
         @Max(value = 360, message = "El plazo no puede superar 360 meses")
-        Integer plazoMeses
+        Integer plazoMeses,
+
+        List<CreditRequirementDto> requisitos
 ) {}

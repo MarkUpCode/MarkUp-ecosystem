@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Builder
@@ -26,6 +27,10 @@ public class CooperativeStatusItemDto {
     private BigDecimal cuotaMensual;
     private BigDecimal totalPagar;
     private BigDecimal interesTotal;
+
+    private String direccion;
+    private String mapsUrl;
+    private List<CreditRequirementDto> requisitos;
 
 
 }

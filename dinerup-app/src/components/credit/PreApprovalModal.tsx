@@ -1,6 +1,6 @@
 import { AlertCircle, CheckCircle, Shield, X } from "lucide-react";
 import { useEffect, useState } from "react";
-import type { CooperativeOfferDefaults } from "../../types/credit";
+import type { CooperativeOfferDefaults, CreditRequirement } from "../../types/credit";
 
 interface PreApprovalModalProps {
   open: boolean;
@@ -13,8 +13,9 @@ interface PreApprovalModalProps {
   onApproveWithoutGuarantee: (
     solicitudId: number,
     offer: { tasaAnual: number; plazoMeses: number },
+    requirements: CreditRequirement[],
   ) => Promise<void>;
-  onApproveWithGuarantee: (solicitudId: number) => Promise<void>;
+  onApproveWithGuarantee: (solicitudId: number, requirements: CreditRequirement[]) => Promise<void>;
   isLoading: boolean;
 }
 
@@ -33,6 +34,12 @@ export default function PreApprovalModal({
   const [tasaAnual, setTasaAnual] = useState("");
   const [plazoMeses, setPlazoMeses] = useState("");
   const [formError, setFormError] = useState("");
+  const [requirements, setRequirements] = useState<CreditRequirement[]>([
+    { title: "Cédula de ciudadanía", description: "Original y copia", category: "IDENTIDAD", mandatory: true },
+    { title: "Planilla de servicio básico", description: "Últimos 2 meses", category: "DOMICILIO", mandatory: true },
+    { title: "Respaldo de ingresos", description: "Según actividad económica", category: "INGRESOS", mandatory: true },
+    { title: "Constancia de referencia Dinerop", description: "Documento generado por la aplicación", category: "DINEROP", mandatory: true },
+  ]);
 
   useEffect(() => {
     if (open && defaults) {
@@ -58,7 +65,7 @@ export default function PreApprovalModal({
       await onApproveWithoutGuarantee(solicitudId, {
         tasaAnual: tasa,
         plazoMeses: plazo,
-      });
+      }, requirements);
       onClose();
     } catch {
       return;
@@ -67,7 +74,7 @@ export default function PreApprovalModal({
 
   const handleWithGuarantee = async () => {
     try {
-      await onApproveWithGuarantee(solicitudId);
+      await onApproveWithGuarantee(solicitudId, requirements);
       onClose();
     } catch {
       return;
@@ -149,6 +156,29 @@ export default function PreApprovalModal({
           </div>
 
           <div className="mb-8">
+
+                      <div className="mb-8 rounded-xl border border-slate-200 p-5">
+                        <div className="flex items-center justify-between gap-3">
+                          <div>
+                            <h3 className="font-semibold text-gray-900">Requisitos para esta oferta</h3>
+                            <p className="mt-1 text-sm text-gray-600">La lista quedará guardada para esta solicitud.</p>
+                          </div>
+                          <button type="button" onClick={() => setRequirements((items) => [...items, { title: "", description: "", category: "OTROS", mandatory: true }])} className="rounded-lg bg-slate-900 px-3 py-2 text-sm font-semibold text-white">Agregar</button>
+                        </div>
+                        <div className="mt-4 space-y-3">
+                          {requirements.map((requirement, index) => (
+                            <div key={`${index}-${requirement.title}`} className="grid gap-2 md:grid-cols-[1fr_1fr_auto_auto]">
+                              <input value={requirement.title} placeholder="Documento requerido" onChange={(event) => setRequirements((items) => items.map((item, itemIndex) => itemIndex === index ? { ...item, title: event.target.value } : item))} className="rounded-lg border border-gray-300 px-3 py-2 text-sm" />
+                              <input value={requirement.description ?? ""} placeholder="Detalle" onChange={(event) => setRequirements((items) => items.map((item, itemIndex) => itemIndex === index ? { ...item, description: event.target.value } : item))} className="rounded-lg border border-gray-300 px-3 py-2 text-sm" />
+                              <label className="flex items-center gap-2 rounded-lg border border-gray-300 px-3 py-2 text-sm">
+                                <input type="checkbox" checked={requirement.mandatory !== false} onChange={(event) => setRequirements((items) => items.map((item, itemIndex) => itemIndex === index ? { ...item, mandatory: event.target.checked } : item))} />
+                                Obligatorio
+                              </label>
+                              <button type="button" onClick={() => setRequirements((items) => items.filter((_, itemIndex) => itemIndex !== index))} className="rounded-lg border border-red-200 px-3 py-2 text-sm text-red-600">Quitar</button>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
             <p className="text-sm font-semibold text-gray-700 mb-4">
               Requiere garante para esta aprobacion?
             </p>

@@ -17,6 +17,10 @@ import jakarta.validation.Valid;
 
 import java.util.List;
 import java.util.Map;
+import com.markup.dinerop.credit.service.CreditRequirementService;
+import com.markup.dinerop.credit.service.CreditReferralPdfService;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 
 @RestController
 @RequestMapping("/api/credits")
@@ -29,6 +33,8 @@ public class CreditController {
     private final CooperativeCreditDecisionService cooperativeCreditDecisionService;
     private final ClientCreditCooperativeStatusService clientCreditCooperativeStatusService;
     private final ClientCreditAcceptanceService clientCreditAcceptanceService;
+        private final CreditRequirementService creditRequirementService;
+        private final CreditReferralPdfService creditReferralPdfService;
 
 
 
@@ -50,6 +56,19 @@ public class CreditController {
                                 "status", result.status()
                         )
         );
+    }
+
+    @GetMapping(value = "/me/{solicitudId}/cooperatives/{cooperativaId}/referral.pdf", produces = MediaType.APPLICATION_PDF_VALUE)
+    public ResponseEntity<byte[]> referralPdf(
+            @AuthenticationPrincipal User user,
+            @PathVariable Long solicitudId,
+            @PathVariable Long cooperativaId
+    ) {
+        byte[] pdf = creditReferralPdfService.generate(user.getIdUser(), solicitudId, cooperativaId);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=dinerop-referencia-" + solicitudId + ".pdf")
+                .contentType(MediaType.APPLICATION_PDF)
+                .body(pdf);
     }
 
 
@@ -113,7 +132,8 @@ public class CreditController {
                 cooperativaId,
                 dto.decision(),
                 dto.tasaAnual(),
-                dto.plazoMeses()
+                dto.plazoMeses(),
+                dto.requisitos()
         );
 
         return ResponseEntity.ok(
@@ -142,13 +162,15 @@ public class CreditController {
     @PreAuthorize("hasRole('COOPERATIVE')")
     public ResponseEntity<Map<String, Object>> solicitarGarante(
             @PathVariable Long solicitudId,
-            @AuthenticationPrincipal User user
+            @AuthenticationPrincipal User user,
+            @RequestBody(required = false) List<com.markup.dinerop.credit.dto.CreditRequirementDto> requisitos
     ) {
         Long cooperativaId = user.getCooperativaId();
 
         creditService.solicitarGarante(
                 solicitudId,
-                cooperativaId
+                cooperativaId,
+                requisitos
         );
 
         return ResponseEntity.ok(

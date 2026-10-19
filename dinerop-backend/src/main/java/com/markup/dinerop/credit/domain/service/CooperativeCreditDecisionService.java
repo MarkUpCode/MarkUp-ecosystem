@@ -11,6 +11,8 @@ import com.markup.dinerop.credit.infrastructure.repository.SolicitudCooperativaC
 import com.markup.dinerop.credit.infrastructure.repository.SolicitudCooperativaRepository;
 import com.markup.dinerop.notification.service.NotificationService;
 import com.markup.dinerop.notification.service.PushNotificationService;
+import com.markup.dinerop.credit.dto.CreditRequirementDto;
+import com.markup.dinerop.credit.service.CreditRequirementService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
@@ -27,6 +29,7 @@ public class CooperativeCreditDecisionService {
     private final SolicitudCooperativaCotizacionRepository cotizacionRepository;
     private final NotificationService notificationService;
     private final PushNotificationService pushNotificationService;
+    private final CreditRequirementService creditRequirementService;
 
     @Transactional
     public void decide(
@@ -34,7 +37,8 @@ public class CooperativeCreditDecisionService {
             Long cooperativaId,
             String decision,
             BigDecimal tasaAnual,
-            Integer plazoMeses
+            Integer plazoMeses,
+            java.util.List<CreditRequirementDto> requisitos
     ) {
 
         SolicitudCooperativa sc = repository
@@ -93,6 +97,7 @@ public class CooperativeCreditDecisionService {
 
             sc.setEstado(SolicitudCooperativaStatus.PRE_APROBADA);
             repository.save(sc);
+            creditRequirementService.replaceForOffer(sc.getId(), requisitos);
 
             notificationService.sendCreditOfferEmail(
                     cr.getEmail(),

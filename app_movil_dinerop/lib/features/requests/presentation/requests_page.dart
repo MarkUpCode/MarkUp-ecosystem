@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:printing/printing.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../app/providers.dart';
 import '../../../core/errors/app_exception.dart';
@@ -66,13 +68,14 @@ class _RequestsPageState extends ConsumerState<RequestsPage> {
   ) {
     final query = _searchQuery.trim().toLowerCase();
     return requests.where((request) {
-      final matchesSearch = query.isEmpty ||
+      final matchesSearch =
+          query.isEmpty ||
           request.solicitudId.toString().contains(query) ||
           request.monto.toString().contains(query);
       final matchesStatus =
           _statusFilter == null || request.estado == _statusFilter;
-      final matchesType = _typeFilter == null ||
-          request.tipo.toUpperCase() == _typeFilter;
+      final matchesType =
+          _typeFilter == null || request.tipo.toUpperCase() == _typeFilter;
       return matchesSearch && matchesStatus && matchesType;
     }).toList();
   }
@@ -88,161 +91,167 @@ class _RequestsPageState extends ConsumerState<RequestsPage> {
           data: (items) {
             final filteredItems = _filteredRequests(items);
             return RefreshIndicator(
-            onRefresh: () async => ref.invalidate(requestsProvider),
-            child: items.isEmpty
-                ? ListView(
-                    children: [
-                      const SizedBox(height: 88),
-                      AppEmptyState(
-                        title: 'Todavía no tienes solicitudes',
-                        message:
-                            'Crea tu primera solicitud para ver su seguimiento y ofertas aquí.',
-                        actionLabel: 'Solicitar crédito',
-                        onAction: () => context.push('/request-credit'),
-                        icon: Icons.account_balance_wallet_outlined,
-                      ),
-                    ],
-                  )
-                : ListView.separated(
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    padding: const EdgeInsets.fromLTRB(20, 22, 20, 32),
-                    itemCount: filteredItems.length + 1,
-                    separatorBuilder: (_, __) => const SizedBox(height: 14),
-                    itemBuilder: (context, index) {
-                      if (index == 0) {
-                        return Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    'Mis solicitudes',
-                                    style: theme.textTheme.headlineSmall
-                                        ?.copyWith(
-                                          fontWeight: FontWeight.w900,
-                                        ),
-                                  ),
-                                ),
-                                Text(
-                                  '${filteredItems.length}/${items.length}',
-                                  style: theme.textTheme.bodySmall?.copyWith(
-                                    fontWeight: FontWeight.w700,
-                                    color: AppColors.primary,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 5),
-                            Text(
-                              'Revisa tus avances, respuestas y ofertas.',
-                              style: theme.textTheme.bodyMedium,
-                            ),
-                            const SizedBox(height: 16),
-                            TextField(
-                              controller: _searchController,
-                              onChanged: (value) =>
-                                  setState(() => _searchQuery = value),
-                              decoration: InputDecoration(
-                                hintText: 'Buscar por número o monto',
-                                prefixIcon: const Icon(Icons.search_rounded),
-                                suffixIcon: _searchQuery.isEmpty
-                                    ? null
-                                    : IconButton(
-                                        onPressed: () {
-                                          _searchController.clear();
-                                          setState(() => _searchQuery = '');
-                                        },
-                                        icon: const Icon(Icons.close_rounded),
-                                      ),
-                                filled: true,
-                                fillColor: theme.colorScheme.surface,
-                              ),
-                            ),
-                            const SizedBox(height: 12),
-                            SingleChildScrollView(
-                              scrollDirection: Axis.horizontal,
-                              child: Row(
+              onRefresh: () async => ref.invalidate(requestsProvider),
+              child: items.isEmpty
+                  ? ListView(
+                      children: [
+                        const SizedBox(height: 88),
+                        AppEmptyState(
+                          title: 'Todavía no tienes solicitudes',
+                          message:
+                              'Crea tu primera solicitud para ver su seguimiento y ofertas aquí.',
+                          actionLabel: 'Solicitar crédito',
+                          onAction: () => context.push('/request-credit'),
+                          icon: Icons.account_balance_wallet_outlined,
+                        ),
+                      ],
+                    )
+                  : ListView.separated(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      padding: const EdgeInsets.fromLTRB(20, 22, 20, 32),
+                      itemCount: filteredItems.length + 1,
+                      separatorBuilder: (_, __) => const SizedBox(height: 14),
+                      itemBuilder: (context, index) {
+                        if (index == 0) {
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
                                 children: [
-                                  FilterChip(
-                                    label: const Text('Todos'),
-                                    selected: _statusFilter == null &&
-                                        _typeFilter == null,
-                                    onSelected: (_) => setState(() {
-                                      _statusFilter = null;
-                                      _typeFilter = null;
-                                    }),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  ...[
-                                    (
-                                      label: 'Enviadas',
-                                      value: CreditRequestStatus.enviada,
-                                    ),
-                                    (
-                                      label: 'Pre aprobadas',
-                                      value: CreditRequestStatus.preAprobada,
-                                    ),
-                                    (
-                                      label: 'Rechazadas',
-                                      value: CreditRequestStatus.rechazada,
-                                    ),
-                                  ].map(
-                                    (filter) => Padding(
-                                      padding: const EdgeInsets.only(right: 8),
-                                      child: FilterChip(
-                                        label: Text(filter.label),
-                                        selected: _statusFilter == filter.value,
-                                        onSelected: (_) => setState(() {
-                                          _typeFilter = null;
-                                          _statusFilter =
-                                              _statusFilter == filter.value
-                                                  ? null
-                                                  : filter.value;
-                                        }),
-                                      ),
+                                  Expanded(
+                                    child: Text(
+                                      'Mis solicitudes',
+                                      style: theme.textTheme.headlineSmall
+                                          ?.copyWith(
+                                            fontWeight: FontWeight.w900,
+                                          ),
                                     ),
                                   ),
-                                  FilterChip(
-                                    label: const Text('Créditos'),
-                                    selected: _typeFilter == 'CREDITO',
-                                    onSelected: (_) => setState(() {
-                                      _statusFilter = null;
-                                      _typeFilter = _typeFilter == 'CREDITO'
-                                          ? null
-                                          : 'CREDITO';
-                                    }),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  FilterChip(
-                                    label: const Text('Inversiones'),
-                                    selected: _typeFilter == 'INVERSION',
-                                    onSelected: (_) => setState(() {
-                                      _statusFilter = null;
-                                      _typeFilter = _typeFilter == 'INVERSION'
-                                          ? null
-                                          : 'INVERSION';
-                                    }),
+                                  Text(
+                                    '${filteredItems.length}/${items.length}',
+                                    style: theme.textTheme.bodySmall?.copyWith(
+                                      fontWeight: FontWeight.w700,
+                                      color: AppColors.primary,
+                                    ),
                                   ),
                                 ],
                               ),
-                            ),
-                            if (filteredItems.isEmpty) ...[
-                              const SizedBox(height: 30),
-                              const Center(
-                                child: Text('No hay solicitudes con esos filtros.'),
+                              const SizedBox(height: 5),
+                              Text(
+                                'Revisa tus avances, respuestas y ofertas.',
+                                style: theme.textTheme.bodyMedium,
                               ),
+                              const SizedBox(height: 16),
+                              TextField(
+                                controller: _searchController,
+                                onChanged: (value) =>
+                                    setState(() => _searchQuery = value),
+                                decoration: InputDecoration(
+                                  hintText: 'Buscar por número o monto',
+                                  prefixIcon: const Icon(Icons.search_rounded),
+                                  suffixIcon: _searchQuery.isEmpty
+                                      ? null
+                                      : IconButton(
+                                          onPressed: () {
+                                            _searchController.clear();
+                                            setState(() => _searchQuery = '');
+                                          },
+                                          icon: const Icon(Icons.close_rounded),
+                                        ),
+                                  filled: true,
+                                  fillColor: theme.colorScheme.surface,
+                                ),
+                              ),
+                              const SizedBox(height: 12),
+                              SingleChildScrollView(
+                                scrollDirection: Axis.horizontal,
+                                child: Row(
+                                  children: [
+                                    FilterChip(
+                                      label: const Text('Todos'),
+                                      selected:
+                                          _statusFilter == null &&
+                                          _typeFilter == null,
+                                      onSelected: (_) => setState(() {
+                                        _statusFilter = null;
+                                        _typeFilter = null;
+                                      }),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    ...[
+                                      (
+                                        label: 'Enviadas',
+                                        value: CreditRequestStatus.enviada,
+                                      ),
+                                      (
+                                        label: 'Pre aprobadas',
+                                        value: CreditRequestStatus.preAprobada,
+                                      ),
+                                      (
+                                        label: 'Rechazadas',
+                                        value: CreditRequestStatus.rechazada,
+                                      ),
+                                    ].map(
+                                      (filter) => Padding(
+                                        padding: const EdgeInsets.only(
+                                          right: 8,
+                                        ),
+                                        child: FilterChip(
+                                          label: Text(filter.label),
+                                          selected:
+                                              _statusFilter == filter.value,
+                                          onSelected: (_) => setState(() {
+                                            _typeFilter = null;
+                                            _statusFilter =
+                                                _statusFilter == filter.value
+                                                ? null
+                                                : filter.value;
+                                          }),
+                                        ),
+                                      ),
+                                    ),
+                                    FilterChip(
+                                      label: const Text('Créditos'),
+                                      selected: _typeFilter == 'CREDITO',
+                                      onSelected: (_) => setState(() {
+                                        _statusFilter = null;
+                                        _typeFilter = _typeFilter == 'CREDITO'
+                                            ? null
+                                            : 'CREDITO';
+                                      }),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    FilterChip(
+                                      label: const Text('Inversiones'),
+                                      selected: _typeFilter == 'INVERSION',
+                                      onSelected: (_) => setState(() {
+                                        _statusFilter = null;
+                                        _typeFilter = _typeFilter == 'INVERSION'
+                                            ? null
+                                            : 'INVERSION';
+                                      }),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              if (filteredItems.isEmpty) ...[
+                                const SizedBox(height: 30),
+                                const Center(
+                                  child: Text(
+                                    'No hay solicitudes con esos filtros.',
+                                  ),
+                                ),
+                              ],
                             ],
-                          ],
+                          );
+                        }
+                        final item = filteredItems[index - 1];
+                        return CreditRequestCard(
+                          request: item,
+                          onTap: () => _showDetails(context, ref, item),
                         );
-                      }
-                      final item = filteredItems[index - 1];
-                      return CreditRequestCard(
-                        request: item,
-                        onTap: () => _showDetails(context, ref, item),
-                      );
-                    },
-                  ),
+                      },
+                    ),
             );
           },
           loading: () => const AppLoader(label: 'Cargando solicitudes...'),
@@ -431,7 +440,10 @@ class _OfferCardState extends ConsumerState<_OfferCard> {
           );
       ref.invalidate(requestsProvider);
       ref.invalidate(dashboardCreditRequestsProvider);
-      if (mounted) Navigator.pop(context);
+      if (mounted) {
+        await _showDocumentsAfterAcceptance();
+        if (mounted) Navigator.pop(context);
+      }
     } catch (error) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -445,6 +457,79 @@ class _OfferCardState extends ConsumerState<_OfferCard> {
     } finally {
       if (mounted) setState(() => _accepting = false);
     }
+  }
+
+  Future<void> _showDocumentsAfterAcceptance() async {
+    await showDialog<void>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Documentos para la cooperativa'),
+        content: SizedBox(
+          width: 420,
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('Lleva estos documentos a la oficina:'),
+                const SizedBox(height: 12),
+                ...widget.offer.requisitos.map(
+                  (item) => Padding(
+                    padding: const EdgeInsets.only(bottom: 10),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Icon(Icons.check_circle_outline, size: 18),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            '${item.title}${item.description == null ? '' : '\n${item.description}'}',
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                if (widget.offer.direccion?.isNotEmpty == true) ...[
+                  const Divider(height: 24),
+                  Text('Oficina: ${widget.offer.direccion}'),
+                ],
+              ],
+            ),
+          ),
+        ),
+        actions: [
+          if (widget.offer.mapsUrl?.isNotEmpty == true)
+            TextButton.icon(
+              onPressed: () => launchUrl(
+                Uri.parse(widget.offer.mapsUrl!),
+                mode: LaunchMode.externalApplication,
+              ),
+              icon: const Icon(Icons.map_outlined),
+              label: const Text('Cómo llegar'),
+            ),
+          TextButton.icon(
+            onPressed: () async {
+              final bytes = await ref
+                  .read(creditRepositoryProvider)
+                  .downloadReferralPdf(
+                    solicitudId: widget.requestId,
+                    cooperativaId: widget.offer.cooperativaId,
+                  );
+              await Printing.sharePdf(
+                bytes: bytes,
+                filename: 'dinerop-referencia-${widget.requestId}.pdf',
+              );
+            },
+            icon: const Icon(Icons.picture_as_pdf_outlined),
+            label: const Text('PDF Dinerop'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('Listo'),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -529,78 +614,77 @@ class _OfferCardState extends ConsumerState<_OfferCard> {
                   ],
                 ),
                 const SizedBox(height: 16),
-                if (needsGuarantor)
-                  _GuarantorNotice(color: color, soft: soft),
+                if (needsGuarantor) _GuarantorNotice(color: color, soft: soft),
                 if (needsGuarantor) const SizedBox(height: 12),
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.symmetric(vertical: 17),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFE4E8FF),
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: Column(
-                      children: [
-                        Text(
-                          'CUOTA MENSUAL',
-                          style: TextStyle(
-                            color: AppColors.primary,
-                            fontSize: 10,
-                            fontWeight: FontWeight.w800,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          formatCurrency(offer.cuotaMensual ?? 0),
-                          style: const TextStyle(
-                            color: Color(0xFF3730A3),
-                            fontWeight: FontWeight.w900,
-                            fontSize: 29,
-                          ),
-                        ),
-                        Text(
-                          'durante ${offer.plazoMeses ?? '-'} meses',
-                          style: const TextStyle(
-                            color: Color(0xFF5B5BA8),
-                            fontSize: 11,
-                          ),
-                        ),
-                      ],
-                    ),
+                if (offer.requisitos.isNotEmpty)
+                  _RequirementsPreview(requirements: offer.requisitos),
+                if (offer.requisitos.isNotEmpty) const SizedBox(height: 12),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(vertical: 17),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFE4E8FF),
+                    borderRadius: BorderRadius.circular(16),
                   ),
-                  const SizedBox(height: 12),
-                  GridView.count(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 10,
-                    mainAxisSpacing: 10,
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    childAspectRatio: 1.8,
+                  child: Column(
                     children: [
-                      _Metric(
-                        label: 'MONTO',
-                        value: formatCurrency(offer.monto),
+                      Text(
+                        'CUOTA MENSUAL',
+                        style: TextStyle(
+                          color: AppColors.primary,
+                          fontSize: 10,
+                          fontWeight: FontWeight.w800,
+                        ),
                       ),
-                      _Metric(
-                        label: 'TASA ANUAL',
-                        value: offer.tasaAnual == null
-                            ? '-'
-                            : '${offer.tasaAnual!.toStringAsFixed(2)}%',
+                      const SizedBox(height: 4),
+                      Text(
+                        formatCurrency(offer.cuotaMensual ?? 0),
+                        style: const TextStyle(
+                          color: Color(0xFF3730A3),
+                          fontWeight: FontWeight.w900,
+                          fontSize: 29,
+                        ),
                       ),
-                      _Metric(
-                        label: 'TOTAL A PAGAR',
-                        value: offer.totalPagar == null
-                            ? '-'
-                            : formatCurrency(offer.totalPagar!),
-                      ),
-                      _Metric(
-                        label: 'INTERÉS TOTAL',
-                        value: offer.interesTotal == null
-                            ? '-'
-                            : formatCurrency(offer.interesTotal!),
+                      Text(
+                        'durante ${offer.plazoMeses ?? '-'} meses',
+                        style: const TextStyle(
+                          color: Color(0xFF5B5BA8),
+                          fontSize: 11,
+                        ),
                       ),
                     ],
                   ),
+                ),
+                const SizedBox(height: 12),
+                GridView.count(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 10,
+                  mainAxisSpacing: 10,
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  childAspectRatio: 1.8,
+                  children: [
+                    _Metric(label: 'MONTO', value: formatCurrency(offer.monto)),
+                    _Metric(
+                      label: 'TASA ANUAL',
+                      value: offer.tasaAnual == null
+                          ? '-'
+                          : '${offer.tasaAnual!.toStringAsFixed(2)}%',
+                    ),
+                    _Metric(
+                      label: 'TOTAL A PAGAR',
+                      value: offer.totalPagar == null
+                          ? '-'
+                          : formatCurrency(offer.totalPagar!),
+                    ),
+                    _Metric(
+                      label: 'INTERÉS TOTAL',
+                      value: offer.interesTotal == null
+                          ? '-'
+                          : formatCurrency(offer.interesTotal!),
+                    ),
+                  ],
+                ),
                 const SizedBox(height: 16),
                 SizedBox(
                   width: double.infinity,
@@ -700,6 +784,46 @@ class _GuarantorNotice extends StatelessWidget {
             ],
           ),
         ),
+      ],
+    ),
+  );
+}
+
+class _RequirementsPreview extends StatelessWidget {
+  const _RequirementsPreview({required this.requirements});
+  final List<CreditRequirement> requirements;
+
+  @override
+  Widget build(BuildContext context) => Container(
+    padding: const EdgeInsets.all(14),
+    decoration: BoxDecoration(
+      color: AppColors.infoSoft,
+      borderRadius: BorderRadius.circular(15),
+    ),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Documentos solicitados',
+          style: TextStyle(fontWeight: FontWeight.w800),
+        ),
+        const SizedBox(height: 6),
+        ...requirements
+            .take(4)
+            .map(
+              (item) => Padding(
+                padding: const EdgeInsets.only(bottom: 4),
+                child: Text(
+                  '• ${item.title}',
+                  style: const TextStyle(fontSize: 12),
+                ),
+              ),
+            ),
+        if (requirements.length > 4)
+          Text(
+            '+ ${requirements.length - 4} documentos más',
+            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
+          ),
       ],
     ),
   );

@@ -1,3 +1,4 @@
+import type { CooperativeCreditRequest, CooperativeOfferDefaults, CreditRequirement } from "../types/credit";
 import { useEffect, useState } from "react";
 import { FileText, TrendingUp, Clock, User } from "lucide-react";
 import type { ReactNode } from "react";
@@ -15,7 +16,6 @@ import {
 import { getOnboardingForCooperative, type OnboardingCooperativeDetail } from "../api/onboarding.api";
 import { getErrorMessage } from "../api/errors";
 
-import type { CooperativeCreditRequest, CooperativeOfferDefaults } from "../types/credit";
 import { CreditEstado } from "../types/creditEstado";
 import { CreditDecision } from "../types/creditDecision";
 
@@ -70,11 +70,12 @@ export default function DashboardCooperative() {
     solicitudId: number,
     decision: CreditDecision,
     offer?: { tasaAnual: number; plazoMeses: number },
+    requirements?: CreditRequirement[],
   ) => {
     try {
       setProcessingId(solicitudId);
       setActionError("");
-      await decideCreditRequest(solicitudId, decision, offer);
+      await decideCreditRequest(solicitudId, decision, offer, requirements);
       await loadRequests();
     } catch (error) {
       setActionError(
@@ -109,8 +110,9 @@ export default function DashboardCooperative() {
   const handleApproveWithoutGuarantee = async (
     solicitudId: number,
     offer: { tasaAnual: number; plazoMeses: number },
+    requirements: CreditRequirement[],
   ) => {
-    await handleDecision(solicitudId, CreditDecision.PRE_APROBAR, offer);
+    await handleDecision(solicitudId, CreditDecision.PRE_APROBAR, offer, requirements);
   };
 
   const handleViewApplicant = async (solicitudId: number) => {
@@ -125,11 +127,11 @@ export default function DashboardCooperative() {
     }
   };
 
-  const handleApproveWithGuarantee = async (solicitudId: number) => {
+  const handleApproveWithGuarantee = async (solicitudId: number, requirements: CreditRequirement[]) => {
     try {
       setProcessingId(solicitudId);
       setActionError("");
-      await requestGuaranteeForCreditRequest(solicitudId);
+      await requestGuaranteeForCreditRequest(solicitudId, requirements);
       await loadRequests();
     } catch (error) {
       setActionError(

@@ -13,6 +13,9 @@ class CreditCooperativeStatus {
     required this.cuotaMensual,
     required this.totalPagar,
     required this.interesTotal,
+    this.direccion,
+    this.mapsUrl,
+    this.requisitos = const [],
   });
 
   final int cooperativaId;
@@ -26,13 +29,18 @@ class CreditCooperativeStatus {
   final double? cuotaMensual;
   final double? totalPagar;
   final double? interesTotal;
+  final String? direccion;
+  final String? mapsUrl;
+  final List<CreditRequirement> requisitos;
 
   factory CreditCooperativeStatus.fromJson(Map<String, dynamic> json) {
     return CreditCooperativeStatus(
       cooperativaId: (json['cooperativaId'] as num).toInt(),
       nombreCooperativa: (json['nombreCooperativa'] ?? '').toString(),
       estado: creditRequestStatusFromJson(json['estado']?.toString()),
-      fechaActualizacion: DateTime.tryParse((json['fechaActualizacion'] ?? '').toString()),
+      fechaActualizacion: DateTime.tryParse(
+        (json['fechaActualizacion'] ?? '').toString(),
+      ),
       monto: (json['monto'] as num?)?.toDouble() ?? 0,
       plazoMeses: (json['plazoMeses'] as num?)?.toInt(),
       tipoCredito: json['tipoCredito']?.toString(),
@@ -40,6 +48,36 @@ class CreditCooperativeStatus {
       cuotaMensual: (json['cuotaMensual'] as num?)?.toDouble(),
       totalPagar: (json['totalPagar'] as num?)?.toDouble(),
       interesTotal: (json['interesTotal'] as num?)?.toDouble(),
+      direccion: json['direccion']?.toString(),
+      mapsUrl: json['mapsUrl']?.toString(),
+      requisitos: (json['requisitos'] as List<dynamic>? ?? const [])
+          .whereType<Map>()
+          .map(
+            (item) =>
+                CreditRequirement.fromJson(Map<String, dynamic>.from(item)),
+          )
+          .toList(),
     );
   }
+}
+
+class CreditRequirement {
+  const CreditRequirement({
+    required this.title,
+    this.description,
+    this.category,
+    this.mandatory = true,
+  });
+  final String title;
+  final String? description;
+  final String? category;
+  final bool mandatory;
+
+  factory CreditRequirement.fromJson(Map<String, dynamic> json) =>
+      CreditRequirement(
+        title: (json['title'] ?? '').toString(),
+        description: json['description']?.toString(),
+        category: json['category']?.toString(),
+        mandatory: json['mandatory'] != false,
+      );
 }

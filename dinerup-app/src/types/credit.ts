@@ -32,6 +32,14 @@ export interface CooperativeOfferDefaults {
   tasaAnual: number;
 }
 
+export interface CreditRequirement {
+  title: string;
+  description?: string;
+  category?: string;
+  mandatory?: boolean;
+  displayOrder?: number;
+}
+
 /**
  * CLIENTE
  * GET /api/credits/me/{solicitudId}/pre-approved
@@ -48,4 +56,7 @@ export interface CreditRequestCooperative {
   cuotaMensual: number;
   totalPagar: number;
   interesTotal: number;
+  direccion?: string;
+  mapsUrl?: string;
+  requisitos?: CreditRequirement[];
 }

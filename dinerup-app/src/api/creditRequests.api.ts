@@ -6,6 +6,7 @@ import type {
   CreditRequestCooperative,
 } from "../types/credit";
 import { CreditDecision } from "../types/creditDecision";
+import type { CreditRequirement } from "../types/credit";
 
 export const getMyCreditRequests = async (): Promise<CreditRequest[]> => {
   const data = await httpClient<CreditRequest | CreditRequest[] | null>(
@@ -44,13 +45,14 @@ export const decideCreditRequest = async (
   solicitudId: number,
   decision: CreditDecision,
   offer?: { tasaAnual: number; plazoMeses: number },
+  requisitos?: CreditRequirement[],
 ): Promise<void> => {
   await httpClient<void>(
     `/api/credits/cooperative/me/requests/${solicitudId}/decision`,
     {
       method: "PUT",
       auth: true,
-      body: { decision, ...offer },
+      body: { decision, ...offer, requisitos },
     },
   );
 };
@@ -79,12 +81,14 @@ export const getCreditRequestCooperatives = async (
 
 export const requestGuaranteeForCreditRequest = async (
   solicitudId: number,
+  requisitos?: CreditRequirement[],
 ): Promise<void> => {
   await httpClient<void>(
     `/api/credits/cooperative/me/requests/${solicitudId}/solicitar-garante`,
     {
       method: "PUT",
       auth: true,
+      body: requisitos,
     },
   );
 };
