@@ -83,8 +83,8 @@ export default function PreApprovalModal({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-[70]">
-      <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full">
-        <div className="bg-gradient-to-r from-green-50 to-emerald-50 border-b border-green-200 p-6 flex items-start justify-between">
+      <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[92vh] flex flex-col overflow-hidden">
+        <div className="shrink-0 bg-gradient-to-r from-green-50 to-emerald-50 border-b border-green-200 p-6 flex items-start justify-between">
           <div className="flex items-start gap-4 flex-1">
             <div className="flex-shrink-0 p-3 bg-green-100 rounded-full">
               <CheckCircle className="w-8 h-8 text-green-600" />
@@ -107,7 +107,7 @@ export default function PreApprovalModal({
           </button>
         </div>
 
-        <div className="p-8">
+        <div className="p-8 overflow-y-auto overscroll-contain">
           <div className="mb-8 p-5 bg-blue-50 border border-blue-200 rounded-lg">
             <div className="grid grid-cols-3 gap-4">
               <div>

@@ -460,89 +460,157 @@ class _OfferCardState extends ConsumerState<_OfferCard> {
   }
 
   Future<void> _showDocumentsAfterAcceptance() async {
-    await showDialog<void>(
+    await showModalBottomSheet<void>(
       context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text('Documentos para la cooperativa'),
-        content: SizedBox(
-          width: 420,
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text('Lleva estos documentos a la oficina:'),
-                const SizedBox(height: 12),
-                ...widget.offer.requisitos.map(
-                  (item) => Padding(
-                    padding: const EdgeInsets.only(bottom: 10),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Icon(Icons.check_circle_outline, size: 18),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            '${item.title}${item.description == null ? '' : '\n${item.description}'}',
-                          ),
+      isScrollControlled: true,
+      useSafeArea: true,
+      builder: (sheetContext) => DraggableScrollableSheet(
+        expand: false,
+        initialChildSize: .72,
+        minChildSize: .45,
+        maxChildSize: .94,
+        builder: (_, controller) => Material(
+          color: Theme.of(context).colorScheme.surface,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 16, 12, 8),
+                child: Row(
+                  children: [
+                    const Expanded(
+                      child: Text(
+                        'Documentos para la cooperativa',
+                        style: TextStyle(
+                          fontSize: 19,
+                          fontWeight: FontWeight.w800,
                         ),
-                      ],
+                      ),
                     ),
-                  ),
+                    IconButton(
+                      onPressed: () => Navigator.pop(sheetContext),
+                      icon: const Icon(Icons.close_rounded),
+                    ),
+                  ],
                 ),
-                if (widget.offer.direccion?.isNotEmpty == true) ...[
-                  const Divider(height: 24),
-                  Text('Oficina: ${widget.offer.direccion}'),
-                ],
-              ],
-            ),
+              ),
+              Expanded(
+                child: ListView(
+                  controller: controller,
+                  padding: const EdgeInsets.fromLTRB(20, 4, 20, 20),
+                  children: [
+                    const Text('Presenta estos documentos en la oficina:'),
+                    const SizedBox(height: 12),
+                    ...widget.offer.requisitos.map(
+                      (item) => Container(
+                        margin: const EdgeInsets.only(bottom: 10),
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: item.mandatory
+                              ? AppColors.infoSoft
+                              : Theme.of(
+                                  context,
+                                ).colorScheme.surfaceContainerHighest,
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Icon(
+                              item.mandatory
+                                  ? Icons.assignment_turned_in_outlined
+                                  : Icons.info_outline,
+                              size: 20,
+                            ),
+                            const SizedBox(width: 9),
+                            Expanded(
+                              child: Text(
+                                '${item.title}${item.description == null ? '' : '\n${item.description}'}\n${item.mandatory ? 'Obligatorio' : 'Opcional'}',
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    if (widget.offer.direccion?.isNotEmpty == true) ...[
+                      const Divider(height: 24),
+                      Text('Ubicación: ${widget.offer.direccion}'),
+                    ],
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
+                child: Row(
+                  children: [
+                    if (widget.offer.mapsUrl?.isNotEmpty == true)
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          onPressed: () => launchUrl(
+                            Uri.parse(widget.offer.mapsUrl!),
+                            mode: LaunchMode.externalApplication,
+                          ),
+                          icon: const Icon(Icons.map_outlined),
+                          label: const Text('Cómo llegar'),
+                        ),
+                      ),
+                    if (widget.offer.mapsUrl?.isNotEmpty == true)
+                      const SizedBox(width: 10),
+                    Expanded(
+                      child: FilledButton.icon(
+                        onPressed: _previewReferralPdf,
+                        icon: const Icon(Icons.picture_as_pdf_outlined),
+                        label: const Text('Ver PDF'),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
         ),
-        actions: [
-          if (widget.offer.mapsUrl?.isNotEmpty == true)
-            TextButton.icon(
-              onPressed: () => launchUrl(
-                Uri.parse(widget.offer.direccion!),
-                mode: LaunchMode.externalApplication,
-              ),
-              icon: const Icon(Icons.map_outlined),
-              label: const Text('Cómo llegar'),
-            ),
-          TextButton.icon(
-            onPressed: _previewReferralPdf,
-            icon: const Icon(Icons.picture_as_pdf_outlined),
-            label: const Text('PDF Dinerop'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Listo'),
-          ),
-        ],
       ),
     );
   }
 
   Future<void> _previewReferralPdf() async {
-    final bytes = await ref
-        .read(creditRepositoryProvider)
-        .downloadReferralPdf(
-          solicitudId: widget.requestId,
-          cooperativaId: widget.offer.cooperativaId,
-        );
-    if (!mounted) return;
-    await showModalBottomSheet<void>(
-      context: context,
-      isScrollControlled: true,
-      builder: (_) => SizedBox(
-        height: MediaQuery.sizeOf(context).height * .9,
-        child: PdfPreview(
-          build: (_) async => bytes,
-          canChangePageFormat: false,
-          canChangeOrientation: false,
-          allowSharing: true,
-          allowPrinting: true,
+    try {
+      final bytes = await ref
+          .read(creditRepositoryProvider)
+          .downloadReferralPdf(
+            solicitudId: widget.requestId,
+            cooperativaId: widget.offer.cooperativaId,
+          );
+      if (!mounted) return;
+      await showModalBottomSheet<void>(
+        context: context,
+        isScrollControlled: true,
+        useSafeArea: true,
+        builder: (_) => SizedBox(
+          height: MediaQuery.sizeOf(context).height * .9,
+          child: PdfPreview(
+            build: (_) async => bytes,
+            canChangePageFormat: false,
+            canChangeOrientation: false,
+            allowSharing: true,
+            allowPrinting: true,
+          ),
         ),
-      ),
-    );
+      );
+    } catch (error) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              error is AppException ? error.message : AppErrorMessages.generic,
+            ),
+          ),
+        );
+      }
+    }
   }
 
   @override
@@ -633,7 +701,11 @@ class _OfferCardState extends ConsumerState<_OfferCard> {
                   _RequirementsPreview(requirements: offer.requisitos),
                 if (offer.requisitos.isNotEmpty) const SizedBox(height: 12),
                 if (offer.estado == CreditRequestStatus.aceptada)
-                  _AcceptedOfferNotice(offer: offer)
+                  _AcceptedOfferNotice(
+                    offer: offer,
+                    onOpenDocuments: _showDocumentsAfterAcceptance,
+                    onPreviewPdf: _previewReferralPdf,
+                  )
                 else ...[
                   Container(
                     width: double.infinity,
@@ -850,8 +922,14 @@ class _RequirementsPreview extends StatelessWidget {
 }
 
 class _AcceptedOfferNotice extends StatelessWidget {
-  const _AcceptedOfferNotice({required this.offer});
+  const _AcceptedOfferNotice({
+    required this.offer,
+    required this.onOpenDocuments,
+    required this.onPreviewPdf,
+  });
   final CreditCooperativeStatus offer;
+  final VoidCallback onOpenDocuments;
+  final VoidCallback onPreviewPdf;
 
   @override
   Widget build(BuildContext context) => Container(
@@ -861,16 +939,53 @@ class _AcceptedOfferNotice extends StatelessWidget {
       color: AppColors.successSoft,
       borderRadius: BorderRadius.circular(15),
     ),
-    child: Row(
+    child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Icon(Icons.verified_rounded, color: AppColors.success),
-        const SizedBox(width: 9),
-        Expanded(
-          child: Text(
-            'Oferta aceptada. Presenta únicamente los documentos indicados en esta lista en la oficina de ${offer.nombreCooperativa}.',
-            style: const TextStyle(fontWeight: FontWeight.w700),
-          ),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Icon(Icons.verified_rounded, color: AppColors.success),
+            const SizedBox(width: 9),
+            Expanded(
+              child: Text(
+                'Oferta aceptada. Presenta únicamente los documentos indicados en esta lista en la oficina de ${offer.nombreCooperativa}.',
+                style: const TextStyle(fontWeight: FontWeight.w700),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            Expanded(
+              child: OutlinedButton.icon(
+                onPressed: onOpenDocuments,
+                icon: const Icon(Icons.list_alt_outlined),
+                label: const Text('Requisitos'),
+              ),
+            ),
+            const SizedBox(width: 8),
+            if (offer.mapsUrl?.isNotEmpty == true)
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: () => launchUrl(
+                    Uri.parse(offer.mapsUrl!),
+                    mode: LaunchMode.externalApplication,
+                  ),
+                  icon: const Icon(Icons.map_outlined),
+                  label: const Text('Maps'),
+                ),
+              ),
+            if (offer.mapsUrl?.isNotEmpty == true) const SizedBox(width: 8),
+            Expanded(
+              child: FilledButton.icon(
+                onPressed: onPreviewPdf,
+                icon: const Icon(Icons.picture_as_pdf_outlined),
+                label: const Text('Ver PDF'),
+              ),
+            ),
+          ],
         ),
       ],
     ),
