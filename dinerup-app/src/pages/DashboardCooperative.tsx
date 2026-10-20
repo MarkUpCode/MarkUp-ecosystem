@@ -283,17 +283,17 @@ export default function DashboardCooperative() {
                       </p>
                     </div>
 
-                    <div className="bg-gray-50 rounded-lg p-4 flex gap-4">
-                      <User className="w-10 h-10 text-gray-400" />
+                    <div className="bg-blue-50 border border-blue-100 rounded-lg p-4 flex gap-4">
+                      <User className="w-10 h-10 text-blue-500" />
                       <div className="flex-1">
                         <p className="font-semibold text-gray-800 text-sm mb-2">
-                          Informacion del solicitante
+                          Datos del solicitante
                         </p>
-                        <p className="text-gray-600 text-sm">
-                          Nombre:{" "}
-                          <span className="italic text-gray-400">
-                            No disponible
-                          </span>
+                        <p className="text-gray-900 text-base font-bold">
+                          {r.nombreSolicitante || "Nombre pendiente de onboarding"}
+                        </p>
+                        <p className="text-gray-700 text-sm mt-1">
+                          Cédula: <span className="font-bold tracking-wide">{r.cedulaSolicitante || "Pendiente"}</span>
                         </p>
                         <button
                           onClick={() => void handleViewApplicant(r.solicitudId)}

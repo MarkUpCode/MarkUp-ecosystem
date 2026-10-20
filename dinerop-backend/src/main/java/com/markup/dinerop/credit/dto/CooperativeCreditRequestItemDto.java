@@ -8,9 +8,12 @@ import java.time.LocalDateTime;
 
 public record CooperativeCreditRequestItemDto(
         Long solicitudId,
+        Long clientId,
         BigDecimal montoSolicitado,
         CreditRequestType tipo,
         LocalDateTime fechaSolicitud,
-        SolicitudCooperativaStatus estado
+        SolicitudCooperativaStatus estado,
+        String nombreSolicitante,
+        String cedulaSolicitante
 ) {}
 

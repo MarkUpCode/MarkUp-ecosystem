@@ -31,10 +31,13 @@ public interface SolicitudCooperativaRepository extends JpaRepository<SolicitudC
         @Query("""
         select new com.markup.dinerop.credit.dto.CooperativeCreditRequestItemDto(
             sc.solicitudId,
+            cr.clientId,
             cr.amount,
             cr.tipo,
             cr.fechaSolicitud,
-            sc.estado
+            sc.estado,
+            null,
+            null
         )
         from SolicitudCooperativa sc
         join sc.creditRequest cr

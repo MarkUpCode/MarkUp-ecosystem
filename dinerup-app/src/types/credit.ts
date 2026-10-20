@@ -23,7 +23,10 @@ export interface CreditRequest extends BaseCreditRequest {
  * GET /api/credits/cooperative/me/requests
  */
 export interface CooperativeCreditRequest extends BaseCreditRequest {
+  clientId?: number;
   montoSolicitado: number;
+  nombreSolicitante?: string;
+  cedulaSolicitante?: string;
 }
 
 export interface CooperativeOfferDefaults {
