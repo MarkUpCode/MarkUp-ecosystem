@@ -501,25 +501,14 @@ class _OfferCardState extends ConsumerState<_OfferCard> {
           if (widget.offer.mapsUrl?.isNotEmpty == true)
             TextButton.icon(
               onPressed: () => launchUrl(
-                Uri.parse(widget.offer.mapsUrl!),
+                Uri.parse(widget.offer.direccion!),
                 mode: LaunchMode.externalApplication,
               ),
               icon: const Icon(Icons.map_outlined),
               label: const Text('Cómo llegar'),
             ),
           TextButton.icon(
-            onPressed: () async {
-              final bytes = await ref
-                  .read(creditRepositoryProvider)
-                  .downloadReferralPdf(
-                    solicitudId: widget.requestId,
-                    cooperativaId: widget.offer.cooperativaId,
-                  );
-              await Printing.sharePdf(
-                bytes: bytes,
-                filename: 'dinerop-referencia-${widget.requestId}.pdf',
-              );
-            },
+            onPressed: _previewReferralPdf,
             icon: const Icon(Icons.picture_as_pdf_outlined),
             label: const Text('PDF Dinerop'),
           ),
@@ -528,6 +517,30 @@ class _OfferCardState extends ConsumerState<_OfferCard> {
             child: const Text('Listo'),
           ),
         ],
+      ),
+    );
+  }
+
+  Future<void> _previewReferralPdf() async {
+    final bytes = await ref
+        .read(creditRepositoryProvider)
+        .downloadReferralPdf(
+          solicitudId: widget.requestId,
+          cooperativaId: widget.offer.cooperativaId,
+        );
+    if (!mounted) return;
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      builder: (_) => SizedBox(
+        height: MediaQuery.sizeOf(context).height * .9,
+        child: PdfPreview(
+          build: (_) async => bytes,
+          canChangePageFormat: false,
+          canChangeOrientation: false,
+          allowSharing: true,
+          allowPrinting: true,
+        ),
       ),
     );
   }
@@ -619,104 +632,111 @@ class _OfferCardState extends ConsumerState<_OfferCard> {
                 if (offer.requisitos.isNotEmpty)
                   _RequirementsPreview(requirements: offer.requisitos),
                 if (offer.requisitos.isNotEmpty) const SizedBox(height: 12),
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.symmetric(vertical: 17),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFE4E8FF),
-                    borderRadius: BorderRadius.circular(16),
+                if (offer.estado == CreditRequestStatus.aceptada)
+                  _AcceptedOfferNotice(offer: offer)
+                else ...[
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(vertical: 17),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFE4E8FF),
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Column(
+                      children: [
+                        Text(
+                          'CUOTA MENSUAL',
+                          style: TextStyle(
+                            color: AppColors.primary,
+                            fontSize: 10,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          formatCurrency(offer.cuotaMensual ?? 0),
+                          style: const TextStyle(
+                            color: Color(0xFF3730A3),
+                            fontWeight: FontWeight.w900,
+                            fontSize: 29,
+                          ),
+                        ),
+                        Text(
+                          'durante ${offer.plazoMeses ?? '-'} meses',
+                          style: const TextStyle(
+                            color: Color(0xFF5B5BA8),
+                            fontSize: 11,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                  child: Column(
+                  const SizedBox(height: 12),
+                  GridView.count(
+                    crossAxisCount: 2,
+                    crossAxisSpacing: 10,
+                    mainAxisSpacing: 10,
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    childAspectRatio: 1.8,
                     children: [
-                      Text(
-                        'CUOTA MENSUAL',
-                        style: TextStyle(
-                          color: AppColors.primary,
-                          fontSize: 10,
-                          fontWeight: FontWeight.w800,
-                        ),
+                      _Metric(
+                        label: 'MONTO',
+                        value: formatCurrency(offer.monto),
                       ),
-                      const SizedBox(height: 4),
-                      Text(
-                        formatCurrency(offer.cuotaMensual ?? 0),
-                        style: const TextStyle(
-                          color: Color(0xFF3730A3),
-                          fontWeight: FontWeight.w900,
-                          fontSize: 29,
-                        ),
+                      _Metric(
+                        label: 'TASA ANUAL',
+                        value: offer.tasaAnual == null
+                            ? '-'
+                            : '${offer.tasaAnual!.toStringAsFixed(2)}%',
                       ),
-                      Text(
-                        'durante ${offer.plazoMeses ?? '-'} meses',
-                        style: const TextStyle(
-                          color: Color(0xFF5B5BA8),
-                          fontSize: 11,
-                        ),
+                      _Metric(
+                        label: 'TOTAL A PAGAR',
+                        value: offer.totalPagar == null
+                            ? '-'
+                            : formatCurrency(offer.totalPagar!),
+                      ),
+                      _Metric(
+                        label: 'INTERÉS TOTAL',
+                        value: offer.interesTotal == null
+                            ? '-'
+                            : formatCurrency(offer.interesTotal!),
                       ),
                     ],
                   ),
-                ),
-                const SizedBox(height: 12),
-                GridView.count(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 10,
-                  mainAxisSpacing: 10,
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  childAspectRatio: 1.8,
-                  children: [
-                    _Metric(label: 'MONTO', value: formatCurrency(offer.monto)),
-                    _Metric(
-                      label: 'TASA ANUAL',
-                      value: offer.tasaAnual == null
-                          ? '-'
-                          : '${offer.tasaAnual!.toStringAsFixed(2)}%',
-                    ),
-                    _Metric(
-                      label: 'TOTAL A PAGAR',
-                      value: offer.totalPagar == null
-                          ? '-'
-                          : formatCurrency(offer.totalPagar!),
-                    ),
-                    _Metric(
-                      label: 'INTERÉS TOTAL',
-                      value: offer.interesTotal == null
-                          ? '-'
-                          : formatCurrency(offer.interesTotal!),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                SizedBox(
-                  width: double.infinity,
-                  child: FilledButton.icon(
-                    style: FilledButton.styleFrom(backgroundColor: color),
-                    onPressed: needsGuarantor
-                        ? () async {
-                            final completed = await context.push<bool>(
-                              '/guarantor-onboarding',
-                            );
-                            if (!mounted || completed != true) return;
-                            ref.invalidate(requestsProvider);
-                            ref.invalidate(dashboardCreditRequestsProvider);
-                            Navigator.of(this.context).pop();
-                          }
-                        : _accepting
-                        ? null
-                        : _accept,
-                    icon: Icon(
-                      needsGuarantor
-                          ? Icons.group_add_rounded
-                          : Icons.verified_user_rounded,
-                    ),
-                    label: Text(
-                      needsGuarantor
-                          ? 'Completar información del garante'
+                  const SizedBox(height: 16),
+                  SizedBox(
+                    width: double.infinity,
+                    child: FilledButton.icon(
+                      style: FilledButton.styleFrom(backgroundColor: color),
+                      onPressed: needsGuarantor
+                          ? () async {
+                              final completed = await context.push<bool>(
+                                '/guarantor-onboarding',
+                              );
+                              if (!mounted || completed != true) return;
+                              ref.invalidate(requestsProvider);
+                              ref.invalidate(dashboardCreditRequestsProvider);
+                              Navigator.of(this.context).pop();
+                            }
                           : _accepting
-                          ? 'Aceptando oferta...'
-                          : 'Aceptar esta oferta',
+                          ? null
+                          : _accept,
+                      icon: Icon(
+                        needsGuarantor
+                            ? Icons.group_add_rounded
+                            : Icons.verified_user_rounded,
+                      ),
+                      label: Text(
+                        needsGuarantor
+                            ? 'Completar información del garante'
+                            : _accepting
+                            ? 'Aceptando oferta...'
+                            : 'Aceptar esta oferta',
+                      ),
                     ),
                   ),
-                ),
+                ],
               ],
             ),
           ),
@@ -824,6 +844,34 @@ class _RequirementsPreview extends StatelessWidget {
             '+ ${requirements.length - 4} documentos más',
             style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
           ),
+      ],
+    ),
+  );
+}
+
+class _AcceptedOfferNotice extends StatelessWidget {
+  const _AcceptedOfferNotice({required this.offer});
+  final CreditCooperativeStatus offer;
+
+  @override
+  Widget build(BuildContext context) => Container(
+    width: double.infinity,
+    padding: const EdgeInsets.all(14),
+    decoration: BoxDecoration(
+      color: AppColors.successSoft,
+      borderRadius: BorderRadius.circular(15),
+    ),
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Icon(Icons.verified_rounded, color: AppColors.success),
+        const SizedBox(width: 9),
+        Expanded(
+          child: Text(
+            'Oferta aceptada. Presenta únicamente los documentos indicados en esta lista en la oficina de ${offer.nombreCooperativa}.',
+            style: const TextStyle(fontWeight: FontWeight.w700),
+          ),
+        ),
       ],
     ),
   );

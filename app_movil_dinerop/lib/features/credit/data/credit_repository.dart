@@ -5,6 +5,7 @@ import 'models/credit_cooperative_status.dart';
 import 'models/credit_request_payload.dart';
 import 'models/credit_request_response.dart';
 import 'dart:typed_data';
+import 'package:dio/dio.dart';
 
 class CreditRepository {
   CreditRepository(this._client);
@@ -75,6 +76,7 @@ class CreditRepository {
   }) {
     return _client.request<Uint8List>(
       '/api/credits/me/$solicitudId/cooperatives/$cooperativaId/referral.pdf',
+      responseType: ResponseType.bytes,
       parser: (data) => Uint8List.fromList(List<int>.from(data as List)),
     );
   }

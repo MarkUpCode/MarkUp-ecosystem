@@ -58,7 +58,7 @@ public class ClientCreditCooperativeStatusService {
                     .totalPagar(cotizacion != null ? cotizacion.getTotalPagar() : null)
                     .interesTotal(cotizacion != null ? cotizacion.getInteresTotal() : null)
                     .direccion(coop.getDireccion())
-                    .mapsUrl(coop.getPaginaWeb())
+                    .mapsUrl(coop.getDireccion())
                     .requisitos(requirements)
                     .build();
 

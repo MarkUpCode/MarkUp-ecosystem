@@ -65,6 +65,7 @@ class ApiClient {
     Map<String, dynamic>? queryParameters,
     Object? body,
     T Function(dynamic data)? parser,
+    ResponseType? responseType,
   }) async {
     final stopwatch = Stopwatch()..start();
     try {
@@ -73,7 +74,11 @@ class ApiClient {
         path,
         data: body,
         queryParameters: queryParameters,
-        options: Options(method: method, extra: {'auth': authenticated}),
+        options: Options(
+          method: method,
+          responseType: responseType,
+          extra: {'auth': authenticated},
+        ),
       );
       debugPrint(
         '[API] $method $path completed: HTTP ${response.statusCode} in ${stopwatch.elapsedMilliseconds}ms',
