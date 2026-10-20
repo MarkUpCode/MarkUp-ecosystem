@@ -31,17 +31,29 @@ public interface SolicitudCooperativaRepository extends JpaRepository<SolicitudC
         @Query("""
         select new com.markup.dinerop.credit.dto.CooperativeCreditRequestItemDto(
             sc.solicitudId,
-            cr.clientId,
+            coalesce(cr.clientId, account.idUser),
             cr.email,
             cr.amount,
             cr.tipo,
             cr.fechaSolicitud,
             sc.estado,
-            null,
-            null
+            coalesce(
+                concat(persona.nombres, ' ', persona.apellidos),
+                concat(pre.firstName, ' ', pre.lastName)
+            ),
+            coalesce(persona.cedula, pre.identification)
         )
         from SolicitudCooperativa sc
         join sc.creditRequest cr
+        left join com.markup.dinerop.auth.entity.User account
+            on lower(account.email) = lower(cr.email)
+        left join com.markup.dinerop.auth.entity.UserPreRegistration pre
+            on pre.userId = coalesce(cr.clientId, account.idUser)
+        left join com.markup.dinerop.onboarding.domain.entity.SolicitudOnboarding onboarding
+            on onboarding.usuarioId = coalesce(cr.clientId, account.idUser)
+        left join com.markup.dinerop.onboarding.domain.entity.PersonaOnboarding persona
+            on persona.solicitud = onboarding
+            and persona.rol = com.markup.dinerop.onboarding.domain.enums.RolPersona.SOLICITANTE
         where sc.cooperativaId = :cooperativaId
         order by cr.fechaSolicitud desc
     """)

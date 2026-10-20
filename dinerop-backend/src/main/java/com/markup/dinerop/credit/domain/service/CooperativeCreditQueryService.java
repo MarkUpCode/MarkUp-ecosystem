@@ -26,10 +26,7 @@ public class CooperativeCreditQueryService {
 
     @Transactional(readOnly = true)
     public List<CooperativeCreditRequestItemDto> getRequestsForCooperative(Long cooperativaId) {
-        return solicitudCooperativaRepository.findRequestsByCooperativaId(cooperativaId)
-                .stream()
-                .map(this::withApplicant)
-                .toList();
+        return solicitudCooperativaRepository.findRequestsByCooperativaId(cooperativaId);
     }
 
     private CooperativeCreditRequestItemDto withApplicant(CooperativeCreditRequestItemDto item) {
