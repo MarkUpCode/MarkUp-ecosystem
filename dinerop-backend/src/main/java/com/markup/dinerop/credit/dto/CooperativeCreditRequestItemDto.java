@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 public record CooperativeCreditRequestItemDto(
         Long solicitudId,
         Long clientId,
+        String email,
         BigDecimal montoSolicitado,
         CreditRequestType tipo,
         LocalDateTime fechaSolicitud,

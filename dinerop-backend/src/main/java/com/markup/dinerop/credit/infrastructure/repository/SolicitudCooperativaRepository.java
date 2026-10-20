@@ -32,6 +32,7 @@ public interface SolicitudCooperativaRepository extends JpaRepository<SolicitudC
         select new com.markup.dinerop.credit.dto.CooperativeCreditRequestItemDto(
             sc.solicitudId,
             cr.clientId,
+            cr.email,
             cr.amount,
             cr.tipo,
             cr.fechaSolicitud,
