@@ -1,0 +1,13 @@
+Actividad 2 - resultados iniciales disponibles
+
+Prueba Maven inicial ejecutada el 2026-10-22 antes de las correcciones:
+- Comando: dinerop-backend\mvnw.cmd test
+- Resultado: aprobado, código de salida 0.
+- Evidencia: los reportes Surefire existentes en dinerop-backend\target\surefire-reports.
+
+Prueba previa de creación de ADMIN por CLIENT:
+- Resultado inicial: HTTP 200 y cuenta pendiente con rol ADMIN, según evidencia comunicada para la actividad.
+- Archivo de evidencia original: no registrado en el repositorio disponible.
+- No se vuelve a ejecutar ni se inventan datos de la cuenta.
+
+No se incluyen secretos, contraseñas, JWT, tokens ni datos personales.

@@ -48,7 +48,6 @@ public class AuthController {
     // =========================================================
     @GetMapping("/activate")
     public ResponseEntity<String> activate(@RequestParam("token") String token) {
-        log.info("[ACTIVATE] tokenPrefix={}", token.substring(0, Math.min(10, token.length())));
         authService.activateAccount(token);
         return ResponseEntity.ok("Cuenta activada correctamente");
     }

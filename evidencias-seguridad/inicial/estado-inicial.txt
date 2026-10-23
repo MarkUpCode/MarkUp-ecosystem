@@ -1,0 +1,7 @@
+Actividad 2 - evidencia inicial
+
+Repositorio: MarkUpCode/MarkUp-ecosystem
+Commit inicial registrado: 2882921 (version 1.3 en la parte de cooperativa)
+Estado Git inicial: limpio (registrado antes de los cambios de esta actividad).
+
+No se incluyen secretos, contraseñas, JWT, tokens ni datos personales.

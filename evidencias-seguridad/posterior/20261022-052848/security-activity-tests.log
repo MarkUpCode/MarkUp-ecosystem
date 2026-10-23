@@ -1,0 +1,131 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ---------------------< com.markup:dinerop-backend >---------------------
+[INFO] Building dinerop-backend 0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ dinerop-backend ---
+[INFO] Copying 3 resources from src\main\resources to target\classes
+[INFO] Copying 1 resource from src\main\resources to target\classes
+[INFO] 
+[INFO] --- compiler:3.13.0:compile (default-compile) @ dinerop-backend ---
+[INFO] Recompiling the module because of changed source code.
+[INFO] Compiling 212 source files with javac [debug parameters release 17] to target\classes
+[WARNING] /D:/MarkUp-ecosystem/dinerop-backend/src/main/java/com/markup/dinerop/cooperative/domain/entity/CooperativeRate.java:[35,21] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ dinerop-backend ---
+[INFO] skip non existing resourceDirectory D:\MarkUp-ecosystem\dinerop-backend\src\test\resources
+[INFO] 
+[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ dinerop-backend ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 5 source files with javac [debug parameters release 17] to target\test-classes
+[INFO] 
+[INFO] --- surefire:3.2.5:test (default-test) @ dinerop-backend ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running com.markup.dinerop.security.SecurityActivityTest
+05:29:07.800 [main] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.markup.dinerop.security.SecurityActivityTest]: SecurityActivityTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+05:29:07.997 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.markup.dinerop.DineropBackendApplication for test class com.markup.dinerop.security.SecurityActivityTest
+05:29:08.187 [main] INFO org.springframework.boot.devtools.restart.RestartApplicationListener -- Restart disabled due to context in which it is running
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v3.3.2)
+
+2026-10-22T05:29:08.586-05:00  INFO 51516 --- [dinerop-backend] [           main] c.m.d.security.SecurityActivityTest      : Starting SecurityActivityTest using Java 17.0.19 with PID 51516 (started by Sebas in D:\MarkUp-ecosystem\dinerop-backend)
+2026-10-22T05:29:08.588-05:00  INFO 51516 --- [dinerop-backend] [           main] c.m.d.security.SecurityActivityTest      : The following 1 profile is active: "dev"
+2026-10-22T05:29:09.895-05:00  INFO 51516 --- [dinerop-backend] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-10-22T05:29:10.141-05:00  INFO 51516 --- [dinerop-backend] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 237 ms. Found 19 JPA repository interfaces.
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+2026-10-22T05:29:11.991-05:00  INFO 51516 --- [dinerop-backend] [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-10-22T05:29:12.084-05:00  INFO 51516 --- [dinerop-backend] [           main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.5.2.Final
+2026-10-22T05:29:12.181-05:00  INFO 51516 --- [dinerop-backend] [           main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-10-22T05:29:12.352-05:00  INFO 51516 --- [dinerop-backend] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-10-22T05:29:12.393-05:00  INFO 51516 --- [dinerop-backend] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-10-22T05:29:12.620-05:00  INFO 51516 --- [dinerop-backend] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection conn0: url=jdbc:h2:mem:dinerop_security_test user=SA
+2026-10-22T05:29:12.623-05:00  INFO 51516 --- [dinerop-backend] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-10-22T05:29:12.668-05:00  WARN 51516 --- [dinerop-backend] [           main] org.hibernate.orm.deprecation            : HHH90000025: H2Dialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-10-22T05:29:14.559-05:00  INFO 51516 --- [dinerop-backend] [           main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+Hibernate: drop table if exists activation_tokens cascade 
+Hibernate: drop table if exists actividad_economica cascade 
+Hibernate: drop table if exists cooperativa cascade 
+Hibernate: drop table if exists cooperativa_tasa cascade 
+Hibernate: drop table if exists credit_requirements cascade 
+Hibernate: drop table if exists direccion_onboarding cascade 
+Hibernate: drop table if exists email_verification_otps cascade 
+Hibernate: drop table if exists ingreso_egreso cascade 
+Hibernate: drop table if exists page_visits cascade 
+Hibernate: drop table if exists password_reset_tokens cascade 
+Hibernate: drop table if exists persona_onboarding cascade 
+Hibernate: drop table if exists push_device_tokens cascade 
+Hibernate: drop table if exists referencia_personal cascade 
+Hibernate: drop table if exists solicitud_cooperativa cascade 
+Hibernate: drop table if exists solicitud_cooperativa_cotizacion cascade 
+Hibernate: drop table if exists solicitud_credito cascade 
+Hibernate: drop table if exists solicitud_onboarding cascade 
+Hibernate: drop table if exists user_pre_registration cascade 
+Hibernate: drop table if exists users cascade 
+Hibernate: create table activation_tokens (used boolean not null, expires_at timestamp(6) with time zone not null, id bigint generated by default as identity, user_id bigint not null, token varchar(255) not null unique, primary key (id))
+Hibernate: create table actividad_economica (id bigint generated by default as identity, persona_id bigint not null unique, direccion_negocio varchar(255), nombre_negocio varchar(255), telefono_negocio varchar(255), tiempo_actividad varchar(255), primary key (id))
+Hibernate: create table cooperativa (calificacion float(53), monto_maximo_credito numeric(38,2) not null, id bigint, id_cooperativa bigint generated by default as identity, ciudad varchar(255), direccion varchar(255), logo_url varchar(255), nombre varchar(255), pagina_web varchar(255), provincia varchar(255), telefono varchar(255), primary key (id_cooperativa))
+Hibernate: create table cooperativa_tasa (activa boolean not null, tasa_anual numeric(6,3) not null, cooperativa_id bigint not null, fecha_actualizacion timestamp(6), fecha_creacion timestamp(6) not null, id bigint generated by default as identity, tipo_credito enum ('CONSUMO','MICROCREDITO') not null, primary key (id), constraint uk_cooperativa_tasa_coop_tipo unique (cooperativa_id, tipo_credito))
+Hibernate: create table credit_requirements (display_order integer not null, mandatory boolean not null, id bigint generated by default as identity, solicitud_cooperativa_id bigint not null, category varchar(40) not null, title varchar(180) not null, description varchar(1000), primary key (id))
+Hibernate: create table direccion_onboarding (id bigint generated by default as identity, persona_id bigint not null unique, barrio varchar(255), calle_principal varchar(255), canton varchar(255), numero varchar(255), provincia varchar(255), referencia_ubicacion varchar(255), tipo_vivienda enum ('ARRENDADA','PROPIA'), primary key (id))
+Hibernate: create table email_verification_otps (attempts integer not null, revoked boolean not null, used boolean not null, created_at timestamp(6) with time zone not null, expires_at timestamp(6) with time zone not null, id bigint generated by default as identity, email varchar(150) not null, otp_hash varchar(255) not null, primary key (id))
+Hibernate: create table ingreso_egreso (egreso_mensual float(53), ingreso_mensual float(53), id bigint generated by default as identity, persona_id bigint not null unique, primary key (id))
+Hibernate: create table page_visits (id bigint generated by default as identity, total_visits bigint not null, primary key (id))
+Hibernate: create table password_reset_tokens (used boolean not null, created_at timestamp(6), expires_at timestamp(6) not null, id bigint generated by default as identity, user_id bigint not null, token varchar(255) not null unique, primary key (id))
+Hibernate: create table persona_onboarding (fecha_nacimiento date, fecha_registro timestamp(6), id bigint generated by default as identity, solicitud_id bigint not null, apellidos varchar(255), cedula varchar(255), empresa_trabajo varchar(255), estado_civil varchar(255), nombres varchar(255), ocupacion varchar(255), telefono varchar(255), estado_formulario enum ('COMPLETO','PENDIENTE','SOLICITADO'), rol enum ('CONYUGE_GARANTE','CONYUGE_SOLICITANTE','GARANTE','SOLICITANTE'), primary key (id))
+Hibernate: create table push_device_tokens (enabled boolean not null, created_at timestamp(6) not null, id bigint generated by default as identity, updated_at timestamp(6) not null, user_id bigint not null, token varchar(4096) not null, primary key (id), unique (token))
+Hibernate: create table referencia_personal (id bigint generated by default as identity, persona_id bigint not null, nombre_completo varchar(255), parentesco varchar(255), telefono varchar(255), tipo enum ('FAMILIAR','PERSONAL'), primary key (id))
+Hibernate: create table solicitud_cooperativa (cooperativa_id bigint not null, fecha_actualizacion timestamp(6), fecha_envio timestamp(6) not null, id bigint generated by default as identity, solicitud_id bigint not null, estado enum ('ACEPTADA','ENVIADA','PRE_APROBADA','RECHAZADA','SOLICITANDO_GARANTE') not null, primary key (id), constraint uk_solicitud_coop unique (solicitud_id, cooperativa_id))
+Hibernate: create table solicitud_cooperativa_cotizacion (cuota_mensual numeric(38,2) not null, interes_total numeric(38,2) not null, monto numeric(38,2) not null, plazo_meses integer not null, tasa_anual numeric(6,3) not null, tasa_mensual numeric(10,8) not null, total_pagar numeric(38,2) not null, fecha_calculo timestamp(6) not null, id bigint generated by default as identity, solicitud_cooperativa_id bigint not null, tipo_credito enum ('CONSUMO','MICROCREDITO') not null, primary key (id), constraint uk_cotizacion_sc unique (solicitud_cooperativa_id))
+Hibernate: create table solicitud_credito (monto_solicitado numeric(38,2) not null, plazo_meses integer, fecha_actualizacion timestamp(6), fecha_solicitud timestamp(6) not null, id bigint generated by default as identity, id_cliente bigint, cedula varchar(255) not null, ciudad varchar(255), email varchar(255) not null, provincia varchar(255), estado enum ('CREADA','ENVIADA') not null, tipo enum ('CREDITO','INVERSION') not null, tipo_credito enum ('CONSUMO','MICROCREDITO'), primary key (id))
+Hibernate: create table solicitud_onboarding (fecha_creacion timestamp(6), id bigint generated by default as identity, usuario_id bigint, destino_credito varchar(255), estado enum ('COMPLETADO','EN_PROCESO','SOLICITANDO_GARANTE'), primary key (id))
+Hibernate: create table user_pre_registration (created_at timestamp(6) not null, id bigint generated by default as identity, user_id bigint not null unique, identification varchar(30) not null, phone varchar(30), city varchar(100), first_name varchar(100) not null, last_name varchar(100) not null, province varchar(100), primary key (id))
+Hibernate: create table users (active boolean not null, cooperativa_id bigint, created_at timestamp(6), id_user bigint generated by default as identity, status varchar(30) not null, email varchar(150) not null unique, password varchar(255), role enum ('ADMIN','CLIENT','COOPERATIVE') not null, primary key (id_user))
+Hibernate: alter table if exists activation_tokens add constraint FKgtry5rof27b5hdur1a11y0gsn foreign key (user_id) references users
+Hibernate: alter table if exists actividad_economica add constraint FK9dgra9mdsw3qmyfm2c7we9jjl foreign key (persona_id) references persona_onboarding
+Hibernate: alter table if exists direccion_onboarding add constraint FKl3r5vsv1xqsketsxs1qdq8gml foreign key (persona_id) references persona_onboarding
+Hibernate: alter table if exists ingreso_egreso add constraint FKn07yvqngy9ajl7duiip3kbbdt foreign key (persona_id) references persona_onboarding
+Hibernate: alter table if exists password_reset_tokens add constraint FKk3ndxg5xp6v7wd4gjyusp15gq foreign key (user_id) references users
+Hibernate: alter table if exists persona_onboarding add constraint FKce6jfjtig1da6bj3hp72i9ref foreign key (solicitud_id) references solicitud_onboarding
+Hibernate: alter table if exists push_device_tokens add constraint FK2qcqv76gikm6enhya0uumjjiq foreign key (user_id) references users
+Hibernate: alter table if exists referencia_personal add constraint FK3f5a2cdyal0xk5c9gh0qblcvb foreign key (persona_id) references persona_onboarding
+Hibernate: alter table if exists solicitud_cooperativa add constraint FKk4gsh2ixok5x2yyd647xyxaq9 foreign key (solicitud_id) references solicitud_credito
+2026-10-22T05:29:14.641-05:00  INFO 51516 --- [dinerop-backend] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-10-22T05:29:15.226-05:00  INFO 51516 --- [dinerop-backend] [           main] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-10-22T05:29:16.293-05:00  WARN 51516 --- [dinerop-backend] [           main] c.m.d.n.config.FirebaseConfig            : Firebase push notifications disabled: FIREBASE_SERVICE_ACCOUNT_BASE64 is not configured
+2026-10-22T05:29:16.553-05:00  INFO 51516 --- [dinerop-backend] [           main] eAuthenticationProviderManagerConfigurer : Global AuthenticationManager configured with AuthenticationProvider bean with name authenticationProvider
+2026-10-22T05:29:16.555-05:00  WARN 51516 --- [dinerop-backend] [           main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with an AuthenticationProvider bean. UserDetailsService beans will not be used for username/password login. Consider removing the AuthenticationProvider bean. Alternatively, consider using the UserDetailsService in a manually instantiated DaoAuthenticationProvider.
+2026-10-22T05:29:18.213-05:00  INFO 51516 --- [dinerop-backend] [           main] o.s.b.t.m.w.SpringBootMockServletContext : Initializing Spring TestDispatcherServlet ''
+2026-10-22T05:29:18.214-05:00  INFO 51516 --- [dinerop-backend] [           main] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
+2026-10-22T05:29:18.218-05:00  INFO 51516 --- [dinerop-backend] [           main] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 3 ms
+2026-10-22T05:29:18.932-05:00  INFO 51516 --- [dinerop-backend] [           main] c.m.d.security.SecurityActivityTest      : Started SecurityActivityTest in 10.756 seconds (process running for 12.242)
+Hibernate: select u1_0.id_user from users u1_0 where u1_0.email=? fetch first ? rows only
+Hibernate: select u1_0.id_user,u1_0.active,u1_0.cooperativa_id,u1_0.created_at,u1_0.email,u1_0.password,u1_0.role,u1_0.status from users u1_0 where u1_0.email=?
+Hibernate: insert into users (active,cooperativa_id,created_at,email,password,role,status,id_user) values (?,?,?,?,?,?,?,default)
+2026-10-22T05:29:19.322-05:00  INFO 51516 --- [dinerop-backend] [           main] c.m.d.auth.config.AdminBootstrapRunner   : ADMIN bootstrap completed for admin@markup.com
+2026-10-22T05:29:19.560-05:00  WARN 51516 --- [dinerop-backend] [           main] .w.s.m.s.DefaultHandlerExceptionResolver : Resolved [org.springframework.http.converter.HttpMessageNotReadableException: JSON parse error: Cannot deserialize value of type `com.markup.dinerop.auth.entity.Role` from String "ROOT": not one of the values accepted for Enum class: [COOPERATIVE, ADMIN, CLIENT]]
+2026-10-22T05:29:19.633-05:00  WARN 51516 --- [dinerop-backend] [           main] .w.s.m.s.DefaultHandlerExceptionResolver : Resolved [org.springframework.web.bind.MethodArgumentNotValidException: Validation failed for argument [0] in public org.springframework.http.ResponseEntity<com.markup.dinerop.auth.dto.PublicRegistrationResponse> com.markup.dinerop.auth.controller.AuthController.register(com.markup.dinerop.auth.dto.PublicRegistrationRequest) with 4 errors: [Field error in object 'publicRegistrationRequest' on field 'identification': rejected value [null]; codes [NotBlank.publicRegistrationRequest.identification,NotBlank.identification,NotBlank.java.lang.String,NotBlank]; arguments [org.springframework.context.support.DefaultMessageSourceResolvable: codes [publicRegistrationRequest.identification,identification]; arguments []; default message [identification]]; default message [must not be blank]] [Field error in object 'publicRegistrationRequest' on field 'firstName': rejected value []; codes [NotBlank.publicRegistrationRequest.firstName,NotBlank.firstName,NotBlank.java.lang.String,NotBlank]; arguments [org.springframework.context.support.DefaultMessageSourceResolvable: codes [publicRegistrationRequest.firstName,firstName]; arguments []; default message [firstName]]; default message [must not be blank]] [Field error in object 'publicRegistrationRequest' on field 'lastName': rejected value []; codes [NotBlank.publicRegistrationRequest.lastName,NotBlank.lastName,NotBlank.java.lang.String,NotBlank]; arguments [org.springframework.context.support.DefaultMessageSourceResolvable: codes [publicRegistrationRequest.lastName,lastName]; arguments []; default message [lastName]]; default message [must not be blank]] [Field error in object 'publicRegistrationRequest' on field 'email': rejected value [not-an-email]; codes [Email.publicRegistrationRequest.email,Email.email,Email.java.lang.String,Email]; arguments [org.springframework.context.support.DefaultMessageSourceResolvable: codes [publicRegistrationRequest.email,email]; arguments []; default message [email],[Ljakarta.validation.constraints.Pattern$Flag;@20674c52,.*]; default message [must be a well-formed email address]] ]
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 12.23 s -- in com.markup.dinerop.security.SecurityActivityTest
+[INFO] 
+[INFO] Results:
+[INFO] 
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  30.467 s
+[INFO] Finished at: 2026-10-22T05:29:22-05:00
+[INFO] ------------------------------------------------------------------------

@@ -99,6 +99,7 @@ public class CreditController {
     }
 
     @GetMapping("/me")
+    @PreAuthorize("hasRole('CLIENT')")
     public ResponseEntity<List<ClientCreditResponseDto>> getMyCredits(@AuthenticationPrincipal User user) {
         Long clientId = user.getIdUser();
         return ResponseEntity.ok(clientCreditQueryService.getMyCredits(clientId));
@@ -211,4 +212,3 @@ public class CreditController {
 
 
 }
-

@@ -88,11 +88,6 @@ public class JwtService {
     }
 
     private Key getSigningKey() {
-        System.out.println("====================================");
-        System.out.println("JWT SECRET: " + secret);
-        System.out.println("LONGITUD: " + secret.length());
-        System.out.println("====================================");
-
         byte[] keyBytes;
 
         if (isValidBase64(secret)) {

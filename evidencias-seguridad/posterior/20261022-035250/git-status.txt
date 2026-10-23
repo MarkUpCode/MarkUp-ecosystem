@@ -1,0 +1,16 @@
+## main...origin/main
+ M dinerop-backend/API_DOCUMENTATION.md
+ M dinerop-backend/pom.xml
+ M dinerop-backend/src/main/java/com/markup/dinerop/auth/config/JwtAuthenticationFilter.java
+ M dinerop-backend/src/main/java/com/markup/dinerop/auth/config/SecurityConfig.java
+ M dinerop-backend/src/main/java/com/markup/dinerop/auth/controller/AuthController.java
+ M dinerop-backend/src/main/java/com/markup/dinerop/auth/controller/InternalAuthController.java
+ M dinerop-backend/src/main/java/com/markup/dinerop/auth/service/JwtService.java
+ M dinerop-backend/src/main/java/com/markup/dinerop/credit/infrastructure/web/CreditController.java
+ M dinerop-backend/src/main/java/com/markup/dinerop/notification/service/NotificationService.java
+?? dinerop-backend/docs/
+?? dinerop-backend/src/test/java/com/markup/dinerop/auth/service/AuthServiceSecurityActivityTest.java
+?? dinerop-backend/src/test/java/com/markup/dinerop/credit/
+?? dinerop-backend/src/test/java/com/markup/dinerop/security/
+?? evidencias-seguridad/
+?? security-activity.ps1

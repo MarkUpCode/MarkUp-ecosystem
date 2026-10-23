@@ -96,19 +96,7 @@ public class NotificationService {
         // =====================================================
         if (!emailEnabled) {
 
-            log.warn("");
-            log.warn("========================================================");
-            log.warn("        MODO DESARROLLO - ACTIVACIÓN DE CUENTA");
-            log.warn("========================================================");
-            log.warn("Usuario : {}", to);
-            log.warn("");
-            log.warn("LINK DE ACTIVACIÓN:");
-            log.warn("{}", activationLink);
-            log.warn("");
-            log.warn("TOKEN:");
-            log.warn("{}", activationToken);
-            log.warn("========================================================");
-            log.warn("");
+            log.warn("Activation email suppressed in development for {}", to);
 
             return;
         }
@@ -195,12 +183,7 @@ public class NotificationService {
     // =========================================================
     public void sendRegistrationOtpEmail(String to, String code) {
         if (!emailEnabled) {
-            log.warn("====================================================");
-            log.warn("      MODO DESARROLLO - OTP DE VERIFICACIÓN");
-            log.warn("====================================================");
-            log.warn("Usuario : {}", to);
-            log.warn("Código  : {}", code);
-            log.warn("====================================================");
+            log.warn("Registration OTP email suppressed in development for {}", to);
             return;
         }
 
@@ -237,19 +220,7 @@ public class NotificationService {
         // Desarrollo
         if (!emailEnabled) {
 
-            log.warn("");
-            log.warn("====================================================");
-            log.warn("      MODO DESARROLLO - RESET PASSWORD");
-            log.warn("====================================================");
-            log.warn("Usuario : {}", to);
-            log.warn("");
-            log.warn("LINK RESET:");
-            log.warn(resetLink);
-            log.warn("");
-            log.warn("TOKEN:");
-            log.warn(resetToken);
-            log.warn("====================================================");
-            log.warn("");
+            log.warn("Password reset email suppressed in development for {}", to);
 
             return;
         }

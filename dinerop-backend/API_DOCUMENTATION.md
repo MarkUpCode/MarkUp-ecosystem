@@ -121,13 +121,13 @@ Restablece la contraseña usando el token recibido por email.
 ## 2. Internal Auth
 
 **Base path:** `/api/internal/auth`  
-**Auth required:** No (uso interno)
+**Auth required:** Sí, requiere rol `ADMIN`.
 
 ---
 
 ### POST `/api/internal/auth/pre-register`
 
-Pre-registra un usuario asignándole un rol y generando un token de activación.
+Pre-registra un usuario asignándole un rol permitido y generando un token de activación.
 
 **Request body:**
 ```json
