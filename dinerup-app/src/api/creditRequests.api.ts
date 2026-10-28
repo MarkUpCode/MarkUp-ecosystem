@@ -112,6 +112,22 @@ export const createCreditRequest = async (
   });
 };
 
+export type GuaranteeDecision = "ACEPTAR" | "SOLICITAR_NUEVO";
+
+export const decideGuaranteeForCreditRequest = async (
+  solicitudId: number,
+  decision: GuaranteeDecision,
+): Promise<void> => {
+  await httpClient<void>(
+    `/api/credits/cooperative/me/requests/${solicitudId}/garante-decision`,
+    {
+      method: "PUT",
+      auth: true,
+      body: { decision },
+    },
+  );
+};
+
 export const acceptCreditCooperative = async (
   solicitudId: number,
   cooperativaId: number,

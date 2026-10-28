@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../app/providers.dart';
+import '../../../core/data/locations/ecuador_locations.dart';
 import '../../../core/errors/app_exception.dart';
 import '../../../shared/widgets/app_badge.dart';
 import '../../../shared/widgets/app_button.dart';
@@ -26,9 +27,18 @@ class _RequestCreditPageState extends ConsumerState<RequestCreditPage> {
   final _cityController = TextEditingController();
   CreditRequestType _type = CreditRequestType.credito;
   CreditType _creditType = CreditType.microcredito;
+  String? _selectedProvince;
+  String? _selectedCity;
   String? _error;
   String? _success;
   bool _isLoading = false;
+  bool _isLoadingLocation = true;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _loadLocationData());
+  }
 
   @override
   void dispose() {
@@ -37,6 +47,73 @@ class _RequestCreditPageState extends ConsumerState<RequestCreditPage> {
     _provinceController.dispose();
     _cityController.dispose();
     super.dispose();
+  }
+
+  List<String> get _provinceNames =>
+      ecuadorProvincias.map((province) => province.provincia).toList();
+
+  List<String> _cityNames([String? province]) {
+    final provinceName = province ?? _selectedProvince;
+    if (provinceName == null || provinceName.isEmpty) return const [];
+
+    final provinceData = ecuadorProvincias.firstWhere(
+      (item) => item.provincia == provinceName,
+      orElse: () => const EcuadorProvincia(provincia: '', cantones: []),
+    );
+    return provinceData.cantones.map((city) => city.nombre).toList();
+  }
+
+  Future<void> _loadLocationData() async {
+    try {
+      final profile = await ref.read(clientProfileProvider.future);
+      final province = profile.province?.trim();
+      final city = profile.city?.trim();
+      final validProvince =
+          province != null && _provinceNames.contains(province)
+          ? province
+          : null;
+      final validCity =
+          validProvince != null &&
+              city != null &&
+              _cityNames(validProvince).contains(city)
+          ? city
+          : null;
+
+      if (!mounted) return;
+      setState(() {
+        _selectedProvince = validProvince;
+        _selectedCity = validCity;
+        _provinceController.text = validProvince ?? '';
+        _cityController.text = validCity ?? '';
+      });
+    } catch (error) {
+      if (!mounted) return;
+      setState(() {
+        _error = error is AppException
+            ? error.message
+            : AppErrorMessages.generic;
+      });
+    } finally {
+      if (mounted) {
+        setState(() => _isLoadingLocation = false);
+      }
+    }
+  }
+
+  void _updateProvince(String? value) {
+    setState(() {
+      _selectedProvince = value;
+      _selectedCity = null;
+      _provinceController.text = value ?? '';
+      _cityController.clear();
+    });
+  }
+
+  void _updateCity(String? value) {
+    setState(() {
+      _selectedCity = value;
+      _cityController.text = value ?? '';
+    });
   }
 
   Future<void> _submit() async {
@@ -53,18 +130,26 @@ class _RequestCreditPageState extends ConsumerState<RequestCreditPage> {
         amount: double.parse(_amountController.text.replaceAll(',', '.')),
         type: _type,
         creditType: _type == CreditRequestType.inversion ? null : _creditType,
-        plazoMeses: _plazoController.text.trim().isEmpty ? null : int.tryParse(_plazoController.text.trim()),
+        plazoMeses: _plazoController.text.trim().isEmpty
+            ? null
+            : int.tryParse(_plazoController.text.trim()),
         province: _provinceController.text.trim(),
         city: _cityController.text.trim(),
       );
-      final response = await ref.read(creditRepositoryProvider).createCreditRequest(payload);
+      final response = await ref
+          .read(creditRepositoryProvider)
+          .createCreditRequest(payload);
       setState(() {
-        _success = response.message.isNotEmpty ? response.message : 'Solicitud enviada correctamente.';
+        _success = response.message.isNotEmpty
+            ? response.message
+            : 'Solicitud enviada correctamente.';
       });
       ref.invalidate(dashboardCreditRequestsProvider);
     } catch (error) {
       setState(() {
-        _error = error is AppException ? error.message : AppErrorMessages.generic;
+        _error = error is AppException
+            ? error.message
+            : AppErrorMessages.generic;
       });
     } finally {
       setState(() => _isLoading = false);
@@ -84,36 +169,64 @@ class _RequestCreditPageState extends ConsumerState<RequestCreditPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Text('Completa la información mínima que el backend requiere.', style: Theme.of(context).textTheme.bodyMedium),
+                  Text(
+                    'Completa la información mínima que el backend requiere.',
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
                   const SizedBox(height: 18),
                   DropdownButtonFormField<CreditRequestType>(
                     initialValue: _type,
-                    decoration: const InputDecoration(labelText: 'Tipo de solicitud'),
+                    decoration: const InputDecoration(
+                      labelText: 'Tipo de solicitud',
+                    ),
                     items: const [
-                      DropdownMenuItem(value: CreditRequestType.credito, child: Text('Crédito')),
-                      DropdownMenuItem(value: CreditRequestType.inversion, child: Text('Inversión')),
+                      DropdownMenuItem(
+                        value: CreditRequestType.credito,
+                        child: Text('Crédito'),
+                      ),
+                      DropdownMenuItem(
+                        value: CreditRequestType.inversion,
+                        child: Text('Inversión'),
+                      ),
                     ],
-                    onChanged: (value) => setState(() => _type = value ?? CreditRequestType.credito),
+                    onChanged: (value) => setState(
+                      () => _type = value ?? CreditRequestType.credito,
+                    ),
                   ),
                   const SizedBox(height: 16),
                   DropdownButtonFormField<CreditType>(
                     initialValue: _creditType,
-                    decoration: const InputDecoration(labelText: 'Tipo de crédito'),
+                    decoration: const InputDecoration(
+                      labelText: 'Tipo de crédito',
+                    ),
                     items: const [
-                      DropdownMenuItem(value: CreditType.microcredito, child: Text('Microcrédito')),
-                      DropdownMenuItem(value: CreditType.consumo, child: Text('Consumo')),
+                      DropdownMenuItem(
+                        value: CreditType.microcredito,
+                        child: Text('Microcrédito'),
+                      ),
+                      DropdownMenuItem(
+                        value: CreditType.consumo,
+                        child: Text('Consumo'),
+                      ),
                     ],
                     onChanged: _type == CreditRequestType.inversion
                         ? null
-                        : (value) => setState(() => _creditType = value ?? CreditType.microcredito),
+                        : (value) => setState(
+                            () =>
+                                _creditType = value ?? CreditType.microcredito,
+                          ),
                   ),
                   const SizedBox(height: 16),
                   AppTextField(
                     controller: _amountController,
                     label: 'Monto',
                     prefixIcon: Icons.payments_outlined,
-                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                    validator: (value) => value == null || value.trim().isEmpty ? 'Ingresa un monto' : null,
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
+                    ),
+                    validator: (value) => value == null || value.trim().isEmpty
+                        ? 'Ingresa un monto'
+                        : null,
                   ),
                   const SizedBox(height: 16),
                   AppTextField(
@@ -123,9 +236,56 @@ class _RequestCreditPageState extends ConsumerState<RequestCreditPage> {
                     keyboardType: TextInputType.number,
                   ),
                   const SizedBox(height: 16),
-                  AppTextField(controller: _provinceController, label: 'Provincia', prefixIcon: Icons.location_city_outlined),
+                  DropdownButtonFormField<String>(
+                    initialValue: _selectedProvince,
+                    isExpanded: true,
+                    decoration: const InputDecoration(
+                      labelText: 'Provincia',
+                      hintText: 'Selecciona una provincia',
+                      prefixIcon: Icon(Icons.map_outlined),
+                    ),
+                    items: _provinceNames
+                        .map(
+                          (province) => DropdownMenuItem(
+                            value: province,
+                            child: Text(
+                              province,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        )
+                        .toList(),
+                    onChanged: _isLoadingLocation ? null : _updateProvince,
+                    validator: (value) => value == null || value.isEmpty
+                        ? 'Selecciona una provincia'
+                        : null,
+                  ),
                   const SizedBox(height: 16),
-                  AppTextField(controller: _cityController, label: 'Ciudad', prefixIcon: Icons.place_outlined),
+                  DropdownButtonFormField<String>(
+                    initialValue: _selectedCity,
+                    isExpanded: true,
+                    decoration: InputDecoration(
+                      labelText: 'Ciudad',
+                      hintText: _selectedProvince == null
+                          ? 'Primero selecciona una provincia'
+                          : 'Selecciona una ciudad',
+                      prefixIcon: const Icon(Icons.location_city_outlined),
+                    ),
+                    items: _cityNames()
+                        .map(
+                          (city) => DropdownMenuItem(
+                            value: city,
+                            child: Text(city, overflow: TextOverflow.ellipsis),
+                          ),
+                        )
+                        .toList(),
+                    onChanged: _isLoadingLocation || _selectedProvince == null
+                        ? null
+                        : _updateCity,
+                    validator: (value) => value == null || value.isEmpty
+                        ? 'Selecciona una ciudad'
+                        : null,
+                  ),
                   const SizedBox(height: 16),
                   if (_error != null) ...[
                     AppErrorView(message: _error!),
@@ -135,7 +295,12 @@ class _RequestCreditPageState extends ConsumerState<RequestCreditPage> {
                     AppBadge(label: _success!),
                     const SizedBox(height: 16),
                   ],
-                  AppButton(label: 'Enviar solicitud', icon: Icons.send_rounded, isLoading: _isLoading, onPressed: _submit),
+                  AppButton(
+                    label: 'Enviar solicitud',
+                    icon: Icons.send_rounded,
+                    isLoading: _isLoading,
+                    onPressed: _submit,
+                  ),
                 ],
               ),
             ),

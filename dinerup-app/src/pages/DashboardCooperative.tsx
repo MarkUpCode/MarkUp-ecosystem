@@ -11,6 +11,8 @@ import {
   getMyCooperativeRequests,
   decideCreditRequest,
   requestGuaranteeForCreditRequest,
+  decideGuaranteeForCreditRequest,
+  type GuaranteeDecision,
   getCooperativeOfferDefaults,
 } from "../api/creditRequests.api";
 import { getOnboardingForCooperative, type OnboardingCooperativeDetail } from "../api/onboarding.api";
@@ -138,6 +140,25 @@ export default function DashboardCooperative() {
         getErrorMessage(error, "No se pudo registrar la solicitud de garante."),
       );
       throw error;
+    } finally {
+      setProcessingId(null);
+    }
+  };
+
+  const handleGuaranteeDecision = async (
+    solicitudId: number,
+    decision: GuaranteeDecision,
+  ) => {
+    try {
+      setProcessingId(solicitudId);
+      setActionError("");
+      await decideGuaranteeForCreditRequest(solicitudId, decision);
+      setApplicantDetail(null);
+      await loadRequests();
+    } catch (error) {
+      setActionError(
+        getErrorMessage(error, "No se pudo registrar la decisión del garante."),
+      );
     } finally {
       setProcessingId(null);
     }
@@ -369,7 +390,14 @@ export default function DashboardCooperative() {
       )}
 
       {applicantDetail && (
-        <ApplicantDetailModal detail={applicantDetail} onClose={() => setApplicantDetail(null)} />
+        <ApplicantDetailModal
+          detail={applicantDetail}
+          onClose={() => setApplicantDetail(null)}
+          onGuaranteeDecision={(decision) =>
+            void handleGuaranteeDecision(applicantDetail.solicitudId, decision)
+          }
+          isProcessing={processingId === applicantDetail.solicitudId}
+        />
       )}
 
       <Footer />
@@ -380,25 +408,54 @@ export default function DashboardCooperative() {
 function ApplicantDetailModal({
   detail,
   onClose,
+  onGuaranteeDecision,
+  isProcessing,
 }: {
   detail: OnboardingCooperativeDetail;
   onClose: () => void;
+  onGuaranteeDecision?: (decision: GuaranteeDecision) => void;
+  isProcessing?: boolean;
 }) {
-  const applicant = detail.personas.find((person) => person.rol === "SOLICITANTE") ?? detail.personas[0];
-  if (!applicant) return null;
+  if (detail.personas.length === 0) return null;
   const money = (value?: number) => value == null ? "—" : `$${value.toLocaleString("es-EC", { minimumFractionDigits: 2 })}`;
+  const guarantee = detail.personas.find((person) => person.rol === "GARANTE");
 
   return (
     <div className="fixed inset-0 z-[80] flex items-center justify-center bg-black/50 p-4">
       <div className="max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-2xl bg-white p-6 shadow-2xl">
-        <div className="mb-6 flex items-start justify-between"><div><h2 className="text-2xl font-bold text-gray-900">Información del solicitante</h2><p className="text-sm text-gray-600">Solicitud #{detail.solicitudId}</p></div><button onClick={onClose} className="rounded-lg px-3 py-2 text-gray-600 hover:bg-gray-100">Cerrar</button></div>
-        <div className="grid gap-4 md:grid-cols-2">
-          <DetailSection title="Datos personales"><Detail label="Nombre" value={`${applicant.nombres} ${applicant.apellidos}`} /><Detail label="Cédula" value={applicant.cedula} /><Detail label="Fecha de nacimiento" value={applicant.fechaNacimiento} /><Detail label="Estado civil" value={applicant.estadoCivil} /><Detail label="Teléfono" value={applicant.telefono} /></DetailSection>
-          <DetailSection title="Trabajo"><Detail label="Ocupación" value={applicant.ocupacion} /><Detail label="Empresa" value={applicant.empresaTrabajo} /><Detail label="Negocio" value={applicant.actividadEconomica?.nombreNegocio} /><Detail label="Tiempo de actividad" value={applicant.actividadEconomica?.tiempoActividad} /></DetailSection>
-          <DetailSection title="Dirección"><Detail label="Provincia" value={applicant.direccion?.provincia} /><Detail label="Cantón" value={applicant.direccion?.canton} /><Detail label="Barrio" value={applicant.direccion?.barrio} /><Detail label="Dirección" value={[applicant.direccion?.callePrincipal, applicant.direccion?.numero].filter(Boolean).join(" ")} /><Detail label="Vivienda" value={applicant.direccion?.tipoVivienda} /></DetailSection>
-          <DetailSection title="Situación económica"><Detail label="Ingreso mensual" value={money(applicant.ingresoEgreso?.ingresoMensual)} /><Detail label="Egreso mensual" value={money(applicant.ingresoEgreso?.egresoMensual)} /><Detail label="Teléfono del negocio" value={applicant.actividadEconomica?.telefonoNegocio} /></DetailSection>
-        </div>
-        {applicant.referencias && applicant.referencias.length > 0 && <DetailSection title="Referencias"><div className="space-y-2">{applicant.referencias.map((reference, index) => <p key={`${reference.telefono}-${index}`} className="text-sm text-gray-700">{reference.nombreCompleto} · {reference.tipo} · {reference.telefono}</p>)}</div></DetailSection>}
+        <div className="mb-6 flex items-start justify-between"><div><h2 className="text-2xl font-bold text-gray-900">Información de la solicitud</h2><p className="text-sm text-gray-600">Solicitud #{detail.solicitudId}</p></div><button onClick={onClose} className="rounded-lg px-3 py-2 text-gray-600 hover:bg-gray-100">Cerrar</button></div>
+        {detail.personas.map((person) => (
+          <div key={`${person.rol}-${person.cedula}`} className="mb-6">
+            <h3 className="mb-3 text-lg font-bold text-gray-800">
+              {person.rol === "GARANTE" ? "Información del garante" : "Información del solicitante"}
+            </h3>
+            <div className="grid gap-4 md:grid-cols-2">
+              <DetailSection title="Datos personales"><Detail label="Nombre" value={`${person.nombres} ${person.apellidos}`} /><Detail label="Cédula" value={person.cedula} /><Detail label="Fecha de nacimiento" value={person.fechaNacimiento} /><Detail label="Estado civil" value={person.estadoCivil} /><Detail label="Teléfono" value={person.telefono} /></DetailSection>
+              <DetailSection title="Trabajo"><Detail label="Ocupación" value={person.ocupacion} /><Detail label="Empresa" value={person.empresaTrabajo} /><Detail label="Negocio" value={person.actividadEconomica?.nombreNegocio} /><Detail label="Tiempo de actividad" value={person.actividadEconomica?.tiempoActividad} /></DetailSection>
+              <DetailSection title="Dirección"><Detail label="Provincia" value={person.direccion?.provincia} /><Detail label="Cantón" value={person.direccion?.canton} /><Detail label="Barrio" value={person.direccion?.barrio} /><Detail label="Dirección" value={[person.direccion?.callePrincipal, person.direccion?.numero].filter(Boolean).join(" ")} /><Detail label="Vivienda" value={person.direccion?.tipoVivienda} /></DetailSection>
+              <DetailSection title="Situación económica"><Detail label="Ingreso mensual" value={money(person.ingresoEgreso?.ingresoMensual)} /><Detail label="Egreso mensual" value={money(person.ingresoEgreso?.egresoMensual)} /><Detail label="Teléfono del negocio" value={person.actividadEconomica?.telefonoNegocio} /></DetailSection>
+            </div>
+            {person.referencias && person.referencias.length > 0 && <DetailSection title="Referencias"><div className="space-y-2">{person.referencias.map((reference, index) => <p key={`${reference.telefono}-${index}`} className="text-sm text-gray-700">{reference.nombreCompleto} · {reference.tipo} · {reference.telefono}</p>)}</div></DetailSection>}
+          </div>
+        ))}
+        {guarantee && onGuaranteeDecision && (
+          <div className="flex flex-col gap-3 border-t border-gray-200 pt-5 sm:flex-row sm:justify-end">
+            <button
+              onClick={() => onGuaranteeDecision("SOLICITAR_NUEVO")}
+              disabled={isProcessing}
+              className="rounded-lg bg-amber-600 px-4 py-2 font-semibold text-white hover:bg-amber-700 disabled:opacity-50"
+            >
+              Solicitar nuevo garante
+            </button>
+            <button
+              onClick={() => onGuaranteeDecision("ACEPTAR")}
+              disabled={isProcessing}
+              className="rounded-lg bg-green-600 px-4 py-2 font-semibold text-white hover:bg-green-700 disabled:opacity-50"
+            >
+              Aceptar garante
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

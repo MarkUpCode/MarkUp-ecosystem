@@ -15,6 +15,9 @@ import com.markup.dinerop.credit.dto.PublicCreditRequestDto;
 import com.markup.dinerop.credit.infrastructure.repository.CreditRequestRepository;
 import com.markup.dinerop.credit.infrastructure.repository.SolicitudCooperativaCotizacionRepository;
 import com.markup.dinerop.credit.infrastructure.repository.SolicitudCooperativaRepository;
+import com.markup.dinerop.onboarding.domain.enums.RolPersona;
+import com.markup.dinerop.onboarding.infrastructure.repository.PersonaOnboardingRepository;
+import com.markup.dinerop.onboarding.infrastructure.repository.SolicitudOnboardingRepository;
 import com.markup.dinerop.auth.repository.UserRepository;
 import com.markup.dinerop.cooperative.domain.service.CooperativeService;
 import com.markup.dinerop.notification.service.NotificationService;
@@ -48,6 +51,8 @@ public class CreditService {
     private final CooperativeService cooperativeService;
     private final NotificationService notificationService;
         private final CreditRequirementService creditRequirementService;
+        private final SolicitudOnboardingRepository solicitudOnboardingRepository;
+        private final PersonaOnboardingRepository personaOnboardingRepository;
 
 
 
@@ -492,8 +497,54 @@ public class CreditService {
         );
     }
 
+    @Transactional
+    public void decidirGarante(
+            Long solicitudId,
+            Long cooperativaId,
+            String decision
+    ) {
+        SolicitudCooperativa sc = solicitudCooperativaRepository
+                .findBySolicitudIdAndCooperativaId(solicitudId, cooperativaId)
+                .orElseThrow(() -> new IllegalStateException("Solicitud cooperativa no encontrada"));
+
+        if (sc.getEstado() != SolicitudCooperativaStatus.SOLICITANDO_GARANTE) {
+            throw new IllegalStateException(
+                    "La solicitud no está esperando la revisión de un garante"
+            );
+        }
+
+        if ("ACEPTAR".equalsIgnoreCase(decision)) {
+            Long clientId = sc.getCreditRequest().getClientId();
+            if (clientId == null) {
+                throw new IllegalStateException("La solicitud no tiene un cliente asociado");
+            }
+            Long onboardingId = solicitudOnboardingRepository.findByUsuarioId(clientId)
+                    .map(onboarding -> onboarding.getId())
+                    .orElseThrow(() -> new IllegalStateException("El cliente no tiene onboarding"));
+            if (!personaOnboardingRepository.existsBySolicitudIdAndRol(
+                    onboardingId,
+                    RolPersona.GARANTE
+            )) {
+                throw new IllegalStateException("El cliente aún no ha enviado la información del garante");
+            }
+            sc.setEstado(SolicitudCooperativaStatus.PRE_APROBADA);
+            return;
+        }
+
+        if ("SOLICITAR_NUEVO".equalsIgnoreCase(decision)) {
+            notificationService.sendGuaranteeRequiredEmail(
+                    sc.getCreditRequest().getEmail(),
+                    cooperativeService.getById(cooperativaId).getNombre()
+            );
+            return;
+        }
+
+        throw new IllegalArgumentException(
+                "La decisión del garante debe ser ACEPTAR o SOLICITAR_NUEVO"
+        );
+    }
+
 
 
 
 }
-

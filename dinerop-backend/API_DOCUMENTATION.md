@@ -38,6 +38,25 @@ Autentica un usuario y retorna un JWT.
 }
 ```
 
+La lista `personas` incluye tanto al `SOLICITANTE` como al `GARANTE` cuando
+el cliente ya completó la información solicitada. La cooperativa puede revisar
+el garante mediante el endpoint de créditos:
+
+### PUT `/api/credits/cooperative/me/requests/{solicitudId}/garante-decision`
+
+Registra la decisión de la cooperativa después de revisar el garante.
+
+**Request body:**
+```json
+{
+  "decision": "ACEPTAR | SOLICITAR_NUEVO"
+}
+```
+
+`ACEPTAR` cambia la oferta a `PRE_APROBADA` para que el cliente continúe con
+el flujo normal de aceptación y requisitos. `SOLICITAR_NUEVO` mantiene la
+solicitud pendiente de garante y permite reemplazar el garante enviado.
+
 **Response `200`:**
 ```json
 {

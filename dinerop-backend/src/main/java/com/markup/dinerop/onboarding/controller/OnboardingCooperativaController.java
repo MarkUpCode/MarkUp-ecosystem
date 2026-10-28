@@ -6,6 +6,8 @@ import com.markup.dinerop.onboarding.application.usecase.SolicitarGaranteUseCase
 import com.markup.dinerop.onboarding.dto.response.OnboardingUnificadoResponse;
 import com.markup.dinerop.onboarding.infrastructure.mapper.OnboardingMapper;
 import com.markup.dinerop.credit.infrastructure.repository.SolicitudCooperativaRepository;
+import com.markup.dinerop.credit.infrastructure.repository.CreditRequestRepository;
+import com.markup.dinerop.onboarding.infrastructure.repository.SolicitudOnboardingRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -21,6 +23,8 @@ public class OnboardingCooperativaController {
     private final ObtenerOnboardingUnificadoUseCase obtenerOnboardingUC;
     private final OnboardingMapper mapper;
     private final SolicitudCooperativaRepository solicitudCooperativaRepository;
+    private final CreditRequestRepository creditRequestRepository;
+    private final SolicitudOnboardingRepository solicitudOnboardingRepository;
 
     @PostMapping("/{solicitudId}/solicitar-garante")
     @PreAuthorize("hasRole('COOPERATIVE')")
@@ -46,8 +50,14 @@ public class OnboardingCooperativaController {
             throw new AccessDeniedException("Solicitud no pertenece a esta cooperativa");
         }
 
+        Long clientId = creditRequestRepository.findById(solicitudId)
+                .map(creditRequest -> creditRequest.getClientId())
+                .orElseThrow(() -> new IllegalArgumentException("Solicitud de crédito no encontrada"));
+        Long onboardingId = solicitudOnboardingRepository.findByUsuarioId(clientId)
+                .map(onboarding -> onboarding.getId())
+                .orElseThrow(() -> new IllegalArgumentException("Onboarding no encontrado para la solicitud"));
         return mapper.toOnboardingUnificadoResponse(
-                obtenerOnboardingUC.execute(solicitudId)
+                obtenerOnboardingUC.execute(onboardingId)
         );
     }
 }

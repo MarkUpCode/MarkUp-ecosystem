@@ -7,6 +7,7 @@ import com.markup.dinerop.credit.dto.CooperativeDecisionRequestDto;
 import com.markup.dinerop.credit.dto.CooperativeStatusItemDto;
 import com.markup.dinerop.credit.dto.ClientCreditRequestDto;
 import com.markup.dinerop.credit.dto.PublicCreditRequestDto;
+import com.markup.dinerop.credit.dto.GuaranteeDecisionRequestDto;
 import org.springframework.security.access.prepost.PreAuthorize;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -176,6 +177,23 @@ public class CreditController {
 
         return ResponseEntity.ok(
                 Map.of("message", "Solicitud de garante registrada correctamente")
+        );
+    }
+
+    @PutMapping("/cooperative/me/requests/{solicitudId}/garante-decision")
+    @PreAuthorize("hasRole('COOPERATIVE')")
+    public ResponseEntity<Map<String, Object>> decidirGarante(
+            @PathVariable Long solicitudId,
+            @Valid @RequestBody GuaranteeDecisionRequestDto dto,
+            @AuthenticationPrincipal User user
+    ) {
+        creditService.decidirGarante(
+                solicitudId,
+                user.getCooperativaId(),
+                dto.decision()
+        );
+        return ResponseEntity.ok(
+                Map.of("message", "Decisión del garante registrada correctamente")
         );
     }
 

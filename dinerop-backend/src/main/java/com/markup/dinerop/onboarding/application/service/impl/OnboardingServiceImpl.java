@@ -1,6 +1,8 @@
 package com.markup.dinerop.onboarding.application.service.impl;
 
 import com.markup.dinerop.credit.domain.service.CreditService;
+import com.markup.dinerop.credit.domain.model.CreditRequest;
+import com.markup.dinerop.credit.infrastructure.repository.CreditRequestRepository;
 import com.markup.dinerop.onboarding.application.service.OnboardingService;
 import com.markup.dinerop.onboarding.domain.entity.*;
 import com.markup.dinerop.onboarding.domain.enums.EstadoFormulario;
@@ -36,6 +38,7 @@ public class OnboardingServiceImpl implements OnboardingService {
     private final OnboardingMapper mapper;
     private final UserRepository userRepository;
     private final UserPreRegistrationRepository userPreRegistrationRepository;
+    private final CreditRequestRepository creditRequestRepository;
 
     @Override
     public SolicitudOnboarding crearSolicitudConSolicitante(
@@ -89,8 +92,11 @@ public class OnboardingServiceImpl implements OnboardingService {
 
     @Override
     public SolicitudOnboarding solicitarGarante(Long solicitudId, Long cooperativaId) {
-        SolicitudOnboarding solicitud = solicitudRepo.findById(solicitudId)
-                .orElseThrow(() -> new ResourceNotFoundException("Solicitud no encontrada"));
+        Long clientId = creditRequestRepository.findById(solicitudId)
+                .map(CreditRequest::getClientId)
+                .orElseThrow(() -> new ResourceNotFoundException("Solicitud de crédito no encontrada"));
+        SolicitudOnboarding solicitud = solicitudRepo.findByUsuarioId(clientId)
+                .orElseThrow(() -> new ResourceNotFoundException("Onboarding no encontrado para la solicitud"));
 
         if (solicitud.getEstado() == EstadoOnboarding.SOLICITANDO_GARANTE) {
             return solicitud;
@@ -117,9 +123,8 @@ public class OnboardingServiceImpl implements OnboardingService {
                 .findByUsuarioId(clientId)
                 .orElseThrow(() -> new ResourceNotFoundException("Solicitud no encontrada para este usuario"));
 
-        if (personaRepo.existsBySolicitudIdAndRol(solicitud.getId(), RolPersona.GARANTE)) {
-            throw new BusinessException("El garante ya fue registrado");
-        }
+        personaRepo.findBySolicitudIdAndRol(solicitud.getId(), RolPersona.GARANTE)
+                .ifPresent(personaRepo::delete);
 
         PersonaOnboarding garante = mapper.toPersona(request);
         garante.setSolicitud(solicitud);
