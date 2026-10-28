@@ -10,6 +10,9 @@ import com.markup.dinerop.credit.infrastructure.repository.SolicitudCooperativaC
 import com.markup.dinerop.credit.infrastructure.repository.SolicitudCooperativaRepository;
 import lombok.RequiredArgsConstructor;
 import com.markup.dinerop.credit.service.CreditRequirementService;
+import com.markup.dinerop.onboarding.domain.enums.RolPersona;
+import com.markup.dinerop.onboarding.infrastructure.repository.PersonaOnboardingRepository;
+import com.markup.dinerop.onboarding.infrastructure.repository.SolicitudOnboardingRepository;
 import com.markup.dinerop.credit.dto.CreditRequirementDto;
 import org.springframework.stereotype.Service;
 
@@ -22,7 +25,9 @@ public class ClientCreditCooperativeStatusService {
     private final SolicitudCooperativaRepository solicitudCooperativaRepository;
     private final SolicitudCooperativaCotizacionRepository cotizacionRepository;
     private final CooperativeService cooperativeService;
-        private final CreditRequirementService requirementService;
+    private final CreditRequirementService requirementService;
+    private final SolicitudOnboardingRepository solicitudOnboardingRepository;
+    private final PersonaOnboardingRepository personaOnboardingRepository;
 
     public List<CooperativeStatusItemDto> getPreApprovedCooperatives(Long clientId, Long solicitudId) {
 
@@ -38,6 +43,13 @@ public class ClientCreditCooperativeStatusService {
 
         return rows.stream().map(sc -> {
             var coop = cooperativeService.getById(sc.getCooperativaId());
+            var onboarding = solicitudOnboardingRepository.findByUsuarioId(clientId).orElse(null);
+            var garanteEnRevision = sc.getEstado() == SolicitudCooperativaStatus.SOLICITANDO_GARANTE
+                    && onboarding != null
+                    && personaOnboardingRepository.existsBySolicitudIdAndRol(
+                    onboarding.getId(),
+                    RolPersona.GARANTE
+            );
                 var cotizacion = cotizacionRepository.findBySolicitudCooperativaId(sc.getId())
                     .orElseGet(() -> createMissingQuotation(sc));
 
@@ -49,6 +61,7 @@ public class ClientCreditCooperativeStatusService {
                     .cooperativaId(sc.getCooperativaId())
                     .nombreCooperativa(coop != null ? coop.getNombre() : "-")
                     .estado(sc.getEstado().name())
+                    .garanteEnRevision(garanteEnRevision)
                     .fechaActualizacion(sc.getFechaActualizacion())
                     .monto(cotizacion != null ? cotizacion.getMonto() : null)
                     .plazoMeses(cotizacion != null ? cotizacion.getPlazoMeses() : null)

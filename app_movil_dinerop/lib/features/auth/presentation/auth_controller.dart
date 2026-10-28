@@ -172,6 +172,7 @@ class AuthController extends ChangeNotifier {
       final response = await _authRepository.login(email, password);
       _token = response.accessToken;
       _user = response.user;
+      await _persistCurrentSession();
 
       if (_user?.isActive == true && _user?.isClient == true) {
         final status = await _safeLoadOnboardingStatus();

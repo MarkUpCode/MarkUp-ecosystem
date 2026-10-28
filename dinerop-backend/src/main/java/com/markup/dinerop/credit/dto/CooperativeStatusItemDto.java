@@ -17,6 +17,7 @@ public class CooperativeStatusItemDto {
     private Long cooperativaId;
     private String nombreCooperativa;
     private String estado; // PRE_APROBADA
+    private boolean garanteEnRevision;
     private LocalDateTime fechaActualizacion;
 
     private BigDecimal monto;
@@ -34,4 +35,3 @@ public class CooperativeStatusItemDto {
 
 
 }
-

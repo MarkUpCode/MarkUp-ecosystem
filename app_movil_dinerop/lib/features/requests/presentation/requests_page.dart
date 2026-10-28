@@ -617,7 +617,11 @@ class _OfferCardState extends ConsumerState<_OfferCard> {
   Widget build(BuildContext context) {
     final offer = widget.offer;
     final needsGuarantor =
-        offer.estado == CreditRequestStatus.solicitandoGarante;
+        offer.estado == CreditRequestStatus.solicitandoGarante &&
+        !offer.garanteEnRevision;
+    final guaranteeInReview =
+        offer.estado == CreditRequestStatus.solicitandoGarante &&
+        offer.garanteEnRevision;
     final color = needsGuarantor ? AppColors.warning : AppColors.success;
     final soft = needsGuarantor ? AppColors.warningSoft : AppColors.successSoft;
     return Container(
@@ -686,6 +690,8 @@ class _OfferCardState extends ConsumerState<_OfferCard> {
                     _OfferStatus(
                       text: needsGuarantor
                           ? 'Requiere garante'
+                          : guaranteeInReview
+                          ? 'Garante en revisión'
                           : offer.estado == CreditRequestStatus.aceptada
                           ? 'Aceptada'
                           : 'Preaprobada',
@@ -696,10 +702,18 @@ class _OfferCardState extends ConsumerState<_OfferCard> {
                 ),
                 const SizedBox(height: 16),
                 if (needsGuarantor) _GuarantorNotice(color: color, soft: soft),
+                if (guaranteeInReview)
+                  _GuaranteeReviewNotice(color: color, soft: soft),
                 if (needsGuarantor) const SizedBox(height: 12),
-                if (offer.requisitos.isNotEmpty)
+                if (guaranteeInReview) const SizedBox(height: 12),
+                if (!needsGuarantor &&
+                    !guaranteeInReview &&
+                    offer.requisitos.isNotEmpty)
                   _RequirementsPreview(requirements: offer.requisitos),
-                if (offer.requisitos.isNotEmpty) const SizedBox(height: 12),
+                if (!needsGuarantor &&
+                    !guaranteeInReview &&
+                    offer.requisitos.isNotEmpty)
+                  const SizedBox(height: 12),
                 if (offer.estado == CreditRequestStatus.aceptada)
                   _AcceptedOfferNotice(
                     offer: offer,
@@ -791,6 +805,8 @@ class _OfferCardState extends ConsumerState<_OfferCard> {
                               ref.invalidate(dashboardCreditRequestsProvider);
                               Navigator.of(this.context).pop();
                             }
+                          : guaranteeInReview
+                          ? null
                           : _accepting
                           ? null
                           : _accept,
@@ -802,6 +818,8 @@ class _OfferCardState extends ConsumerState<_OfferCard> {
                       label: Text(
                         needsGuarantor
                             ? 'Completar información del garante'
+                            : guaranteeInReview
+                            ? 'Garante en revisión'
                             : _accepting
                             ? 'Aceptando oferta...'
                             : 'Aceptar esta oferta',
@@ -874,6 +892,39 @@ class _GuarantorNotice extends StatelessWidget {
                 ),
               ),
             ],
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
+class _GuaranteeReviewNotice extends StatelessWidget {
+  const _GuaranteeReviewNotice({required this.color, required this.soft});
+
+  final Color color;
+  final Color soft;
+
+  @override
+  Widget build(BuildContext context) => Container(
+    padding: const EdgeInsets.all(14),
+    decoration: BoxDecoration(
+      color: soft,
+      borderRadius: BorderRadius.circular(15),
+    ),
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(Icons.hourglass_top_rounded, color: color),
+        const SizedBox(width: 9),
+        Expanded(
+          child: Text(
+            'La información del garante fue enviada y está en revisión. '
+            'La cooperativa debe aceptarla antes de mostrar los requisitos finales.',
+            style: TextStyle(
+              color: color.withValues(alpha: .9),
+              fontSize: 12,
+            ),
           ),
         ),
       ],
