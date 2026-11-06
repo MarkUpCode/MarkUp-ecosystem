@@ -27,7 +27,8 @@ class OnboardingPage extends ConsumerStatefulWidget {
   ConsumerState<OnboardingPage> createState() => _OnboardingPageState();
 }
 
-class _OnboardingPageState extends ConsumerState<OnboardingPage> {
+class _OnboardingPageState extends ConsumerState<OnboardingPage>
+    with WidgetsBindingObserver {
   final _destinoController = TextEditingController(text: 'CREDITO');
   final _emailController = TextEditingController();
   final _nombresController = TextEditingController();
@@ -75,15 +76,35 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
   String? _selectedCanton;
   String? _selectedParish;
   int _step = 0;
+  final ScrollController _formScrollController = ScrollController();
+  bool _keyboardVisible = false;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    FocusManager.instance.addListener(_handleFocusChange);
     WidgetsBinding.instance.addPostFrameCallback((_) => _loadInitialData());
   }
 
   @override
+  void didChangeMetrics() {
+    final view = WidgetsBinding.instance.platformDispatcher.views.first;
+    final keyboardVisible = view.viewInsets.bottom > 0;
+    if (keyboardVisible == _keyboardVisible) return;
+
+    if (mounted) {
+      setState(() => _keyboardVisible = keyboardVisible);
+    } else {
+      _keyboardVisible = keyboardVisible;
+    }
+  }
+
+  @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    FocusManager.instance.removeListener(_handleFocusChange);
+    _formScrollController.dispose();
     _destinoController.dispose();
     _emailController.dispose();
     _nombresController.dispose();
@@ -117,6 +138,28 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
       reference.dispose();
     }
     super.dispose();
+  }
+
+  void _handleFocusChange() {
+    final focusNode = FocusManager.instance.primaryFocus;
+    if (focusNode == null || !focusNode.hasFocus) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _scrollFocusedFieldIntoView();
+    });
+  }
+
+  void _scrollFocusedFieldIntoView() {
+    final focusNode = FocusManager.instance.primaryFocus;
+    final focusedContext = focusNode?.context;
+    if (focusedContext == null || !_formScrollController.hasClients) return;
+
+    Scrollable.ensureVisible(
+      focusedContext,
+      alignment: 0.18,
+      duration: const Duration(milliseconds: 280),
+      curve: Curves.easeOutCubic,
+      alignmentPolicy: ScrollPositionAlignmentPolicy.explicit,
+    );
   }
 
   int get _totalSteps => widget.isGuarantor ? 5 : (_tieneConyuge ? 6 : 5);
@@ -761,25 +804,53 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
   String _formatDate(DateTime dateTime) =>
       DateFormat('yyyy-MM-dd').format(dateTime);
 
-  Widget _buildHeader(BuildContext context) {
+  Widget _buildHeader(BuildContext context, {bool compact = false}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(
-          widget.isGuarantor
-              ? 'Información del garante'
-              : 'Completar Información',
-          style: Theme.of(
-            context,
-          ).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.w800),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Tooltip(
+              message: 'Volver al menú',
+              child: Material(
+                color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                borderRadius: BorderRadius.circular(12),
+                child: IconButton(
+                  visualDensity: VisualDensity.compact,
+                  onPressed: () {
+                    FocusManager.instance.primaryFocus?.unfocus();
+                    context.go('/dashboard');
+                  },
+                  icon: const Icon(Icons.arrow_back_rounded, size: 20),
+                ),
+              ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                widget.isGuarantor
+                    ? 'Información del garante'
+                    : 'Completar Información',
+                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                  fontWeight: FontWeight.w800,
+                  fontSize: compact ? 22 : null,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
         ),
-        const SizedBox(height: 8),
-        Text(
-          widget.isGuarantor
-              ? 'Registra los datos del garante solicitados por la cooperativa. Este formulario se llena una sola vez.'
-              : 'Este formulario se llena una sola vez. Luego podras solicitar creditos sin volver a ingresar tus datos.',
-          style: Theme.of(context).textTheme.bodyLarge,
-        ),
+        if (!compact) ...[
+          const SizedBox(height: 8),
+          Text(
+            widget.isGuarantor
+                ? 'Registra los datos del garante solicitados por la cooperativa. Este formulario se llena una sola vez.'
+                : 'Este formulario se llena una sola vez. Luego podras solicitar creditos sin volver a ingresar tus datos.',
+            style: Theme.of(context).textTheme.bodyLarge,
+          ),
+        ],
       ],
     );
   }
@@ -1453,25 +1524,34 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
     }
 
     final theme = Theme.of(context);
+    final keyboardVisible =
+        _keyboardVisible || MediaQuery.viewInsetsOf(context).bottom > 0;
+    final compactLayout = keyboardVisible;
 
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       body: SafeArea(
         child: Center(
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 760),
             child: Padding(
-              padding: const EdgeInsets.all(24),
+              padding: EdgeInsets.fromLTRB(
+                compactLayout ? 16 : 24,
+                compactLayout ? 12 : 24,
+                compactLayout ? 16 : 24,
+                compactLayout ? 8 : 24,
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  _buildHeader(context),
-                  const SizedBox(height: 20),
+                  _buildHeader(context, compact: compactLayout),
+                  SizedBox(height: compactLayout ? 8 : 20),
                   StepProgress(
                     currentStep: _step + 1,
                     totalSteps: _totalSteps,
                     label: 'Completa tu formulario',
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: compactLayout ? 8 : 16),
                   if (_error != null) ...[
                     AppErrorView(message: _error!),
                     const SizedBox(height: 12),
@@ -1485,12 +1565,19 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
                         key: ValueKey(
                           'step_${_step}_${_tieneConyuge ? 'spouse' : 'no_spouse'}',
                         ),
-                        padding: const EdgeInsets.only(bottom: 16),
+                        controller: _formScrollController,
+                        keyboardDismissBehavior:
+                            ScrollViewKeyboardDismissBehavior.onDrag,
+                        padding: EdgeInsets.only(
+                          bottom: MediaQuery.viewInsetsOf(context).bottom > 0
+                              ? 220
+                              : 32,
+                        ),
                         child: _buildStepContent(context),
                       ),
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: compactLayout ? 8 : 16),
                   Row(
                     children: [
                       Expanded(
@@ -1518,16 +1605,18 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 12),
-                  Text(
-                    widget.isGuarantor
-                        ? 'Esta información será revisada por la cooperativa para continuar con la solicitud.'
-                        : 'Este formulario se llena una sola vez. Luego podras solicitar creditos sin volver a ingresar tus datos.',
-                    textAlign: TextAlign.center,
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: theme.colorScheme.onSurfaceVariant,
+                  if (!keyboardVisible) ...[
+                    const SizedBox(height: 12),
+                    Text(
+                      widget.isGuarantor
+                          ? 'Esta información será revisada por la cooperativa para continuar con la solicitud.'
+                          : 'Este formulario se llena una sola vez. Luego podras solicitar creditos sin volver a ingresar tus datos.',
+                      textAlign: TextAlign.center,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
                     ),
-                  ),
+                  ],
                 ],
               ),
             ),
