@@ -19,6 +19,31 @@ body {
     #f5f8fc;
 }
 
+.portal-shell {
+  position: relative;
+  isolation: isolate;
+}
+
+.portal-shell::before {
+  position: fixed;
+  z-index: -1;
+  inset: 0;
+  pointer-events: none;
+  content: "";
+  background-image: linear-gradient(rgba(15, 36, 84, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(15, 36, 84, 0.025) 1px, transparent 1px);
+  background-size: 32px 32px;
+  mask-image: linear-gradient(to bottom, black, transparent 72%);
+}
+
+.portal-panel {
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 1.5rem;
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow: 0 18px 55px rgba(15, 36, 84, 0.07);
+  backdrop-filter: blur(18px);
+}
+
 button,
 input {
   font: inherit;

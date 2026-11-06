@@ -1,6 +1,6 @@
 import type { CooperativeCreditRequest, CooperativeOfferDefaults, CreditRequirement } from "../types/credit";
 import { useEffect, useState } from "react";
-import { FileText, TrendingUp, Clock, User } from "lucide-react";
+import { FileText, TrendingUp, Clock, User, ArrowUpRight, Search, SlidersHorizontal, CheckCircle2 } from "lucide-react";
 import type { ReactNode } from "react";
 
 import Navbar from "../components/layout/Navbar";
@@ -48,6 +48,7 @@ export default function DashboardCooperative() {
   const [loadingOfferDefaults, setLoadingOfferDefaults] = useState(false);
   const [applicantDetail, setApplicantDetail] = useState<OnboardingCooperativeDetail | null>(null);
   const [loadingApplicant, setLoadingApplicant] = useState(false);
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
     void loadRequests();
@@ -165,7 +166,8 @@ export default function DashboardCooperative() {
   };
 
   const filteredRequests = requests.filter((r) =>
-    filter === "all" ? true : r.estado === filter,
+    (filter === "all" || r.estado === filter) &&
+    `${r.solicitudId} ${r.nombreSolicitante ?? ""} ${r.tipo}`.toLowerCase().includes(search.toLowerCase()),
   );
 
   const stats = {
@@ -179,11 +181,12 @@ export default function DashboardCooperative() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col bg-[#f5f8fc]">
+    <div className="portal-shell flex min-h-screen flex-col bg-[#f5f8fc]">
       <Navbar />
 
       <main className="flex-1 max-w-7xl mx-auto px-4 py-8 w-full">
-        <div className="mb-8 overflow-hidden rounded-[2rem] bg-gradient-to-br from-[#0f2454] via-[#123f77] to-[#0ea5a4] p-6 text-white shadow-xl shadow-slate-300/40 sm:p-9">
+        <div className="relative mb-8 overflow-hidden rounded-[2rem] bg-gradient-to-br from-[#0b1d42] via-[#123f77] to-[#0ea5a4] p-6 text-white shadow-2xl shadow-cyan-950/20 sm:p-10">
+          <div className="absolute -right-20 -top-32 h-80 w-80 rounded-full border-[34px] border-white/10" />
           <p className="mb-2 text-sm font-semibold uppercase tracking-[0.18em] text-cyan-100">Centro de operaciones</p>
           <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
             <div>
@@ -203,7 +206,7 @@ export default function DashboardCooperative() {
           </div>
         )}
 
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div className="mb-8 grid grid-cols-2 gap-3 lg:grid-cols-4">
           <StatCard label="Total recibidas" value={stats.total} icon={<FileText />} />
           <StatCard label="Enviadas" value={stats.enviada} icon={<Clock />} />
           <StatCard
@@ -218,8 +221,14 @@ export default function DashboardCooperative() {
           />
         </div>
 
-        <div className="mb-6 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-          <div className="flex gap-3 flex-wrap">
+        <div className="portal-panel mb-6 p-4 sm:p-5">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+            <div className="relative w-full lg:max-w-sm">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+              <input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Buscar por solicitante o número" className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 pl-10 pr-4 text-sm outline-none transition focus:border-cyan-400 focus:bg-white focus:ring-4 focus:ring-cyan-100" />
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              <SlidersHorizontal className="mr-1 h-4 w-4 text-slate-400" />
             <FilterButton
               label="Todas"
               active={filter === "all"}
@@ -240,6 +249,7 @@ export default function DashboardCooperative() {
               active={filter === CreditEstado.RECHAZADA}
               onClick={() => setFilter(CreditEstado.RECHAZADA)}
             />
+            </div>
           </div>
         </div>
 
@@ -252,18 +262,19 @@ export default function DashboardCooperative() {
             {filteredRequests.map((r) => (
               <div
                 key={r.solicitudId}
-                className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition hover:shadow-lg"
+                className="portal-panel p-5 transition hover:-translate-y-0.5 hover:border-cyan-200 hover:shadow-xl sm:p-6"
               >
                 <div className="flex flex-col lg:flex-row gap-6">
                   <div className="flex-1 space-y-4">
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between gap-3">
                       <div className="flex items-center gap-3">
                         <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#123f77] font-bold text-white shadow-lg shadow-blue-900/20">
                           {r.solicitudId}
                         </div>
-                        <h3 className="text-xl font-bold text-slate-900">
-                          Solicitud #{r.solicitudId}
-                        </h3>
+                        <div>
+                          <p className="text-xs font-bold uppercase tracking-[0.14em] text-slate-400">Expediente financiero</p>
+                          <h3 className="text-xl font-bold text-slate-900">Solicitud #{r.solicitudId}</h3>
+                        </div>
                       </div>
 
                       <span
@@ -300,13 +311,16 @@ export default function DashboardCooperative() {
                       </div>
                     </div>
 
-                    <div className="rounded-xl bg-slate-50 p-3">
+                    <div className="flex items-center justify-between rounded-xl bg-slate-50 p-3">
+                      <div>
                       <p className="text-xs text-gray-600 font-medium">
                         Fecha de solicitud
                       </p>
                       <p className="text-sm text-gray-800 font-medium mt-1">
                         {new Date(r.fechaSolicitud).toLocaleString("es-EC")}
                       </p>
+                      </div>
+                      <CheckCircle2 className="h-5 w-5 text-emerald-500" />
                     </div>
 
                     <div className="flex gap-4 rounded-xl border border-cyan-100 bg-cyan-50 p-4">
@@ -339,7 +353,7 @@ export default function DashboardCooperative() {
                         r.estado !== CreditEstado.ENVIADA ||
                         processingId === r.solicitudId
                       }
-                      className={`w-full py-3 rounded-xl text-sm font-semibold ${
+                      className={`flex w-full items-center justify-center gap-2 rounded-xl py-3 text-sm font-semibold ${
                         r.estado === CreditEstado.ENVIADA
                           ? "bg-emerald-600 text-white transition hover:bg-emerald-700"
                           : "bg-slate-100 text-slate-400"
@@ -348,6 +362,7 @@ export default function DashboardCooperative() {
                       {processingId === r.solicitudId
                         ? "Procesando..."
                         : "Pre-aprobar"}
+                      {r.estado === CreditEstado.ENVIADA && <ArrowUpRight className="h-4 w-4" />}
                     </button>
 
                     <button

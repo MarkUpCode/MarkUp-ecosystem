@@ -7,6 +7,8 @@ import {
   CheckCircle,
   TrendingUp,
   Wallet,
+  ArrowUpRight,
+  Sparkles,
 } from "lucide-react";
 import { useAuth } from "../context/useAuth";
 
@@ -164,11 +166,13 @@ export default function DashboardClient() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col bg-[#f5f8fc]">
+    <div className="portal-shell flex min-h-screen flex-col bg-[#f5f8fc]">
       <Navbar />
 
       <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
-        <div className="mb-8 overflow-hidden rounded-[2rem] bg-gradient-to-br from-[#0f2454] via-[#123f77] to-[#0ea5a4] p-6 text-white shadow-xl shadow-slate-300/40 sm:p-9">
+        <div className="relative mb-8 overflow-hidden rounded-[2rem] bg-gradient-to-br from-[#0b1d42] via-[#123f77] to-[#0ea5a4] p-6 text-white shadow-2xl shadow-cyan-950/20 sm:p-10">
+          <div className="absolute -right-20 -top-32 h-80 w-80 rounded-full border-[34px] border-white/10" />
+          <div className="absolute -bottom-28 right-28 h-56 w-56 rounded-full bg-cyan-300/10 blur-2xl" />
           <div className="relative z-10 flex flex-col justify-between gap-6 sm:flex-row sm:items-end">
             <div>
               <p className="mb-2 text-sm font-semibold uppercase tracking-[0.18em] text-cyan-100">Tu espacio financiero</p>
@@ -222,7 +226,22 @@ export default function DashboardClient() {
           </div>
         )}
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8">
+        <div className="mb-8 grid grid-cols-2 gap-3 lg:grid-cols-4">
+          {[
+            ["Solicitudes", creditRequests.length, "Tus procesos activos"],
+            ["Cooperativas", cooperatives.length, "Entidades disponibles"],
+            ["En revisión", creditRequests.filter((request) => request.estado === "ENVIADA").length, "Esperando respuesta"],
+            ["Perfil", needsOnboarding ? "Pendiente" : "Completo", needsOnboarding ? "Te falta un paso" : "Listo para operar"],
+          ].map(([label, value, caption]) => (
+            <div key={label} className="portal-panel p-4 sm:p-5">
+              <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">{label}</p>
+              <p className="mt-2 text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl">{value}</p>
+              <p className="mt-1 text-xs text-slate-500">{caption}</p>
+            </div>
+          ))}
+        </div>
+
+        <div className="mb-8 grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-2">
           <div
             className={`rounded-2xl border bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg sm:p-6 ${
               needsOnboarding
@@ -233,9 +252,15 @@ export default function DashboardClient() {
             <div className="mb-4 w-fit rounded-xl bg-cyan-50 p-3">
               <TrendingUp className="h-6 w-6 text-cyan-700 sm:h-8 sm:w-8" />
             </div>
-            <h3 className="mb-2 text-lg font-bold text-slate-900 sm:text-xl">
+            <div className="mb-5 flex items-start justify-between">
+              <div>
+                <p className="mb-1 text-xs font-bold uppercase tracking-[0.14em] text-cyan-700">Financiamiento</p>
+                <h3 className="text-lg font-bold text-slate-900 sm:text-xl">
               Solicitar Credito
-            </h3>
+                </h3>
+              </div>
+              <ArrowUpRight className="h-5 w-5 text-cyan-600" />
+            </div>
             <p className="mb-4 text-xs text-slate-500 sm:text-sm">
               Accede a creditos de multiples cooperativas
             </p>
@@ -263,9 +288,15 @@ export default function DashboardClient() {
             <div className="mb-4 w-fit rounded-xl bg-emerald-50 p-3">
               <Wallet className="h-6 w-6 text-emerald-700 sm:h-8 sm:w-8" />
             </div>
-            <h3 className="mb-2 text-lg font-bold text-slate-900 sm:text-xl">
+            <div className="mb-5 flex items-start justify-between">
+              <div>
+                <p className="mb-1 text-xs font-bold uppercase tracking-[0.14em] text-emerald-700">Crecimiento</p>
+                <h3 className="text-lg font-bold text-slate-900 sm:text-xl">
               Realizar Inversion
-            </h3>
+                </h3>
+              </div>
+              <Sparkles className="h-5 w-5 text-emerald-600" />
+            </div>
             <p className="mb-4 text-xs text-slate-500 sm:text-sm">
               Invierte de forma segura con buenas tasas
             </p>
@@ -284,8 +315,8 @@ export default function DashboardClient() {
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-md overflow-hidden">
-          <div className="flex border-b border-slate-200 bg-slate-50">
+        <div className="portal-panel overflow-hidden">
+          <div className="flex items-center justify-between border-b border-slate-200 bg-white px-2">
             {(["requests", "cooperatives"] as const).map((tab) => (
               <button
                 key={tab}
@@ -301,7 +332,14 @@ export default function DashboardClient() {
             ))}
           </div>
 
-          <div className="p-4 sm:p-6">
+          <div className="p-4 sm:p-7">
+            <div className="mb-6 flex items-end justify-between gap-4">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-[0.14em] text-slate-400">Actividad</p>
+                <h2 className="mt-1 text-xl font-bold text-slate-900">{activeTab === "requests" ? "Tus solicitudes" : "Red de cooperativas"}</h2>
+              </div>
+              <span className="hidden rounded-full bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-500 sm:inline-flex">{activeTab === "requests" ? `${creditRequests.length} registros` : `${cooperatives.length} entidades`}</span>
+            </div>
             {isLoading ? (
               <div className="text-center py-16">Cargando...</div>
             ) : activeTab === "requests" ? (
