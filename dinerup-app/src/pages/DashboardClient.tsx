@@ -164,23 +164,39 @@ export default function DashboardClient() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex flex-col">
+    <div className="flex min-h-screen flex-col bg-[#f5f8fc]">
       <Navbar />
 
       <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+        <div className="mb-8 overflow-hidden rounded-[2rem] bg-gradient-to-br from-[#0f2454] via-[#123f77] to-[#0ea5a4] p-6 text-white shadow-xl shadow-slate-300/40 sm:p-9">
+          <div className="relative z-10 flex flex-col justify-between gap-6 sm:flex-row sm:items-end">
+            <div>
+              <p className="mb-2 text-sm font-semibold uppercase tracking-[0.18em] text-cyan-100">Tu espacio financiero</p>
+              <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl">Hola, {user?.name?.split(" ")[0] ?? "bienvenido"}</h1>
+              <p className="mt-2 max-w-xl text-sm text-blue-100 sm:text-base">
+                {needsOnboarding ? "Completa tu perfil para desbloquear todas las opciones." : "Administra tus solicitudes y encuentra oportunidades a tu medida."}
+              </p>
+            </div>
+            <div className="rounded-2xl border border-white/20 bg-white/10 px-4 py-3 text-sm backdrop-blur">
+              <span className="block text-blue-100">Sesión protegida</span>
+              <span className="font-semibold">Datos cifrados y seguros</span>
+            </div>
+          </div>
+        </div>
+
         {needsOnboarding && (
-          <div className="mb-8 bg-gradient-to-r from-amber-500 to-orange-500 rounded-2xl shadow-lg p-6 sm:p-8 text-white relative overflow-hidden">
+          <div className="mb-8 overflow-hidden rounded-2xl border border-amber-200 bg-amber-50 p-6 shadow-sm sm:p-8">
             <div className="absolute top-0 right-0 w-64 h-64 bg-white opacity-10 rounded-full -mr-32 -mt-32" />
             <div className="relative z-10 flex flex-col sm:flex-row gap-4">
-              <div className="bg-white/20 p-3 rounded-lg">
+              <div className="h-fit rounded-xl bg-amber-100 p-3 text-amber-700">
                 <AlertCircle className="w-6 h-6 sm:w-8 sm:h-8" />
               </div>
               <div className="flex-1">
-                <h2 className="text-xl sm:text-2xl font-bold mb-2">
+                <h2 className="mb-2 text-xl font-bold text-slate-900 sm:text-2xl">
                   Completa tu formulario una sola vez para enviar solicitudes a
                   todas las cooperativas
                 </h2>
-                <p className="text-amber-50 mb-4 sm:mb-6 text-sm sm:text-base">
+                <p className="mb-4 text-sm text-slate-600 sm:mb-6 sm:text-base">
                   Para solicitar creditos o realizar inversiones necesitamos
                   conocer tus datos. Es un proceso rapido que solo haras una
                   vez.
@@ -188,7 +204,7 @@ export default function DashboardClient() {
                 <button
                   disabled={checkingOnboarding}
                   onClick={handleGoToOnboarding}
-                  className="bg-white text-orange-600 px-6 sm:px-8 py-2.5 sm:py-3 rounded-xl font-semibold hover:bg-gray-50 transition-all shadow-lg hover:shadow-xl inline-flex items-center gap-2 disabled:opacity-60"
+                  className="inline-flex items-center gap-2 rounded-xl bg-amber-500 px-6 py-2.5 font-semibold text-white shadow-lg transition-all hover:bg-amber-600 disabled:opacity-60 sm:px-8 sm:py-3"
                 >
                   <CheckCircle className="w-5 h-5" />
                   {checkingOnboarding
@@ -200,38 +216,27 @@ export default function DashboardClient() {
           </div>
         )}
 
-        <div className="mb-6 sm:mb-8">
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">
-            Bienvenid@ {user?.name}
-          </h1>
-          <p className="text-gray-600 text-sm sm:text-base">
-            {needsOnboarding
-              ? "Completa tu perfil para acceder a todas las funciones"
-              : "Gestiona tus solicitudes y encuentra las mejores opciones financieras"}
-          </p>
-        </div>
-
         {pageError && (
-          <div className="mb-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          <div className="mb-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
             {pageError}
           </div>
         )}
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8">
           <div
-            className={`bg-white rounded-2xl shadow-md p-5 sm:p-6 border-2 ${
+            className={`rounded-2xl border bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg sm:p-6 ${
               needsOnboarding
-                ? "border-gray-200 opacity-75"
-                : "border-blue-100 hover:border-blue-300"
+                ? "border-slate-200 opacity-75"
+                : "border-slate-200 hover:border-cyan-300"
             }`}
           >
-            <div className="bg-blue-100 p-3 rounded-xl mb-4 w-fit">
-              <TrendingUp className="w-6 h-6 sm:w-8 sm:h-8 text-blue-600" />
+            <div className="mb-4 w-fit rounded-xl bg-cyan-50 p-3">
+              <TrendingUp className="h-6 w-6 text-cyan-700 sm:h-8 sm:w-8" />
             </div>
-            <h3 className="text-lg sm:text-xl font-bold text-gray-800 mb-2">
+            <h3 className="mb-2 text-lg font-bold text-slate-900 sm:text-xl">
               Solicitar Credito
             </h3>
-            <p className="text-gray-600 mb-4 text-xs sm:text-sm">
+            <p className="mb-4 text-xs text-slate-500 sm:text-sm">
               Accede a creditos de multiples cooperativas
             </p>
             <button
@@ -240,7 +245,7 @@ export default function DashboardClient() {
               className={`w-full py-2.5 sm:py-3 rounded-xl font-medium flex items-center justify-center gap-2 ${
                 needsOnboarding
                   ? "bg-gray-200 text-gray-500 cursor-not-allowed"
-                  : "bg-primary-600 text-white hover:bg-primary-700 shadow-md"
+                  : "bg-[#123f77] text-white shadow-md hover:bg-[#0f2454]"
               }`}
             >
               <Plus className="w-5 h-5" />
@@ -249,19 +254,19 @@ export default function DashboardClient() {
           </div>
 
           <div
-            className={`bg-white rounded-2xl shadow-md p-5 sm:p-6 border-2 ${
+            className={`rounded-2xl border bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg sm:p-6 ${
               needsOnboarding
-                ? "border-gray-200 opacity-75"
-                : "border-emerald-100 hover:border-emerald-300"
+                ? "border-slate-200 opacity-75"
+                : "border-slate-200 hover:border-emerald-300"
             }`}
           >
-            <div className="bg-emerald-100 p-3 rounded-xl mb-4 w-fit">
-              <Wallet className="w-6 h-6 sm:w-8 sm:h-8 text-emerald-600" />
+            <div className="mb-4 w-fit rounded-xl bg-emerald-50 p-3">
+              <Wallet className="h-6 w-6 text-emerald-700 sm:h-8 sm:w-8" />
             </div>
-            <h3 className="text-lg sm:text-xl font-bold text-gray-800 mb-2">
+            <h3 className="mb-2 text-lg font-bold text-slate-900 sm:text-xl">
               Realizar Inversion
             </h3>
-            <p className="text-gray-600 mb-4 text-xs sm:text-sm">
+            <p className="mb-4 text-xs text-slate-500 sm:text-sm">
               Invierte de forma segura con buenas tasas
             </p>
             <button
@@ -280,15 +285,15 @@ export default function DashboardClient() {
         </div>
 
         <div className="bg-white rounded-2xl shadow-md overflow-hidden">
-          <div className="border-b bg-gray-50 flex">
+          <div className="flex border-b border-slate-200 bg-slate-50">
             {(["requests", "cooperatives"] as const).map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
                 className={`flex-1 py-4 font-medium ${
                   activeTab === tab
-                    ? "bg-white text-primary-600"
-                    : "text-gray-600"
+                    ? "bg-white text-[#123f77] shadow-[inset_0_-2px_0_#06b6d4]"
+                    : "text-slate-500 hover:text-slate-900"
                 }`}
               >
                 {tab === "requests" ? "Mis Solicitudes" : "Cooperativas"}
@@ -311,14 +316,14 @@ export default function DashboardClient() {
                   {needsOnboarding ? (
                     <button
                       onClick={handleGoToOnboarding}
-                      className="bg-primary-600 text-white px-6 py-3 rounded-xl"
+                      className="rounded-xl bg-[#123f77] px-6 py-3 text-white"
                     >
                       Completar Perfil
                     </button>
                   ) : (
                     <button
                       onClick={handleRequestCredit}
-                      className="bg-primary-600 text-white px-6 py-3 rounded-xl"
+                      className="rounded-xl bg-[#123f77] px-6 py-3 text-white"
                     >
                       Crear Solicitud
                     </button>
