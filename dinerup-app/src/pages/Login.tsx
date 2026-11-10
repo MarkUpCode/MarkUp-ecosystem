@@ -1,9 +1,8 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Building2, User } from "lucide-react";
 import { useAuth } from "../context/useAuth";
 import CompleteRegistrationModal from "../components/auth/CompleteRegistrationModal";
 import PublicCreditRequestModal from "../components/credit/PublicCreditRequestModal";
@@ -15,7 +14,6 @@ import LogoDinerop from "../images/LogoDinerop.png";
 const loginSchema = z.object({
   email: z.string().email("Email inválido"),
   password: z.string().min(6, "La contraseña debe tener al menos 6 caracteres"),
-  userType: z.enum(["client", "cooperative"]),
 });
 
 type LoginFormData = z.infer<typeof loginSchema>;
@@ -33,7 +31,7 @@ export default function Login() {
 
   const loginForm = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
-    defaultValues: { email: "", password: "", userType: "client" },
+    defaultValues: { email: "", password: "" },
   });
 
   const onLogin = async (data: LoginFormData) => {
@@ -44,11 +42,6 @@ export default function Login() {
       const rawRole = typeof result?.role === "string" ? result.role.toLowerCase() : "";
       if (!rawRole) { setError("No se pudo determinar el tipo de usuario."); return; }
       if (rawRole !== "client" && rawRole !== "cooperative") { setError("Tipo de cuenta no reconocido."); return; }
-      if (rawRole !== data.userType) {
-        const roleLabel = rawRole === "client" ? "Cliente" : "Cooperativa";
-        setError(`Esta cuenta es de tipo ${roleLabel}. Por favor selecciona el perfil correcto.`);
-        return;
-      }
       navigate(rawRole === "client" ? "/dashboard-client" : "/dashboard-cooperative");
     } catch {
       setError("Credenciales incorrectas o error al iniciar sesión");
@@ -242,8 +235,6 @@ export default function Login() {
             )}
 
             <form onSubmit={loginForm.handleSubmit(onLogin)} className="space-y-5">
-              <UserTypeSelector register={loginForm.register} />
-
               <InputField
                 label="Correo electrónico"
                 type="email"
@@ -413,31 +404,3 @@ function InputField({
   );
 }
 
-function UserTypeSelector({ register }: { register: unknown }) {
-  return (
-    <div>
-      <label className="block text-sm font-semibold text-gray-700 mb-3">Tipo de cuenta</label>
-      <div className="grid grid-cols-2 gap-3">
-        <UserTypeOption value="client" icon={User} label="Cliente" register={register} />
-        <UserTypeOption value="cooperative" icon={Building2} label="Cooperativa" register={register} />
-      </div>
-    </div>
-  );
-}
-
-function UserTypeOption({
-  value, icon: Icon, label, register,
-}: {
-  value: string; icon: unknown; label: string; register: unknown;
-}) {
-  const IconComponent = Icon as React.ComponentType<{ className: string }>;
-  return (
-    <label className="cursor-pointer group">
-      <input type="radio" value={value} {...(register as (name: string) => object)("userType")} className="peer sr-only" />
-      <div className="p-4 border-2 border-gray-200 rounded-xl text-center peer-checked:border-brand-primary peer-checked:bg-brand-primary/10 transition-all hover:border-gray-300 group-hover:shadow-md">
-        <IconComponent className="w-6 h-6 mx-auto mb-2 text-gray-500 peer-checked:text-brand-primary transition-colors" />
-        <span className="text-sm font-bold text-gray-700 peer-checked:text-brand-primary transition-colors">{label}</span>
-      </div>
-    </label>
-  );
-}

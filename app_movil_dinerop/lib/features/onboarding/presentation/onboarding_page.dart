@@ -76,7 +76,9 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
   String? _selectedCanton;
   String? _selectedParish;
   int _step = 0;
+  int _validationAttempt = 0;
   final ScrollController _formScrollController = ScrollController();
+  final Set<TextEditingController> _invalidFields = <TextEditingController>{};
   bool _keyboardVisible = false;
 
   @override
@@ -240,13 +242,91 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
   void _goNext() {
     final validationMessage = _currentStepValidationMessage();
     if (validationMessage != null) {
-      setState(() => _error = validationMessage);
+      setState(() {
+        _error = validationMessage;
+        _validationAttempt++;
+        _invalidFields
+          ..clear()
+          ..addAll(_invalidControllersForCurrentStep());
+      });
       return;
     }
     setState(() {
       _error = null;
+      _invalidFields.clear();
       _step = math.min(_step + 1, _totalSteps - 1);
     });
+  }
+
+  bool _hasFieldError(TextEditingController controller) =>
+      _invalidFields.contains(controller);
+
+  String? _dropdownError(Object? value) =>
+      _error != null && value == null ? 'Selecciona una opción' : null;
+
+  List<TextEditingController> _invalidControllersForCurrentStep() {
+    bool empty(TextEditingController controller) =>
+        controller.text.trim().isEmpty;
+    bool isTenDigits(TextEditingController controller) =>
+        RegExp(r'^\d{10}$').hasMatch(controller.text.trim());
+    switch (_step) {
+      case 0:
+        return [
+          if (empty(_cedulaController) || !isTenDigits(_cedulaController))
+            _cedulaController,
+          if (empty(_nombresController)) _nombresController,
+          if (empty(_apellidosController)) _apellidosController,
+          if (_fechaNacimiento == null) _fechaNacimientoController,
+        ];
+      case 1:
+        return [
+          if (empty(_telefonoController) || !isTenDigits(_telefonoController))
+            _telefonoController,
+          if (empty(_ocupacionController)) _ocupacionController,
+          if (empty(_empresaController)) _empresaController,
+        ];
+      case 2:
+        return [
+          if (empty(_calleController)) _calleController,
+          if (empty(_numeroController)) _numeroController,
+        ];
+      case 3:
+        return [
+          if (double.tryParse(_ingresoController.text.replaceAll(',', '.')) ==
+                  null ||
+              double.tryParse(_ingresoController.text.replaceAll(',', '.'))! <
+                  0)
+            _ingresoController,
+          if (double.tryParse(_egresoController.text.replaceAll(',', '.')) ==
+                  null ||
+              double.tryParse(_egresoController.text.replaceAll(',', '.'))! < 0)
+            _egresoController,
+          ..._references.expand(
+            (reference) => [
+              if (empty(reference.nombreCompletoController))
+                reference.nombreCompletoController,
+              if (empty(reference.telefonoController))
+                reference.telefonoController,
+            ],
+          ),
+        ];
+      case 4:
+        if (!widget.isGuarantor && _tieneConyuge) {
+          return [
+            if (empty(_conyugeCedulaController) ||
+                !isTenDigits(_conyugeCedulaController))
+              _conyugeCedulaController,
+            if (empty(_conyugeNombresController)) _conyugeNombresController,
+            if (empty(_conyugeApellidosController)) _conyugeApellidosController,
+            if (_conyugeFechaNacimiento == null)
+              _conyugeFechaNacimientoController,
+            if (empty(_conyugeTelefonoController) ||
+                !isTenDigits(_conyugeTelefonoController))
+              _conyugeTelefonoController,
+          ];
+        }
+    }
+    return const [];
   }
 
   String? _currentStepValidationMessage() {
@@ -836,8 +916,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
                   fontWeight: FontWeight.w800,
                   fontSize: compact ? 22 : null,
                 ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+                softWrap: true,
               ),
             ),
           ],
@@ -893,6 +972,8 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
           const SizedBox(height: 18),
           AppTextField(
             controller: _cedulaController,
+            hasError: _hasFieldError(_cedulaController),
+            errorAnimationKey: _validationAttempt,
             label: 'Cédula *',
             hint: 'Ej: 1234567890',
             prefixIcon: Icons.credit_card_outlined,
@@ -900,6 +981,8 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
           const SizedBox(height: 12),
           AppTextField(
             controller: _nombresController,
+            hasError: _hasFieldError(_nombresController),
+            errorAnimationKey: _validationAttempt,
             label: 'Nombres *',
             hint: 'Ej: Juan',
             prefixIcon: Icons.badge_outlined,
@@ -907,6 +990,8 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
           const SizedBox(height: 12),
           AppTextField(
             controller: _apellidosController,
+            hasError: _hasFieldError(_apellidosController),
+            errorAnimationKey: _validationAttempt,
             label: 'Apellidos *',
             hint: 'Ej: García Pérez',
             prefixIcon: Icons.badge_outlined,
@@ -914,6 +999,8 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
           const SizedBox(height: 12),
           AppTextField(
             controller: _fechaNacimientoController,
+            hasError: _hasFieldError(_fechaNacimientoController),
+            errorAnimationKey: _validationAttempt,
             label: 'Fecha de Nacimiento *',
             hint: 'Seleccionar',
             prefixIcon: Icons.calendar_month_outlined,
@@ -923,7 +1010,10 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
           const SizedBox(height: 12),
           DropdownButtonFormField<String>(
             initialValue: _estadoCivil,
-            decoration: const InputDecoration(labelText: 'Estado Civil *'),
+            decoration: InputDecoration(
+              labelText: 'Estado Civil *',
+              errorText: _dropdownError(_estadoCivil),
+            ),
             items: const [
               DropdownMenuItem(value: 'SOLTERO', child: Text('SOLTERO')),
               DropdownMenuItem(value: 'CASADO', child: Text('CASADO')),
@@ -968,6 +1058,8 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
           ],
           AppTextField(
             controller: _telefonoController,
+            hasError: _hasFieldError(_telefonoController),
+            errorAnimationKey: _validationAttempt,
             label: 'Teléfono *',
             hint: 'Ej: 0987654321',
             prefixIcon: Icons.phone_outlined,
@@ -975,6 +1067,8 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
           const SizedBox(height: 12),
           AppTextField(
             controller: _ocupacionController,
+            hasError: _hasFieldError(_ocupacionController),
+            errorAnimationKey: _validationAttempt,
             label: 'Ocupación *',
             hint: 'Ej: Ingeniero de Sistemas',
             prefixIcon: Icons.work_outline,
@@ -982,6 +1076,8 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
           const SizedBox(height: 12),
           AppTextField(
             controller: _empresaController,
+            hasError: _hasFieldError(_empresaController),
+            errorAnimationKey: _validationAttempt,
             label: 'Empresa o Negocio *',
             hint: 'Ej: Empresa XYZ',
             prefixIcon: Icons.apartment_outlined,
@@ -1008,7 +1104,10 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
           const SizedBox(height: 18),
           DropdownButtonFormField<String>(
             initialValue: _selectedProvince,
-            decoration: const InputDecoration(labelText: 'Provincia *'),
+            decoration: InputDecoration(
+              labelText: 'Provincia *',
+              errorText: _dropdownError(_selectedProvince),
+            ),
             items: _provinceNames
                 .map(
                   (province) =>
@@ -1020,7 +1119,10 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
           const SizedBox(height: 12),
           DropdownButtonFormField<String>(
             initialValue: _selectedCanton,
-            decoration: const InputDecoration(labelText: 'Cantón *'),
+            decoration: InputDecoration(
+              labelText: 'Cantón *',
+              errorText: _dropdownError(_selectedCanton),
+            ),
             items: cantons
                 .map(
                   (canton) =>
@@ -1032,7 +1134,10 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
           const SizedBox(height: 12),
           DropdownButtonFormField<String>(
             initialValue: _selectedParish,
-            decoration: const InputDecoration(labelText: 'Parroquia *'),
+            decoration: InputDecoration(
+              labelText: 'Parroquia *',
+              errorText: _dropdownError(_selectedParish),
+            ),
             items: parishes
                 .map(
                   (parish) =>
@@ -1044,6 +1149,8 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
           const SizedBox(height: 12),
           AppTextField(
             controller: _calleController,
+            hasError: _hasFieldError(_calleController),
+            errorAnimationKey: _validationAttempt,
             label: 'Calle Principal *',
             hint: 'Ej: Calle 10 de Agosto',
             prefixIcon: Icons.add_road_outlined,
@@ -1051,6 +1158,8 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
           const SizedBox(height: 12),
           AppTextField(
             controller: _numeroController,
+            hasError: _hasFieldError(_numeroController),
+            errorAnimationKey: _validationAttempt,
             label: 'Número *',
             hint: 'Ej: 123-45',
             prefixIcon: Icons.numbers_outlined,
@@ -1065,7 +1174,10 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
           const SizedBox(height: 12),
           DropdownButtonFormField<String>(
             initialValue: _tipoVivienda,
-            decoration: const InputDecoration(labelText: 'Tipo de Vivienda *'),
+            decoration: InputDecoration(
+              labelText: 'Tipo de Vivienda *',
+              errorText: _dropdownError(_tipoVivienda),
+            ),
             items: const [
               DropdownMenuItem(value: 'PROPIA', child: Text('PROPIA')),
               DropdownMenuItem(value: 'ARRENDADA', child: Text('ALQUILADA')),
@@ -1150,6 +1262,8 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
                 const SizedBox(height: 12),
                 AppTextField(
                   controller: _ingresoController,
+                  hasError: _hasFieldError(_ingresoController),
+                  errorAnimationKey: _validationAttempt,
                   label: 'Ingreso Mensual (USD) *',
                   hint: 'Ej: 1500',
                   prefixIcon: Icons.south_west_outlined,
@@ -1160,6 +1274,8 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
                 const SizedBox(height: 12),
                 AppTextField(
                   controller: _egresoController,
+                  hasError: _hasFieldError(_egresoController),
+                  errorAnimationKey: _validationAttempt,
                   label: 'Egreso Mensual (USD) *',
                   hint: 'Ej: 1000',
                   prefixIcon: Icons.north_east_outlined,
@@ -1208,6 +1324,10 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
                         children: [
                           AppTextField(
                             controller: reference.nombreCompletoController,
+                            hasError: _hasFieldError(
+                              reference.nombreCompletoController,
+                            ),
+                            errorAnimationKey: _validationAttempt,
                             label: 'Nombre Completo *',
                             hint: 'Ej: María García',
                             prefixIcon: Icons.person_outline,
@@ -1248,6 +1368,10 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
                           const SizedBox(height: 12),
                           AppTextField(
                             controller: reference.telefonoController,
+                            hasError: _hasFieldError(
+                              reference.telefonoController,
+                            ),
+                            errorAnimationKey: _validationAttempt,
                             label: 'Teléfono *',
                             hint: 'Ej: 0987654321',
                             prefixIcon: Icons.phone_outlined,
@@ -1294,6 +1418,8 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
           const SizedBox(height: 18),
           AppTextField(
             controller: _conyugeCedulaController,
+            hasError: _hasFieldError(_conyugeCedulaController),
+            errorAnimationKey: _validationAttempt,
             label: 'Cédula del Cónyuge *',
             hint: 'Ej: 1234567890',
             prefixIcon: Icons.credit_card_outlined,
@@ -1301,6 +1427,8 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
           const SizedBox(height: 12),
           AppTextField(
             controller: _conyugeNombresController,
+            hasError: _hasFieldError(_conyugeNombresController),
+            errorAnimationKey: _validationAttempt,
             label: 'Nombres *',
             hint: 'Ej: María',
             prefixIcon: Icons.person_outline,
@@ -1308,6 +1436,8 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
           const SizedBox(height: 12),
           AppTextField(
             controller: _conyugeApellidosController,
+            hasError: _hasFieldError(_conyugeApellidosController),
+            errorAnimationKey: _validationAttempt,
             label: 'Apellidos *',
             hint: 'Ej: García Pérez',
             prefixIcon: Icons.person_outline,
@@ -1315,6 +1445,8 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
           const SizedBox(height: 12),
           AppTextField(
             controller: _conyugeFechaNacimientoController,
+            hasError: _hasFieldError(_conyugeFechaNacimientoController),
+            errorAnimationKey: _validationAttempt,
             label: 'Fecha de Nacimiento *',
             hint: 'Seleccionar',
             prefixIcon: Icons.calendar_month_outlined,
@@ -1324,6 +1456,8 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
           const SizedBox(height: 12),
           AppTextField(
             controller: _conyugeTelefonoController,
+            hasError: _hasFieldError(_conyugeTelefonoController),
+            errorAnimationKey: _validationAttempt,
             label: 'Teléfono *',
             hint: 'Ej: 0987654321',
             prefixIcon: Icons.phone_outlined,
@@ -1546,11 +1680,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
                 children: [
                   _buildHeader(context, compact: compactLayout),
                   SizedBox(height: compactLayout ? 8 : 20),
-                  StepProgress(
-                    currentStep: _step + 1,
-                    totalSteps: _totalSteps,
-                    label: 'Completa tu formulario',
-                  ),
+                  StepProgress(currentStep: _step + 1, totalSteps: _totalSteps),
                   SizedBox(height: compactLayout ? 8 : 16),
                   if (_error != null) ...[
                     AppErrorView(message: _error!),

@@ -1,539 +1,131 @@
+import { useEffect, useMemo, useState, type ReactNode } from "react";
+import {
+  Activity, AlertCircle, BarChart3, Bell, CheckCircle2, ChevronRight,
+  Clock3, FileCheck2, FileText, LayoutDashboard, LogOut, Menu, Search,
+  Settings2, ShieldCheck, SlidersHorizontal, TrendingUp, User, Users, X,
+} from "lucide-react";
 import type { CooperativeCreditRequest, CooperativeOfferDefaults, CreditRequirement } from "../types/credit";
-import { useEffect, useState } from "react";
-import { FileText, TrendingUp, Clock, User, ArrowUpRight, Search, SlidersHorizontal, CheckCircle2 } from "lucide-react";
-import type { ReactNode } from "react";
-
-import Navbar from "../components/layout/Navbar";
-import Footer from "../components/layout/Footer";
+import { decideCreditRequest, decideGuaranteeForCreditRequest, getCooperativeOfferDefaults, getMyCooperativeRequests, requestGuaranteeForCreditRequest, type GuaranteeDecision } from "../api/creditRequests.api";
+import { getErrorMessage } from "../api/errors";
+import { getOnboardingForCooperative, type OnboardingCooperativeDetail } from "../api/onboarding.api";
+import { useAuth } from "../context/useAuth";
+import { CreditDecision } from "../types/creditDecision";
+import { CreditEstado } from "../types/creditEstado";
 import PreApprovalModal from "../components/credit/PreApprovalModal";
 
-import {
-  getMyCooperativeRequests,
-  decideCreditRequest,
-  requestGuaranteeForCreditRequest,
-  decideGuaranteeForCreditRequest,
-  type GuaranteeDecision,
-  getCooperativeOfferDefaults,
-} from "../api/creditRequests.api";
-import { getOnboardingForCooperative, type OnboardingCooperativeDetail } from "../api/onboarding.api";
-import { getErrorMessage } from "../api/errors";
-
-import { CreditEstado } from "../types/creditEstado";
-import { CreditDecision } from "../types/creditDecision";
-
 type Filter = "all" | CreditEstado;
+type Section = "overview" | "requests" | "analytics" | "settings";
+type Stats = { total: number; pending: number; approved: number; rejected: number };
 
-interface StatCardProps {
-  label: string;
-  value: number;
-  icon: ReactNode;
-}
-
-interface FilterButtonProps {
-  label: string;
-  active: boolean;
-  onClick: () => void;
-}
+const navItems: { id: Section; label: string; icon: typeof LayoutDashboard }[] = [
+  { id: "overview", label: "Resumen", icon: LayoutDashboard },
+  { id: "requests", label: "Solicitudes", icon: FileText },
+  { id: "analytics", label: "Rendimiento", icon: BarChart3 },
+  { id: "settings", label: "Configuración", icon: Settings2 },
+];
 
 export default function DashboardCooperative() {
+  const { user, logout } = useAuth();
   const [requests, setRequests] = useState<CooperativeCreditRequest[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [section, setSection] = useState<Section>("overview");
   const [filter, setFilter] = useState<Filter>("all");
+  const [search, setSearch] = useState("");
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [processingId, setProcessingId] = useState<number | null>(null);
   const [actionError, setActionError] = useState("");
-  const [showPreApprovalModal, setShowPreApprovalModal] = useState(false);
-  const [selectedRequest, setSelectedRequest] =
-    useState<CooperativeCreditRequest | null>(null);
+  const [selectedRequest, setSelectedRequest] = useState<CooperativeCreditRequest | null>(null);
   const [offerDefaults, setOfferDefaults] = useState<CooperativeOfferDefaults | null>(null);
-  const [loadingOfferDefaults, setLoadingOfferDefaults] = useState(false);
+  const [showPreApproval, setShowPreApproval] = useState(false);
+  const [loadingOffer, setLoadingOffer] = useState(false);
   const [applicantDetail, setApplicantDetail] = useState<OnboardingCooperativeDetail | null>(null);
-  const [loadingApplicant, setLoadingApplicant] = useState(false);
-  const [search, setSearch] = useState("");
 
-  useEffect(() => {
-    void loadRequests();
-  }, []);
+  useEffect(() => { void loadRequests(); }, []);
 
   const loadRequests = async () => {
     setIsLoading(true);
-    setActionError("");
-    try {
-      const data = await getMyCooperativeRequests();
-      setRequests(data);
-    } catch (error) {
-      setActionError(
-        getErrorMessage(error, "No se pudieron cargar las solicitudes."),
-      );
-    } finally {
-      setIsLoading(false);
-    }
+    try { setRequests(await getMyCooperativeRequests()); }
+    catch (error) { setActionError(getErrorMessage(error, "No se pudieron cargar las solicitudes.")); }
+    finally { setIsLoading(false); }
   };
 
-  const handleDecision = async (
-    solicitudId: number,
-    decision: CreditDecision,
-    offer?: { tasaAnual: number; plazoMeses: number },
-    requirements?: CreditRequirement[],
-  ) => {
-    try {
-      setProcessingId(solicitudId);
-      setActionError("");
-      await decideCreditRequest(solicitudId, decision, offer, requirements);
-      await loadRequests();
-    } catch (error) {
-      setActionError(
-        getErrorMessage(error, "No se pudo registrar la decision."),
-      );
-      throw error;
-    } finally {
-      setProcessingId(null);
-    }
-  };
-
-  const handleOpenPreApprovalModal = async (request: CooperativeCreditRequest) => {
-    setSelectedRequest(request);
-    setShowPreApprovalModal(true);
-    setOfferDefaults(null);
-    setLoadingOfferDefaults(true);
-    try {
-      setOfferDefaults(await getCooperativeOfferDefaults(request.solicitudId));
-    } catch (error) {
-      setActionError(getErrorMessage(error, "No se pudo cargar la tasa estándar de la cooperativa."));
-    } finally {
-      setLoadingOfferDefaults(false);
-    }
-  };
-
-  const handleClosePreApprovalModal = () => {
-    setShowPreApprovalModal(false);
-    setSelectedRequest(null);
-    setOfferDefaults(null);
-  };
-
-  const handleApproveWithoutGuarantee = async (
-    solicitudId: number,
-    offer: { tasaAnual: number; plazoMeses: number },
-    requirements: CreditRequirement[],
-  ) => {
-    await handleDecision(solicitudId, CreditDecision.PRE_APROBAR, offer, requirements);
-  };
-
-  const handleViewApplicant = async (solicitudId: number) => {
-    setLoadingApplicant(true);
-    setActionError("");
-    try {
-      setApplicantDetail(await getOnboardingForCooperative(solicitudId));
-    } catch (error) {
-      setActionError(getErrorMessage(error, "No se pudo cargar la información del solicitante."));
-    } finally {
-      setLoadingApplicant(false);
-    }
-  };
-
-  const handleApproveWithGuarantee = async (solicitudId: number, requirements: CreditRequirement[]) => {
-    try {
-      setProcessingId(solicitudId);
-      setActionError("");
-      await requestGuaranteeForCreditRequest(solicitudId, requirements);
-      await loadRequests();
-    } catch (error) {
-      setActionError(
-        getErrorMessage(error, "No se pudo registrar la solicitud de garante."),
-      );
-      throw error;
-    } finally {
-      setProcessingId(null);
-    }
-  };
-
-  const handleGuaranteeDecision = async (
-    solicitudId: number,
-    decision: GuaranteeDecision,
-  ) => {
-    try {
-      setProcessingId(solicitudId);
-      setActionError("");
-      await decideGuaranteeForCreditRequest(solicitudId, decision);
-      setApplicantDetail(null);
-      await loadRequests();
-    } catch (error) {
-      setActionError(
-        getErrorMessage(error, "No se pudo registrar la decisión del garante."),
-      );
-    } finally {
-      setProcessingId(null);
-    }
-  };
-
-  const filteredRequests = requests.filter((r) =>
-    (filter === "all" || r.estado === filter) &&
-    `${r.solicitudId} ${r.nombreSolicitante ?? ""} ${r.tipo}`.toLowerCase().includes(search.toLowerCase()),
-  );
-
-  const stats = {
+  const stats = useMemo<Stats>(() => ({
     total: requests.length,
-    enviada: requests.filter((r) => r.estado === CreditEstado.ENVIADA).length,
-    preAprobada: requests.filter(
-      (r) => r.estado === CreditEstado.PRE_APROBADA,
-    ).length,
-    rechazada: requests.filter((r) => r.estado === CreditEstado.RECHAZADA)
-      .length,
+    pending: requests.filter((request) => request.estado === CreditEstado.ENVIADA).length,
+    approved: requests.filter((request) => request.estado === CreditEstado.PRE_APROBADA).length,
+    rejected: requests.filter((request) => request.estado === CreditEstado.RECHAZADA).length,
+  }), [requests]);
+
+  const filteredRequests = useMemo(() => requests.filter((request) => {
+    const matchesStatus = filter === "all" || request.estado === filter;
+    const haystack = `${request.solicitudId} ${request.nombreSolicitante ?? ""} ${request.tipo}`.toLowerCase();
+    return matchesStatus && haystack.includes(search.toLowerCase());
+  }), [filter, requests, search]);
+
+  const openSection = (next: Section) => { setSection(next); setSidebarOpen(false); };
+  const handleDecision = async (id: number, decision: CreditDecision, offer?: { tasaAnual: number; plazoMeses: number }, requirements?: CreditRequirement[]) => {
+    try { setProcessingId(id); setActionError(""); await decideCreditRequest(id, decision, offer, requirements); await loadRequests(); }
+    catch (error) { setActionError(getErrorMessage(error, "No se pudo registrar la decisión.")); throw error; }
+    finally { setProcessingId(null); }
+  };
+  const openPreApproval = async (request: CooperativeCreditRequest) => {
+    setSelectedRequest(request); setShowPreApproval(true); setLoadingOffer(true); setOfferDefaults(null);
+    try { setOfferDefaults(await getCooperativeOfferDefaults(request.solicitudId)); }
+    catch (error) { setActionError(getErrorMessage(error, "No se pudo cargar la tasa estándar.")); }
+    finally { setLoadingOffer(false); }
+  };
+  const viewApplicant = async (id: number) => {
+    try { setApplicantDetail(await getOnboardingForCooperative(id)); }
+    catch (error) { setActionError(getErrorMessage(error, "No se pudo cargar la información del solicitante.")); }
+  };
+  const requestGuarantee = async (id: number, requirements: CreditRequirement[]) => {
+    try { setProcessingId(id); await requestGuaranteeForCreditRequest(id, requirements); await loadRequests(); }
+    catch (error) { setActionError(getErrorMessage(error, "No se pudo solicitar el garante.")); throw error; }
+    finally { setProcessingId(null); }
+  };
+  const decideGuarantee = async (id: number, decision: GuaranteeDecision) => {
+    try { setProcessingId(id); await decideGuaranteeForCreditRequest(id, decision); setApplicantDetail(null); await loadRequests(); }
+    catch (error) { setActionError(getErrorMessage(error, "No se pudo registrar la decisión del garante.")); }
+    finally { setProcessingId(null); }
   };
 
-  return (
-    <div className="portal-shell flex min-h-screen flex-col bg-[#f5f8fc]">
-      <Navbar />
-
-      <main className="flex-1 max-w-7xl mx-auto px-4 py-8 w-full">
-        <div className="relative mb-8 overflow-hidden rounded-[2rem] bg-gradient-to-br from-[#0b1d42] via-[#123f77] to-[#0ea5a4] p-6 text-white shadow-2xl shadow-cyan-950/20 sm:p-10">
-          <div className="absolute -right-20 -top-32 h-80 w-80 rounded-full border-[34px] border-white/10" />
-          <p className="mb-2 text-sm font-semibold uppercase tracking-[0.18em] text-cyan-100">Centro de operaciones</p>
-          <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
-            <div>
-              <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl">Panel de cooperativa</h1>
-              <p className="mt-2 text-blue-100">Gestiona solicitudes, evalúa perfiles y toma decisiones con claridad.</p>
-            </div>
-            <div className="rounded-2xl border border-white/20 bg-white/10 px-4 py-3 text-sm backdrop-blur">
-              <span className="block text-blue-100">Bandeja actualizada</span>
-              <span className="font-semibold">{requests.length} solicitudes registradas</span>
-            </div>
-          </div>
-        </div>
-
-        {actionError && (
-          <div className="mb-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-            {actionError}
-          </div>
-        )}
-
-        <div className="mb-8 grid grid-cols-2 gap-3 lg:grid-cols-4">
-          <StatCard label="Total recibidas" value={stats.total} icon={<FileText />} />
-          <StatCard label="Enviadas" value={stats.enviada} icon={<Clock />} />
-          <StatCard
-            label="Pre aprobadas"
-            value={stats.preAprobada}
-            icon={<TrendingUp />}
-          />
-          <StatCard
-            label="Rechazadas"
-            value={stats.rechazada}
-            icon={<TrendingUp />}
-          />
-        </div>
-
-        <div className="portal-panel mb-6 p-4 sm:p-5">
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-            <div className="relative w-full lg:max-w-sm">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-              <input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Buscar por solicitante o número" className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 pl-10 pr-4 text-sm outline-none transition focus:border-cyan-400 focus:bg-white focus:ring-4 focus:ring-cyan-100" />
-            </div>
-            <div className="flex flex-wrap items-center gap-2">
-              <SlidersHorizontal className="mr-1 h-4 w-4 text-slate-400" />
-            <FilterButton
-              label="Todas"
-              active={filter === "all"}
-              onClick={() => setFilter("all")}
-            />
-            <FilterButton
-              label="Enviadas"
-              active={filter === CreditEstado.ENVIADA}
-              onClick={() => setFilter(CreditEstado.ENVIADA)}
-            />
-            <FilterButton
-              label="Pre aprobadas"
-              active={filter === CreditEstado.PRE_APROBADA}
-              onClick={() => setFilter(CreditEstado.PRE_APROBADA)}
-            />
-            <FilterButton
-              label="Rechazadas"
-              active={filter === CreditEstado.RECHAZADA}
-              onClick={() => setFilter(CreditEstado.RECHAZADA)}
-            />
-            </div>
-          </div>
-        </div>
-
-        {isLoading ? (
-          <Loading />
-        ) : filteredRequests.length === 0 ? (
-          <Empty />
-        ) : (
-          <div className="flex flex-col gap-4">
-            {filteredRequests.map((r) => (
-              <div
-                key={r.solicitudId}
-                className="portal-panel p-5 transition hover:-translate-y-0.5 hover:border-cyan-200 hover:shadow-xl sm:p-6"
-              >
-                <div className="flex flex-col lg:flex-row gap-6">
-                  <div className="flex-1 space-y-4">
-                    <div className="flex items-center justify-between gap-3">
-                      <div className="flex items-center gap-3">
-                        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#123f77] font-bold text-white shadow-lg shadow-blue-900/20">
-                          {r.solicitudId}
-                        </div>
-                        <div>
-                          <p className="text-xs font-bold uppercase tracking-[0.14em] text-slate-400">Expediente financiero</p>
-                          <h3 className="text-xl font-bold text-slate-900">Solicitud #{r.solicitudId}</h3>
-                        </div>
-                      </div>
-
-                      <span
-                        className={`px-4 py-1.5 rounded-full text-xs font-semibold ${
-                          r.estado === CreditEstado.ENVIADA ||
-                          r.estado === CreditEstado.SOLICITANDO_GARANTE
-                            ? "bg-amber-50 text-amber-700 ring-1 ring-amber-200"
-                            : r.estado === CreditEstado.PRE_APROBADA
-                              ? "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200"
-                              : "bg-red-50 text-red-700 ring-1 ring-red-200"
-                        }`}
-                      >
-                        {r.estado}
-                      </span>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="rounded-xl border border-cyan-100 bg-cyan-50 p-4">
-                        <p className="mb-1 text-xs font-medium text-cyan-700">
-                          Monto solicitado
-                        </p>
-                        <p className="text-2xl font-bold text-slate-900">
-                          ${r.montoSolicitado.toLocaleString("es-EC")}
-                        </p>
-                      </div>
-
-                      <div className="rounded-xl border border-slate-100 bg-slate-50 p-4">
-                        <p className="mb-1 text-xs font-medium text-slate-500">
-                          Tipo de credito
-                        </p>
-                        <p className="text-lg font-semibold text-slate-900">
-                          {r.tipo}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center justify-between rounded-xl bg-slate-50 p-3">
-                      <div>
-                      <p className="text-xs text-gray-600 font-medium">
-                        Fecha de solicitud
-                      </p>
-                      <p className="text-sm text-gray-800 font-medium mt-1">
-                        {new Date(r.fechaSolicitud).toLocaleString("es-EC")}
-                      </p>
-                      </div>
-                      <CheckCircle2 className="h-5 w-5 text-emerald-500" />
-                    </div>
-
-                    <div className="flex gap-4 rounded-xl border border-cyan-100 bg-cyan-50 p-4">
-                      <User className="h-10 w-10 text-cyan-700" />
-                      <div className="flex-1">
-                        <p className="font-semibold text-gray-800 text-sm mb-2">
-                          Datos del solicitante
-                        </p>
-                        <p className="text-base font-bold text-slate-900">
-                          {r.nombreSolicitante || "Nombre pendiente de onboarding"}
-                        </p>
-                        <p className="mt-1 text-sm text-slate-600">
-                          Cédula: <span className="font-bold tracking-wide">{r.cedulaSolicitante || "Pendiente"}</span>
-                        </p>
-                        <button
-                          onClick={() => void handleViewApplicant(r.solicitudId)}
-                          disabled={loadingApplicant}
-                          className="mt-2 text-sm font-semibold text-[#123f77] hover:underline disabled:cursor-wait disabled:opacity-50"
-                        >
-                          {loadingApplicant ? "Cargando información..." : "Ver información completa"}
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="lg:w-64 flex flex-col justify-center gap-3">
-                    <button
-                      onClick={() => void handleOpenPreApprovalModal(r)}
-                      disabled={
-                        r.estado !== CreditEstado.ENVIADA ||
-                        processingId === r.solicitudId
-                      }
-                      className={`flex w-full items-center justify-center gap-2 rounded-xl py-3 text-sm font-semibold ${
-                        r.estado === CreditEstado.ENVIADA
-                          ? "bg-emerald-600 text-white transition hover:bg-emerald-700"
-                          : "bg-slate-100 text-slate-400"
-                      }`}
-                    >
-                      {processingId === r.solicitudId
-                        ? "Procesando..."
-                        : "Pre-aprobar"}
-                      {r.estado === CreditEstado.ENVIADA && <ArrowUpRight className="h-4 w-4" />}
-                    </button>
-
-                    <button
-                      onClick={() =>
-                        void handleDecision(
-                          r.solicitudId,
-                          CreditDecision.RECHAZAR,
-                        )
-                      }
-                      disabled={
-                        r.estado !== CreditEstado.ENVIADA ||
-                        processingId === r.solicitudId
-                      }
-                      className={`w-full py-3 rounded-xl text-sm font-semibold ${
-                        r.estado === CreditEstado.ENVIADA
-                          ? "bg-red-600 text-white transition hover:bg-red-700"
-                          : "bg-slate-100 text-slate-400"
-                      }`}
-                    >
-                      {processingId === r.solicitudId
-                        ? "Procesando..."
-                        : "Rechazar"}
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </main>
-
-      {selectedRequest && (
-        <PreApprovalModal
-          open={showPreApprovalModal}
-          onClose={handleClosePreApprovalModal}
-          solicitudId={selectedRequest.solicitudId}
-          monto={selectedRequest.montoSolicitado}
-          tipo={selectedRequest.tipo}
-          defaults={offerDefaults}
-          loadingDefaults={loadingOfferDefaults}
-          onApproveWithoutGuarantee={handleApproveWithoutGuarantee}
-          onApproveWithGuarantee={handleApproveWithGuarantee}
-          isLoading={processingId === selectedRequest.solicitudId}
-        />
-      )}
-
-      {applicantDetail && (
-        <ApplicantDetailModal
-          detail={applicantDetail}
-          onClose={() => setApplicantDetail(null)}
-          onGuaranteeDecision={(decision) =>
-            void handleGuaranteeDecision(applicantDetail.solicitudId, decision)
-          }
-          isProcessing={processingId === applicantDetail.solicitudId}
-        />
-      )}
-
-      <Footer />
-    </div>
-  );
-}
-
-function ApplicantDetailModal({
-  detail,
-  onClose,
-  onGuaranteeDecision,
-  isProcessing,
-}: {
-  detail: OnboardingCooperativeDetail;
-  onClose: () => void;
-  onGuaranteeDecision?: (decision: GuaranteeDecision) => void;
-  isProcessing?: boolean;
-}) {
-  if (detail.personas.length === 0) return null;
-  const money = (value?: number) => value == null ? "—" : `$${value.toLocaleString("es-EC", { minimumFractionDigits: 2 })}`;
-  const guarantee = detail.personas.find((person) => person.rol === "GARANTE");
-
-  return (
-    <div className="fixed inset-0 z-[80] flex items-center justify-center bg-black/50 p-4">
-      <div className="max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-2xl bg-white p-6 shadow-2xl">
-        <div className="mb-6 flex items-start justify-between"><div><h2 className="text-2xl font-bold text-gray-900">Información de la solicitud</h2><p className="text-sm text-gray-600">Solicitud #{detail.solicitudId}</p></div><button onClick={onClose} className="rounded-lg px-3 py-2 text-gray-600 hover:bg-gray-100">Cerrar</button></div>
-        {detail.personas.map((person) => (
-          <div key={`${person.rol}-${person.cedula}`} className="mb-6">
-            <h3 className="mb-3 text-lg font-bold text-gray-800">
-              {person.rol === "GARANTE" ? "Información del garante" : "Información del solicitante"}
-            </h3>
-            <div className="grid gap-4 md:grid-cols-2">
-              <DetailSection title="Datos personales"><Detail label="Nombre" value={`${person.nombres} ${person.apellidos}`} /><Detail label="Cédula" value={person.cedula} /><Detail label="Fecha de nacimiento" value={person.fechaNacimiento} /><Detail label="Estado civil" value={person.estadoCivil} /><Detail label="Teléfono" value={person.telefono} /></DetailSection>
-              <DetailSection title="Trabajo"><Detail label="Ocupación" value={person.ocupacion} /><Detail label="Empresa" value={person.empresaTrabajo} /><Detail label="Negocio" value={person.actividadEconomica?.nombreNegocio} /><Detail label="Tiempo de actividad" value={person.actividadEconomica?.tiempoActividad} /></DetailSection>
-              <DetailSection title="Dirección"><Detail label="Provincia" value={person.direccion?.provincia} /><Detail label="Cantón" value={person.direccion?.canton} /><Detail label="Barrio" value={person.direccion?.barrio} /><Detail label="Dirección" value={[person.direccion?.callePrincipal, person.direccion?.numero].filter(Boolean).join(" ")} /><Detail label="Vivienda" value={person.direccion?.tipoVivienda} /></DetailSection>
-              <DetailSection title="Situación económica"><Detail label="Ingreso mensual" value={money(person.ingresoEgreso?.ingresoMensual)} /><Detail label="Egreso mensual" value={money(person.ingresoEgreso?.egresoMensual)} /><Detail label="Teléfono del negocio" value={person.actividadEconomica?.telefonoNegocio} /></DetailSection>
-            </div>
-            {person.referencias && person.referencias.length > 0 && <DetailSection title="Referencias"><div className="space-y-2">{person.referencias.map((reference, index) => <p key={`${reference.telefono}-${index}`} className="text-sm text-gray-700">{reference.nombreCompleto} · {reference.tipo} · {reference.telefono}</p>)}</div></DetailSection>}
-          </div>
-        ))}
-        {guarantee && onGuaranteeDecision && (
-          <div className="flex flex-col gap-3 border-t border-gray-200 pt-5 sm:flex-row sm:justify-end">
-            <button
-              onClick={() => onGuaranteeDecision("SOLICITAR_NUEVO")}
-              disabled={isProcessing}
-              className="rounded-lg bg-amber-600 px-4 py-2 font-semibold text-white hover:bg-amber-700 disabled:opacity-50"
-            >
-              Solicitar nuevo garante
-            </button>
-            <button
-              onClick={() => onGuaranteeDecision("ACEPTAR")}
-              disabled={isProcessing}
-              className="rounded-lg bg-green-600 px-4 py-2 font-semibold text-white hover:bg-green-700 disabled:opacity-50"
-            >
-              Aceptar garante
-            </button>
-          </div>
-        )}
+  return <div className="coop-dashboard min-h-screen bg-[#f4f7fb] text-slate-900">
+    <div className="flex min-h-screen">
+      <aside className={`fixed inset-y-0 left-0 z-50 flex w-[272px] -translate-x-full flex-col bg-[#081b44] text-white transition-transform duration-300 lg:static lg:translate-x-0 ${sidebarOpen ? "translate-x-0" : ""}`}>
+        <div className="flex h-24 items-center gap-3 border-b border-white/10 px-7"><div className="grid h-11 w-11 place-items-center rounded-2xl bg-[#75d858] text-xl font-black text-[#081b44]">D</div><div><p className="text-lg font-extrabold">DINEROP</p><p className="text-[10px] font-bold uppercase tracking-[0.2em] text-blue-200">Panel cooperativo</p></div><button onClick={() => setSidebarOpen(false)} className="ml-auto lg:hidden" aria-label="Cerrar menú"><X /></button></div>
+        <div className="px-5 py-7"><p className="mb-3 px-3 text-[10px] font-bold uppercase tracking-[0.2em] text-blue-300">Centro de operaciones</p><nav className="space-y-1">{navItems.map(({ id, label, icon: Icon }) => <button key={id} onClick={() => openSection(id)} className={`flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-sm font-semibold transition ${section === id ? "bg-white text-[#123f77]" : "text-blue-100 hover:bg-white/10"}`}><Icon className="h-[18px] w-[18px]" />{label}{id === "requests" && stats.pending > 0 && <span className="ml-auto rounded-full bg-[#75d858] px-2 py-0.5 text-[10px] font-black text-[#081b44]">{stats.pending}</span>}</button>)}</nav></div>
+        <div className="mt-auto p-5"><div className="rounded-2xl border border-white/10 bg-white/5 p-4"><div className="flex items-center gap-2 text-xs font-semibold text-blue-200"><ShieldCheck className="h-4 w-4 text-[#75d858]" />Entorno seguro</div><p className="mt-3 text-xs leading-5 text-blue-200/80">Gestiona solicitudes y acompaña cada decisión con información clara.</p></div><button onClick={logout} className="mt-5 flex items-center gap-3 px-3 py-3 text-sm font-semibold text-blue-100 hover:text-white"><LogOut className="h-4 w-4" />Cerrar sesión</button></div>
+      </aside>
+      {sidebarOpen && <button className="fixed inset-0 z-40 bg-slate-950/50 lg:hidden" onClick={() => setSidebarOpen(false)} aria-label="Cerrar menú" />}
+      <div className="min-w-0 flex-1">
+        <header className="sticky top-0 z-30 flex h-20 items-center justify-between border-b border-slate-200/80 bg-white/90 px-4 backdrop-blur-xl sm:px-7"><div className="flex items-center gap-3"><button onClick={() => setSidebarOpen(true)} className="grid h-10 w-10 place-items-center rounded-xl border border-slate-200 text-slate-600 lg:hidden" aria-label="Abrir menú"><Menu className="h-5 w-5" /></button><div><p className="text-xs font-bold uppercase tracking-[0.16em] text-slate-400">{navItems.find((item) => item.id === section)?.label}</p><h1 className="text-xl font-extrabold tracking-tight text-[#0b214c] sm:text-2xl">Hola, {String(user?.name ?? "equipo").split(" ")[0]}</h1></div></div><div className="flex items-center gap-3"><button className="relative grid h-10 w-10 place-items-center rounded-xl border border-slate-200 text-slate-500" aria-label="Notificaciones"><Bell className="h-[18px] w-[18px]" /><span className="absolute right-2 top-2 h-1.5 w-1.5 rounded-full bg-[#75d858]" /></button><div className="hidden items-center gap-3 border-l border-slate-200 pl-4 sm:flex"><div className="grid h-10 w-10 place-items-center rounded-xl bg-[#e6f4ff] text-[#123f77]"><Users className="h-5 w-5" /></div><div><p className="max-w-[150px] truncate text-sm font-bold">{String(user?.name ?? "Cooperativa")}</p><p className="text-xs text-slate-500">Cuenta cooperativa</p></div></div></div></header>
+        <main className="mx-auto w-full max-w-[1500px] px-4 py-6 sm:px-7 sm:py-8">{actionError && <div className="mb-6 flex items-center gap-3 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700"><AlertCircle className="h-5 w-5" />{actionError}</div>}{section === "overview" && <Overview requests={requests} stats={stats} isLoading={isLoading} onOpenRequests={() => openSection("requests")} onViewApplicant={viewApplicant} onPreApprove={openPreApproval} />}{section === "requests" && <RequestsView requests={filteredRequests} stats={stats} isLoading={isLoading} filter={filter} search={search} setFilter={setFilter} setSearch={setSearch} processingId={processingId} onViewApplicant={viewApplicant} onPreApprove={openPreApproval} onReject={(id) => void handleDecision(id, CreditDecision.RECHAZAR)} />}{section === "analytics" && <Analytics stats={stats} />}{section === "settings" && <SettingsView name={String(user?.name ?? "Cooperativa")} />}</main>
       </div>
     </div>
-  );
+    {selectedRequest && <PreApprovalModal open={showPreApproval} onClose={() => { setShowPreApproval(false); setSelectedRequest(null); }} solicitudId={selectedRequest.solicitudId} monto={selectedRequest.montoSolicitado} tipo={selectedRequest.tipo} defaults={offerDefaults} loadingDefaults={loadingOffer} onApproveWithoutGuarantee={(id, offer, requirements) => handleDecision(id, CreditDecision.PRE_APROBAR, offer, requirements)} onApproveWithGuarantee={requestGuarantee} isLoading={processingId === selectedRequest.solicitudId} />}
+    {applicantDetail && <ApplicantModal detail={applicantDetail} onClose={() => setApplicantDetail(null)} onDecision={(decision) => void decideGuarantee(applicantDetail.solicitudId, decision)} processing={processingId === applicantDetail.solicitudId} />}
+  </div>;
 }
 
-function DetailSection({ title, children }: { title: string; children: ReactNode }) {
-  return <section className="rounded-xl border border-gray-200 p-4"><h3 className="mb-3 font-semibold text-gray-900">{title}</h3>{children}</section>;
-}
+function Overview({ requests, stats, isLoading, onOpenRequests, onViewApplicant, onPreApprove }: { requests: CooperativeCreditRequest[]; stats: Stats; isLoading: boolean; onOpenRequests: () => void; onViewApplicant: (id: number) => void; onPreApprove: (request: CooperativeCreditRequest) => void }) { return <><section className="relative mb-7 overflow-hidden rounded-[1.75rem] bg-[#0b2b61] p-6 text-white shadow-xl sm:p-8"><div className="absolute -right-16 -top-32 h-80 w-80 rounded-full border-[34px] border-white/[0.07]" /><div className="relative max-w-2xl"><p className="mb-3 flex items-center gap-2 text-xs font-bold uppercase tracking-[0.2em] text-[#91e6ff]"><Activity className="h-4 w-4" />Operación financiera</p><h2 className="text-2xl font-extrabold sm:text-3xl">Tu bandeja, más clara y accionable.</h2><p className="mt-3 max-w-xl text-sm leading-6 text-blue-100">Evalúa perfiles, revisa expedientes y responde a las personas que buscan una opción de crédito compatible.</p><button onClick={onOpenRequests} className="mt-6 inline-flex items-center gap-2 rounded-xl bg-[#75d858] px-4 py-3 text-sm font-extrabold text-[#0b2b2f]">Ver solicitudes pendientes<ChevronRight className="h-4 w-4" /></button></div></section><div className="mb-7 grid gap-4 sm:grid-cols-2 xl:grid-cols-4"><Metric label="Solicitudes recibidas" value={stats.total} icon={<FileText />} tone="blue" /><Metric label="Requieren atención" value={stats.pending} icon={<Clock3 />} tone="amber" /><Metric label="Pre aprobadas" value={stats.approved} icon={<CheckCircle2 />} tone="green" /><Metric label="Rechazadas" value={stats.rejected} icon={<TrendingUp />} tone="rose" /></div><div className="grid gap-6 xl:grid-cols-[1.4fr_0.8fr]"><section className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm sm:p-6"><div className="mb-5 flex items-center justify-between"><div><p className="text-xs font-bold uppercase tracking-[0.16em] text-slate-400">Actividad reciente</p><h3 className="mt-1 text-lg font-extrabold text-[#0b214c]">Últimas solicitudes</h3></div><button onClick={onOpenRequests} className="text-sm font-bold text-[#1261a0]">Ver todas</button></div>{isLoading ? <Loading /> : requests.length === 0 ? <Empty /> : <div className="divide-y divide-slate-100">{requests.slice(0, 4).map((request) => <RequestRow key={request.solicitudId} request={request} onViewApplicant={onViewApplicant} onPreApprove={onPreApprove} />)}</div>}</section><section className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm sm:p-6"><p className="text-xs font-bold uppercase tracking-[0.16em] text-slate-400">Estado de respuestas</p><h3 className="mt-1 text-lg font-extrabold text-[#0b214c]">Cartera actual</h3><div className="my-7 flex justify-center"><Donut stats={stats} /></div><div className="space-y-3"><Legend color="bg-[#75d858]" label="Pre aprobadas" value={stats.approved} /><Legend color="bg-[#f5b84b]" label="En revisión" value={stats.pending} /><Legend color="bg-[#f17878]" label="Rechazadas" value={stats.rejected} /></div></section></div></>; }
 
-function Detail({ label, value }: { label: string; value?: string }) {
-  return <p className="mb-2 text-sm"><span className="text-gray-500">{label}: </span><span className="font-medium text-gray-800">{value || "—"}</span></p>;
-}
+function RequestsView({ requests, stats, isLoading, filter, search, setFilter, setSearch, processingId, onViewApplicant, onPreApprove, onReject }: { requests: CooperativeCreditRequest[]; stats: Stats; isLoading: boolean; filter: Filter; search: string; setFilter: (filter: Filter) => void; setSearch: (search: string) => void; processingId: number | null; onViewApplicant: (id: number) => void; onPreApprove: (request: CooperativeCreditRequest) => void; onReject: (id: number) => void }) { const filters: Filter[] = ["all", CreditEstado.ENVIADA, CreditEstado.PRE_APROBADA, CreditEstado.RECHAZADA]; return <section><div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between"><div><p className="text-xs font-bold uppercase tracking-[0.16em] text-slate-400">Expedientes</p><h2 className="mt-1 text-2xl font-extrabold text-[#0b214c]">Solicitudes de crédito</h2><p className="mt-1 text-sm text-slate-500">Revisa cada caso y toma una decisión informada.</p></div><div className="relative w-full lg:max-w-sm"><Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" /><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Buscar solicitante o número" className="w-full rounded-xl border border-slate-200 bg-white py-3 pl-10 pr-4 text-sm outline-none focus:border-sky-400 focus:ring-4 focus:ring-sky-100" /></div></div><div className="mb-5 flex flex-wrap items-center gap-2"><SlidersHorizontal className="mr-1 h-4 w-4 text-slate-400" />{filters.map((value) => <button key={value} onClick={() => setFilter(value)} className={`rounded-lg px-3 py-2 text-xs font-bold ${filter === value ? "bg-[#123f77] text-white" : "border border-slate-200 bg-white text-slate-600"}`}>{filterLabel(value, stats)}</button>)}</div>{isLoading ? <Loading /> : requests.length === 0 ? <Empty /> : <div className="space-y-4">{requests.map((request) => <RequestCard key={request.solicitudId} request={request} processingId={processingId} onViewApplicant={onViewApplicant} onPreApprove={onPreApprove} onReject={onReject} />)}</div>}</section>; }
 
-function StatCard({ label, value, icon }: StatCardProps) {
-  return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-      <div className="flex justify-between items-start">
-        <div>
-          <p className="mb-2 text-sm font-medium text-slate-500">{label}</p>
-          <p className="text-4xl font-extrabold text-slate-900">{value}</p>
-        </div>
-        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-cyan-50 text-cyan-700">
-          {icon}
-        </div>
-      </div>
-    </div>
-  );
-}
+function RequestCard({ request, processingId, onViewApplicant, onPreApprove, onReject }: { request: CooperativeCreditRequest; processingId: number | null; onViewApplicant: (id: number) => void; onPreApprove: (request: CooperativeCreditRequest) => void; onReject: (id: number) => void }) { const pending = request.estado === CreditEstado.ENVIADA; return <article className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm sm:p-6"><div className="flex flex-col gap-5 xl:flex-row xl:items-center"><div className="flex min-w-0 flex-1 items-start gap-4"><div className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-[#e8f4fb] text-sm font-extrabold text-[#1261a0]">#{request.solicitudId}</div><div className="min-w-0 flex-1"><div className="flex flex-wrap items-center gap-2"><h3 className="font-extrabold text-slate-800">{request.nombreSolicitante || "Solicitante pendiente"}</h3><StatusBadge status={request.estado} /></div><p className="mt-1 text-sm text-slate-500">{request.tipo} · {new Date(request.fechaSolicitud).toLocaleDateString("es-EC")}</p><div className="mt-4 flex flex-wrap gap-6"><div><p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Monto solicitado</p><p className="mt-1 text-lg font-extrabold text-[#0b214c]">${request.montoSolicitado.toLocaleString("es-EC")}</p></div><div><p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Identificación</p><p className="mt-1 text-sm font-semibold text-slate-700">{request.cedulaSolicitante || "Pendiente"}</p></div></div></div></div><div className="flex flex-wrap items-center gap-2 xl:justify-end"><button onClick={() => onViewApplicant(request.solicitudId)} className="rounded-xl border border-slate-200 px-3 py-2.5 text-xs font-bold text-slate-700">Ver expediente</button><button onClick={() => onPreApprove(request)} disabled={!pending || processingId === request.solicitudId} className={`rounded-xl px-3 py-2.5 text-xs font-bold ${pending ? "bg-[#75d858] text-[#0b2b2f]" : "cursor-not-allowed bg-slate-100 text-slate-400"}`}>Pre aprobar</button><button onClick={() => onReject(request.solicitudId)} disabled={!pending || processingId === request.solicitudId} className={`rounded-xl px-3 py-2.5 text-xs font-bold ${pending ? "border border-red-200 text-red-600" : "cursor-not-allowed bg-slate-100 text-slate-400"}`}>Rechazar</button></div></div></article>; }
 
-function FilterButton({ label, active, onClick }: FilterButtonProps) {
-  return (
-    <button
-      onClick={onClick}
-      className={`px-5 py-2.5 rounded-xl font-medium ${
-        active ? "bg-[#123f77] text-white shadow-md" : "border border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
-      }`}
-    >
-      {label}
-    </button>
-  );
-}
+function RequestRow({ request, onViewApplicant, onPreApprove }: { request: CooperativeCreditRequest; onViewApplicant: (id: number) => void; onPreApprove: (request: CooperativeCreditRequest) => void }) { return <div className="flex flex-wrap items-center gap-3 py-4"><div className="grid h-9 w-9 place-items-center rounded-lg bg-slate-100 text-xs font-bold text-slate-600">#{request.solicitudId}</div><div className="min-w-[140px] flex-1"><p className="text-sm font-bold text-slate-800">{request.nombreSolicitante || "Solicitante pendiente"}</p><p className="text-xs text-slate-500">{request.tipo}</p></div><p className="text-sm font-extrabold text-[#0b214c]">${request.montoSolicitado.toLocaleString("es-EC")}</p><StatusBadge status={request.estado} /><button onClick={() => request.estado === CreditEstado.ENVIADA ? onPreApprove(request) : onViewApplicant(request.solicitudId)} className="grid h-8 w-8 place-items-center rounded-lg text-slate-400 hover:bg-slate-100" aria-label="Abrir solicitud"><ChevronRight className="h-4 w-4" /></button></div>; }
 
-function Loading() {
-  return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-16 text-center shadow-sm">
-      <div className="mx-auto h-16 w-16 animate-spin rounded-full border-4 border-cyan-100 border-t-cyan-600" />
-      <p className="mt-6 text-lg font-medium text-slate-600">
-        Cargando solicitudes...
-      </p>
-    </div>
-  );
-}
-
-function Empty() {
-  return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-16 text-center shadow-sm">
-      <FileText className="mx-auto mb-4 h-10 w-10 text-slate-400" />
-      <p className="text-xl font-semibold text-slate-700">No hay solicitudes</p>
-    </div>
-  );
-}
+function Analytics({ stats }: { stats: Stats }) { const total = Math.max(stats.total, 1); return <section><p className="text-xs font-bold uppercase tracking-[0.16em] text-slate-400">Rendimiento</p><h2 className="mt-1 text-2xl font-extrabold text-[#0b214c]">Lectura de tu operación</h2><div className="mt-6 grid gap-6 lg:grid-cols-2"><section className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm"><h3 className="font-extrabold">Distribución de solicitudes</h3><div className="mt-6 space-y-5"><Progress label="Pendientes de revisión" value={stats.pending} total={total} color="bg-[#f5b84b]" /><Progress label="Pre aprobadas" value={stats.approved} total={total} color="bg-[#75d858]" /><Progress label="Rechazadas" value={stats.rejected} total={total} color="bg-[#f17878]" /></div></section><section className="rounded-2xl bg-[#0b2b61] p-6 text-white shadow-sm"><p className="text-xs font-bold uppercase tracking-[0.16em] text-blue-200">Indicador principal</p><p className="mt-8 text-5xl font-extrabold">{Math.round((stats.approved / total) * 100)}%</p><p className="mt-2 text-sm text-blue-100">de las solicitudes actuales cuentan con una pre aprobación.</p><div className="mt-8 flex items-center gap-2 text-sm font-semibold text-[#9be985]"><TrendingUp className="h-4 w-4" />Datos calculados desde tu bandeja real</div></section></div></section>; }
+function SettingsView({ name }: { name: string }) { return <section><p className="text-xs font-bold uppercase tracking-[0.16em] text-slate-400">Cuenta</p><h2 className="mt-1 text-2xl font-extrabold text-[#0b214c]">Configuración</h2><div className="mt-6 max-w-2xl rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm"><div className="flex items-center gap-4 border-b border-slate-100 pb-5"><div className="grid h-12 w-12 place-items-center rounded-xl bg-[#e8f4fb] text-[#1261a0]"><User className="h-5 w-5" /></div><div><h3 className="font-extrabold">{name}</h3><p className="text-sm text-slate-500">Perfil de cooperativa</p></div></div><div className="mt-5 grid gap-3 sm:grid-cols-2"><Info label="Acceso" value="Cuenta cooperativa" /><Info label="Seguridad" value="Sesión protegida" /></div></div></section>; }
+function Metric({ label, value, icon, tone }: { label: string; value: number; icon: ReactNode; tone: string }) { const colors: Record<string, string> = { blue: "bg-sky-50 text-sky-700", amber: "bg-amber-50 text-amber-700", green: "bg-emerald-50 text-emerald-700", rose: "bg-rose-50 text-rose-700" }; return <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm"><div className="flex items-start justify-between"><div><p className="text-xs font-bold uppercase tracking-wide text-slate-400">{label}</p><p className="mt-3 text-3xl font-extrabold text-[#0b214c]">{value}</p></div><div className={`grid h-10 w-10 place-items-center rounded-xl ${colors[tone]}`}>{icon}</div></div></div>; }
+function filterLabel(filter: Filter, stats: Stats) { if (filter === "all") return `Todas (${stats.total})`; if (filter === CreditEstado.ENVIADA) return `Pendientes (${stats.pending})`; if (filter === CreditEstado.PRE_APROBADA) return `Pre aprobadas (${stats.approved})`; return `Rechazadas (${stats.rejected})`; }
+function StatusBadge({ status }: { status: CreditEstado }) { const color = status === CreditEstado.PRE_APROBADA ? "bg-emerald-50 text-emerald-700" : status === CreditEstado.RECHAZADA ? "bg-rose-50 text-rose-700" : status === CreditEstado.SOLICITANDO_GARANTE ? "bg-violet-50 text-violet-700" : "bg-amber-50 text-amber-700"; return <span className={`rounded-full px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wide ${color}`}>{status.replace(/_/g, " ")}</span>; }
+function Donut({ stats }: { stats: Stats }) { const total = Math.max(stats.approved + stats.pending + stats.rejected, 1); const approved = stats.approved / total * 360; const pending = stats.pending / total * 360; return <div className="grid h-40 w-40 place-items-center rounded-full" style={{ background: `conic-gradient(#75d858 0deg ${approved}deg, #f5b84b ${approved}deg ${approved + pending}deg, #f17878 ${approved + pending}deg 360deg)` }}><div className="grid h-28 w-28 place-items-center rounded-full bg-white"><span className="text-2xl font-extrabold text-[#0b214c]">{stats.total}</span></div></div>; }
+function Legend({ color, label, value }: { color: string; label: string; value: number }) { return <div className="flex items-center justify-between text-sm"><span className="flex items-center gap-2 text-slate-600"><span className={`h-2.5 w-2.5 rounded-full ${color}`} />{label}</span><b>{value}</b></div>; }
+function Progress({ label, value, total, color }: { label: string; value: number; total: number; color: string }) { const percent = Math.round(value / total * 100); return <div><div className="mb-2 flex justify-between text-sm"><span className="font-semibold text-slate-600">{label}</span><b>{percent}%</b></div><div className="h-2 overflow-hidden rounded-full bg-slate-100"><div className={`h-full rounded-full ${color}`} style={{ width: `${percent}%` }} /></div></div>; }
+function Info({ label, value }: { label: string; value: string }) { return <div className="rounded-xl bg-slate-50 p-4"><p className="text-xs text-slate-400">{label}</p><p className="mt-1 text-sm font-bold text-slate-700">{value}</p></div>; }
+function Loading() { return <div className="py-10 text-center text-sm font-medium text-slate-500"><div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-sky-100 border-t-sky-600" /><p className="mt-3">Cargando solicitudes...</p></div>; }
+function Empty() { return <div className="py-12 text-center"><FileCheck2 className="mx-auto h-10 w-10 text-slate-300" /><p className="mt-3 font-bold text-slate-600">No hay solicitudes para mostrar</p><p className="mt-1 text-sm text-slate-400">Cuando llegue una nueva solicitud aparecerá aquí.</p></div>; }
+function ApplicantModal({ detail, onClose, onDecision, processing }: { detail: OnboardingCooperativeDetail; onClose: () => void; onDecision: (decision: GuaranteeDecision) => void; processing: boolean }) { if (!detail.personas.length) return null; const money = (value?: number) => value == null ? "—" : `$${value.toLocaleString("es-EC", { minimumFractionDigits: 2 })}`; const guarantee = detail.personas.find((person) => person.rol === "GARANTE"); return <div className="fixed inset-0 z-[80] flex items-center justify-center bg-slate-950/60 p-4"><div className="max-h-[90vh] w-full max-w-4xl overflow-y-auto rounded-2xl bg-white p-6 shadow-2xl"><div className="mb-6 flex justify-between"><div><p className="text-xs font-bold uppercase tracking-wider text-slate-400">Expediente financiero</p><h2 className="mt-1 text-2xl font-extrabold text-[#0b214c]">Información de la solicitud</h2><p className="text-sm text-slate-500">Solicitud #{detail.solicitudId}</p></div><button onClick={onClose} className="rounded-xl px-3 py-2 text-sm font-bold text-slate-500 hover:bg-slate-100">Cerrar</button></div>{detail.personas.map((person) => <div key={`${person.rol}-${person.cedula}`} className="mb-6"><h3 className="mb-3 text-lg font-extrabold">{person.rol === "GARANTE" ? "Información del garante" : "Información del solicitante"}</h3><div className="grid gap-4 md:grid-cols-2"><DetailSection title="Datos personales"><Detail label="Nombre" value={`${person.nombres} ${person.apellidos}`} /><Detail label="Cédula" value={person.cedula} /><Detail label="Fecha de nacimiento" value={person.fechaNacimiento} /><Detail label="Estado civil" value={person.estadoCivil} /><Detail label="Teléfono" value={person.telefono} /></DetailSection><DetailSection title="Trabajo"><Detail label="Ocupación" value={person.ocupacion} /><Detail label="Empresa" value={person.empresaTrabajo} /><Detail label="Negocio" value={person.actividadEconomica?.nombreNegocio} /></DetailSection><DetailSection title="Dirección"><Detail label="Provincia" value={person.direccion?.provincia} /><Detail label="Cantón" value={person.direccion?.canton} /><Detail label="Barrio" value={person.direccion?.barrio} /><Detail label="Dirección" value={[person.direccion?.callePrincipal, person.direccion?.numero].filter(Boolean).join(" ")} /><Detail label="Vivienda" value={person.direccion?.tipoVivienda} /></DetailSection><DetailSection title="Situación económica"><Detail label="Ingreso mensual" value={money(person.ingresoEgreso?.ingresoMensual)} /><Detail label="Egreso mensual" value={money(person.ingresoEgreso?.egresoMensual)} /></DetailSection></div></div>)}{guarantee && <div className="flex gap-3 border-t border-slate-200 pt-5"><button onClick={() => onDecision("SOLICITAR_NUEVO")} disabled={processing} className="rounded-xl bg-amber-600 px-4 py-2.5 text-sm font-bold text-white">Solicitar nuevo garante</button><button onClick={() => onDecision("ACEPTAR")} disabled={processing} className="rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-bold text-white">Aceptar garante</button></div>}</div></div>; }
+function DetailSection({ title, children }: { title: string; children: ReactNode }) { return <section className="rounded-xl border border-slate-200 p-4"><h3 className="mb-3 text-sm font-extrabold">{title}</h3>{children}</section>; }
+function Detail({ label, value }: { label: string; value?: string }) { return <p className="mb-2 text-sm"><span className="text-slate-400">{label}: </span><span className="font-semibold text-slate-700">{value || "—"}</span></p>; }
