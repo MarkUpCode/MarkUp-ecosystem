@@ -15,7 +15,7 @@ export default function Navbar() {
   if (!user) return null;
 
   return (
-    <nav className="sticky top-0 z-30 border-b border-slate-200/80 bg-white/90 shadow-[0_8px_30px_rgba(15,23,42,0.06)] backdrop-blur-xl">
+    <nav className="sticky top-0 z-30 border-b border-white/10 bg-[#0b1d42] shadow-[0_8px_30px_rgba(11,29,66,0.2)]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center space-x-3">
@@ -27,8 +27,8 @@ export default function Navbar() {
               />
             </div>
             <div>
-              <h1 className="text-lg font-extrabold tracking-tight text-slate-950">Dinerop</h1>
-              <p className="text-xs font-medium text-slate-500">Tu portal financiero</p>
+              <h1 className="text-lg font-extrabold tracking-tight text-white">Dinerop</h1>
+              <p className="text-xs font-medium text-blue-100">Tu portal financiero</p>
             </div>
           </div>
 
@@ -37,18 +37,18 @@ export default function Navbar() {
               <ShieldCheck className="h-4 w-4" />
               Entorno seguro
             </div>
-            <button className="grid h-10 w-10 place-items-center rounded-xl text-slate-500 transition hover:bg-slate-100 hover:text-slate-900" aria-label="Notificaciones">
+            <button className="grid h-10 w-10 place-items-center rounded-xl text-blue-100 transition hover:bg-white/10 hover:text-white" aria-label="Notificaciones">
               <Bell className="h-5 w-5" />
             </button>
-            <div className="hidden items-center gap-2 rounded-2xl border border-slate-200 bg-slate-50 px-2 py-1.5 sm:flex">
-              <div className="grid h-8 w-8 place-items-center rounded-xl bg-[#123f77] text-white">
+            <div className="hidden items-center gap-2 rounded-2xl border border-white/10 bg-white/10 px-2 py-1.5 sm:flex">
+              <div className="grid h-8 w-8 place-items-center rounded-xl bg-white/15 text-white">
                 <UserRound className="h-4 w-4" />
               </div>
-              <span className="max-w-28 truncate pr-2 text-sm font-semibold text-slate-700">{user.name}</span>
+              <span className="max-w-28 truncate pr-2 text-sm font-semibold text-white">{user.name}</span>
             </div>
             <button
               onClick={handleLogout}
-              className="flex items-center space-x-2 rounded-xl px-3 py-2 text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-950 sm:px-4"
+              className="flex items-center space-x-2 rounded-xl px-3 py-2 text-blue-100 transition-colors hover:bg-white/10 hover:text-white sm:px-4"
             >
               <LogOut className="w-5 h-5" />
               <span className="font-medium">Salir</span>
