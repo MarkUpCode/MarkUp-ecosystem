@@ -7,17 +7,47 @@ export type AuthUser = Record<string, unknown> & {
   name?: string;
 };
 
+function normalizeToken(value: string) {
+  let token = value.trim();
+
+  if (token.startsWith('"') && token.endsWith('"')) {
+    try {
+      const parsed = JSON.parse(token);
+      if (typeof parsed === "string") {
+        token = parsed.trim();
+      }
+    } catch {
+      return null;
+    }
+  }
+
+  if (token.startsWith("Bearer ")) {
+    token = token.slice("Bearer ".length).trim();
+  }
+
+  return token || null;
+}
+
 export function readStoredToken() {
   const storageKeys = [AUTH_TOKEN_KEY, ...LEGACY_TOKEN_KEYS];
 
   for (const key of storageKeys) {
     const value = localStorage.getItem(key);
     if (value) {
+      const token = normalizeToken(value);
+      if (!token) {
+        continue;
+      }
+
+      if (key !== AUTH_TOKEN_KEY || token !== value) {
+        localStorage.setItem(AUTH_TOKEN_KEY, token);
+      }
+
       if (key !== AUTH_TOKEN_KEY) {
-        localStorage.setItem(AUTH_TOKEN_KEY, value);
         localStorage.removeItem(key);
       }
-      return value;
+
+      return token;
     }
   }
 
@@ -39,7 +69,12 @@ export function readStoredUser() {
 }
 
 export function storeAuthSession(token: string, user: AuthUser) {
-  localStorage.setItem(AUTH_TOKEN_KEY, token);
+  const normalizedToken = normalizeToken(token);
+  if (!normalizedToken) {
+    throw new Error("La respuesta de autenticacion contiene un token invalido.");
+  }
+
+  localStorage.setItem(AUTH_TOKEN_KEY, normalizedToken);
   localStorage.setItem(AUTH_USER_KEY, JSON.stringify(user));
 }
 
@@ -64,5 +99,5 @@ export function extractToken(payload: Record<string, unknown> | null | undefined
     payload?.jwt ??
     null;
 
-  return typeof value === "string" ? value : null;
+  return typeof value === "string" ? normalizeToken(value) : null;
 }
