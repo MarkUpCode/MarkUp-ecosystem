@@ -30,6 +30,7 @@ import Footer from "../components/layout/Footer";
 import OnboardingPopup from "../components/onboarding/OnboardingPopup";
 import NewCreditModal from "../components/credit/NewCreditModal";
 import NewInvestmentModal from "../components/investment/NewInvestmentModal";
+import CooperativeLogoMarquee from "../components/cooperative/CooperativeLogoMarquee";
 
 export default function DashboardClient() {
   const { user } = useAuth();
@@ -170,6 +171,7 @@ export default function DashboardClient() {
       <Navbar />
 
       <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+        <CooperativeLogoMarquee />
         <div className="relative mb-8 overflow-hidden rounded-[2rem] bg-gradient-to-br from-[#0b1d42] via-[#123f77] to-[#0ea5a4] p-6 text-white shadow-2xl shadow-cyan-950/20 sm:p-10">
           <div className="absolute -right-20 -top-32 h-80 w-80 rounded-full border-[34px] border-white/10" />
           <div className="absolute -bottom-28 right-28 h-56 w-56 rounded-full bg-cyan-300/10 blur-2xl" />

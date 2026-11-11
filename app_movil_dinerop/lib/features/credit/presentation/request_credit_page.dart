@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../app/providers.dart';
 import '../../../core/data/locations/ecuador_locations.dart';
@@ -139,21 +142,65 @@ class _RequestCreditPageState extends ConsumerState<RequestCreditPage> {
       final response = await ref
           .read(creditRepositoryProvider)
           .createCreditRequest(payload);
-      setState(() {
-        _success = response.message.isNotEmpty
-            ? response.message
-            : 'Solicitud enviada correctamente.';
-      });
       ref.invalidate(dashboardCreditRequestsProvider);
+
+      if (!mounted) return;
+      await _showSubmissionConfirmation(response.cooperativasNotificadas);
+      if (mounted) context.go('/dashboard');
     } catch (error) {
+      if (!mounted) return;
       setState(() {
         _error = error is AppException
             ? error.message
             : AppErrorMessages.generic;
       });
     } finally {
-      setState(() => _isLoading = false);
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
+  }
+
+  Future<void> _showSubmissionConfirmation(int? cooperativasNotificadas) async {
+    final count = cooperativasNotificadas;
+    final destination = count == null
+        ? 'a las cooperativas disponibles'
+        : 'a $count ${count == 1 ? 'cooperativa' : 'cooperativas'}';
+
+    late final Timer autoCloseTimer;
+    final dialogFuture = showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) {
+        return AlertDialog(
+          icon: Icon(
+            Icons.check_circle_rounded,
+            color: Theme.of(dialogContext).colorScheme.primary,
+            size: 48,
+          ),
+          title: const Text('Solicitud enviada'),
+          content: Text(
+            'Enviamos tu solicitud correctamente $destination. '
+            'Ahora espera cualquier novedad; te avisaremos cuando haya una respuesta.',
+            textAlign: TextAlign.center,
+          ),
+          actionsAlignment: MainAxisAlignment.center,
+          actions: [
+            FilledButton(
+              onPressed: () => Navigator.of(dialogContext).pop(),
+              child: const Text('Ir al menú principal'),
+            ),
+          ],
+        );
+      },
+    );
+    autoCloseTimer = Timer(const Duration(seconds: 4), () {
+      if (mounted && Navigator.of(context).canPop()) {
+        Navigator.of(context).pop();
+      }
+    });
+    await dialogFuture;
+    autoCloseTimer.cancel();
   }
 
   @override
@@ -170,7 +217,7 @@ class _RequestCreditPageState extends ConsumerState<RequestCreditPage> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Text(
-                    'Completa la información mínima que el backend requiere.',
+                    'Completa la información mínima.',
                     style: Theme.of(context).textTheme.bodyMedium,
                   ),
                   const SizedBox(height: 18),

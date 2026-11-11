@@ -982,6 +982,7 @@ class _AcceptedOfferNotice extends StatelessWidget {
   final VoidCallback onOpenDocuments;
   final VoidCallback onPreviewPdf;
 
+
   @override
   Widget build(BuildContext context) => Container(
     width: double.infinity,
@@ -1006,41 +1007,50 @@ class _AcceptedOfferNotice extends StatelessWidget {
             ),
           ],
         ),
-        const SizedBox(height: 12),
-        Row(
-          children: [
-            Expanded(
-              child: OutlinedButton.icon(
-                onPressed: onOpenDocuments,
-                icon: const Icon(Icons.list_alt_outlined),
-                label: const Text('Requisitos'),
+
+        const SizedBox(height: 16),
+
+        // Botón de requisitos
+        SizedBox(
+          width: double.infinity,
+          child: OutlinedButton.icon(
+            onPressed: onOpenDocuments,
+            icon: const Icon(Icons.list_alt_outlined),
+            label: const Text('Ver requisitos'),
+          ),
+        ),
+
+        const SizedBox(height: 10),
+
+        // Botón de ubicación
+        if (offer.mapsUrl?.isNotEmpty == true) ...[
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton.icon(
+              onPressed: () => launchUrl(
+                Uri.parse(offer.mapsUrl!),
+                mode: LaunchMode.externalApplication,
               ),
+              icon: const Icon(Icons.map_outlined),
+              label: const Text('Ver ubicación'),
             ),
-            const SizedBox(width: 8),
-            if (offer.mapsUrl?.isNotEmpty == true)
-              Expanded(
-                child: OutlinedButton.icon(
-                  onPressed: () => launchUrl(
-                    Uri.parse(offer.mapsUrl!),
-                    mode: LaunchMode.externalApplication,
-                  ),
-                  icon: const Icon(Icons.map_outlined),
-                  label: const Text('Maps'),
-                ),
-              ),
-            if (offer.mapsUrl?.isNotEmpty == true) const SizedBox(width: 8),
-            Expanded(
-              child: FilledButton.icon(
-                onPressed: onPreviewPdf,
-                icon: const Icon(Icons.picture_as_pdf_outlined),
-                label: const Text('Ver PDF'),
-              ),
-            ),
-          ],
+          ),
+          const SizedBox(height: 10),
+        ],
+
+        // Botón de PDF
+        SizedBox(
+          width: double.infinity,
+          child: FilledButton.icon(
+            onPressed: onPreviewPdf,
+            icon: const Icon(Icons.picture_as_pdf_outlined),
+            label: const Text('Ver PDF'),
+          ),
         ),
       ],
     ),
   );
+
 }
 
 class _Metric extends StatelessWidget {
