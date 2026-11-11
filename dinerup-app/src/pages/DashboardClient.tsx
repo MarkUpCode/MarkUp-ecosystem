@@ -186,7 +186,7 @@ export default function DashboardClient() {
     <div className="portal-shell flex min-h-screen flex-col bg-[#f5f8fc]">
       <Navbar />
 
-      <div className="flex flex-1">
+      <div className="flex min-h-[calc(100vh-4rem)] flex-1">
         {sidebarOpen && (
           <button
             aria-label="Cerrar menú"
@@ -195,7 +195,7 @@ export default function DashboardClient() {
           />
         )}
         <aside
-          className={`fixed inset-y-0 left-0 z-40 flex w-72 transform flex-col bg-[#0b1d42] px-5 py-6 text-white shadow-2xl transition-transform duration-300 lg:sticky lg:top-16 lg:z-20 lg:h-[calc(100vh-4rem)] lg:translate-x-0 lg:shadow-none ${
+          className={`fixed inset-y-0 left-0 z-40 flex w-72 transform flex-col bg-[#0b1d42] px-5 py-6 text-white shadow-2xl transition-transform duration-300 lg:sticky lg:top-16 lg:z-20 lg:min-h-[calc(100vh-4rem)] lg:translate-x-0 lg:shadow-none ${
             sidebarOpen ? "translate-x-0" : "-translate-x-full"
           }`}
         >

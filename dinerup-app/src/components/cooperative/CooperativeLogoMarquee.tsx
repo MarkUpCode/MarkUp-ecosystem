@@ -12,9 +12,9 @@ export default function CooperativeLogoMarquee() {
   return (
     <section
       aria-label="Cooperativas aliadas"
-      className="mb-8 overflow-hidden rounded-2xl border border-slate-200/80 bg-white/80 py-3 shadow-sm"
+      className="mb-8 overflow-hidden rounded-2xl border border-white/10 bg-[#0b1d42] py-3 shadow-lg shadow-[#0b1d42]/15"
     >
-      <div className="mb-2 px-4 text-center text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">
+      <div className="mb-2 px-4 text-center text-[10px] font-bold uppercase tracking-[0.2em] text-cyan-100/70">
         Cooperativas aliadas
       </div>
       <div className="relative overflow-hidden">
@@ -22,7 +22,7 @@ export default function CooperativeLogoMarquee() {
           {[...cooperatives, ...cooperatives].map((cooperative, index) => (
             <div
               key={`${cooperative.name}-${index}`}
-              className="mx-2 flex h-16 w-44 shrink-0 items-center justify-center rounded-xl border border-slate-100 bg-slate-50/80 px-4 sm:mx-3 sm:w-52"
+              className="mx-2 flex h-16 w-44 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/10 px-4 sm:mx-3 sm:w-52"
             >
               <img
                 src={cooperative.logo}
