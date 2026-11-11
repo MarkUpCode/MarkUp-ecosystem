@@ -183,10 +183,10 @@ export default function DashboardClient() {
   };
 
   return (
-    <div className="portal-shell flex min-h-screen flex-col bg-[#f5f8fc]">
+    <div className="portal-shell flex h-screen flex-col overflow-hidden bg-[#f5f8fc]">
       <Navbar />
 
-      <div className="flex min-h-[calc(100vh-4rem)] flex-1">
+      <div className="flex min-h-0 flex-1 overflow-hidden">
         {sidebarOpen && (
           <button
             aria-label="Cerrar menú"
@@ -195,7 +195,7 @@ export default function DashboardClient() {
           />
         )}
         <aside
-          className={`fixed inset-y-0 left-0 z-40 flex w-72 transform flex-col bg-[#0b1d42] px-5 py-6 text-white shadow-2xl transition-transform duration-300 lg:sticky lg:top-16 lg:z-20 lg:min-h-[calc(100vh-4rem)] lg:translate-x-0 lg:shadow-none ${
+          className={`fixed inset-y-0 left-0 z-40 flex w-72 transform flex-col bg-[#0b1d42] px-5 py-6 text-white shadow-2xl transition-transform duration-300 lg:sticky lg:top-0 lg:z-20 lg:h-full lg:min-h-0 lg:translate-x-0 lg:shadow-none ${
             sidebarOpen ? "translate-x-0" : "-translate-x-full"
           }`}
         >
@@ -276,7 +276,7 @@ export default function DashboardClient() {
           </div>
         </aside>
 
-        <main className="min-w-0 flex-1 px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
+        <main className="min-h-0 min-w-0 flex-1 overflow-y-auto px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
           <div className="mx-auto max-w-7xl">
             <div className="mb-4 flex items-center gap-3 lg:hidden">
               <button
@@ -299,8 +299,8 @@ export default function DashboardClient() {
                 </p>
               </div>
             </div>
-        <CooperativeLogoMarquee />
-        <div className="relative mb-8 overflow-hidden rounded-[2rem] bg-gradient-to-br from-[#0b1d42] via-[#123f77] to-[#0ea5a4] p-6 text-white shadow-2xl shadow-cyan-950/20 sm:p-10">
+        {activeSection === "overview" && <CooperativeLogoMarquee />}
+        {activeSection === "overview" && <div className="relative mb-8 overflow-hidden rounded-[2rem] bg-gradient-to-br from-[#0b1d42] via-[#123f77] to-[#0ea5a4] p-6 text-white shadow-2xl shadow-cyan-950/20 sm:p-10">
           <div className="absolute -right-20 -top-32 h-80 w-80 rounded-full border-[34px] border-white/10" />
           <div className="absolute -bottom-28 right-28 h-56 w-56 rounded-full bg-cyan-300/10 blur-2xl" />
           <div className="relative z-10 flex flex-col justify-between gap-6 sm:flex-row sm:items-end">
@@ -316,9 +316,9 @@ export default function DashboardClient() {
               <span className="font-semibold">Datos cifrados y seguros</span>
             </div>
           </div>
-        </div>
+        </div>}
 
-        {needsOnboarding && (
+        {activeSection === "overview" && needsOnboarding && (
           <div className="mb-8 overflow-hidden rounded-2xl border border-amber-200 bg-amber-50 p-6 shadow-sm sm:p-8">
             <div className="absolute top-0 right-0 w-64 h-64 bg-white opacity-10 rounded-full -mr-32 -mt-32" />
             <div className="relative z-10 flex flex-col sm:flex-row gap-4">
@@ -356,7 +356,7 @@ export default function DashboardClient() {
           </div>
         )}
 
-        <div className="mb-8 grid grid-cols-2 gap-3 lg:grid-cols-4">
+        {activeSection === "overview" && <div className="mb-8 grid grid-cols-2 gap-3 lg:grid-cols-4">
           {[
             ["Solicitudes", creditRequests.length, "Tus procesos activos"],
             ["Cooperativas", cooperatives.length, "Entidades disponibles"],
@@ -369,7 +369,7 @@ export default function DashboardClient() {
               <p className="mt-1 text-xs text-slate-500">{caption}</p>
             </div>
           ))}
-        </div>
+        </div>}
 
         {activeSection === "overview" && (
           <div className="portal-panel mb-8 p-5 sm:p-6">
