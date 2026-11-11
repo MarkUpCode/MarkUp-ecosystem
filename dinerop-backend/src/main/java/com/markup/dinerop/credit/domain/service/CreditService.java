@@ -15,12 +15,16 @@ import com.markup.dinerop.credit.dto.PublicCreditRequestDto;
 import com.markup.dinerop.credit.infrastructure.repository.CreditRequestRepository;
 import com.markup.dinerop.credit.infrastructure.repository.SolicitudCooperativaCotizacionRepository;
 import com.markup.dinerop.credit.infrastructure.repository.SolicitudCooperativaRepository;
+import com.markup.dinerop.credit.infrastructure.repository.CreditProcessEventRepository;
+import com.markup.dinerop.credit.domain.model.CreditProcessEvent;
 import com.markup.dinerop.onboarding.domain.enums.RolPersona;
+import com.markup.dinerop.onboarding.domain.enums.EstadoGarante;
 import com.markup.dinerop.onboarding.infrastructure.repository.PersonaOnboardingRepository;
 import com.markup.dinerop.onboarding.infrastructure.repository.SolicitudOnboardingRepository;
 import com.markup.dinerop.auth.repository.UserRepository;
 import com.markup.dinerop.cooperative.domain.service.CooperativeService;
 import com.markup.dinerop.notification.service.NotificationService;
+import com.markup.dinerop.notification.service.PushNotificationService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -50,6 +54,8 @@ public class CreditService {
     private final UserRepository userRepository;
     private final CooperativeService cooperativeService;
     private final NotificationService notificationService;
+    private final PushNotificationService pushNotificationService;
+    private final CreditProcessEventRepository creditProcessEventRepository;
         private final CreditRequirementService creditRequirementService;
         private final SolicitudOnboardingRepository solicitudOnboardingRepository;
         private final PersonaOnboardingRepository personaOnboardingRepository;
@@ -491,6 +497,11 @@ public class CreditService {
 
         sc.setEstado(SolicitudCooperativaStatus.SOLICITANDO_GARANTE);
         creditRequirementService.replaceForOffer(sc.getId(), requisitos);
+        addEvent(
+                solicitudId,
+                "GARANTE_SOLICITADO",
+                "La cooperativa solicitó información de un garante."
+        );
         notificationService.sendGuaranteeRequiredEmail(
                 sc.getCreditRequest().getEmail(),
                 cooperativeService.getById(cooperativaId).getNombre()
@@ -521,20 +532,58 @@ public class CreditService {
             Long onboardingId = solicitudOnboardingRepository.findByUsuarioId(clientId)
                     .map(onboarding -> onboarding.getId())
                     .orElseThrow(() -> new IllegalStateException("El cliente no tiene onboarding"));
-            if (!personaOnboardingRepository.existsBySolicitudIdAndRol(
-                    onboardingId,
-                    RolPersona.GARANTE
-            )) {
+            var garante = personaOnboardingRepository
+                    .findTopBySolicitudIdAndRolOrderByFechaRegistroDesc(
+                            onboardingId,
+                            RolPersona.GARANTE
+                    )
+                    .orElse(null);
+            if (garante == null) {
                 throw new IllegalStateException("El cliente aún no ha enviado la información del garante");
             }
+            garante.setEstadoGarante(EstadoGarante.ACEPTADO);
+            personaOnboardingRepository.save(garante);
             sc.setEstado(SolicitudCooperativaStatus.PRE_APROBADA);
+            addEvent(
+                    solicitudId,
+                    "GARANTE_ACEPTADO",
+                    "La cooperativa aceptó la información del garante."
+            );
             return;
         }
 
         if ("SOLICITAR_NUEVO".equalsIgnoreCase(decision)) {
-            notificationService.sendGuaranteeRequiredEmail(
+            Long clientId = sc.getCreditRequest().getClientId();
+            if (clientId == null) {
+                throw new IllegalStateException("La solicitud no tiene un cliente asociado");
+            }
+            Long onboardingId = solicitudOnboardingRepository.findByUsuarioId(clientId)
+                    .map(onboarding -> onboarding.getId())
+                    .orElseThrow(() -> new IllegalStateException("El cliente no tiene onboarding"));
+            personaOnboardingRepository
+                    .findTopBySolicitudIdAndRolOrderByFechaRegistroDesc(
+                            onboardingId,
+                            RolPersona.GARANTE
+                    )
+                    .ifPresent(garante -> {
+                        garante.setEstadoGarante(EstadoGarante.RECHAZADO);
+                        personaOnboardingRepository.save(garante);
+                    });
+            sc.setEstado(SolicitudCooperativaStatus.SOLICITANDO_GARANTE);
+            addEvent(
+                    solicitudId,
+                    "NUEVO_GARANTE_SOLICITADO",
+                    "La cooperativa rechazó el garante y solicitó uno nuevo."
+            );
+            String cooperativeName = cooperativeService.getById(cooperativaId).getNombre();
+            notificationService.sendNewGuaranteeRequiredEmail(
                     sc.getCreditRequest().getEmail(),
-                    cooperativeService.getById(cooperativaId).getNombre()
+                    cooperativeName
+            );
+            pushNotificationService.sendGuaranteeRejected(
+                    clientId,
+                    cooperativeName,
+                    solicitudId
             );
             return;
         }
@@ -544,7 +593,11 @@ public class CreditService {
         );
     }
 
-
-
-
+    private void addEvent(Long solicitudId, String tipo, String detalle) {
+        creditProcessEventRepository.save(CreditProcessEvent.builder()
+                .solicitudId(solicitudId)
+                .tipo(tipo)
+                .detalle(detalle)
+                .build());
+    }
 }

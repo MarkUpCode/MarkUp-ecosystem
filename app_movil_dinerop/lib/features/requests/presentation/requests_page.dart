@@ -817,7 +817,7 @@ class _OfferCardState extends ConsumerState<_OfferCard> {
                       ),
                       label: Text(
                         needsGuarantor
-                            ? 'Completar información del garante'
+                            ? 'Registrar información del garante'
                             : guaranteeInReview
                             ? 'Garante en revisión'
                             : _accepting
@@ -885,7 +885,7 @@ class _GuarantorNotice extends StatelessWidget {
               ),
               const SizedBox(height: 3),
               Text(
-                'La cooperativa necesita un garante para avanzar con tu solicitud.',
+                'La cooperativa necesita un garante para avanzar. Si ya enviaste uno y fue rechazado, registra aquí un nuevo garante.',
                 style: TextStyle(
                   color: color.withValues(alpha: .9),
                   fontSize: 12,

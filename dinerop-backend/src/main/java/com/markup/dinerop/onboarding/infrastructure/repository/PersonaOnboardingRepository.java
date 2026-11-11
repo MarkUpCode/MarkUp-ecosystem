@@ -3,6 +3,7 @@ package com.markup.dinerop.onboarding.infrastructure.repository;
 import com.markup.dinerop.onboarding.domain.entity.PersonaOnboarding;
 import com.markup.dinerop.onboarding.domain.enums.EstadoFormulario;
 import com.markup.dinerop.onboarding.domain.enums.RolPersona;
+import com.markup.dinerop.onboarding.domain.enums.EstadoGarante;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -20,5 +21,10 @@ public interface PersonaOnboardingRepository extends JpaRepository<PersonaOnboar
             Long solicitudId,
             RolPersona rol,
             EstadoFormulario estadoFormulario
+    );
+
+    Optional<PersonaOnboarding> findTopBySolicitudIdAndRolOrderByFechaRegistroDesc(
+            Long solicitudId,
+            RolPersona rol
     );
 }

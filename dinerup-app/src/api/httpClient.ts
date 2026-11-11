@@ -33,6 +33,7 @@ function shouldSendAuthHeader(path: string, method: string, auth?: boolean) {
 
 type HttpClientOptions = Omit<RequestInit, "body"> & {
   auth?: boolean;
+  logoutOnUnauthorized?: boolean;
   body?: BodyInit | object | null;
 };
 
@@ -40,7 +41,7 @@ export async function httpClient<T = unknown>(
   urlOrPath: string,
   options: HttpClientOptions = {},
 ): Promise<T> {
-  const { auth, headers, ...rest } = options;
+  const { auth, logoutOnUnauthorized = true, headers, ...rest } = options;
   const method = (rest.method ?? "GET").toUpperCase();
   const path = normalizePath(urlOrPath);
   const shouldAuth = shouldSendAuthHeader(path, method, auth);
@@ -112,8 +113,7 @@ export async function httpClient<T = unknown>(
     });
 
     // httpClient.ts
-    if (response.status === 401 && shouldAuth) {
-      // solo 401
+    if (response.status === 401 && shouldAuth && logoutOnUnauthorized) {
       emitUnauthorizedEvent();
     }
 

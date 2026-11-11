@@ -18,6 +18,9 @@ import jakarta.validation.Valid;
 
 import java.util.List;
 import java.util.Map;
+import com.markup.dinerop.credit.dto.CreditProcessEventDto;
+import com.markup.dinerop.credit.infrastructure.repository.CreditProcessEventRepository;
+import com.markup.dinerop.credit.infrastructure.repository.SolicitudCooperativaRepository;
 import com.markup.dinerop.credit.service.CreditRequirementService;
 import com.markup.dinerop.credit.service.CreditReferralPdfService;
 import org.springframework.http.HttpHeaders;
@@ -36,6 +39,8 @@ public class CreditController {
     private final ClientCreditAcceptanceService clientCreditAcceptanceService;
         private final CreditRequirementService creditRequirementService;
         private final CreditReferralPdfService creditReferralPdfService;
+            private final CreditProcessEventRepository creditProcessEventRepository;
+            private final SolicitudCooperativaRepository solicitudCooperativaRepository;
 
 
 
@@ -195,6 +200,31 @@ public class CreditController {
         return ResponseEntity.ok(
                 Map.of("message", "Decisión del garante registrada correctamente")
         );
+    }
+
+    @GetMapping("/cooperative/me/requests/{solicitudId}/timeline")
+    @PreAuthorize("hasRole('COOPERATIVE')")
+    public ResponseEntity<List<CreditProcessEventDto>> getCreditTimeline(
+            @PathVariable Long solicitudId,
+            @AuthenticationPrincipal User user
+    ) {
+        if (!solicitudCooperativaRepository.existsBySolicitudIdAndCooperativaId(
+                solicitudId,
+                user.getCooperativaId()
+        )) {
+            throw new org.springframework.security.access.AccessDeniedException(
+                    "Solicitud no pertenece a esta cooperativa"
+            );
+        }
+        return ResponseEntity.ok(creditProcessEventRepository
+                .findBySolicitudIdOrderByFechaAsc(solicitudId)
+                .stream()
+                .map(event -> new CreditProcessEventDto(
+                        event.getTipo(),
+                        event.getDetalle(),
+                        event.getFecha()
+                ))
+                .toList());
     }
 
 

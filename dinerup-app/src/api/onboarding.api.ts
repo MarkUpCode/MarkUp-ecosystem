@@ -33,6 +33,7 @@ export interface SolicitanteData {
   nombres: string;
   apellidos: string;
   cedula: string;
+  estadoGarante?: "EN_REVISION" | "RECHAZADO" | "ACEPTADO";
   fechaNacimiento: string;
   estadoCivil: string;
   ocupacion: string;

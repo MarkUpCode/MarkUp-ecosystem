@@ -5,7 +5,7 @@ import {
   Settings2, ShieldCheck, SlidersHorizontal, TrendingUp, User, Users, X,
 } from "lucide-react";
 import type { CooperativeCreditRequest, CooperativeOfferDefaults, CreditRequirement } from "../types/credit";
-import { decideCreditRequest, decideGuaranteeForCreditRequest, getCooperativeOfferDefaults, getMyCooperativeRequests, requestGuaranteeForCreditRequest, type GuaranteeDecision } from "../api/creditRequests.api";
+import { decideCreditRequest, decideGuaranteeForCreditRequest, getCooperativeOfferDefaults, getCreditRequestTimeline, getMyCooperativeRequests, requestGuaranteeForCreditRequest, type CreditTimelineEvent, type GuaranteeDecision } from "../api/creditRequests.api";
 import { getErrorMessage } from "../api/errors";
 import { getOnboardingForCooperative, type OnboardingCooperativeDetail } from "../api/onboarding.api";
 import { useAuth } from "../context/useAuth";
@@ -39,6 +39,7 @@ export default function DashboardCooperative() {
   const [showPreApproval, setShowPreApproval] = useState(false);
   const [loadingOffer, setLoadingOffer] = useState(false);
   const [applicantDetail, setApplicantDetail] = useState<OnboardingCooperativeDetail | null>(null);
+  const [timeline, setTimeline] = useState<CreditTimelineEvent[]>([]);
 
   useEffect(() => { void loadRequests(); }, []);
 
@@ -75,7 +76,10 @@ export default function DashboardCooperative() {
     finally { setLoadingOffer(false); }
   };
   const viewApplicant = async (id: number) => {
-    try { setApplicantDetail(await getOnboardingForCooperative(id)); }
+    try {
+      setApplicantDetail(await getOnboardingForCooperative(id));
+      setTimeline(await getCreditRequestTimeline(id));
+    }
     catch (error) { setActionError(getErrorMessage(error, "No se pudo cargar la información del solicitante.")); }
   };
   const requestGuarantee = async (id: number, requirements: CreditRequirement[]) => {
@@ -103,7 +107,8 @@ export default function DashboardCooperative() {
       </div>
     </div>
     {selectedRequest && <PreApprovalModal open={showPreApproval} onClose={() => { setShowPreApproval(false); setSelectedRequest(null); }} solicitudId={selectedRequest.solicitudId} monto={selectedRequest.montoSolicitado} tipo={selectedRequest.tipo} defaults={offerDefaults} loadingDefaults={loadingOffer} onApproveWithoutGuarantee={(id, offer, requirements) => handleDecision(id, CreditDecision.PRE_APROBAR, offer, requirements)} onApproveWithGuarantee={requestGuarantee} isLoading={processingId === selectedRequest.solicitudId} />}
-    {applicantDetail && <ApplicantModal detail={applicantDetail} onClose={() => setApplicantDetail(null)} onDecision={(decision) => void decideGuarantee(applicantDetail.solicitudId, decision)} processing={processingId === applicantDetail.solicitudId} />}
+    {applicantDetail && <ApplicantModal detail={applicantDetail} onClose={() => { setApplicantDetail(null); setTimeline([]); }} onDecision={(decision) => void decideGuarantee(applicantDetail.solicitudId, decision)} processing={processingId === applicantDetail.solicitudId} />}
+    {applicantDetail && <TimelinePanel events={timeline} />}
   </div>;
 }
 
@@ -126,6 +131,13 @@ function Progress({ label, value, total, color }: { label: string; value: number
 function Info({ label, value }: { label: string; value: string }) { return <div className="rounded-xl bg-slate-50 p-4"><p className="text-xs text-slate-400">{label}</p><p className="mt-1 text-sm font-bold text-slate-700">{value}</p></div>; }
 function Loading() { return <div className="py-10 text-center text-sm font-medium text-slate-500"><div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-sky-100 border-t-sky-600" /><p className="mt-3">Cargando solicitudes...</p></div>; }
 function Empty() { return <div className="py-12 text-center"><FileCheck2 className="mx-auto h-10 w-10 text-slate-300" /><p className="mt-3 font-bold text-slate-600">No hay solicitudes para mostrar</p><p className="mt-1 text-sm text-slate-400">Cuando llegue una nueva solicitud aparecerá aquí.</p></div>; }
+function TimelinePanel({ events }: { events: CreditTimelineEvent[] }) {
+  if (!events.length) return null;
+  return <div className="fixed bottom-5 right-5 z-[90] hidden w-80 rounded-2xl border border-slate-200 bg-white p-5 shadow-2xl lg:block">
+    <p className="text-xs font-bold uppercase tracking-[0.16em] text-slate-400">Historial del proceso</p>
+    <div className="mt-4 space-y-4">{events.map((event, index) => <div key={`${event.fecha}-${index}`} className="relative pl-5"><span className="absolute left-0 top-1.5 h-2.5 w-2.5 rounded-full bg-[#1f6577]" /><p className="text-sm font-extrabold text-[#173b57]">{event.tipo.replace(/_/g, " ")}</p><p className="mt-1 text-xs leading-5 text-slate-500">{event.detalle}</p><p className="mt-1 text-[10px] text-slate-400">{new Date(event.fecha).toLocaleString("es-EC")}</p></div>)}</div>
+  </div>;
+}
 function ApplicantModal({ detail, onClose, onDecision, processing }: { detail: OnboardingCooperativeDetail; onClose: () => void; onDecision: (decision: GuaranteeDecision) => void; processing: boolean }) { if (!detail.personas.length) return null; const money = (value?: number) => value == null ? "—" : `$${value.toLocaleString("es-EC", { minimumFractionDigits: 2 })}`; const guarantee = detail.personas.find((person) => person.rol === "GARANTE"); return <div className="fixed inset-0 z-[80] flex items-center justify-center bg-slate-950/60 p-4"><div className="max-h-[90vh] w-full max-w-4xl overflow-y-auto rounded-2xl bg-white p-6 shadow-2xl"><div className="mb-6 flex justify-between"><div><p className="text-xs font-bold uppercase tracking-wider text-slate-400">Expediente financiero</p><h2 className="mt-1 text-2xl font-extrabold text-[#0b214c]">Información de la solicitud</h2><p className="text-sm text-slate-500">Solicitud #{detail.solicitudId}</p></div><button onClick={onClose} className="rounded-xl px-3 py-2 text-sm font-bold text-slate-500 hover:bg-slate-100">Cerrar</button></div>{detail.personas.map((person) => <div key={`${person.rol}-${person.cedula}`} className="mb-6"><h3 className="mb-3 text-lg font-extrabold">{person.rol === "GARANTE" ? "Información del garante" : "Información del solicitante"}</h3><div className="grid gap-4 md:grid-cols-2"><DetailSection title="Datos personales"><Detail label="Nombre" value={`${person.nombres} ${person.apellidos}`} /><Detail label="Cédula" value={person.cedula} /><Detail label="Fecha de nacimiento" value={person.fechaNacimiento} /><Detail label="Estado civil" value={person.estadoCivil} /><Detail label="Teléfono" value={person.telefono} /></DetailSection><DetailSection title="Trabajo"><Detail label="Ocupación" value={person.ocupacion} /><Detail label="Empresa" value={person.empresaTrabajo} /><Detail label="Negocio" value={person.actividadEconomica?.nombreNegocio} /></DetailSection><DetailSection title="Dirección"><Detail label="Provincia" value={person.direccion?.provincia} /><Detail label="Cantón" value={person.direccion?.canton} /><Detail label="Barrio" value={person.direccion?.barrio} /><Detail label="Dirección" value={[person.direccion?.callePrincipal, person.direccion?.numero].filter(Boolean).join(" ")} /><Detail label="Vivienda" value={person.direccion?.tipoVivienda} /></DetailSection><DetailSection title="Situación económica"><Detail label="Ingreso mensual" value={money(person.ingresoEgreso?.ingresoMensual)} /><Detail label="Egreso mensual" value={money(person.ingresoEgreso?.egresoMensual)} /></DetailSection></div></div>)}{guarantee && <div className="flex gap-3 border-t border-slate-200 pt-5"><button onClick={() => onDecision("SOLICITAR_NUEVO")} disabled={processing} className="rounded-xl bg-amber-600 px-4 py-2.5 text-sm font-bold text-white">Solicitar nuevo garante</button><button onClick={() => onDecision("ACEPTAR")} disabled={processing} className="rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-bold text-white">Aceptar garante</button></div>}</div></div>; }
 function DetailSection({ title, children }: { title: string; children: ReactNode }) { return <section className="rounded-xl border border-slate-200 p-4"><h3 className="mb-3 text-sm font-extrabold">{title}</h3>{children}</section>; }
 function Detail({ label, value }: { label: string; value?: string }) { return <p className="mb-2 text-sm"><span className="text-slate-400">{label}: </span><span className="font-semibold text-slate-700">{value || "—"}</span></p>; }

@@ -2,6 +2,7 @@ package com.markup.dinerop.onboarding.dto.response;
 
 import com.markup.dinerop.onboarding.domain.enums.EstadoFormulario;
 import com.markup.dinerop.onboarding.domain.enums.RolPersona;
+import com.markup.dinerop.onboarding.domain.enums.EstadoGarante;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -15,6 +16,7 @@ public class PersonaOnboardingResponse {
     private Long id;
     private RolPersona rol;
     private EstadoFormulario estadoFormulario;
+    private EstadoGarante estadoGarante;
     private String nombres;
     private String apellidos;
     private String cedula;

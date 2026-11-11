@@ -3,11 +3,14 @@ package com.markup.dinerop.onboarding.application.service.impl;
 import com.markup.dinerop.credit.domain.service.CreditService;
 import com.markup.dinerop.credit.domain.model.CreditRequest;
 import com.markup.dinerop.credit.infrastructure.repository.CreditRequestRepository;
+import com.markup.dinerop.credit.domain.model.CreditProcessEvent;
+import com.markup.dinerop.credit.infrastructure.repository.CreditProcessEventRepository;
 import com.markup.dinerop.onboarding.application.service.OnboardingService;
 import com.markup.dinerop.onboarding.domain.entity.*;
 import com.markup.dinerop.onboarding.domain.enums.EstadoFormulario;
 import com.markup.dinerop.onboarding.domain.enums.EstadoOnboarding;
 import com.markup.dinerop.onboarding.domain.enums.RolPersona;
+import com.markup.dinerop.onboarding.domain.enums.EstadoGarante;
 import com.markup.dinerop.onboarding.dto.request.PersonaOnboardingRequest;
 import com.markup.dinerop.onboarding.dto.request.SolicitudOnboardingRequest;
 import com.markup.dinerop.onboarding.dto.response.FormularioClienteStatusResponse;
@@ -39,6 +42,7 @@ public class OnboardingServiceImpl implements OnboardingService {
     private final UserRepository userRepository;
     private final UserPreRegistrationRepository userPreRegistrationRepository;
     private final CreditRequestRepository creditRequestRepository;
+    private final CreditProcessEventRepository creditProcessEventRepository;
 
     @Override
     public SolicitudOnboarding crearSolicitudConSolicitante(
@@ -123,23 +127,31 @@ public class OnboardingServiceImpl implements OnboardingService {
                 .findByUsuarioId(clientId)
                 .orElseThrow(() -> new ResourceNotFoundException("Solicitud no encontrada para este usuario"));
 
-        personaRepo.findBySolicitudIdAndRol(solicitud.getId(), RolPersona.GARANTE)
-                .ifPresent(personaRepo::delete);
-
         PersonaOnboarding garante = mapper.toPersona(request);
         garante.setSolicitud(solicitud);
         garante.setRol(RolPersona.GARANTE);
         garante.setEstadoFormulario(EstadoFormulario.COMPLETO);
+        garante.setEstadoGarante(EstadoGarante.EN_REVISION);
         linkPersonaRelations(garante, request);
         solicitud.getPersonas().add(garante);
         personaRepo.save(garante);
+        creditRequestRepository.findByClientId(clientId).stream()
+                .filter(creditRequest -> creditRequest.getEstado() != null)
+                .findFirst()
+                .ifPresent(creditRequest -> creditProcessEventRepository.save(
+                        CreditProcessEvent.builder()
+                                .solicitudId(creditRequest.getId())
+                                .tipo("GARANTE_ENVIADO")
+                                .detalle("El usuario envió la información de un garante para revisión.")
+                                .build()
+                ));
 
         boolean solicitanteCompleto = personaRepo.existsBySolicitudIdAndRolAndEstadoFormulario(
                 solicitud.getId(), RolPersona.SOLICITANTE, EstadoFormulario.COMPLETO
         );
 
         if (solicitanteCompleto) {
-            solicitud.setEstado(EstadoOnboarding.COMPLETADO);
+            solicitud.setEstado(EstadoOnboarding.SOLICITANDO_GARANTE);
         }
 
         return solicitud;

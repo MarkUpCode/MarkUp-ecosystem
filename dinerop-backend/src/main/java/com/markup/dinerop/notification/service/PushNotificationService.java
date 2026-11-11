@@ -53,6 +53,27 @@ public class PushNotificationService {
 
     @Transactional
     public void sendCreditAccepted(Long userId, String title, String body, Long solicitudId) {
+        sendToUser(userId, title, body, "CREDIT_ACCEPTED", solicitudId);
+    }
+
+    @Transactional
+    public void sendGuaranteeRejected(Long userId, String cooperativeName, Long solicitudId) {
+        sendToUser(
+                userId,
+                "Necesitas un nuevo garante",
+                cooperativeName + " rechazó el garante enviado. Revisa tu solicitud y registra otro garante.",
+                "GUARANTEE_REJECTED",
+                solicitudId
+        );
+    }
+
+    private void sendToUser(
+            Long userId,
+            String title,
+            String body,
+            String type,
+            Long solicitudId
+    ) {
         if (FirebaseApp.getApps().isEmpty()) {
             log.warn("Push notification skipped: Firebase is not configured");
             return;
@@ -63,7 +84,7 @@ public class PushNotificationService {
                 Message message = Message.builder()
                         .setToken(deviceToken.getToken())
                         .setNotification(Notification.builder().setTitle(title).setBody(body).build())
-                        .putData("type", "CREDIT_ACCEPTED")
+                        .putData("type", type)
                         .putData("solicitudId", String.valueOf(solicitudId))
                         .build();
                 FirebaseMessaging.getInstance().send(message);

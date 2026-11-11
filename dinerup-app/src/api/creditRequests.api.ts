@@ -113,6 +113,20 @@ export const createCreditRequest = async (
 };
 
 export type GuaranteeDecision = "ACEPTAR" | "SOLICITAR_NUEVO";
+export type CreditTimelineEvent = {
+  tipo: string;
+  detalle: string;
+  fecha: string;
+};
+
+export const getCreditRequestTimeline = async (
+  solicitudId: number,
+): Promise<CreditTimelineEvent[]> => {
+  return httpClient<CreditTimelineEvent[]>(
+    `/api/credits/cooperative/me/requests/${solicitudId}/timeline`,
+    { auth: true, logoutOnUnauthorized: false },
+  );
+};
 
 export const decideGuaranteeForCreditRequest = async (
   solicitudId: number,
@@ -123,6 +137,7 @@ export const decideGuaranteeForCreditRequest = async (
     {
       method: "PUT",
       auth: true,
+      logoutOnUnauthorized: false,
       body: { decision },
     },
   );

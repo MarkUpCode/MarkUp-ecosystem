@@ -2,6 +2,7 @@ package com.markup.dinerop.onboarding.domain.entity;
 
 import com.markup.dinerop.onboarding.domain.enums.EstadoFormulario;
 import com.markup.dinerop.onboarding.domain.enums.RolPersona;
+import com.markup.dinerop.onboarding.domain.enums.EstadoGarante;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -30,6 +31,9 @@ public class PersonaOnboarding {
 
     @Enumerated(EnumType.STRING)
     private EstadoFormulario estadoFormulario;
+
+    @Enumerated(EnumType.STRING)
+    private EstadoGarante estadoGarante;
 
     private String nombres;
     private String apellidos;

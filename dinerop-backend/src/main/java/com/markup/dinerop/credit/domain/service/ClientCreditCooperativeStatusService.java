@@ -11,6 +11,7 @@ import com.markup.dinerop.credit.infrastructure.repository.SolicitudCooperativaR
 import lombok.RequiredArgsConstructor;
 import com.markup.dinerop.credit.service.CreditRequirementService;
 import com.markup.dinerop.onboarding.domain.enums.RolPersona;
+import com.markup.dinerop.onboarding.domain.enums.EstadoGarante;
 import com.markup.dinerop.onboarding.infrastructure.repository.PersonaOnboardingRepository;
 import com.markup.dinerop.onboarding.infrastructure.repository.SolicitudOnboardingRepository;
 import com.markup.dinerop.credit.dto.CreditRequirementDto;
@@ -46,10 +47,14 @@ public class ClientCreditCooperativeStatusService {
             var onboarding = solicitudOnboardingRepository.findByUsuarioId(clientId).orElse(null);
             var garanteEnRevision = sc.getEstado() == SolicitudCooperativaStatus.SOLICITANDO_GARANTE
                     && onboarding != null
-                    && personaOnboardingRepository.existsBySolicitudIdAndRol(
-                    onboarding.getId(),
-                    RolPersona.GARANTE
-            );
+                    && personaOnboardingRepository
+                    .findTopBySolicitudIdAndRolOrderByFechaRegistroDesc(
+                            onboarding.getId(),
+                            RolPersona.GARANTE
+                    )
+                    .map(garante -> garante.getEstadoGarante() == null
+                            || garante.getEstadoGarante() == EstadoGarante.EN_REVISION)
+                    .orElse(false);
                 var cotizacion = cotizacionRepository.findBySolicitudCooperativaId(sc.getId())
                     .orElseGet(() -> createMissingQuotation(sc));
 

@@ -46,6 +46,20 @@ public class CreditOfferEmailBuilder {
                 .build();
     }
 
+    public EmailTemplate buildNewGuaranteeRequired(String cooperativeName, String dashboardUrl) {
+        return EmailTemplate.builder()
+                .title("La cooperativa solicita otro garante")
+                .message("""
+                        %s revisó la información enviada y necesita que registres un nuevo garante para continuar con tu solicitud.
+                        """.formatted(cooperativeName))
+                .buttonText("Registrar nuevo garante")
+                .buttonUrl(dashboardUrl)
+                .info1("El garante anterior no fue validado.")
+                .info2("Ingresa a tu solicitud y completa nuevamente la información.")
+                .info3("Podrás hacerlo hasta que la cooperativa apruebe un garante.")
+                .build();
+    }
+
     private String money(BigDecimal amount) {
         return NumberFormat.getCurrencyInstance(ECUADOR).format(amount);
     }

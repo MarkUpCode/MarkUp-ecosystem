@@ -301,6 +301,18 @@ public class NotificationService {
                 .build());
     }
 
+    public void sendNewGuaranteeRequiredEmail(String to, String cooperativeName) {
+                EmailTemplate template = creditOfferEmailBuilder.buildNewGuaranteeRequired(
+                        cooperativeName,
+                        clientDashboardUrl()
+                );
+                sendEmail(SendEmailDto.builder()
+                        .to(to)
+                        .subject(cooperativeName + " solicita un nuevo garante")
+                        .htmlContent(emailTemplateEngine.render(template))
+                        .build());
+    }
+
     private String clientDashboardUrl() {
         return frontendUrl.endsWith("/")
                 ? frontendUrl + "dashboard-client"
