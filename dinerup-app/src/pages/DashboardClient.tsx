@@ -34,7 +34,6 @@ import type { CreditRequest } from "../types/credit";
 import CooperativeCard from "../components/cooperative/CooperativeCard";
 import CreditCard from "../components/credit/CreditCard";
 import Navbar from "../components/layout/Navbar";
-import Footer from "../components/layout/Footer";
 import OnboardingPopup from "../components/onboarding/OnboardingPopup";
 import NewCreditModal from "../components/credit/NewCreditModal";
 import NewInvestmentModal from "../components/investment/NewInvestmentModal";
@@ -585,7 +584,6 @@ export default function DashboardClient() {
         </div>
       )}
 
-      <Footer />
     </div>
   );
 }
