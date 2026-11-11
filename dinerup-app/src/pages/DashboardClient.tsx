@@ -9,6 +9,14 @@ import {
   Wallet,
   ArrowUpRight,
   Sparkles,
+  Menu,
+  X,
+  LayoutDashboard,
+  ClipboardList,
+  Landmark,
+  UserRound,
+  ChevronLeft,
+  ShieldCheck,
 } from "lucide-react";
 import { useAuth } from "../context/useAuth";
 
@@ -40,9 +48,10 @@ export default function DashboardClient() {
   const [creditRequests, setCreditRequests] = useState<CreditRequest[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [pageError, setPageError] = useState("");
-  const [activeTab, setActiveTab] = useState<"cooperatives" | "requests">(
-    "requests",
-  );
+  const [activeSection, setActiveSection] = useState<
+    "overview" | "requests" | "cooperatives"
+  >("overview");
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const [needsOnboarding, setNeedsOnboarding] = useState(true);
   const [checkingOnboarding, setCheckingOnboarding] = useState(false);
@@ -129,6 +138,13 @@ export default function DashboardClient() {
     setShowInvestmentModal(true);
   };
 
+  const selectSection = (
+    section: "overview" | "requests" | "cooperatives",
+  ) => {
+    setActiveSection(section);
+    setSidebarOpen(false);
+  };
+
   const handleCreditSubmit = async (data: { amount: number; creditType: string; plazoMeses: number; cedula: string; provincia: string; ciudad: string }) => {
     try {
       await createCreditRequest({
@@ -170,7 +186,119 @@ export default function DashboardClient() {
     <div className="portal-shell flex min-h-screen flex-col bg-[#f5f8fc]">
       <Navbar />
 
-      <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+      <div className="flex flex-1">
+        {sidebarOpen && (
+          <button
+            aria-label="Cerrar menú"
+            className="fixed inset-0 z-30 bg-slate-950/40 lg:hidden"
+            onClick={() => setSidebarOpen(false)}
+          />
+        )}
+        <aside
+          className={`fixed inset-y-0 left-0 z-40 flex w-72 transform flex-col bg-[#0b1d42] px-5 py-6 text-white shadow-2xl transition-transform duration-300 lg:sticky lg:top-16 lg:z-20 lg:h-[calc(100vh-4rem)] lg:translate-x-0 lg:shadow-none ${
+            sidebarOpen ? "translate-x-0" : "-translate-x-full"
+          }`}
+        >
+          <div className="mb-8 flex items-center justify-between lg:hidden">
+            <span className="text-sm font-bold uppercase tracking-[0.16em] text-cyan-100">
+              Menú principal
+            </span>
+            <button
+              aria-label="Cerrar menú"
+              onClick={() => setSidebarOpen(false)}
+              className="rounded-xl p-2 text-blue-100 hover:bg-white/10"
+            >
+              <X className="h-5 w-5" />
+            </button>
+          </div>
+          <div className="mb-8 hidden items-center gap-3 lg:flex">
+            <div className="grid h-10 w-10 place-items-center rounded-xl bg-white/10">
+              <ShieldCheck className="h-5 w-5 text-cyan-200" />
+            </div>
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-cyan-200">
+                Portal cliente
+              </p>
+              <p className="text-sm font-bold text-white">Mi espacio financiero</p>
+            </div>
+          </div>
+          <p className="mb-3 px-3 text-[10px] font-bold uppercase tracking-[0.2em] text-blue-200/70">
+            Navegación
+          </p>
+          <nav className="space-y-2">
+            {[
+              { id: "overview" as const, label: "Resumen", icon: LayoutDashboard },
+              { id: "requests" as const, label: "Mis solicitudes", icon: ClipboardList },
+              { id: "cooperatives" as const, label: "Cooperativas", icon: Landmark },
+            ].map((item) => {
+              const Icon = item.icon;
+              const active = activeSection === item.id;
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => selectSection(item.id)}
+                  className={`flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-sm font-semibold transition ${
+                    active
+                      ? "bg-white text-[#123f77] shadow-lg"
+                      : "text-blue-100 hover:bg-white/10 hover:text-white"
+                  }`}
+                >
+                  <Icon className="h-5 w-5" />
+                  {item.label}
+                  {item.id === "requests" && creditRequests.length > 0 && (
+                    <span
+                      className={`ml-auto rounded-full px-2 py-0.5 text-xs ${
+                        active ? "bg-cyan-100 text-cyan-800" : "bg-white/15"
+                      }`}
+                    >
+                      {creditRequests.length}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+            <button
+              onClick={() => {
+                setSidebarOpen(false);
+                void handleGoToOnboarding();
+              }}
+              className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-sm font-semibold text-blue-100 transition hover:bg-white/10 hover:text-white"
+            >
+              <UserRound className="h-5 w-5" />
+              Mi perfil
+            </button>
+          </nav>
+          <div className="mt-auto hidden rounded-2xl border border-white/10 bg-white/5 p-4 lg:block">
+            <p className="text-xs font-semibold text-cyan-100">Tu seguridad es prioridad</p>
+            <p className="mt-2 text-xs leading-5 text-blue-100/70">
+              Información protegida para que gestiones tus productos con tranquilidad.
+            </p>
+          </div>
+        </aside>
+
+        <main className="min-w-0 flex-1 px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
+          <div className="mx-auto max-w-7xl">
+            <div className="mb-4 flex items-center gap-3 lg:hidden">
+              <button
+                aria-label="Abrir menú"
+                onClick={() => setSidebarOpen(true)}
+                className="grid h-11 w-11 place-items-center rounded-xl bg-[#123f77] text-white shadow-lg"
+              >
+                <Menu className="h-5 w-5" />
+              </button>
+              <div>
+                <p className="text-xs font-bold uppercase tracking-[0.15em] text-cyan-700">
+                  Portal cliente
+                </p>
+                <p className="text-sm font-semibold text-slate-700">
+                  {activeSection === "overview"
+                    ? "Resumen"
+                    : activeSection === "requests"
+                      ? "Mis solicitudes"
+                      : "Cooperativas"}
+                </p>
+              </div>
+            </div>
         <CooperativeLogoMarquee />
         <div className="relative mb-8 overflow-hidden rounded-[2rem] bg-gradient-to-br from-[#0b1d42] via-[#123f77] to-[#0ea5a4] p-6 text-white shadow-2xl shadow-cyan-950/20 sm:p-10">
           <div className="absolute -right-20 -top-32 h-80 w-80 rounded-full border-[34px] border-white/10" />
@@ -243,6 +371,37 @@ export default function DashboardClient() {
           ))}
         </div>
 
+        {activeSection === "overview" && (
+          <div className="portal-panel mb-8 p-5 sm:p-6">
+            <div className="mb-3 flex items-center justify-between gap-4">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-[0.14em] text-cyan-700">
+                  Progreso financiero
+                </p>
+                <h2 className="mt-1 text-lg font-bold text-slate-900">
+                  {needsOnboarding ? "Completa tu perfil para comenzar" : "Tu perfil está listo para operar"}
+                </h2>
+              </div>
+              <span className="rounded-full bg-cyan-50 px-3 py-1 text-sm font-bold text-cyan-700">
+                {needsOnboarding ? "70%" : "100%"}
+              </span>
+            </div>
+            <div className="h-3 overflow-hidden rounded-full bg-slate-100">
+              <div
+                className={`h-full rounded-full bg-gradient-to-r from-[#123f77] to-[#0ea5a4] transition-all ${
+                  needsOnboarding ? "w-[70%]" : "w-full"
+                }`}
+              />
+            </div>
+            <p className="mt-3 text-sm text-slate-500">
+              {needsOnboarding
+                ? "Completa la información pendiente para enviar solicitudes a nuestras cooperativas aliadas."
+                : "Puedes solicitar crédito y consultar el avance de tus procesos desde este portal."}
+            </p>
+          </div>
+        )}
+
+        {activeSection === "overview" && (
         <div className="mb-8 grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-2">
           <div
             className={`rounded-2xl border bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg sm:p-6 ${
@@ -316,35 +475,34 @@ export default function DashboardClient() {
             </button>
           </div>
         </div>
+        )}
 
-        <div className="portal-panel overflow-hidden">
+        {activeSection !== "overview" && <div className="portal-panel overflow-hidden">
           <div className="flex items-center justify-between border-b border-slate-200 bg-white px-2">
-            {(["requests", "cooperatives"] as const).map((tab) => (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                className={`flex-1 py-4 font-medium ${
-                  activeTab === tab
-                    ? "bg-white text-[#123f77] shadow-[inset_0_-2px_0_#06b6d4]"
-                    : "text-slate-500 hover:text-slate-900"
-                }`}
-              >
-                {tab === "requests" ? "Mis Solicitudes" : "Cooperativas"}
-              </button>
-            ))}
+            <div className="flex items-center gap-3 px-5 py-4">
+              {activeSection === "requests" ? (
+                <ClipboardList className="h-5 w-5 text-cyan-700" />
+              ) : (
+                <Landmark className="h-5 w-5 text-cyan-700" />
+              )}
+              <span className="font-bold text-[#123f77]">
+                {activeSection === "requests" ? "Mis solicitudes" : "Cooperativas aliadas"}
+              </span>
+            </div>
           </div>
 
           <div className="p-4 sm:p-7">
             <div className="mb-6 flex items-end justify-between gap-4">
               <div>
                 <p className="text-xs font-bold uppercase tracking-[0.14em] text-slate-400">Actividad</p>
-                <h2 className="mt-1 text-xl font-bold text-slate-900">{activeTab === "requests" ? "Tus solicitudes" : "Red de cooperativas"}</h2>
+                <h2 className="mt-1 text-xl font-bold text-slate-900">{activeSection === "requests" ? "Seguimiento de tus solicitudes" : "Encuentra una cooperativa aliada"}</h2>
               </div>
-              <span className="hidden rounded-full bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-500 sm:inline-flex">{activeTab === "requests" ? `${creditRequests.length} registros` : `${cooperatives.length} entidades`}</span>
+              <span className="hidden rounded-full bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-500 sm:inline-flex">{activeSection === "requests" ? `${creditRequests.length} registros` : `${cooperatives.length} entidades`}</span>
             </div>
             {isLoading ? (
               <div className="text-center py-16">Cargando...</div>
-            ) : activeTab === "requests" ? (
+            ) : (
+              activeSection === "requests" ? (
               creditRequests.length === 0 ? (
                 <div className="text-center py-16">
                   <FileText className="w-10 h-10 mx-auto mb-4 text-gray-400" />
@@ -382,10 +540,12 @@ export default function DashboardClient() {
                   <CooperativeCard key={c.id} cooperative={c} />
                 ))}
               </div>
-            )}
+            ))}
           </div>
-        </div>
-      </main>
+        </div>}
+          </div>
+        </main>
+      </div>
 
       <OnboardingPopup
         open={showOnboardingCompletedPopup}
