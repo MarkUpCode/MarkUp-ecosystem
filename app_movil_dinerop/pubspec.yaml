@@ -98,6 +98,6 @@ flutter:
 # Configuración para cambiar el ícono de la aplicación.
 # IMPORTANTE: esta sección va FUERA de "flutter:".
 flutter_launcher_icons:
-  android: true
+  android: truintle
   ios: true
   image_path: "assets/icon/app_icon.png"
