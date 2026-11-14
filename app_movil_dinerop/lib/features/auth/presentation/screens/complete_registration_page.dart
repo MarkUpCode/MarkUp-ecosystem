@@ -79,9 +79,12 @@ class _CompleteRegistrationPageState extends ConsumerState<CompleteRegistrationP
                   AppTextField(
                     controller: _passwordController,
                     label: 'Contraseña',
+                    keyboardType: TextInputType.text,
                     obscureText: !_showPassword,
                     prefixIcon: Icons.lock_outline,
-                    suffixIcon: _showPassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+                    suffixIcon: _showPassword
+                        ? Icons.visibility_off_outlined
+                        : Icons.visibility_outlined,
                     onSuffixTap: () => setState(() => _showPassword = !_showPassword),
                   ),
                   const SizedBox(height: 16),
