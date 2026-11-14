@@ -16,8 +16,9 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.web.cors.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
@@ -25,6 +26,8 @@ import java.util.List;
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
+
+    private static final Logger log = LoggerFactory.getLogger(SecurityConfig.class);
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final CustomUserDetailsService userDetailsService;
@@ -58,9 +61,10 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/credits/public-request").permitAll()
                         .anyRequest().authenticated()
                 )
-                .exceptionHandling(exceptions ->
-                        exceptions.authenticationEntryPoint(new HttpStatusEntryPoint(org.springframework.http.HttpStatus.UNAUTHORIZED))
-                )
+                .exceptionHandling(exceptions -> exceptions.authenticationEntryPoint((request, response, authException) -> {
+                    log.warn("Unauthenticated request to protected endpoint: {} {}", request.getMethod(), request.getRequestURI());
+                    response.setStatus(org.springframework.http.HttpStatus.UNAUTHORIZED.value());
+                }))
                 .sessionManagement(sess ->
                         sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )

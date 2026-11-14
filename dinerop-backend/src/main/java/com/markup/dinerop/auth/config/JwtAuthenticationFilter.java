@@ -7,6 +7,8 @@ import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -19,6 +21,8 @@ import java.io.IOException;
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
+
+    private static final Logger log = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
 
     private final JwtService jwtService;
     private final UserRepository userRepository;
@@ -47,7 +51,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                 User user = userRepository.findByEmail(userEmail).orElse(null);
 
-                if (user != null && jwtService.isTokenValid(jwt, user)) {
+                if (user == null) {
+                    log.warn("JWT rejected for {} {}: subject has no matching user", request.getMethod(), request.getRequestURI());
+                } else if (jwtService.isTokenValid(jwt, user)) {
 
                     UsernamePasswordAuthenticationToken authToken =
                             new UsernamePasswordAuthenticationToken(
@@ -61,10 +67,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     );
 
                     SecurityContextHolder.getContext().setAuthentication(authToken);
+                } else {
+                    log.warn("JWT rejected for {} {}: token does not match the resolved user", request.getMethod(), request.getRequestURI());
                 }
             }
 
         } catch (JwtException e) {
+            // Log only the failure category and route. Never log the token or its claims.
+            log.warn("JWT rejected for {} {}: {}", request.getMethod(), request.getRequestURI(), e.getClass().getSimpleName());
             SecurityContextHolder.clearContext();
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return;

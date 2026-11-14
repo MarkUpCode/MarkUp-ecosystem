@@ -1,19 +1,25 @@
 package com.markup.dinerop.security;
 
-import com.markup.dinerop.auth.service.AuthService;
+import com.markup.dinerop.auth.entity.Role;
+import com.markup.dinerop.auth.entity.User;
+import com.markup.dinerop.auth.repository.UserRepository;
+import com.markup.dinerop.auth.service.JwtService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.web.servlet.MvcResult;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 
 @SpringBootTest(properties = {
         "spring.datasource.url=jdbc:h2:mem:dinerop_security_test;MODE=PostgreSQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE",
@@ -29,12 +35,70 @@ class SecurityActivityTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
-    private AuthService authService;
+    @Autowired
+    private JwtService jwtService;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @Test
     void anonymousUserCannotAccessPrivateCreditsEndpoint() throws Exception {
         mockMvc.perform(get("/api/credits/me"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void loginTokenForClientCanAccessMyCreditsEndpoint() throws Exception {
+        userRepository.saveAndFlush(User.builder()
+                .email("jwt-client@example.com")
+                .password(passwordEncoder.encode("test-password"))
+                .role(Role.CLIENT)
+                .status("ACTIVE")
+                .active(true)
+                .build());
+
+        MvcResult login = mockMvc.perform(post("/api/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"email":"jwt-client@example.com","password":"test-password"}
+                                """))
+                .andExpect(status().isOk())
+                .andReturn();
+        String token = objectMapper.readTree(login.getResponse().getContentAsString())
+                .get("accessToken").asText();
+
+        mockMvc.perform(get("/api/credits/me")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(content().json("[]"));
+    }
+
+    @Test
+    void validAdminJwtCannotAccessClientCreditsEndpoint() throws Exception {
+        User admin = userRepository.saveAndFlush(User.builder()
+                .email("jwt-admin@example.com")
+                .password("not-used-by-this-test")
+                .role(Role.ADMIN)
+                .status("ACTIVE")
+                .active(true)
+                .build());
+        String token = jwtService.generateToken(admin);
+
+        mockMvc.perform(get("/api/credits/me")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void invalidJwtCannotAccessMyCreditsEndpoint() throws Exception {
+        mockMvc.perform(get("/api/credits/me")
+                        .header("Authorization", "Bearer not.a.valid.jwt"))
                 .andExpect(status().isUnauthorized());
     }
 
