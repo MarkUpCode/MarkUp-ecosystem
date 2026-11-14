@@ -437,6 +437,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
     final current = spouse ? _conyugeFechaNacimiento : _fechaNacimiento;
     final selected = await showDatePicker(
       context: context,
+      locale: const Locale('es'),
       firstDate: DateTime(1940),
       lastDate: DateTime.now(),
       initialDate: current ?? DateTime(1990),
