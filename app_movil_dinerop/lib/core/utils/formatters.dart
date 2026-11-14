@@ -1,7 +1,7 @@
 import 'package:intl/intl.dart';
 
 final NumberFormat _currencyFormatter =
-NumberFormat.simpleCurrency(locale: 'es_EC');
+    NumberFormat.currency(locale: 'es_EC', name: 'USD', symbol: r'$');
 
 final DateFormat _dateFormatter =
 DateFormat('dd MMM yyyy', 'es');

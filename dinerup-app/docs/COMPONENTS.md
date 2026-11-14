@@ -12,7 +12,7 @@
 | Grupo | Componentes |
 |---|---|
 | `components/auth` | `CompleteRegistrationModal` (perfil, OTP y contraseña) |
-| `components/cooperative` | `CooperativeCard`, `CooperativesCarousel`, `CooperativeLogoMarquee` |
+| `components/cooperative` | `CooperativeCard`, `CooperativesCarousel`, `CooperativeLogoMarquee`, `CooperativeNotificationCenter` (campana/feed del panel de cooperativa) |
 | `components/credit` | `CreditCard`, `CreditDetailsModal`, `NewCreditModal`, `PreApprovalModal`, `PublicCreditRequestModal`, `SuccessRequestModal` |
 | `components/investment` | `NewInvestmentModal` |
 | `components/layout` | `Footer`, `Navbar`, `PlatformVisitsCounter`, `UnderDevelopment`, `WelcomePopup` |

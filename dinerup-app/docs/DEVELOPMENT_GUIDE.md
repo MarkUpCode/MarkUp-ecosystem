@@ -23,6 +23,7 @@ Estos comandos se listan como guía; no se ejecutaron como parte de este anális
 - Endpoint/configuración/transporte: `src/api/`; centralizar nuevas llamadas en servicios por dominio y usar `httpClient`.
 - Contratos de crédito/cooperativa/onboarding: `src/types/` y tipos de API relacionados.
 - Estado de sesión: `src/context/` y `src/api/auth/`.
+- Actualización y feed de actividad cooperativo: `src/hooks/useCooperativeLiveUpdates.ts` y `src/components/cooperative/CooperativeNotificationCenter.tsx`.
 - Páginas: `src/pages/`; componentes de UI agrupados bajo `src/components/`.
 - Datos estáticos: `src/data/`; estilos globales y configuración Tailwind en raíz.
 

@@ -10,6 +10,8 @@ Las páginas mantienen datos de pantalla en `useState`: solicitudes y carga, sec
 
 Ejemplos: `DashboardClient` carga cooperativas, solicitudes y estado de onboarding; `DashboardCooperative` mantiene bandeja, filtros y expediente. `CreditDetailsModal` carga cooperativas disponibles. No se observan Redux, Zustand, TanStack Query, Apollo ni una capa de caché remota.
 
+El dashboard de cooperativa usa `useCooperativeLiveUpdates` para refrescar la bandeja REST cada 15 segundos (y al recuperar visibilidad), comparar snapshots y crear una actividad local que alimenta los toasts y la campana. La lista de notificaciones se mantiene en memoria del componente y se reinicia al recargar; no representa un feed durable del servidor.
+
 ## Formularios
 
 Login combina React Hook Form y Zod vía `@hookform/resolvers/zod`. Otros flujos mantienen estado controlado con hooks y validación imperativa en sus componentes (por ejemplo `NewCreditModal` y `PublicCreditRequestModal`). Los pasos de onboarding comparten información mediante props `data`/`setData` desde `OnboardingPage`.

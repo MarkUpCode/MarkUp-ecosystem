@@ -48,6 +48,8 @@ sequenceDiagram
 
 Las reglas públicas explícitas adicionales en `httpClient` son `POST /api/credits/public-request` y `POST /api/cooperatives`. Se puede sobrescribir con opción `auth`. Los endpoints reflejan únicamente lo que el frontend intenta invocar; no se dispone aquí del código de backend ni de un contrato OpenAPI.
 
+El panel de cooperativa consulta periódicamente `GET /api/credits/cooperative/me/requests` cada 15 segundos y al volver a la pestaña. La campana y los toasts se generan en el cliente al comparar las respuestas (altas, cambios y elementos que dejan de aparecer). No se encontró un endpoint/canal push de notificaciones, por lo que eventos no reflejados en esa respuesta no pueden notificarse en tiempo real desde el estado actual del backend.
+
 ## Otras integraciones
 
 `package.json` contiene `@supabase/supabase-js`, pero no se detectó uso en el código fuente. No se encontraron SDKs o adaptadores de terceros adicionales para backend. `lucide-react` aporta iconos; Swiper está en dependencias (el uso debe confirmarse en los imports de fuente). `fetch` es la integración HTTP efectiva.

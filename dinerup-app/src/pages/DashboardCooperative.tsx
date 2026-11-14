@@ -1,17 +1,19 @@
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import {
   Activity, AlertCircle, BarChart3, Bell, CheckCircle2, ChevronRight,
   Clock3, FileCheck2, FileText, LayoutDashboard, LogOut, Menu, Search,
   Settings2, ShieldCheck, SlidersHorizontal, TrendingUp, User, Users, X,
 } from "lucide-react";
 import type { CooperativeCreditRequest, CooperativeOfferDefaults, CreditRequirement } from "../types/credit";
-import { decideCreditRequest, decideGuaranteeForCreditRequest, getCooperativeOfferDefaults, getCreditRequestTimeline, getMyCooperativeRequests, requestGuaranteeForCreditRequest, type CreditTimelineEvent, type GuaranteeDecision } from "../api/creditRequests.api";
+import { decideCreditRequest, decideGuaranteeForCreditRequest, getCooperativeOfferDefaults, getCreditRequestTimeline, requestGuaranteeForCreditRequest, type CreditTimelineEvent, type GuaranteeDecision } from "../api/creditRequests.api";
 import { getErrorMessage } from "../api/errors";
 import { getOnboardingForCooperative, type OnboardingCooperativeDetail } from "../api/onboarding.api";
 import { useAuth } from "../context/useAuth";
 import { CreditDecision } from "../types/creditDecision";
 import { CreditEstado } from "../types/creditEstado";
 import PreApprovalModal from "../components/credit/PreApprovalModal";
+import CooperativeNotificationCenter from "../components/cooperative/CooperativeNotificationCenter";
+import { useCooperativeLiveUpdates, type CooperativeNotification } from "../hooks/useCooperativeLiveUpdates";
 
 type Filter = "all" | CreditEstado;
 type Section = "overview" | "requests" | "analytics" | "settings";
@@ -26,8 +28,7 @@ const navItems: { id: Section; label: string; icon: typeof LayoutDashboard }[] =
 
 export default function DashboardCooperative() {
   const { user, logout } = useAuth();
-  const [requests, setRequests] = useState<CooperativeCreditRequest[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const { requests, isLoading, connectionError, lastUpdatedAt, notifications, unreadCount, markRead, markAllRead, refresh } = useCooperativeLiveUpdates();
   const [section, setSection] = useState<Section>("overview");
   const [filter, setFilter] = useState<Filter>("all");
   const [search, setSearch] = useState("");
@@ -40,15 +41,18 @@ export default function DashboardCooperative() {
   const [loadingOffer, setLoadingOffer] = useState(false);
   const [applicantDetail, setApplicantDetail] = useState<OnboardingCooperativeDetail | null>(null);
   const [timeline, setTimeline] = useState<CreditTimelineEvent[]>([]);
+  const seenToastIds = useRef(new Set<string>());
+  const [toasts, setToasts] = useState<CooperativeNotification[]>([]);
 
-  useEffect(() => { void loadRequests(); }, []);
-
-  const loadRequests = async () => {
-    setIsLoading(true);
-    try { setRequests(await getMyCooperativeRequests()); }
-    catch (error) { setActionError(getErrorMessage(error, "No se pudieron cargar las solicitudes.")); }
-    finally { setIsLoading(false); }
-  };
+  useEffect(() => {
+    const newNotifications = notifications.filter((notification) => !seenToastIds.current.has(notification.id));
+    if (!newNotifications.length) return;
+    for (const notification of newNotifications) seenToastIds.current.add(notification.id);
+    setToasts((current) => [...newNotifications, ...current].slice(0, 4));
+    for (const notification of newNotifications) {
+      window.setTimeout(() => setToasts((current) => current.filter((item) => item.id !== notification.id)), 7000);
+    }
+  }, [notifications]);
 
   const stats = useMemo<Stats>(() => ({
     total: requests.length,
@@ -65,7 +69,7 @@ export default function DashboardCooperative() {
 
   const openSection = (next: Section) => { setSection(next); setSidebarOpen(false); };
   const handleDecision = async (id: number, decision: CreditDecision, offer?: { tasaAnual: number; plazoMeses: number }, requirements?: CreditRequirement[]) => {
-    try { setProcessingId(id); setActionError(""); await decideCreditRequest(id, decision, offer, requirements); await loadRequests(); }
+    try { setProcessingId(id); setActionError(""); await decideCreditRequest(id, decision, offer, requirements); await refresh(); }
     catch (error) { setActionError(getErrorMessage(error, "No se pudo registrar la decisión.")); throw error; }
     finally { setProcessingId(null); }
   };
@@ -83,12 +87,12 @@ export default function DashboardCooperative() {
     catch (error) { setActionError(getErrorMessage(error, "No se pudo cargar la información del solicitante.")); }
   };
   const requestGuarantee = async (id: number, requirements: CreditRequirement[]) => {
-    try { setProcessingId(id); await requestGuaranteeForCreditRequest(id, requirements); await loadRequests(); }
+    try { setProcessingId(id); await requestGuaranteeForCreditRequest(id, requirements); await refresh(); }
     catch (error) { setActionError(getErrorMessage(error, "No se pudo solicitar el garante.")); throw error; }
     finally { setProcessingId(null); }
   };
   const decideGuarantee = async (id: number, decision: GuaranteeDecision) => {
-    try { setProcessingId(id); await decideGuaranteeForCreditRequest(id, decision); setApplicantDetail(null); await loadRequests(); }
+    try { setProcessingId(id); await decideGuaranteeForCreditRequest(id, decision); setApplicantDetail(null); await refresh(); }
     catch (error) { setActionError(getErrorMessage(error, "No se pudo registrar la decisión del garante.")); }
     finally { setProcessingId(null); }
   };
@@ -102,13 +106,14 @@ export default function DashboardCooperative() {
       </aside>
       {sidebarOpen && <button className="fixed inset-0 z-40 bg-slate-950/50 lg:hidden" onClick={() => setSidebarOpen(false)} aria-label="Cerrar menú" />}
       <div className="min-w-0 flex-1">
-        <header className="sticky top-0 z-30 flex h-20 items-center justify-between border-b border-slate-200/80 bg-white/90 px-4 backdrop-blur-xl sm:px-7"><div className="flex items-center gap-3"><button onClick={() => setSidebarOpen(true)} className="grid h-10 w-10 place-items-center rounded-xl border border-slate-200 text-slate-600 lg:hidden" aria-label="Abrir menú"><Menu className="h-5 w-5" /></button><div><p className="text-xs font-bold uppercase tracking-[0.16em] text-slate-400">{navItems.find((item) => item.id === section)?.label}</p><h1 className="text-xl font-extrabold tracking-tight text-[#173b57] sm:text-2xl">Hola, {String(user?.name ?? "equipo").split(" ")[0]}</h1></div></div><div className="flex items-center gap-3"><button className="relative grid h-10 w-10 place-items-center rounded-xl border border-slate-200 text-slate-500" aria-label="Notificaciones"><Bell className="h-[18px] w-[18px]" /><span className="absolute right-2 top-2 h-1.5 w-1.5 rounded-full bg-[#d6ad61]" /></button><div className="hidden items-center gap-3 border-l border-slate-200 pl-4 sm:flex"><div className="grid h-10 w-10 place-items-center rounded-xl bg-[#edf3f4] text-[#1f6577]"><Users className="h-5 w-5" /></div><div><p className="max-w-[150px] truncate text-sm font-bold">{String(user?.name ?? "Cooperativa")}</p><p className="text-xs text-slate-500">Cuenta cooperativa</p></div></div></div></header>
+        <header className="sticky top-0 z-30 flex h-20 items-center justify-between border-b border-slate-200/80 bg-white/90 px-4 backdrop-blur-xl sm:px-7"><div className="flex items-center gap-3"><button onClick={() => setSidebarOpen(true)} className="grid h-10 w-10 place-items-center rounded-xl border border-slate-200 text-slate-600 lg:hidden" aria-label="Abrir menú"><Menu className="h-5 w-5" /></button><div><p className="text-xs font-bold uppercase tracking-[0.16em] text-slate-400">{navItems.find((item) => item.id === section)?.label}</p><h1 className="text-xl font-extrabold tracking-tight text-[#173b57] sm:text-2xl">Hola, {String(user?.name ?? "equipo").split(" ")[0]}</h1></div></div><div className="flex items-center gap-3"><div className="hidden text-right sm:block"><p className={`text-[11px] font-semibold ${connectionError ? "text-amber-700" : "text-emerald-700"}`}>{connectionError ? "Sin conexión con el servidor" : "Actualización automática activa"}</p><p className="text-[10px] text-slate-400">{lastUpdatedAt ? `Actualizado ${new Date(lastUpdatedAt).toLocaleTimeString("es-EC", { hour: "2-digit", minute: "2-digit" })}` : "Conectando…"}</p></div><CooperativeNotificationCenter notifications={notifications} unreadCount={unreadCount} onMarkRead={markRead} onMarkAllRead={markAllRead} onOpenNotification={(notification) => { setFilter("all"); setSearch(String(notification.requestId)); openSection("requests"); }} /><div className="hidden items-center gap-3 border-l border-slate-200 pl-4 sm:flex"><div className="grid h-10 w-10 place-items-center rounded-xl bg-[#edf3f4] text-[#1f6577]"><Users className="h-5 w-5" /></div><div><p className="max-w-[150px] truncate text-sm font-bold">{String(user?.name ?? "Cooperativa")}</p><p className="text-xs text-slate-500">Cuenta cooperativa</p></div></div></div></header>
         <main className="mx-auto w-full max-w-[1500px] px-4 py-6 sm:px-7 sm:py-8">{actionError && <div className="mb-6 flex items-center gap-3 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700"><AlertCircle className="h-5 w-5" />{actionError}</div>}{section === "overview" && <Overview requests={requests} stats={stats} isLoading={isLoading} onOpenRequests={() => openSection("requests")} onViewApplicant={viewApplicant} onPreApprove={openPreApproval} />}{section === "requests" && <RequestsView requests={filteredRequests} stats={stats} isLoading={isLoading} filter={filter} search={search} setFilter={setFilter} setSearch={setSearch} processingId={processingId} onViewApplicant={viewApplicant} onPreApprove={openPreApproval} onReject={(id) => void handleDecision(id, CreditDecision.RECHAZAR)} />}{section === "analytics" && <Analytics stats={stats} />}{section === "settings" && <SettingsView name={String(user?.name ?? "Cooperativa")} />}</main>
       </div>
     </div>
     {selectedRequest && <PreApprovalModal open={showPreApproval} onClose={() => { setShowPreApproval(false); setSelectedRequest(null); }} solicitudId={selectedRequest.solicitudId} monto={selectedRequest.montoSolicitado} tipo={selectedRequest.tipo} defaults={offerDefaults} loadingDefaults={loadingOffer} onApproveWithoutGuarantee={(id, offer, requirements) => handleDecision(id, CreditDecision.PRE_APROBAR, offer, requirements)} onApproveWithGuarantee={requestGuarantee} isLoading={processingId === selectedRequest.solicitudId} />}
     {applicantDetail && <ApplicantModal detail={applicantDetail} onClose={() => { setApplicantDetail(null); setTimeline([]); }} onDecision={(decision) => void decideGuarantee(applicantDetail.solicitudId, decision)} processing={processingId === applicantDetail.solicitudId} />}
     {applicantDetail && <TimelinePanel events={timeline} />}
+    <div className="fixed right-4 top-24 z-[100] flex w-[min(92vw,390px)] flex-col gap-3 sm:right-6">{toasts.map((toast) => <div key={toast.id} className="flex items-start gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-xl transition hover:-translate-y-0.5"><span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-[#e8f4fb] text-[#1261a0]"><Bell className="h-5 w-5" /></span><button type="button" onClick={() => { markRead(toast.id); setFilter("all"); setSearch(String(toast.requestId)); openSection("requests"); setToasts((current) => current.filter((item) => item.id !== toast.id)); }} className="min-w-0 flex-1 text-left"><span className="block text-sm font-extrabold text-[#173b57]">{toast.title}</span><span className="mt-1 block text-xs leading-5 text-slate-600">{toast.message}</span><span className="mt-2 block text-[10px] font-bold text-[#1f6577]">Ver solicitud #{toast.requestId}</span></button><button type="button" onClick={() => setToasts((current) => current.filter((item) => item.id !== toast.id))} className="rounded-md p-1 text-slate-400 hover:bg-slate-100" aria-label="Cerrar aviso"><X className="h-4 w-4" /></button></div>)}</div>
   </div>;
 }
 
