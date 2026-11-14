@@ -5,6 +5,7 @@ export interface DireccionData {
   canton: string;
   barrio: string;
   callePrincipal: string;
+  calleSecundaria?: string;
   numero: string;
   referenciaUbicacion: string;
   tipoVivienda: "PROPIA" | "ALQUILADA" | "FAMILIAR";

@@ -42,6 +42,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
   final _cantonController = TextEditingController();
   final _barrioController = TextEditingController();
   final _calleController = TextEditingController();
+  final _calleSecundariaController = TextEditingController();
   final _numeroController = TextEditingController();
   final _referenciaUbicacionController = TextEditingController();
   final _nombreNegocioController = TextEditingController();
@@ -120,6 +121,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
     _cantonController.dispose();
     _barrioController.dispose();
     _calleController.dispose();
+    _calleSecundariaController.dispose();
     _numeroController.dispose();
     _referenciaUbicacionController.dispose();
     _nombreNegocioController.dispose();
@@ -535,6 +537,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
           canton: _cantonController.text.trim(),
           barrio: _barrioController.text.trim(),
           callePrincipal: _calleController.text.trim(),
+          calleSecundaria: _calleSecundariaController.text.trim(),
           numero: _numeroController.text.trim(),
           referenciaUbicacion: _referenciaUbicacionController.text.trim(),
           tipoVivienda: _tipoVivienda,
@@ -574,6 +577,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
                 canton: '',
                 barrio: '',
                 callePrincipal: '',
+                calleSecundaria: '',
                 numero: '',
                 referenciaUbicacion: '',
                 tipoVivienda: 'PROPIA',
@@ -1071,7 +1075,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
             hasError: _hasFieldError(_ocupacionController),
             errorAnimationKey: _validationAttempt,
             label: 'Ocupación *',
-            hint: 'Ej: Ingeniero de Sistemas',
+            hint: 'Ej: Comerciante, Empleado, Estudiante',
             prefixIcon: Icons.work_outline,
           ),
           const SizedBox(height: 12),
@@ -1080,7 +1084,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
             hasError: _hasFieldError(_empresaController),
             errorAnimationKey: _validationAttempt,
             label: 'Empresa o Negocio *',
-            hint: 'Ej: Empresa XYZ',
+            hint: 'Ej: Panaderia Juanito',
             prefixIcon: Icons.apartment_outlined,
           ),
         ],
@@ -1158,10 +1162,17 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
           ),
           const SizedBox(height: 12),
           AppTextField(
+            controller: _calleSecundariaController,
+            label: 'Calle Secundaria',
+            hint: 'Ej: Calle B',
+            prefixIcon: Icons.add_road_outlined,
+          ),
+          const SizedBox(height: 12),
+          AppTextField(
             controller: _numeroController,
             hasError: _hasFieldError(_numeroController),
             errorAnimationKey: _validationAttempt,
-            label: 'Número *',
+            label: 'Número de Casa*',
             hint: 'Ej: 123-45',
             prefixIcon: Icons.numbers_outlined,
           ),
@@ -1467,14 +1478,14 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
           AppTextField(
             controller: _conyugeOcupacionController,
             label: 'Ocupación *',
-            hint: 'Ej: Ingeniera',
+            hint: 'Ej: Comerciante, Empleado, Estudiante',
             prefixIcon: Icons.work_outline,
           ),
           const SizedBox(height: 12),
           AppTextField(
             controller: _conyugeEmpresaController,
             label: 'Empresa o Negocio *',
-            hint: 'Ej: Empresa XYZ',
+            hint: 'Ej: Panaderia Juanito',
             prefixIcon: Icons.apartment_outlined,
           ),
         ],

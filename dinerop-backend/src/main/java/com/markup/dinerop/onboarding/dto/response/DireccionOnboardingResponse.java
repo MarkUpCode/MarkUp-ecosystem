@@ -7,6 +7,7 @@ public record DireccionOnboardingResponse(
         String canton,
         String barrio,
         String callePrincipal,
+        String calleSecundaria,
         String numero,
         String referenciaUbicacion,
         TipoVivienda tipoVivienda

@@ -4,6 +4,7 @@ class OnboardingAddressRequest {
     required this.canton,
     this.barrio,
     this.callePrincipal,
+    this.calleSecundaria,
     this.numero,
     this.referenciaUbicacion,
     this.tipoVivienda,
@@ -13,6 +14,7 @@ class OnboardingAddressRequest {
   final String canton;
   final String? barrio;
   final String? callePrincipal;
+  final String? calleSecundaria;
   final String? numero;
   final String? referenciaUbicacion;
   final String? tipoVivienda;
@@ -22,6 +24,7 @@ class OnboardingAddressRequest {
         'canton': canton,
         'barrio': barrio,
         'callePrincipal': callePrincipal,
+        'calleSecundaria': calleSecundaria,
         'numero': numero,
         'referenciaUbicacion': referenciaUbicacion,
         'tipoVivienda': tipoVivienda,

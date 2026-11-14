@@ -18,6 +18,7 @@ public class DireccionRequest {
 
     private String barrio;
     private String callePrincipal;
+    private String calleSecundaria;
     private String numero;
     private String referenciaUbicacion;
     private TipoVivienda tipoVivienda;

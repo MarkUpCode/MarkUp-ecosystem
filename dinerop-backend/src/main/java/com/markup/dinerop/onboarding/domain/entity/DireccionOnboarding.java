@@ -25,6 +25,7 @@ public class DireccionOnboarding {
     private String canton;
     private String barrio;
     private String callePrincipal;
+    private String calleSecundaria;
     private String numero;
     private String referenciaUbicacion;
 
