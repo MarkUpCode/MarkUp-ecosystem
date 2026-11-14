@@ -11,7 +11,7 @@
 | GET | `/api/cooperatives` | Obtener cooperativas |
 | GET, POST | `/api/credits/me` | Listar solicitudes del cliente / crear solicitud |
 | GET | `/api/credits/cooperative/me/requests` | Bandeja de la cooperativa |
-| PUT | `/api/credits/cooperative/me/requests/{id}/decision` | Decidir solicitud con oferta/requisitos |
+| PUT | `/api/credits/cooperative/me/requests/{id}/decision` | Decidir solicitud con oferta/requisitos o motivos de rechazo |
 | GET | `/api/credits/cooperative/me/requests/{id}/offer-defaults` | Valores sugeridos de oferta |
 | PUT | `/api/credits/cooperative/me/requests/{id}/solicitar-garante` | Solicitar garante |
 | GET | `/api/credits/me/{id}/pre-approved` | Cooperativas con preaprobación |

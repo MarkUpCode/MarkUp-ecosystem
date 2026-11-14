@@ -5,6 +5,7 @@ import com.markup.dinerop.credit.domain.model.CreditRequest;
 import com.markup.dinerop.credit.domain.model.SolicitudCooperativa;
 import com.markup.dinerop.credit.domain.model.SolicitudCooperativaCotizacion;
 import com.markup.dinerop.credit.domain.model.enums.SolicitudCooperativaStatus;
+import com.markup.dinerop.credit.domain.model.enums.CreditRejectionReason;
 import com.markup.dinerop.credit.domain.service.calculation.LoanCalculator;
 import com.markup.dinerop.credit.dto.CooperativeOfferDefaultsDto;
 import com.markup.dinerop.credit.infrastructure.repository.SolicitudCooperativaCotizacionRepository;
@@ -19,6 +20,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -38,7 +40,8 @@ public class CooperativeCreditDecisionService {
             String decision,
             BigDecimal tasaAnual,
             Integer plazoMeses,
-            java.util.List<CreditRequirementDto> requisitos
+            List<CreditRequirementDto> requisitos,
+            List<CreditRejectionReason> motivosRechazo
     ) {
 
         SolicitudCooperativa sc = repository
@@ -119,8 +122,23 @@ public class CooperativeCreditDecisionService {
 
         } else if ("RECHAZAR".equalsIgnoreCase(decision)) {
 
+            if (motivosRechazo == null || motivosRechazo.isEmpty()) {
+                throw new IllegalArgumentException("Selecciona al menos un motivo de rechazo");
+            }
+            if (motivosRechazo.size() > 4) {
+                throw new IllegalArgumentException("Puedes seleccionar hasta cuatro motivos de rechazo");
+            }
             sc.setEstado(SolicitudCooperativaStatus.RECHAZADA);
+            sc.setMotivosRechazo(List.copyOf(motivosRechazo.stream().distinct().toList()));
             repository.save(sc);
+            var cooperativeName = cooperativeService.getById(cooperativaId).getNombre();
+            var labels = sc.getMotivosRechazo().stream()
+                    .map(CreditRejectionReason::getLabel)
+                    .toList();
+            notificationService.sendCreditRejectionEmail(cr.getEmail(), cooperativeName, labels);
+            if (cr.getClientId() != null) {
+                pushNotificationService.sendCreditRejected(cr.getClientId(), cooperativeName, labels, cr.getId());
+            }
 
         } else {
             throw new IllegalArgumentException("Decision invalida");

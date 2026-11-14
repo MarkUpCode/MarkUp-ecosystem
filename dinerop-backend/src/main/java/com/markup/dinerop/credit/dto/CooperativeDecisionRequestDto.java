@@ -4,6 +4,7 @@ import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
+import com.markup.dinerop.credit.domain.model.enums.CreditRejectionReason;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -19,5 +20,7 @@ public record CooperativeDecisionRequestDto(
         @Max(value = 360, message = "El plazo no puede superar 360 meses")
         Integer plazoMeses,
 
-        List<CreditRequirementDto> requisitos
+        List<CreditRequirementDto> requisitos,
+
+        List<CreditRejectionReason> motivosRechazo
 ) {}

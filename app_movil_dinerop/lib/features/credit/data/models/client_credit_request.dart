@@ -8,6 +8,7 @@ class ClientCreditRequestSummary {
     required this.tipo,
     required this.fechaSolicitud,
     required this.cantidadSolicitudesEnviadas,
+    this.motivosRechazo = const [],
   });
 
   final int solicitudId;
@@ -16,6 +17,7 @@ class ClientCreditRequestSummary {
   final String tipo;
   final DateTime? fechaSolicitud;
   final int cantidadSolicitudesEnviadas;
+  final List<String> motivosRechazo;
 
   factory ClientCreditRequestSummary.fromJson(Map<String, dynamic> json) {
     return ClientCreditRequestSummary(
@@ -25,6 +27,9 @@ class ClientCreditRequestSummary {
       tipo: (json['tipo'] ?? '').toString(),
       fechaSolicitud: DateTime.tryParse((json['fechaSolicitud'] ?? '').toString()),
       cantidadSolicitudesEnviadas: (json['cantidadSolicitudesEnviadas'] as num?)?.toInt() ?? 0,
+      motivosRechazo: (json['motivosRechazo'] as List<dynamic>? ?? const [])
+          .map((item) => item.toString())
+          .toList(),
     );
   }
 }

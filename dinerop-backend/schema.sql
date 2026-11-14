@@ -251,6 +251,14 @@ CREATE TABLE public.solicitud_cooperativa_evento (
 	fecha timestamp(6) NOT NULL
 );
 
+CREATE TABLE public.solicitud_cooperativa_motivo_rechazo (
+    solicitud_cooperativa_id int8 NOT NULL,
+    motivo varchar(40) NOT NULL,
+    CONSTRAINT fk_rechazo_solicitud_cooperativa
+        FOREIGN KEY (solicitud_cooperativa_id)
+        REFERENCES public.solicitud_cooperativa(id)
+);
+
 -- public.solicitud_cooperativa_cotizacion definition
 
 -- Drop table

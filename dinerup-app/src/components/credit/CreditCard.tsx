@@ -205,6 +205,15 @@ export default function CreditCard({ request }: CreditCardProps) {
           )}
         </section>
 
+        {request.estado === "RECHAZADA" && request.motivosRechazo?.length ? (
+          <section className="rounded-xl border border-red-100 bg-red-50 p-4">
+            <p className="text-sm font-bold text-red-800">Motivos del rechazo</p>
+            <ul className="mt-2 space-y-1 text-sm text-red-700">
+              {request.motivosRechazo.map((reason) => <li key={reason}>• {reason}</li>)}
+            </ul>
+          </section>
+        ) : null}
+
         {/* Botón Ver Información - solo si no está rechazada */}
         {request.estado !== 'RECHAZADA' && (
           <button 

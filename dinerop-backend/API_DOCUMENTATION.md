@@ -450,9 +450,19 @@ Registra la decisión de la cooperativa sobre una solicitud (pre-aprobar o recha
 **Request body:**
 ```json
 {
-  "decision": "PRE_APROBAR | RECHAZAR"
+  "decision": "PRE_APROBAR | RECHAZAR",
+  "motivosRechazo": [
+    "CAPACIDAD_DE_PAGO",
+    "TIEMPO_DE_NEGOCIO",
+    "BURO_DEL_CREDITO",
+    "OTROS"
+  ]
 }
 ```
+
+`motivosRechazo` es obligatorio cuando `decision` es `RECHAZAR` y admite
+uno o más motivos, con un máximo de cuatro. El rechazo se persiste y se
+notifica por correo y push al cliente.
 
 **Response `200`:**
 ```json

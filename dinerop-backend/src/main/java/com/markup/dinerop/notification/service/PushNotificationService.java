@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -54,6 +55,17 @@ public class PushNotificationService {
     @Transactional
     public void sendCreditAccepted(Long userId, String title, String body, Long solicitudId) {
         sendToUser(userId, title, body, "CREDIT_ACCEPTED", solicitudId);
+    }
+
+    @Transactional
+    public void sendCreditRejected(Long userId, String cooperativeName, List<String> reasons, Long solicitudId) {
+        sendToUser(
+                userId,
+                "Tu solicitud fue rechazada",
+                cooperativeName + " indicó: " + String.join(", ", reasons),
+                "CREDIT_REJECTED",
+                solicitudId
+        );
     }
 
     @Transactional

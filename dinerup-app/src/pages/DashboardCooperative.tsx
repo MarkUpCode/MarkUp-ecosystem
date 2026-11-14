@@ -12,6 +12,7 @@ import { useAuth } from "../context/useAuth";
 import { CreditDecision } from "../types/creditDecision";
 import { CreditEstado } from "../types/creditEstado";
 import PreApprovalModal from "../components/credit/PreApprovalModal";
+import RejectCreditModal from "../components/credit/RejectCreditModal";
 import CooperativeNotificationCenter from "../components/cooperative/CooperativeNotificationCenter";
 import { useCooperativeLiveUpdates, type CooperativeNotification } from "../hooks/useCooperativeLiveUpdates";
 
@@ -38,6 +39,7 @@ export default function DashboardCooperative() {
   const [selectedRequest, setSelectedRequest] = useState<CooperativeCreditRequest | null>(null);
   const [offerDefaults, setOfferDefaults] = useState<CooperativeOfferDefaults | null>(null);
   const [showPreApproval, setShowPreApproval] = useState(false);
+  const [rejectingId, setRejectingId] = useState<number | null>(null);
   const [loadingOffer, setLoadingOffer] = useState(false);
   const [applicantDetail, setApplicantDetail] = useState<OnboardingCooperativeDetail | null>(null);
   const [timeline, setTimeline] = useState<CreditTimelineEvent[]>([]);
@@ -68,8 +70,8 @@ export default function DashboardCooperative() {
   }), [filter, requests, search]);
 
   const openSection = (next: Section) => { setSection(next); setSidebarOpen(false); };
-  const handleDecision = async (id: number, decision: CreditDecision, offer?: { tasaAnual: number; plazoMeses: number }, requirements?: CreditRequirement[]) => {
-    try { setProcessingId(id); setActionError(""); await decideCreditRequest(id, decision, offer, requirements); await refresh(); }
+  const handleDecision = async (id: number, decision: CreditDecision, offer?: { tasaAnual: number; plazoMeses: number }, requirements?: CreditRequirement[], motivosRechazo?: string[]) => {
+    try { setProcessingId(id); setActionError(""); await decideCreditRequest(id, decision, offer, requirements, motivosRechazo); await refresh(); }
     catch (error) { setActionError(getErrorMessage(error, "No se pudo registrar la decisión.")); throw error; }
     finally { setProcessingId(null); }
   };
@@ -96,6 +98,11 @@ export default function DashboardCooperative() {
     catch (error) { setActionError(getErrorMessage(error, "No se pudo registrar la decisión del garante.")); }
     finally { setProcessingId(null); }
   };
+  const rejectRequest = async (reasons: string[]) => {
+    if (rejectingId == null) return;
+    try { await handleDecision(rejectingId, CreditDecision.RECHAZAR, undefined, undefined, reasons); setRejectingId(null); }
+    catch (error) { setActionError(getErrorMessage(error, "No se pudo registrar el rechazo.")); }
+  };
 
   return <div className="coop-dashboard min-h-screen bg-[#f5f7f8] text-slate-900">
     <div className="flex min-h-screen">
@@ -107,10 +114,11 @@ export default function DashboardCooperative() {
       {sidebarOpen && <button className="fixed inset-0 z-40 bg-slate-950/50 lg:hidden" onClick={() => setSidebarOpen(false)} aria-label="Cerrar menú" />}
       <div className="min-w-0 flex-1">
         <header className="sticky top-0 z-30 flex h-20 items-center justify-between border-b border-slate-200/80 bg-white/90 px-4 backdrop-blur-xl sm:px-7"><div className="flex items-center gap-3"><button onClick={() => setSidebarOpen(true)} className="grid h-10 w-10 place-items-center rounded-xl border border-slate-200 text-slate-600 lg:hidden" aria-label="Abrir menú"><Menu className="h-5 w-5" /></button><div><p className="text-xs font-bold uppercase tracking-[0.16em] text-slate-400">{navItems.find((item) => item.id === section)?.label}</p><h1 className="text-xl font-extrabold tracking-tight text-[#173b57] sm:text-2xl">Hola, {String(user?.name ?? "equipo").split(" ")[0]}</h1></div></div><div className="flex items-center gap-3"><div className="hidden text-right sm:block"><p className={`text-[11px] font-semibold ${connectionError ? "text-amber-700" : "text-emerald-700"}`}>{connectionError ? "Sin conexión con el servidor" : "Actualización automática activa"}</p><p className="text-[10px] text-slate-400">{lastUpdatedAt ? `Actualizado ${new Date(lastUpdatedAt).toLocaleTimeString("es-EC", { hour: "2-digit", minute: "2-digit" })}` : "Conectando…"}</p></div><CooperativeNotificationCenter notifications={notifications} unreadCount={unreadCount} onMarkRead={markRead} onMarkAllRead={markAllRead} onOpenNotification={(notification) => { setFilter("all"); setSearch(String(notification.requestId)); openSection("requests"); }} /><div className="hidden items-center gap-3 border-l border-slate-200 pl-4 sm:flex"><div className="grid h-10 w-10 place-items-center rounded-xl bg-[#edf3f4] text-[#1f6577]"><Users className="h-5 w-5" /></div><div><p className="max-w-[150px] truncate text-sm font-bold">{String(user?.name ?? "Cooperativa")}</p><p className="text-xs text-slate-500">Cuenta cooperativa</p></div></div></div></header>
-        <main className="mx-auto w-full max-w-[1500px] px-4 py-6 sm:px-7 sm:py-8">{actionError && <div className="mb-6 flex items-center gap-3 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700"><AlertCircle className="h-5 w-5" />{actionError}</div>}{section === "overview" && <Overview requests={requests} stats={stats} isLoading={isLoading} onOpenRequests={() => openSection("requests")} onViewApplicant={viewApplicant} onPreApprove={openPreApproval} />}{section === "requests" && <RequestsView requests={filteredRequests} stats={stats} isLoading={isLoading} filter={filter} search={search} setFilter={setFilter} setSearch={setSearch} processingId={processingId} onViewApplicant={viewApplicant} onPreApprove={openPreApproval} onReject={(id) => void handleDecision(id, CreditDecision.RECHAZAR)} />}{section === "analytics" && <Analytics stats={stats} />}{section === "settings" && <SettingsView name={String(user?.name ?? "Cooperativa")} />}</main>
+        <main className="mx-auto w-full max-w-[1500px] px-4 py-6 sm:px-7 sm:py-8">{actionError && <div className="mb-6 flex items-center gap-3 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700"><AlertCircle className="h-5 w-5" />{actionError}</div>}{section === "overview" && <Overview requests={requests} stats={stats} isLoading={isLoading} onOpenRequests={() => openSection("requests")} onViewApplicant={viewApplicant} onPreApprove={openPreApproval} />}{section === "requests" && <RequestsView requests={filteredRequests} stats={stats} isLoading={isLoading} filter={filter} search={search} setFilter={setFilter} setSearch={setSearch} processingId={processingId} onViewApplicant={viewApplicant} onPreApprove={openPreApproval} onReject={setRejectingId} />}{section === "analytics" && <Analytics stats={stats} />}{section === "settings" && <SettingsView name={String(user?.name ?? "Cooperativa")} />}</main>
       </div>
     </div>
     {selectedRequest && <PreApprovalModal open={showPreApproval} onClose={() => { setShowPreApproval(false); setSelectedRequest(null); }} solicitudId={selectedRequest.solicitudId} monto={selectedRequest.montoSolicitado} tipo={selectedRequest.tipo} defaults={offerDefaults} loadingDefaults={loadingOffer} onApproveWithoutGuarantee={(id, offer, requirements) => handleDecision(id, CreditDecision.PRE_APROBAR, offer, requirements)} onApproveWithGuarantee={requestGuarantee} isLoading={processingId === selectedRequest.solicitudId} />}
+    <RejectCreditModal open={rejectingId !== null} loading={processingId === rejectingId} onClose={() => setRejectingId(null)} onConfirm={rejectRequest} />
     {applicantDetail && <ApplicantModal detail={applicantDetail} onClose={() => { setApplicantDetail(null); setTimeline([]); }} onDecision={(decision) => void decideGuarantee(applicantDetail.solicitudId, decision)} processing={processingId === applicantDetail.solicitudId} />}
     {applicantDetail && <TimelinePanel events={timeline} />}
     <div className="fixed right-4 top-24 z-[100] flex w-[min(92vw,390px)] flex-col gap-3 sm:right-6">{toasts.map((toast) => <div key={toast.id} className="flex items-start gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-xl transition hover:-translate-y-0.5"><span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-[#e8f4fb] text-[#1261a0]"><Bell className="h-5 w-5" /></span><button type="button" onClick={() => { markRead(toast.id); setFilter("all"); setSearch(String(toast.requestId)); openSection("requests"); setToasts((current) => current.filter((item) => item.id !== toast.id)); }} className="min-w-0 flex-1 text-left"><span className="block text-sm font-extrabold text-[#173b57]">{toast.title}</span><span className="mt-1 block text-xs leading-5 text-slate-600">{toast.message}</span><span className="mt-2 block text-[10px] font-bold text-[#1f6577]">Ver solicitud #{toast.requestId}</span></button><button type="button" onClick={() => setToasts((current) => current.filter((item) => item.id !== toast.id))} className="rounded-md p-1 text-slate-400 hover:bg-slate-100" aria-label="Cerrar aviso"><X className="h-4 w-4" /></button></div>)}</div>

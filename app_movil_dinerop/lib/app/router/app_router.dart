@@ -14,6 +14,7 @@ import '../../features/auth/presentation/screens/reset_password_page.dart';
 import '../../features/auth/presentation/screens/splash_page.dart';
 import '../../features/cooperative/presentation/cooperatives_page.dart';
 import '../../features/credit/presentation/credit_simulator_page.dart';
+import '../../features/credit/presentation/credit_bureau_page.dart';
 import '../../features/credit/presentation/investment_simulator_page.dart';
 import '../../features/credit/presentation/request_credit_page.dart';
 import '../../features/dashboard/presentation/dashboard_page.dart';
@@ -170,6 +171,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/request-credit',
         builder: (context, state) => const RequestCreditPage(),
+      ),
+      GoRoute(
+        path: '/credit-bureau',
+        builder: (context, state) => const CreditBureauPage(),
       ),
       ShellRoute(
         builder: (context, state, child) => AppShell(child: child),

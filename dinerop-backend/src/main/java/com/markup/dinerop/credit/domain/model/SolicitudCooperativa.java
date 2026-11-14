@@ -1,10 +1,13 @@
 package com.markup.dinerop.credit.domain.model;
 
 import com.markup.dinerop.credit.domain.model.enums.SolicitudCooperativaStatus;
+import com.markup.dinerop.credit.domain.model.enums.CreditRejectionReason;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(
@@ -50,6 +53,16 @@ public class SolicitudCooperativa {
 
     @Column(name = "fecha_actualizacion")
     private LocalDateTime fechaActualizacion;
+
+    @ElementCollection
+    @CollectionTable(
+            name = "solicitud_cooperativa_motivo_rechazo",
+            joinColumns = @JoinColumn(name = "solicitud_cooperativa_id")
+    )
+    @Column(name = "motivo", nullable = false, length = 40)
+    @Enumerated(EnumType.STRING)
+    @Builder.Default
+    private List<CreditRejectionReason> motivosRechazo = new ArrayList<>();
 
     @PrePersist
     void onCreate() {

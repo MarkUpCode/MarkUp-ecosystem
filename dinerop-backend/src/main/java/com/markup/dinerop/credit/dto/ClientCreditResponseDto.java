@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Builder
@@ -20,5 +21,6 @@ public class ClientCreditResponseDto {
     private String tipo;
     private LocalDateTime fechaSolicitud;
     private Integer cantidadSolicitudesEnviadas;
+    private List<String> motivosRechazo;
 }
 

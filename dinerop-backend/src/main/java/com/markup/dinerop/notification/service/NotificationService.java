@@ -14,6 +14,7 @@ import com.markup.dinerop.notification.template.EmailTemplate;
 import com.markup.dinerop.notification.util.EmailTemplateEngine;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -286,6 +287,36 @@ public class NotificationService {
                 .to(to)
                 .subject("Nueva oferta de crédito de " + cooperativeName)
                 .htmlContent(emailTemplateEngine.render(template))
+                .build());
+    }
+
+    public void sendCreditRejectionEmail(
+            String to,
+            String cooperativeName,
+            List<String> reasons
+    ) {
+        String html = """
+                <!DOCTYPE html>
+                <html lang="es">
+                <head><meta charset="UTF-8"></head>
+                <body style="font-family:Arial,sans-serif;background:#f4f7fb;padding:40px;">
+                  <div style="max-width:600px;margin:auto;background:#fff;border-radius:16px;padding:36px;">
+                    <h2 style="color:#173b57;">Actualización de tu solicitud de crédito</h2>
+                    <p>La cooperativa <strong>%s</strong> no pudo aprobar tu solicitud en esta ocasión.</p>
+                    <p>Motivos registrados:</p>
+                    <ul>%s</ul>
+                    <p style="color:#64748b;font-size:13px;">Puedes revisar el detalle de tu solicitud desde Dinerop.</p>
+                  </div>
+                </body>
+                </html>
+                """.formatted(
+                cooperativeName,
+                reasons.stream().map(reason -> "<li>" + reason + "</li>").collect(java.util.stream.Collectors.joining())
+        );
+        sendEmail(SendEmailDto.builder()
+                .to(to)
+                .subject("Actualización de tu solicitud de crédito")
+                .htmlContent(html)
                 .build());
     }
 

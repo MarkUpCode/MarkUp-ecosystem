@@ -13,6 +13,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import com.markup.dinerop.credit.domain.model.enums.CreditRejectionReason;
 
 @Service
 @RequiredArgsConstructor
@@ -52,6 +53,12 @@ public class ClientCreditQueryService {
     private ClientCreditResponseDto toDto(CreditRequest cr, List<SolicitudCooperativa> distribuciones) {
         int cantidad = distribuciones.size();
         String estado = calcularEstadoAgregado(cr, distribuciones);
+        List<String> motivos = distribuciones.stream()
+                .filter(sc -> sc.getEstado() == SolicitudCooperativaStatus.RECHAZADA)
+                .flatMap(sc -> sc.getMotivosRechazo().stream())
+                .distinct()
+                .map(CreditRejectionReason::getLabel)
+                .toList();
 
         return ClientCreditResponseDto.builder()
                 .solicitudId(cr.getId())
@@ -60,6 +67,7 @@ public class ClientCreditQueryService {
                 .tipo(cr.getTipo().name())
                 .fechaSolicitud(cr.getFechaSolicitud())
                 .cantidadSolicitudesEnviadas(cantidad)
+                .motivosRechazo(motivos)
                 .build();
     }
 

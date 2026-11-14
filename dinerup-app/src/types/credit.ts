@@ -16,6 +16,7 @@ interface BaseCreditRequest {
 export interface CreditRequest extends BaseCreditRequest {
   monto: number;
   cantidadSolicitudesEnviadas: number;
+  motivosRechazo?: string[];
 }
 
 /**

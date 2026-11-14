@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/utils/formatters.dart';
@@ -149,6 +150,37 @@ class CreditRequestCard extends StatelessWidget {
                       ],
                     ),
                     if (!compact) ...[
+                      if (request.estado == CreditRequestStatus.rechazada &&
+                          request.motivosRechazo.isNotEmpty) ...[
+                        const SizedBox(height: 16),
+                        Text(
+                          'Motivos del rechazo',
+                          style: theme.textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        ...request.motivosRechazo.map(
+                          (reason) => Padding(
+                            padding: const EdgeInsets.only(bottom: 5),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Icon(Icons.info_outline_rounded,
+                                    size: 16, color: style.color),
+                                const SizedBox(width: 7),
+                                Expanded(child: Text(reason)),
+                              ],
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        OutlinedButton.icon(
+                          onPressed: () => context.push('/credit-bureau'),
+                          icon: const Icon(Icons.fact_check_outlined),
+                          label: const Text('Consultar buro'),
+                        ),
+                      ],
                       const SizedBox(height: 14),
                       Row(
                         children: [
