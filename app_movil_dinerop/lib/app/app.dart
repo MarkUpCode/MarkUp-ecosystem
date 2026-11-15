@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../features/auth/presentation/auth_controller.dart';
@@ -53,6 +54,16 @@ class _DineropAppState extends ConsumerState<DineropApp>
       theme: AppTheme.light(),
       darkTheme: AppTheme.dark(),
       themeMode: themeMode,
+      locale: const Locale('es', 'EC'),
+      supportedLocales: const [
+        Locale('es', 'EC'),
+        Locale('es'),
+      ],
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
       routerConfig: router,
     );
   }

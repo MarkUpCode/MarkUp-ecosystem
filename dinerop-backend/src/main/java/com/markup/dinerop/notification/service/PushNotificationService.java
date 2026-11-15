@@ -11,6 +11,7 @@ import com.markup.dinerop.notification.repository.PushDeviceTokenRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
@@ -79,15 +80,19 @@ public class PushNotificationService {
         );
     }
 
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void sendGuaranteeRejected(Long userId, String cooperativeName, List<String> reasons, Long solicitudId) {
-        sendToUser(
-                userId,
-                "Necesitas un nuevo garante",
-                cooperativeName + " solicita corregir o cambiar el garante. Motivos: " + String.join("; ", reasons),
-                "GUARANTEE_REJECTED",
-                solicitudId
-        );
+        try {
+            sendToUser(
+                    userId,
+                    "Necesitas un nuevo garante",
+                    cooperativeName + " solicita corregir o cambiar el garante. Motivos: " + String.join("; ", reasons),
+                    "GUARANTEE_REJECTED",
+                    solicitudId
+            );
+        } catch (RuntimeException exception) {
+            log.error("Could not prepare guarantee rejection push for user {}", userId, exception);
+        }
     }
 
     private void sendToUser(

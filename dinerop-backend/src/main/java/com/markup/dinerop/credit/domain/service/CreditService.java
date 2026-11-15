@@ -525,6 +525,8 @@ public class CreditService {
             List<CreditRejectionReason> motivosRechazo,
             String motivoRechazoOtro
     ) {
+        log.info("[CREDIT_GUARANTEE] Processing decision: requestId={}, cooperativeId={}, decision={}, reasonCount={}",
+                solicitudId, cooperativaId, decision, motivosRechazo == null ? 0 : motivosRechazo.size());
         SolicitudCooperativa sc = solicitudCooperativaRepository
                 .findBySolicitudIdAndCooperativaId(solicitudId, cooperativaId)
                 .orElseThrow(() -> new IllegalStateException("Solicitud cooperativa no encontrada"));
@@ -656,17 +658,29 @@ public class CreditService {
             List<String> reasonLabels = normalizedReasons.stream()
                     .map(reason -> reason == CreditRejectionReason.OTROS ? otherReason : reason.getLabel())
                     .toList();
-            notificationService.sendNewGuaranteeRequiredEmail(
-                    sc.getCreditRequest().getEmail(),
-                    cooperativeName,
-                    reasonLabels
-            );
-            pushNotificationService.sendGuaranteeRejected(
-                    clientId,
-                    cooperativeName,
-                    reasonLabels,
-                    solicitudId
-            );
+            try {
+                notificationService.sendNewGuaranteeRequiredEmail(
+                        sc.getCreditRequest().getEmail(),
+                        cooperativeName,
+                        reasonLabels
+                );
+            } catch (RuntimeException notificationFailure) {
+                log.error("[CREDIT_GUARANTEE] Decision saved but retry email failed: requestId={}, cooperativeId={}",
+                        solicitudId, cooperativaId, notificationFailure);
+            }
+            try {
+                pushNotificationService.sendGuaranteeRejected(
+                        clientId,
+                        cooperativeName,
+                        reasonLabels,
+                        solicitudId
+                );
+            } catch (RuntimeException notificationFailure) {
+                log.error("[CREDIT_GUARANTEE] Decision saved but push notification failed: requestId={}, cooperativeId={}",
+                        solicitudId, cooperativaId, notificationFailure);
+            }
+            log.info("[CREDIT_GUARANTEE] New guarantor requested: requestId={}, cooperativeId={}",
+                    solicitudId, cooperativaId);
             return;
         }
 
