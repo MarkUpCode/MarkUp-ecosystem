@@ -1,5 +1,5 @@
 import { AlertCircle, CheckCircle, Shield, X } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { CooperativeOfferDefaults, CreditRequirement } from "../../types/credit";
 
 interface PreApprovalModalProps {
@@ -40,6 +40,30 @@ export default function PreApprovalModal({
     { title: "Respaldo de ingresos", description: "Según actividad económica", category: "INGRESOS", mandatory: true },
     { title: "Constancia de referencia Dinerop", description: "Documento generado por la aplicación", category: "DINEROP", mandatory: true },
   ]);
+  const offerPreview = useMemo(() => {
+    const annualRate = Number(tasaAnual);
+    const term = Number(plazoMeses);
+    if (
+      !Number.isFinite(monto) || monto <= 0 ||
+      !Number.isFinite(annualRate) || annualRate <= 0 || annualRate > 100 ||
+      !Number.isInteger(term) || term < 1 || term > 360
+    ) return null;
+
+    const annualFraction = Math.round((annualRate / 100) * 1e10) / 1e10;
+    const monthlyRate = Math.round((annualFraction / 12) * 1e10) / 1e10;
+    const rawInstallment = monthlyRate === 0
+      ? monto / term
+      : (monto * monthlyRate) / (1 - Math.pow(1 + monthlyRate, -term));
+    const monthlyInstallment = Math.round((rawInstallment + Number.EPSILON) * 100) / 100;
+    const totalToPay = monthlyInstallment * term;
+    return { monthlyInstallment, totalToPay, totalInterest: totalToPay - monto };
+  }, [monto, plazoMeses, tasaAnual]);
+  const formatCurrency = (amount: number) => new Intl.NumberFormat("es-EC", {
+    style: "currency",
+    currency: "USD",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(amount);
 
   useEffect(() => {
     if (open && defaults) {
@@ -144,14 +168,38 @@ export default function PreApprovalModal({
               <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
                 <label className="text-sm font-medium text-gray-700">
                   Tasa anual (%)
-                  <input type="number" min="0.001" max="100" step="0.001" value={tasaAnual} onChange={(event) => setTasaAnual(event.target.value)} className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2" />
+                  <input type="number" min="0.001" max="100" step="0.001" value={tasaAnual} onChange={(event) => { setTasaAnual(event.target.value); setFormError(""); }} className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2" />
                 </label>
                 <label className="text-sm font-medium text-gray-700">
                   Plazo (meses)
-                  <input type="number" min="1" max="360" step="1" value={plazoMeses} onChange={(event) => setPlazoMeses(event.target.value)} className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2" />
+                  <input type="number" min="1" max="360" step="1" value={plazoMeses} onChange={(event) => { setPlazoMeses(event.target.value); setFormError(""); }} className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2" />
                 </label>
               </div>
             )}
+            {offerPreview && <div className="mt-5 rounded-xl border border-slate-200 bg-slate-50 p-4">
+              <div className="mb-3 flex flex-wrap items-baseline justify-between gap-1">
+                <h4 className="text-sm font-bold text-slate-800">Resumen estimado</h4>
+                <span className="text-xs text-slate-500">Se actualiza al cambiar tasa o plazo</span>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="rounded-lg bg-white p-3">
+                  <p className="text-xs text-slate-500">Monto solicitado</p>
+                  <p className="mt-1 text-base font-bold text-slate-900">{formatCurrency(monto)}</p>
+                </div>
+                <div className="rounded-lg bg-white p-3">
+                  <p className="text-xs text-slate-500">Cuota mensual estimada</p>
+                  <p className="mt-1 text-base font-bold text-slate-900">{formatCurrency(offerPreview.monthlyInstallment)}</p>
+                </div>
+                <div className="rounded-lg bg-white p-3">
+                  <p className="text-xs text-slate-500">Interés total estimado</p>
+                  <p className="mt-1 text-base font-bold text-emerald-700">{formatCurrency(offerPreview.totalInterest)}</p>
+                </div>
+                <div className="rounded-lg bg-white p-3">
+                  <p className="text-xs text-slate-500">Total a pagar</p>
+                  <p className="mt-1 text-base font-bold text-slate-900">{formatCurrency(offerPreview.totalToPay)}</p>
+                </div>
+              </div>
+            </div>}
             {formError && <p className="mt-3 text-sm text-red-600">{formError}</p>}
           </div>
 
@@ -167,7 +215,7 @@ export default function PreApprovalModal({
                         </div>
                         <div className="mt-4 space-y-3">
                           {requirements.map((requirement, index) => (
-                            <div key={`${index}-${requirement.title}`} className="grid gap-2 md:grid-cols-[1fr_1fr_auto_auto]">
+                            <div key={index} className="grid gap-2 md:grid-cols-[1fr_1fr_auto_auto]">
                               <input value={requirement.title} placeholder="Documento requerido" onChange={(event) => setRequirements((items) => items.map((item, itemIndex) => itemIndex === index ? { ...item, title: event.target.value } : item))} className="rounded-lg border border-gray-300 px-3 py-2 text-sm" />
                               <input value={requirement.description ?? ""} placeholder="Detalle" onChange={(event) => setRequirements((items) => items.map((item, itemIndex) => itemIndex === index ? { ...item, description: event.target.value } : item))} className="rounded-lg border border-gray-300 px-3 py-2 text-sm" />
                               <label className="flex items-center gap-2 rounded-lg border border-gray-300 px-3 py-2 text-sm">
