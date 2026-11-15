@@ -5,6 +5,8 @@ import com.markup.dinerop.credit.domain.model.CreditRequest;
 import com.markup.dinerop.credit.infrastructure.repository.CreditRequestRepository;
 import com.markup.dinerop.credit.domain.model.CreditProcessEvent;
 import com.markup.dinerop.credit.infrastructure.repository.CreditProcessEventRepository;
+import com.markup.dinerop.credit.infrastructure.repository.SolicitudCooperativaRepository;
+import com.markup.dinerop.credit.domain.model.enums.SolicitudCooperativaStatus;
 import com.markup.dinerop.onboarding.application.service.OnboardingService;
 import com.markup.dinerop.onboarding.domain.entity.*;
 import com.markup.dinerop.onboarding.domain.enums.EstadoFormulario;
@@ -43,6 +45,7 @@ public class OnboardingServiceImpl implements OnboardingService {
     private final UserPreRegistrationRepository userPreRegistrationRepository;
     private final CreditRequestRepository creditRequestRepository;
     private final CreditProcessEventRepository creditProcessEventRepository;
+    private final SolicitudCooperativaRepository solicitudCooperativaRepository;
 
     @Override
     public SolicitudOnboarding crearSolicitudConSolicitante(
@@ -138,13 +141,19 @@ public class OnboardingServiceImpl implements OnboardingService {
         creditRequestRepository.findByClientId(clientId).stream()
                 .filter(creditRequest -> creditRequest.getEstado() != null)
                 .findFirst()
-                .ifPresent(creditRequest -> creditProcessEventRepository.save(
-                        CreditProcessEvent.builder()
-                                .solicitudId(creditRequest.getId())
-                                .tipo("GARANTE_ENVIADO")
-                                .detalle("El usuario envió la información de un garante para revisión.")
-                                .build()
-                ));
+                .ifPresent(creditRequest -> solicitudCooperativaRepository
+                        .findBySolicitudIdAndEstado(
+                                creditRequest.getId(),
+                                SolicitudCooperativaStatus.SOLICITANDO_GARANTE
+                        )
+                        .forEach(solicitudCooperativa -> creditProcessEventRepository.save(
+                                CreditProcessEvent.builder()
+                                        .solicitudId(creditRequest.getId())
+                                        .solicitudCooperativaId(solicitudCooperativa.getId())
+                                        .tipo("GARANTE_ENVIADO")
+                                        .detalle("El usuario envió la información de un garante para revisión.")
+                                        .build()
+                        )));
 
         boolean solicitanteCompleto = personaRepo.existsBySolicitudIdAndRolAndEstadoFormulario(
                 solicitud.getId(), RolPersona.SOLICITANTE, EstadoFormulario.COMPLETO

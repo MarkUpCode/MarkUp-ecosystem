@@ -210,16 +210,13 @@ public class CreditController {
             @PathVariable Long solicitudId,
             @AuthenticationPrincipal User user
     ) {
-        if (!solicitudCooperativaRepository.existsBySolicitudIdAndCooperativaId(
-                solicitudId,
-                user.getCooperativaId()
-        )) {
-            throw new org.springframework.security.access.AccessDeniedException(
-                    "Solicitud no pertenece a esta cooperativa"
-            );
-        }
+        var solicitudCooperativa = solicitudCooperativaRepository
+                .findBySolicitudIdAndCooperativaId(solicitudId, user.getCooperativaId())
+                .orElseThrow(() -> new org.springframework.security.access.AccessDeniedException(
+                        "Solicitud no pertenece a esta cooperativa"
+                ));
         return ResponseEntity.ok(creditProcessEventRepository
-                .findBySolicitudIdOrderByFechaAsc(solicitudId)
+                .findBySolicitudCooperativaIdOrderByFechaAsc(solicitudCooperativa.getId())
                 .stream()
                 .map(event -> new CreditProcessEventDto(
                         event.getTipo(),

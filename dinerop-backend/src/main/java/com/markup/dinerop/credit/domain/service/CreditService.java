@@ -499,6 +499,7 @@ public class CreditService {
         creditRequirementService.replaceForOffer(sc.getId(), requisitos);
         addEvent(
                 solicitudId,
+                sc.getId(),
                 "GARANTE_SOLICITADO",
                 "La cooperativa solicitó información de un garante."
         );
@@ -546,6 +547,7 @@ public class CreditService {
             sc.setEstado(SolicitudCooperativaStatus.PRE_APROBADA);
             addEvent(
                     solicitudId,
+                    sc.getId(),
                     "GARANTE_ACEPTADO",
                     "La cooperativa aceptó la información del garante."
             );
@@ -572,6 +574,7 @@ public class CreditService {
             sc.setEstado(SolicitudCooperativaStatus.SOLICITANDO_GARANTE);
             addEvent(
                     solicitudId,
+                    sc.getId(),
                     "NUEVO_GARANTE_SOLICITADO",
                     "La cooperativa rechazó el garante y solicitó uno nuevo."
             );
@@ -593,9 +596,10 @@ public class CreditService {
         );
     }
 
-    private void addEvent(Long solicitudId, String tipo, String detalle) {
+    private void addEvent(Long solicitudId, Long solicitudCooperativaId, String tipo, String detalle) {
         creditProcessEventRepository.save(CreditProcessEvent.builder()
                 .solicitudId(solicitudId)
+                .solicitudCooperativaId(solicitudCooperativaId)
                 .tipo(tipo)
                 .detalle(detalle)
                 .build());

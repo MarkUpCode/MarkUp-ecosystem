@@ -6,5 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface CreditProcessEventRepository extends JpaRepository<CreditProcessEvent, Long> {
-    List<CreditProcessEvent> findBySolicitudIdOrderByFechaAsc(Long solicitudId);
+    List<CreditProcessEvent> findBySolicitudCooperativaIdOrderByFechaAsc(Long solicitudCooperativaId);
 }

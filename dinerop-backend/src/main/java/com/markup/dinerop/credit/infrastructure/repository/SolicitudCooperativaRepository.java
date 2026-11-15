@@ -62,6 +62,11 @@ public interface SolicitudCooperativaRepository extends JpaRepository<SolicitudC
 
     Optional<SolicitudCooperativa> findBySolicitudIdAndCooperativaId(Long solicitudId, Long cooperativaId);
 
+    List<SolicitudCooperativa> findBySolicitudIdAndEstado(
+            Long solicitudId,
+            SolicitudCooperativaStatus estado
+    );
+
     //----------------------------------------------------------------------------------------------------------------
     //Metodo para obtener detalle de solicitud en diversas cooperativas
     //----------------------------------------------------------------------------------------------------------------

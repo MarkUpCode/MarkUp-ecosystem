@@ -21,6 +21,9 @@ public class CreditProcessEvent {
     @Column(name = "solicitud_id", nullable = false)
     private Long solicitudId;
 
+    @Column(name = "solicitud_cooperativa_id", nullable = false)
+    private Long solicitudCooperativaId;
+
     @Column(nullable = false, length = 60)
     private String tipo;
 
