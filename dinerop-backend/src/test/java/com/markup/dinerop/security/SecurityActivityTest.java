@@ -4,6 +4,13 @@ import com.markup.dinerop.auth.entity.Role;
 import com.markup.dinerop.auth.entity.User;
 import com.markup.dinerop.auth.repository.UserRepository;
 import com.markup.dinerop.auth.service.JwtService;
+import com.markup.dinerop.credit.domain.model.CreditRequest;
+import com.markup.dinerop.credit.domain.model.SolicitudCooperativa;
+import com.markup.dinerop.credit.domain.model.enums.CreditRejectionReason;
+import com.markup.dinerop.credit.domain.model.enums.CreditRequestType;
+import com.markup.dinerop.credit.domain.model.enums.SolicitudCooperativaStatus;
+import com.markup.dinerop.credit.infrastructure.repository.CreditRequestRepository;
+import com.markup.dinerop.credit.infrastructure.repository.SolicitudCooperativaRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -15,6 +22,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MvcResult;
+
+import java.math.BigDecimal;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -47,6 +56,12 @@ class SecurityActivityTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @Autowired
+    private CreditRequestRepository creditRequestRepository;
+
+    @Autowired
+    private SolicitudCooperativaRepository solicitudCooperativaRepository;
+
     @Test
     void anonymousUserCannotAccessPrivateCreditsEndpoint() throws Exception {
         mockMvc.perform(get("/api/credits/me"))
@@ -55,12 +70,26 @@ class SecurityActivityTest {
 
     @Test
     void loginTokenForClientCanAccessMyCreditsEndpoint() throws Exception {
-        userRepository.saveAndFlush(User.builder()
+        User client = userRepository.saveAndFlush(User.builder()
                 .email("jwt-client@example.com")
                 .password(passwordEncoder.encode("test-password"))
                 .role(Role.CLIENT)
                 .status("ACTIVE")
                 .active(true)
+                .build());
+
+        CreditRequest request = creditRequestRepository.saveAndFlush(CreditRequest.builder()
+                .clientId(client.getIdUser())
+                .email(client.getEmail())
+                .identification("1234567890")
+                .amount(new BigDecimal("1000.00"))
+                .tipo(CreditRequestType.CREDITO)
+                .build());
+        solicitudCooperativaRepository.saveAndFlush(SolicitudCooperativa.builder()
+                .solicitudId(request.getId())
+                .cooperativaId(1L)
+                .estado(SolicitudCooperativaStatus.RECHAZADA)
+                .motivosRechazo(java.util.List.of(CreditRejectionReason.CAPACIDAD_DE_PAGO))
                 .build());
 
         MvcResult login = mockMvc.perform(post("/api/auth/login")
@@ -76,7 +105,7 @@ class SecurityActivityTest {
         mockMvc.perform(get("/api/credits/me")
                         .header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk())
-                .andExpect(content().json("[]"));
+                .andExpect(content().json("[{\"motivosRechazo\":[\"El crédito sobrepasa su capacidad de pago\"]}]", false));
     }
 
     @Test

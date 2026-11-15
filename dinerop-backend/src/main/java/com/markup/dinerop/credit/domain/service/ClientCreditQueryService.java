@@ -8,6 +8,7 @@ import com.markup.dinerop.credit.infrastructure.repository.CreditRequestReposito
 import com.markup.dinerop.credit.infrastructure.repository.SolicitudCooperativaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Comparator;
 import java.util.List;
@@ -27,6 +28,7 @@ public class ClientCreditQueryService {
      * distribución aún), con estado agregado calculado a partir de las
      * cooperativas a las que fueron enviadas.
      */
+    @Transactional(readOnly = true)
     public List<ClientCreditResponseDto> getMyCredits(Long clientId) {
 
         // 1. Todas las solicitudes del cliente, mas nuevas primero
