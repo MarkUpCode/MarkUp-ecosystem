@@ -197,7 +197,9 @@ public class CreditController {
         creditService.decidirGarante(
                 solicitudId,
                 user.getCooperativaId(),
-                dto.decision()
+                dto.decision(),
+                dto.motivosRechazo(),
+                dto.motivoRechazoOtro()
         );
         return ResponseEntity.ok(
                 Map.of("message", "Decisión del garante registrada correctamente")

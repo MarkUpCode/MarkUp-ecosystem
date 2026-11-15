@@ -160,9 +160,14 @@ export async function getPreRegistrationData(): Promise<PreRegistrationData> {
 
 export async function submitGuaranteeOnboarding(
   payload: OnboardingPayload,
+  solicitudId?: number,
+  cooperativaId?: number,
 ): Promise<GuaranteeOnboardingResponse> {
+  const query = solicitudId != null && cooperativaId != null
+    ? `?solicitudId=${solicitudId}&cooperativaId=${cooperativaId}`
+    : "";
   return httpClient<GuaranteeOnboardingResponse>(
-    `/api/onboarding/cliente/garante/completar`,
+    `/api/onboarding/cliente/garante/completar${query}`,
     {
       method: "POST",
       body: payload,

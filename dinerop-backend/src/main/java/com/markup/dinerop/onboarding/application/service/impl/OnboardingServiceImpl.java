@@ -124,11 +124,46 @@ public class OnboardingServiceImpl implements OnboardingService {
     @Override
     public SolicitudOnboarding crearYCompletarGaranteDesdeCliente(
             Long clientId,
+            Long creditRequestId,
+            Long cooperativaId,
             PersonaOnboardingRequest request
     ) {
         SolicitudOnboarding solicitud = solicitudRepo
                 .findByUsuarioId(clientId)
                 .orElseThrow(() -> new ResourceNotFoundException("Solicitud no encontrada para este usuario"));
+
+        var creditRequest = creditRequestId == null
+                ? creditRequestRepository.findByClientId(clientId).stream()
+                        .filter(candidate -> candidate.getEstado() != null)
+                        .filter(candidate -> !solicitudCooperativaRepository.findBySolicitudIdAndEstado(
+                                candidate.getId(), SolicitudCooperativaStatus.SOLICITANDO_GARANTE
+                        ).isEmpty())
+                        .findFirst()
+                        .orElseThrow(() -> new BusinessException("No hay una solicitud de crédito pendiente de garante"))
+                : creditRequestRepository.findById(creditRequestId)
+                        .filter(candidate -> clientId.equals(candidate.getClientId()))
+                        .orElseThrow(() -> new ResourceNotFoundException("Solicitud de crédito no encontrada"));
+        var requestsAwaitingGuarantee = solicitudCooperativaRepository.findBySolicitudIdAndEstado(
+                creditRequest.getId(), SolicitudCooperativaStatus.SOLICITANDO_GARANTE
+        );
+        if (requestsAwaitingGuarantee.isEmpty()) {
+            throw new BusinessException("Ninguna cooperativa está esperando información de garante para esta solicitud");
+        }
+        if (cooperativaId == null && requestsAwaitingGuarantee.size() != 1) {
+            throw new BusinessException("Selecciona la cooperativa que solicitó el garante");
+        }
+        var cooperativeRequest = cooperativaId == null
+                ? requestsAwaitingGuarantee.get(0)
+                : requestsAwaitingGuarantee.stream()
+                        .filter(candidate -> cooperativaId.equals(candidate.getCooperativaId()))
+                        .findFirst()
+                        .orElseThrow(() -> new BusinessException("Esta cooperativa no tiene una solicitud de garante pendiente"));
+        var latestGuaranteeEvent = creditProcessEventRepository
+                .findTopBySolicitudCooperativaIdOrderByFechaDescIdDesc(cooperativeRequest.getId())
+                .orElse(null);
+        if (latestGuaranteeEvent != null && "GARANTE_ENVIADO".equals(latestGuaranteeEvent.getTipo())) {
+            throw new BusinessException("La información del garante ya está en revisión");
+        }
 
         PersonaOnboarding garante = mapper.toPersona(request);
         garante.setSolicitud(solicitud);
@@ -138,22 +173,12 @@ public class OnboardingServiceImpl implements OnboardingService {
         linkPersonaRelations(garante, request);
         solicitud.getPersonas().add(garante);
         personaRepo.save(garante);
-        creditRequestRepository.findByClientId(clientId).stream()
-                .filter(creditRequest -> creditRequest.getEstado() != null)
-                .findFirst()
-                .ifPresent(creditRequest -> solicitudCooperativaRepository
-                        .findBySolicitudIdAndEstado(
-                                creditRequest.getId(),
-                                SolicitudCooperativaStatus.SOLICITANDO_GARANTE
-                        )
-                        .forEach(solicitudCooperativa -> creditProcessEventRepository.save(
-                                CreditProcessEvent.builder()
-                                        .solicitudId(creditRequest.getId())
-                                        .solicitudCooperativaId(solicitudCooperativa.getId())
-                                        .tipo("GARANTE_ENVIADO")
-                                        .detalle("El usuario envió la información de un garante para revisión.")
-                                        .build()
-                        )));
+        creditProcessEventRepository.save(CreditProcessEvent.builder()
+                .solicitudId(creditRequest.getId())
+                .solicitudCooperativaId(cooperativeRequest.getId())
+                .tipo("GARANTE_ENVIADO")
+                .detalle("El usuario envió la información de un garante para revisión.")
+                .build());
 
         boolean solicitanteCompleto = personaRepo.existsBySolicitudIdAndRolAndEstadoFormulario(
                 solicitud.getId(), RolPersona.SOLICITANTE, EstadoFormulario.COMPLETO

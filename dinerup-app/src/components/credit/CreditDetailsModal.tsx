@@ -58,7 +58,7 @@ export default function CreditDetailsModal({ open, request, onClose }: CreditDet
   const [confirmationCooperativeId, setConfirmationCooperativeId] = useState<number | null>(null);
   const [acceptingCooperativeId, setAcceptingCooperativeId] = useState<number | null>(null);
   const [acceptError, setAcceptError] = useState<string | null>(null);
-  const [showGuaranteeModal, setShowGuaranteeModal] = useState(false);
+  const [guaranteeCooperativeId, setGuaranteeCooperativeId] = useState<number | null>(null);
 
   const loadCooperatives = useCallback(async () => {
     setIsLoading(true);
@@ -84,11 +84,11 @@ export default function CreditDetailsModal({ open, request, onClose }: CreditDet
   useEffect(() => {
     if (!open) return;
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape" && acceptingCooperativeId === null && !showGuaranteeModal) onClose();
+      if (event.key === "Escape" && acceptingCooperativeId === null && guaranteeCooperativeId === null) onClose();
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [open, acceptingCooperativeId, showGuaranteeModal, onClose]);
+  }, [open, acceptingCooperativeId, guaranteeCooperativeId, onClose]);
 
   const handleAcceptCooperative = async (cooperativaId: number) => {
     setAcceptingCooperativeId(cooperativaId);
@@ -227,7 +227,7 @@ export default function CreditDetailsModal({ open, request, onClose }: CreditDet
                         ) : needsGuarantor ? (
                           <div className="flex flex-col gap-3 rounded-xl border border-amber-100 bg-amber-50 p-4 sm:flex-row sm:items-center sm:justify-between">
                             <p className="text-sm leading-5 text-amber-900">Esta cooperativa necesita información de un garante para continuar.</p>
-                            <button type="button" onClick={() => setShowGuaranteeModal(true)} className="shrink-0 rounded-xl bg-amber-600 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-amber-700">Completar garante</button>
+                            <button type="button" onClick={() => setGuaranteeCooperativeId(coop.cooperativaId)} className="shrink-0 rounded-xl bg-amber-600 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-amber-700">Completar garante</button>
                           </div>
                         ) : (
                           <>
@@ -292,8 +292,10 @@ export default function CreditDetailsModal({ open, request, onClose }: CreditDet
       </div>
 
       <GuaranteeOnboardingModal
-        open={showGuaranteeModal}
-        onClose={() => setShowGuaranteeModal(false)}
+        open={guaranteeCooperativeId !== null}
+        solicitudId={request.solicitudId}
+        cooperativaId={guaranteeCooperativeId ?? 0}
+        onClose={() => setGuaranteeCooperativeId(null)}
         onSuccess={() => { void loadCooperatives(); }}
       />
     </>

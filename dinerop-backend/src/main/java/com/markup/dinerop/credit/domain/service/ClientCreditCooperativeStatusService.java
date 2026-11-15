@@ -9,12 +9,9 @@ import com.markup.dinerop.credit.domain.service.calculation.LoanCalculator;
 import com.markup.dinerop.credit.dto.CooperativeStatusItemDto;
 import com.markup.dinerop.credit.infrastructure.repository.SolicitudCooperativaCotizacionRepository;
 import com.markup.dinerop.credit.infrastructure.repository.SolicitudCooperativaRepository;
+import com.markup.dinerop.credit.infrastructure.repository.CreditProcessEventRepository;
 import lombok.RequiredArgsConstructor;
 import com.markup.dinerop.credit.service.CreditRequirementService;
-import com.markup.dinerop.onboarding.domain.enums.RolPersona;
-import com.markup.dinerop.onboarding.domain.enums.EstadoGarante;
-import com.markup.dinerop.onboarding.infrastructure.repository.PersonaOnboardingRepository;
-import com.markup.dinerop.onboarding.infrastructure.repository.SolicitudOnboardingRepository;
 import com.markup.dinerop.credit.dto.CreditRequirementDto;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,8 +26,7 @@ public class ClientCreditCooperativeStatusService {
     private final SolicitudCooperativaCotizacionRepository cotizacionRepository;
     private final CooperativeService cooperativeService;
     private final CreditRequirementService requirementService;
-    private final SolicitudOnboardingRepository solicitudOnboardingRepository;
-    private final PersonaOnboardingRepository personaOnboardingRepository;
+    private final CreditProcessEventRepository creditProcessEventRepository;
 
     @Transactional(readOnly = true)
     public List<CooperativeStatusItemDto> getPreApprovedCooperatives(Long clientId, Long solicitudId) {
@@ -48,17 +44,20 @@ public class ClientCreditCooperativeStatusService {
 
         return rows.stream().map(sc -> {
             var coop = cooperativeService.getById(sc.getCooperativaId());
-            var onboarding = solicitudOnboardingRepository.findByUsuarioId(clientId).orElse(null);
             var garanteEnRevision = sc.getEstado() == SolicitudCooperativaStatus.SOLICITANDO_GARANTE
-                    && onboarding != null
-                    && personaOnboardingRepository
-                    .findTopBySolicitudIdAndRolOrderByFechaRegistroDesc(
-                            onboarding.getId(),
-                            RolPersona.GARANTE
-                    )
-                    .map(garante -> garante.getEstadoGarante() == null
-                            || garante.getEstadoGarante() == EstadoGarante.EN_REVISION)
-                    .orElse(false);
+                    && creditProcessEventRepository
+                            .findTopBySolicitudCooperativaIdOrderByFechaDescIdDesc(sc.getId())
+                            .map(event -> "GARANTE_ENVIADO".equals(event.getTipo()))
+                            .orElse(false);
+            var lastGuaranteeEvent = creditProcessEventRepository
+                    .findTopBySolicitudCooperativaIdOrderByFechaDescIdDesc(sc.getId())
+                    .orElse(null);
+            var mensajeGarante = lastGuaranteeEvent != null
+                    && "NUEVO_GARANTE_SOLICITADO".equals(lastGuaranteeEvent.getTipo())
+                    ? lastGuaranteeEvent.getDetalle()
+                    : null;
+            var requiereComparecenciaGarante = creditProcessEventRepository
+                    .existsBySolicitudCooperativaIdAndTipo(sc.getId(), "GARANTE_ACEPTADO");
                 var cotizacion = sc.getEstado() == SolicitudCooperativaStatus.RECHAZADA
                         ? null
                         : cotizacionRepository.findBySolicitudCooperativaId(sc.getId())
@@ -73,6 +72,8 @@ public class ClientCreditCooperativeStatusService {
                     .nombreCooperativa(coop != null ? coop.getNombre() : "-")
                     .estado(sc.getEstado().name())
                     .garanteEnRevision(garanteEnRevision)
+                    .mensajeGarante(mensajeGarante)
+                    .requiereComparecenciaGarante(requiereComparecenciaGarante)
                     .fechaActualizacion(sc.getFechaActualizacion())
                     .monto(cotizacion != null ? cotizacion.getMonto() : null)
                     .plazoMeses(cotizacion != null ? cotizacion.getPlazoMeses() : null)

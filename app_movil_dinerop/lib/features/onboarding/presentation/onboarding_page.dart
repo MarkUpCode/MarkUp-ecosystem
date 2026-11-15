@@ -17,11 +17,18 @@ import '../../auth/presentation/auth_controller.dart';
 import '../data/models/onboarding_request.dart';
 
 class OnboardingPage extends ConsumerStatefulWidget {
-  const OnboardingPage({super.key, this.isGuarantor = false});
+  const OnboardingPage({
+    super.key,
+    this.isGuarantor = false,
+    this.solicitudId,
+    this.cooperativaId,
+  });
 
   /// The guarantor has the same five information steps as the web app, but
   /// never includes a spouse and is sent to its dedicated endpoint.
   final bool isGuarantor;
+  final int? solicitudId;
+  final int? cooperativaId;
 
   @override
   ConsumerState<OnboardingPage> createState() => _OnboardingPageState();
@@ -599,7 +606,11 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
       final response = widget.isGuarantor
           ? await ref
                 .read(onboardingRepositoryProvider)
-                .submitGuarantorOnboarding(solicitante)
+                .submitGuarantorOnboarding(
+                  solicitante,
+                  solicitudId: widget.solicitudId!,
+                  cooperativaId: widget.cooperativaId!,
+                )
           : await ref
                 .read(onboardingRepositoryProvider)
                 .submitClientOnboarding(

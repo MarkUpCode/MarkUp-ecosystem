@@ -166,7 +166,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/guarantor-onboarding',
-        builder: (context, state) => const OnboardingPage(isGuarantor: true),
+        builder: (context, state) => OnboardingPage(
+          isGuarantor: true,
+          solicitudId: int.tryParse(state.uri.queryParameters['solicitudId'] ?? ''),
+          cooperativaId: int.tryParse(state.uri.queryParameters['cooperativaId'] ?? ''),
+        ),
       ),
       GoRoute(
         path: '/request-credit',

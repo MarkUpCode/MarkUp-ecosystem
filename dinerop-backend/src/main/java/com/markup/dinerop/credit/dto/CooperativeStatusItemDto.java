@@ -18,6 +18,8 @@ public class CooperativeStatusItemDto {
     private String nombreCooperativa;
     private String estado; // PRE_APROBADA
     private boolean garanteEnRevision;
+    private String mensajeGarante;
+    private boolean requiereComparecenciaGarante;
     private LocalDateTime fechaActualizacion;
 
     private BigDecimal monto;

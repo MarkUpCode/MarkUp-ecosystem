@@ -12,7 +12,12 @@ public class CompletarFormularioGaranteUseCase {
 
     private final OnboardingService service;
 
-    public SolicitudOnboarding execute(Long clientId, PersonaOnboardingRequest request) {
-        return service.crearYCompletarGaranteDesdeCliente(clientId, request);
+    public SolicitudOnboarding execute(
+            Long clientId,
+            Long creditRequestId,
+            Long cooperativaId,
+            PersonaOnboardingRequest request
+    ) {
+        return service.crearYCompletarGaranteDesdeCliente(clientId, creditRequestId, cooperativaId, request);
     }
 }

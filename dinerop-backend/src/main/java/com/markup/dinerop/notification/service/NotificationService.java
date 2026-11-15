@@ -332,10 +332,15 @@ public class NotificationService {
                 .build());
     }
 
-    public void sendNewGuaranteeRequiredEmail(String to, String cooperativeName) {
+    public void sendNewGuaranteeRequiredEmail(
+            String to,
+            String cooperativeName,
+            List<String> reasons
+    ) {
                 EmailTemplate template = creditOfferEmailBuilder.buildNewGuaranteeRequired(
                         cooperativeName,
-                        clientDashboardUrl()
+                        clientDashboardUrl(),
+                        reasons
                 );
                 sendEmail(SendEmailDto.builder()
                         .to(to)

@@ -46,7 +46,14 @@ public class CreditOfferEmailBuilder {
                 .build();
     }
 
-    public EmailTemplate buildNewGuaranteeRequired(String cooperativeName, String dashboardUrl) {
+    public EmailTemplate buildNewGuaranteeRequired(
+            String cooperativeName,
+            String dashboardUrl,
+            java.util.List<String> reasons
+    ) {
+        String reasonList = reasons.stream()
+                .map(this::escapeHtml)
+                .collect(java.util.stream.Collectors.joining("; "));
         return EmailTemplate.builder()
                 .title("La cooperativa solicita otro garante")
                 .message("""
@@ -54,10 +61,18 @@ public class CreditOfferEmailBuilder {
                         """.formatted(cooperativeName))
                 .buttonText("Registrar nuevo garante")
                 .buttonUrl(dashboardUrl)
-                .info1("El garante anterior no fue validado.")
+                .info1("Motivos: " + reasonList)
                 .info2("Ingresa a tu solicitud y completa nuevamente la información.")
                 .info3("Podrás hacerlo hasta que la cooperativa apruebe un garante.")
                 .build();
+    }
+
+    private String escapeHtml(String value) {
+        return value.replace("&", "&amp;")
+                .replace("<", "&lt;")
+                .replace(">", "&gt;")
+                .replace("\"", "&quot;")
+                .replace("'", "&#39;");
     }
 
     private String money(BigDecimal amount) {

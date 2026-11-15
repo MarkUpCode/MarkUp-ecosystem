@@ -114,7 +114,7 @@ export const createCreditRequest = async (
   });
 };
 
-export type GuaranteeDecision = "ACEPTAR" | "SOLICITAR_NUEVO";
+export type GuaranteeDecision = "ACEPTAR" | "SOLICITAR_NUEVO" | "RECHAZAR_CREDITO";
 export type CreditTimelineEvent = {
   tipo: string;
   detalle: string;
@@ -133,6 +133,8 @@ export const getCreditRequestTimeline = async (
 export const decideGuaranteeForCreditRequest = async (
   solicitudId: number,
   decision: GuaranteeDecision,
+  motivosRechazo: string[] = [],
+  motivoRechazoOtro = "",
 ): Promise<void> => {
   await httpClient<void>(
     `/api/credits/cooperative/me/requests/${solicitudId}/garante-decision`,
@@ -140,7 +142,7 @@ export const decideGuaranteeForCreditRequest = async (
       method: "PUT",
       auth: true,
       logoutOnUnauthorized: false,
-      body: { decision },
+      body: { decision, motivosRechazo, motivoRechazoOtro },
     },
   );
 };

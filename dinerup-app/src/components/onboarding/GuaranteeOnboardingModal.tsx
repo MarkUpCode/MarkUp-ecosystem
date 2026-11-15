@@ -9,6 +9,8 @@ import { submitGuaranteeOnboarding, type OnboardingPayload, type SolicitanteData
 
 interface GuaranteeOnboardingModalProps {
   open: boolean;
+  solicitudId: number;
+  cooperativaId: number;
   onClose: () => void;
   onSuccess?: () => void;
 }
@@ -53,7 +55,7 @@ const EMPTY_SOLICITANTE: SolicitanteData = {
   ],
 };
 
-export default function GuaranteeOnboardingModal({ open, onClose, onSuccess }: GuaranteeOnboardingModalProps) {
+export default function GuaranteeOnboardingModal({ open, solicitudId, cooperativaId, onClose, onSuccess }: GuaranteeOnboardingModalProps) {
   const [step, setStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
@@ -108,7 +110,7 @@ export default function GuaranteeOnboardingModal({ open, onClose, onSuccess }: G
         solicitante: formData.solicitante,
       };
 
-      const response = await submitGuaranteeOnboarding(payload);
+      const response = await submitGuaranteeOnboarding(payload, solicitudId, cooperativaId);
 
       if (response && response.id) {
         setShowSuccessModal(true);

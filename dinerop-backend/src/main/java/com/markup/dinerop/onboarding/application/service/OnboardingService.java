@@ -17,6 +17,8 @@ public interface OnboardingService {
 
     SolicitudOnboarding crearYCompletarGaranteDesdeCliente(
             Long clientId,
+            Long creditRequestId,
+            Long cooperativaId,
             PersonaOnboardingRequest request
     );
 

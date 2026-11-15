@@ -49,11 +49,13 @@ public class OnboardingClienteController {
     @PreAuthorize("hasRole('CLIENT')")
     public SolicitudOnboardingResponse completarGarante(
             @AuthenticationPrincipal User user,
+            @RequestParam(required = false) Long solicitudId,
+            @RequestParam(required = false) Long cooperativaId,
             @Valid @RequestBody PersonaOnboardingRequest garanteRequest
     ) {
         log.info("[ONBOARDING] Completar garante | clientId={}", user.getIdUser());
         return mapper.toSolicitudResponse(
-                completarGaranteUC.execute(user.getIdUser(), garanteRequest)
+                completarGaranteUC.execute(user.getIdUser(), solicitudId, cooperativaId, garanteRequest)
         );
     }
 

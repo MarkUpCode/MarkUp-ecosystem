@@ -69,11 +69,22 @@ public class PushNotificationService {
     }
 
     @Transactional
-    public void sendGuaranteeRejected(Long userId, String cooperativeName, Long solicitudId) {
+    public void sendGuaranteeRequired(Long userId, String cooperativeName, Long solicitudId) {
+        sendToUser(
+                userId,
+                "Una cooperativa solicita un garante",
+                cooperativeName + " necesita los datos de un garante. Abre tu solicitud para completarlos.",
+                "GUARANTEE_REQUIRED",
+                solicitudId
+        );
+    }
+
+    @Transactional
+    public void sendGuaranteeRejected(Long userId, String cooperativeName, List<String> reasons, Long solicitudId) {
         sendToUser(
                 userId,
                 "Necesitas un nuevo garante",
-                cooperativeName + " rechazó el garante enviado. Revisa tu solicitud y registra otro garante.",
+                cooperativeName + " solicita corregir o cambiar el garante. Motivos: " + String.join("; ", reasons),
                 "GUARANTEE_REJECTED",
                 solicitudId
         );

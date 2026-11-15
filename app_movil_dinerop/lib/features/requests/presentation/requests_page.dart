@@ -753,11 +753,30 @@ class _OfferCardState extends ConsumerState<_OfferCard> {
                   ),
                   const SizedBox(height: 12),
                 ],
-                if (needsGuarantor) _GuarantorNotice(color: color, soft: soft),
+                if (needsGuarantor)
+                  _GuarantorNotice(
+                    color: color,
+                    soft: soft,
+                    message: offer.mensajeGarante,
+                  ),
                 if (guaranteeInReview)
                   _GuaranteeReviewNotice(color: color, soft: soft),
                 if (needsGuarantor) const SizedBox(height: 12),
                 if (guaranteeInReview) const SizedBox(height: 12),
+                if (offer.requiereComparecenciaGarante)
+                  Container(
+                    width: double.infinity,
+                    margin: const EdgeInsets.only(bottom: 12),
+                    padding: const EdgeInsets.all(14),
+                    decoration: BoxDecoration(
+                      color: AppColors.infoSoft,
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    child: const Text(
+                      'Garante aprobado. Para completar el trámite deben acudir presencialmente el solicitante y el garante con los documentos indicados.',
+                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
+                    ),
+                  ),
                 if (!rejected &&
                     !needsGuarantor &&
                     !guaranteeInReview &&
@@ -852,7 +871,7 @@ class _OfferCardState extends ConsumerState<_OfferCard> {
                       onPressed: needsGuarantor
                           ? () async {
                               final completed = await context.push<bool>(
-                                '/guarantor-onboarding',
+                                '/guarantor-onboarding?solicitudId=${widget.requestId}&cooperativaId=${offer.cooperativaId}',
                               );
                               if (!mounted || completed != true) return;
                               ref.invalidate(requestsProvider);
@@ -914,9 +933,10 @@ class _OfferStatus extends StatelessWidget {
 }
 
 class _GuarantorNotice extends StatelessWidget {
-  const _GuarantorNotice({required this.color, required this.soft});
+  const _GuarantorNotice({required this.color, required this.soft, this.message});
   final Color color;
   final Color soft;
+  final String? message;
   @override
   Widget build(BuildContext context) => Container(
     padding: const EdgeInsets.all(14),
@@ -939,7 +959,7 @@ class _GuarantorNotice extends StatelessWidget {
               ),
               const SizedBox(height: 3),
               Text(
-                'La cooperativa necesita un garante para avanzar. Si ya enviaste uno y fue rechazado, registra aquí un nuevo garante.',
+                message ?? 'La cooperativa necesita un garante para avanzar. Si ya enviaste uno y fue rechazado, registra aquí un nuevo garante.',
                 style: TextStyle(
                   color: color.withValues(alpha: .9),
                   fontSize: 12,

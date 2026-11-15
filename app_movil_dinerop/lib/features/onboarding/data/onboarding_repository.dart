@@ -42,10 +42,13 @@ class OnboardingRepository {
   /// The guarantor endpoint receives the same person structure as the
   /// applicant, but it must not include a spouse or the wrapper payload.
   Future<OnboardingSubmissionResponse> submitGuarantorOnboarding(
-    OnboardingPersonRequest request,
+    OnboardingPersonRequest request, {
+    required int solicitudId,
+    required int cooperativaId,
+  }
   ) {
     return _client.request<OnboardingSubmissionResponse>(
-      '/api/onboarding/cliente/garante/completar',
+      '/api/onboarding/cliente/garante/completar?solicitudId=$solicitudId&cooperativaId=$cooperativaId',
       method: 'POST',
       // PersonaOnboardingRequest in Spring does not contain the email field
       // used by the applicant flow, so keep this body exact.

@@ -11,6 +11,7 @@ import com.markup.dinerop.credit.domain.model.CreditRequest;
 import com.markup.dinerop.credit.domain.model.SolicitudCooperativa;
 import com.markup.dinerop.credit.infrastructure.repository.CreditRequestRepository;
 import com.markup.dinerop.credit.infrastructure.repository.SolicitudCooperativaRepository;
+import com.markup.dinerop.credit.infrastructure.repository.CreditProcessEventRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +27,7 @@ public class CreditReferralPdfService {
     private final CreditRequestRepository creditRequestRepository;
     private final UserRepository userRepository;
     private final CooperativeService cooperativeService;
+    private final CreditProcessEventRepository creditProcessEventRepository;
 
     @Transactional(readOnly = true)
     public byte[] generate(Long clientId, Long solicitudId, Long cooperativaId) {
@@ -51,6 +53,11 @@ public class CreditReferralPdfService {
             document.add(new Paragraph("Cooperativa: " + cooperative.getNombre()));
             document.add(new Paragraph("Monto solicitado: $" + request.getAmount()));
             document.add(new Paragraph(" "));
+            if (creditProcessEventRepository.existsBySolicitudCooperativaIdAndTipo(
+                    offer.getId(), "GARANTE_ACEPTADO")) {
+                document.add(new Paragraph("IMPORTANTE: Para completar el trámite deben presentarse en la cooperativa tanto el solicitante como el garante, con los documentos requeridos."));
+                document.add(new Paragraph(" "));
+            }
             document.add(new Paragraph("Presentar esta constancia junto con los requisitos solicitados en la oficina de la cooperativa."));
             document.add(new Paragraph(" "));
             document.add(new Paragraph("Sello y firma de la cooperativa: ______________________________"));

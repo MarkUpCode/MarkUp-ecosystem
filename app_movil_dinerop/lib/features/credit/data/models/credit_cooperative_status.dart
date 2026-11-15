@@ -14,6 +14,8 @@ class CreditCooperativeStatus {
     required this.totalPagar,
     required this.interesTotal,
     this.garanteEnRevision = false,
+    this.mensajeGarante,
+    this.requiereComparecenciaGarante = false,
     this.direccion,
     this.mapsUrl,
     this.requisitos = const [],
@@ -32,6 +34,8 @@ class CreditCooperativeStatus {
   final double? totalPagar;
   final double? interesTotal;
   final bool garanteEnRevision;
+  final String? mensajeGarante;
+  final bool requiereComparecenciaGarante;
   final String? direccion;
   final String? mapsUrl;
   final List<CreditRequirement> requisitos;
@@ -53,6 +57,8 @@ class CreditCooperativeStatus {
       totalPagar: (json['totalPagar'] as num?)?.toDouble(),
       interesTotal: (json['interesTotal'] as num?)?.toDouble(),
       garanteEnRevision: json['garanteEnRevision'] == true,
+      mensajeGarante: json['mensajeGarante']?.toString(),
+      requiereComparecenciaGarante: json['requiereComparecenciaGarante'] == true,
       direccion: json['direccion']?.toString(),
       mapsUrl: json['mapsUrl']?.toString(),
       requisitos: (json['requisitos'] as List<dynamic>? ?? const [])
