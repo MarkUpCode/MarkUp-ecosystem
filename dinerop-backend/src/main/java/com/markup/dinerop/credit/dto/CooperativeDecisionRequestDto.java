@@ -4,6 +4,7 @@ import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Size;
 import com.markup.dinerop.credit.domain.model.enums.CreditRejectionReason;
 
 import java.math.BigDecimal;
@@ -22,5 +23,8 @@ public record CooperativeDecisionRequestDto(
 
         List<CreditRequirementDto> requisitos,
 
-        List<CreditRejectionReason> motivosRechazo
+        List<CreditRejectionReason> motivosRechazo,
+
+        @Size(max = 500, message = "El otro motivo no puede superar 500 caracteres")
+        String motivoRechazoOtro
 ) {}

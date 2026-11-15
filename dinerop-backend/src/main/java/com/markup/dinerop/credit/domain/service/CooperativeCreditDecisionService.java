@@ -42,7 +42,8 @@ public class CooperativeCreditDecisionService {
             BigDecimal tasaAnual,
             Integer plazoMeses,
             List<CreditRequirementDto> requisitos,
-            List<CreditRejectionReason> motivosRechazo
+            List<CreditRejectionReason> motivosRechazo,
+            String motivoRechazoOtro
     ) {
 
         SolicitudCooperativa sc = repository
@@ -129,8 +130,17 @@ public class CooperativeCreditDecisionService {
             if (motivosRechazo.size() > 4) {
                 throw new IllegalArgumentException("Puedes seleccionar hasta cuatro motivos de rechazo");
             }
+            boolean selectedOther = motivosRechazo.contains(CreditRejectionReason.OTROS);
+            String otherReason = motivoRechazoOtro == null ? "" : motivoRechazoOtro.trim();
+            if (selectedOther && otherReason.isBlank()) {
+                throw new IllegalArgumentException("Describe el otro motivo de rechazo");
+            }
+            if (!selectedOther && !otherReason.isEmpty()) {
+                throw new IllegalArgumentException("Selecciona Otros motivos para enviar una descripción");
+            }
             sc.setEstado(SolicitudCooperativaStatus.RECHAZADA);
             sc.setMotivosRechazo(new ArrayList<>(motivosRechazo.stream().distinct().toList()));
+            sc.setMotivoRechazoOtro(selectedOther ? otherReason : null);
             repository.save(sc);
 
         } else {

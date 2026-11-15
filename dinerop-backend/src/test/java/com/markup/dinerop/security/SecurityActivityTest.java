@@ -167,7 +167,7 @@ class SecurityActivityTest {
                         .header("Authorization", "Bearer " + cooperativeToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                                {"decision":"RECHAZAR","motivosRechazo":["CAPACIDAD_DE_PAGO"]}
+                                {"decision":"RECHAZAR","motivosRechazo":["OTROS"],"motivoRechazoOtro":"El solicitante no presentó los documentos requeridos"}
                                 """))
                 .andExpect(status().isOk());
 
@@ -175,7 +175,7 @@ class SecurityActivityTest {
         mockMvc.perform(get("/api/credits/me")
                         .header("Authorization", "Bearer " + clientToken))
                 .andExpect(status().isOk())
-                .andExpect(content().json("[{\"estado\":\"RECHAZADA\",\"motivosRechazo\":[\"El crédito sobrepasa su capacidad de pago\"]}]", false));
+                .andExpect(content().json("[{\"estado\":\"RECHAZADA\",\"motivosRechazo\":[\"El solicitante no presentó los documentos requeridos\"]}]", false));
     }
 
     @Test

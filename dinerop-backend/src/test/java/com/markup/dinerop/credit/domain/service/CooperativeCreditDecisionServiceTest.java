@@ -56,7 +56,7 @@ class CooperativeCreditDecisionServiceTest {
         when(repository.findBySolicitudIdAndCooperativaId(21L, 9L))
                 .thenReturn(Optional.of(cooperativeRequest));
 
-        decisionService.decide(21L, 9L, "RECHAZAR", null, null, null, reasons);
+        decisionService.decide(21L, 9L, "RECHAZAR", null, null, null, reasons, null);
 
         assertEquals(SolicitudCooperativaStatus.RECHAZADA, cooperativeRequest.getEstado());
         assertEquals(reasons, cooperativeRequest.getMotivosRechazo());

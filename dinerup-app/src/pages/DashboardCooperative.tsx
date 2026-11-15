@@ -70,8 +70,8 @@ export default function DashboardCooperative() {
   }), [filter, requests, search]);
 
   const openSection = (next: Section) => { setSection(next); setSidebarOpen(false); };
-  const handleDecision = async (id: number, decision: CreditDecision, offer?: { tasaAnual: number; plazoMeses: number }, requirements?: CreditRequirement[], motivosRechazo?: string[]) => {
-    try { setProcessingId(id); setActionError(""); await decideCreditRequest(id, decision, offer, requirements, motivosRechazo); await refresh(); }
+  const handleDecision = async (id: number, decision: CreditDecision, offer?: { tasaAnual: number; plazoMeses: number }, requirements?: CreditRequirement[], motivosRechazo?: string[], motivoRechazoOtro?: string) => {
+    try { setProcessingId(id); setActionError(""); await decideCreditRequest(id, decision, offer, requirements, motivosRechazo, motivoRechazoOtro); await refresh(); }
     catch (error) { setActionError(getErrorMessage(error, "No se pudo registrar la decisión.")); throw error; }
     finally { setProcessingId(null); }
   };
@@ -98,9 +98,9 @@ export default function DashboardCooperative() {
     catch (error) { setActionError(getErrorMessage(error, "No se pudo registrar la decisión del garante.")); }
     finally { setProcessingId(null); }
   };
-  const rejectRequest = async (reasons: string[]) => {
+  const rejectRequest = async (reasons: string[], otherReason: string) => {
     if (rejectingId == null) return;
-    try { await handleDecision(rejectingId, CreditDecision.RECHAZAR, undefined, undefined, reasons); setRejectingId(null); }
+    try { await handleDecision(rejectingId, CreditDecision.RECHAZAR, undefined, undefined, reasons, otherReason); setRejectingId(null); }
     catch (error) { setActionError(getErrorMessage(error, "No se pudo registrar el rechazo.")); }
   };
 

@@ -57,9 +57,13 @@ public class ClientCreditQueryService {
         String estado = calcularEstadoAgregado(cr, distribuciones);
         List<String> motivos = distribuciones.stream()
                 .filter(sc -> sc.getEstado() == SolicitudCooperativaStatus.RECHAZADA)
-                .flatMap(sc -> sc.getMotivosRechazo().stream())
+                .flatMap(sc -> sc.getMotivosRechazo().stream()
+                        .map(reason -> reason == CreditRejectionReason.OTROS
+                                && sc.getMotivoRechazoOtro() != null
+                                && !sc.getMotivoRechazoOtro().isBlank()
+                                ? sc.getMotivoRechazoOtro()
+                                : reason.getLabel()))
                 .distinct()
-                .map(CreditRejectionReason::getLabel)
                 .toList();
 
         return ClientCreditResponseDto.builder()

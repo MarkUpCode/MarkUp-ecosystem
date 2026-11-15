@@ -47,13 +47,14 @@ export const decideCreditRequest = async (
   offer?: { tasaAnual: number; plazoMeses: number },
   requisitos?: CreditRequirement[],
   motivosRechazo?: string[],
+  motivoRechazoOtro?: string,
 ): Promise<void> => {
   await httpClient<void>(
     `/api/credits/cooperative/me/requests/${solicitudId}/decision`,
     {
       method: "PUT",
       auth: true,
-      body: { decision, ...offer, requisitos, motivosRechazo },
+      body: { decision, ...offer, requisitos, motivosRechazo, motivoRechazoOtro },
     },
   );
 };

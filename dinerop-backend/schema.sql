@@ -230,6 +230,7 @@ CREATE TABLE public.solicitud_cooperativa (
 	estado varchar(30) NOT NULL,
 	fecha_actualizacion timestamp(6) NULL,
 	fecha_envio timestamp(6) NOT NULL,
+	motivo_rechazo_otro varchar(500) NULL,
 	solicitud_id int8 NOT NULL,
 	CONSTRAINT solicitud_cooperativa_estado_check CHECK (((estado)::text = ANY ((ARRAY['ENVIADA'::character varying, 'SOLICITANDO_GARANTE'::character varying, 'RECHAZADA'::character varying, 'PRE_APROBADA'::character varying, 'ACEPTADA'::character varying])::text[]))),
 	CONSTRAINT solicitud_cooperativa_pkey PRIMARY KEY (id),

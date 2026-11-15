@@ -141,7 +141,8 @@ public class CreditController {
                 dto.tasaAnual(),
                 dto.plazoMeses(),
                 dto.requisitos(),
-                dto.motivosRechazo()
+                dto.motivosRechazo(),
+                dto.motivoRechazoOtro()
         );
 
         return ResponseEntity.ok(

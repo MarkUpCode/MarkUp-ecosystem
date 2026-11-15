@@ -64,6 +64,9 @@ public class SolicitudCooperativa {
     @Builder.Default
     private List<CreditRejectionReason> motivosRechazo = new ArrayList<>();
 
+    @Column(name = "motivo_rechazo_otro", length = 500)
+    private String motivoRechazoOtro;
+
     @PrePersist
     void onCreate() {
         this.fechaEnvio = LocalDateTime.now();
