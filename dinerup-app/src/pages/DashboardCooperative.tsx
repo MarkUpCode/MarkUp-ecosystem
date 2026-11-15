@@ -86,7 +86,11 @@ export default function DashboardCooperative() {
   };
   const viewApplicant = async (id: number) => {
     try {
-      setApplicantDetail(await getOnboardingForCooperative(id));
+      const onboarding = await getOnboardingForCooperative(id);
+      // This route receives the credit request ID. The onboarding response's
+      // solicitudId can be the onboarding record ID, so keep the route ID for
+      // all guarantee decisions made from this modal.
+      setApplicantDetail({ ...onboarding, solicitudId: id });
       setTimeline(await getCreditRequestTimeline(id));
     }
     catch (error) { setActionError(getErrorMessage(error, "No se pudo cargar la información del solicitante.")); }
