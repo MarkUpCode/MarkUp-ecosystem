@@ -3,6 +3,7 @@ package com.markup.dinerop.credit.domain.service;
 import com.markup.dinerop.cooperative.domain.service.CooperativeService;
 import com.markup.dinerop.credit.domain.model.SolicitudCooperativa;
 import com.markup.dinerop.credit.domain.model.SolicitudCooperativaCotizacion;
+import com.markup.dinerop.credit.domain.model.enums.CreditRejectionReason;
 import com.markup.dinerop.credit.domain.model.enums.SolicitudCooperativaStatus;
 import com.markup.dinerop.credit.domain.service.calculation.LoanCalculator;
 import com.markup.dinerop.credit.dto.CooperativeStatusItemDto;
@@ -16,6 +17,7 @@ import com.markup.dinerop.onboarding.infrastructure.repository.PersonaOnboarding
 import com.markup.dinerop.onboarding.infrastructure.repository.SolicitudOnboardingRepository;
 import com.markup.dinerop.credit.dto.CreditRequirementDto;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -30,6 +32,7 @@ public class ClientCreditCooperativeStatusService {
     private final SolicitudOnboardingRepository solicitudOnboardingRepository;
     private final PersonaOnboardingRepository personaOnboardingRepository;
 
+    @Transactional(readOnly = true)
     public List<CooperativeStatusItemDto> getPreApprovedCooperatives(Long clientId, Long solicitudId) {
 
         var rows = solicitudCooperativaRepository.findByClientIdAndSolicitudIdAndEstado(
@@ -38,7 +41,8 @@ public class ClientCreditCooperativeStatusService {
                 List.of(
                         SolicitudCooperativaStatus.PRE_APROBADA,
                         SolicitudCooperativaStatus.ACEPTADA,
-                        SolicitudCooperativaStatus.SOLICITANDO_GARANTE
+                        SolicitudCooperativaStatus.SOLICITANDO_GARANTE,
+                        SolicitudCooperativaStatus.RECHAZADA
                 )
         );
 
@@ -55,8 +59,10 @@ public class ClientCreditCooperativeStatusService {
                     .map(garante -> garante.getEstadoGarante() == null
                             || garante.getEstadoGarante() == EstadoGarante.EN_REVISION)
                     .orElse(false);
-                var cotizacion = cotizacionRepository.findBySolicitudCooperativaId(sc.getId())
-                    .orElseGet(() -> createMissingQuotation(sc));
+                var cotizacion = sc.getEstado() == SolicitudCooperativaStatus.RECHAZADA
+                        ? null
+                        : cotizacionRepository.findBySolicitudCooperativaId(sc.getId())
+                                .orElseGet(() -> createMissingQuotation(sc));
 
             var requirements = requirementService.findForOffer(sc.getId()).stream().map(item -> new CreditRequirementDto(
                     item.getTitle(), item.getDescription(), item.getCategory(), item.isMandatory(), item.getDisplayOrder()
@@ -78,6 +84,13 @@ public class ClientCreditCooperativeStatusService {
                     .direccion(coop.getDireccion())
                     .mapsUrl(coop.getDireccion())
                     .requisitos(requirements)
+                    .motivosRechazo(sc.getMotivosRechazo().stream()
+                            .map(reason -> reason == CreditRejectionReason.OTROS
+                                    && sc.getMotivoRechazoOtro() != null
+                                    && !sc.getMotivoRechazoOtro().isBlank()
+                                    ? sc.getMotivoRechazoOtro()
+                                    : reason.getLabel())
+                            .toList())
                     .build();
 
         }).toList();

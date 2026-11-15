@@ -302,7 +302,7 @@ class _RequestDetailsSheet extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Ofertas de cooperativas',
+                        'Ofertas y respuestas de cooperativas',
                         style: Theme.of(context).textTheme.titleLarge?.copyWith(
                           fontWeight: FontWeight.w900,
                         ),
@@ -327,7 +327,7 @@ class _RequestDetailsSheet extends ConsumerWidget {
             else ...[
               Center(
                 child: Text(
-                  '${offers.length} ${offers.length == 1 ? 'respuesta disponible' : 'respuestas disponibles'}',
+                  '${offers.length} ${offers.length == 1 ? 'respuesta' : 'respuestas'}',
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: AppColors.success,
                     fontWeight: FontWeight.w700,
@@ -622,8 +622,17 @@ class _OfferCardState extends ConsumerState<_OfferCard> {
     final guaranteeInReview =
         offer.estado == CreditRequestStatus.solicitandoGarante &&
         offer.garanteEnRevision;
-    final color = needsGuarantor ? AppColors.warning : AppColors.success;
-    final soft = needsGuarantor ? AppColors.warningSoft : AppColors.successSoft;
+    final rejected = offer.estado == CreditRequestStatus.rechazada;
+    final color = rejected
+        ? AppColors.error
+        : needsGuarantor
+        ? AppColors.warning
+        : AppColors.success;
+    final soft = rejected
+        ? AppColors.errorSoft
+        : needsGuarantor
+        ? AppColors.warningSoft
+        : AppColors.successSoft;
     return Container(
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
@@ -692,6 +701,8 @@ class _OfferCardState extends ConsumerState<_OfferCard> {
                           ? 'Requiere garante'
                           : guaranteeInReview
                           ? 'Garante en revisión'
+                          : rejected
+                          ? 'Rechazada'
                           : offer.estado == CreditRequestStatus.aceptada
                           ? 'Aceptada'
                           : 'Preaprobada',
@@ -701,16 +712,59 @@ class _OfferCardState extends ConsumerState<_OfferCard> {
                   ],
                 ),
                 const SizedBox(height: 16),
+                if (rejected) ...[
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(14),
+                    decoration: BoxDecoration(
+                      color: AppColors.errorSoft,
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Motivos del rechazo',
+                          style: TextStyle(
+                            color: AppColors.error,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        ...offer.motivosRechazo.map(
+                          (reason) => Padding(
+                            padding: const EdgeInsets.only(bottom: 5),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Icon(
+                                  Icons.info_outline_rounded,
+                                  size: 17,
+                                  color: AppColors.error,
+                                ),
+                                const SizedBox(width: 8),
+                                Expanded(child: Text(reason)),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                ],
                 if (needsGuarantor) _GuarantorNotice(color: color, soft: soft),
                 if (guaranteeInReview)
                   _GuaranteeReviewNotice(color: color, soft: soft),
                 if (needsGuarantor) const SizedBox(height: 12),
                 if (guaranteeInReview) const SizedBox(height: 12),
-                if (!needsGuarantor &&
+                if (!rejected &&
+                    !needsGuarantor &&
                     !guaranteeInReview &&
                     offer.requisitos.isNotEmpty)
                   _RequirementsPreview(requirements: offer.requisitos),
-                if (!needsGuarantor &&
+                if (!rejected &&
+                    !needsGuarantor &&
                     !guaranteeInReview &&
                     offer.requisitos.isNotEmpty)
                   const SizedBox(height: 12),
@@ -720,7 +774,7 @@ class _OfferCardState extends ConsumerState<_OfferCard> {
                     onOpenDocuments: _showDocumentsAfterAcceptance,
                     onPreviewPdf: _previewReferralPdf,
                   )
-                else ...[
+                else if (!rejected) ...[
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.symmetric(vertical: 17),
@@ -921,10 +975,7 @@ class _GuaranteeReviewNotice extends StatelessWidget {
           child: Text(
             'La información del garante fue enviada y está en revisión. '
             'La cooperativa debe aceptarla antes de mostrar los requisitos finales.',
-            style: TextStyle(
-              color: color.withValues(alpha: .9),
-              fontSize: 12,
-            ),
+            style: TextStyle(color: color.withValues(alpha: .9), fontSize: 12),
           ),
         ),
       ],
@@ -981,7 +1032,6 @@ class _AcceptedOfferNotice extends StatelessWidget {
   final CreditCooperativeStatus offer;
   final VoidCallback onOpenDocuments;
   final VoidCallback onPreviewPdf;
-
 
   @override
   Widget build(BuildContext context) => Container(
@@ -1050,7 +1100,6 @@ class _AcceptedOfferNotice extends StatelessWidget {
       ],
     ),
   );
-
 }
 
 class _Metric extends StatelessWidget {

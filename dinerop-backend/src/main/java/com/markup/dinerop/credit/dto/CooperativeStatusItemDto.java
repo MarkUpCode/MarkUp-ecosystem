@@ -32,6 +32,7 @@ public class CooperativeStatusItemDto {
     private String direccion;
     private String mapsUrl;
     private List<CreditRequirementDto> requisitos;
+    private List<String> motivosRechazo;
 
 
 }

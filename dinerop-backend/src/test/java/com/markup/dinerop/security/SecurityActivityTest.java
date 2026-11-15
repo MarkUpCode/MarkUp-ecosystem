@@ -4,6 +4,8 @@ import com.markup.dinerop.auth.entity.Role;
 import com.markup.dinerop.auth.entity.User;
 import com.markup.dinerop.auth.repository.UserRepository;
 import com.markup.dinerop.auth.service.JwtService;
+import com.markup.dinerop.cooperative.domain.entity.Cooperative;
+import com.markup.dinerop.cooperative.domain.repository.CooperativeRepository;
 import com.markup.dinerop.credit.domain.model.CreditRequest;
 import com.markup.dinerop.credit.domain.model.SolicitudCooperativa;
 import com.markup.dinerop.credit.domain.model.enums.CreditRejectionReason;
@@ -62,6 +64,9 @@ class SecurityActivityTest {
 
     @Autowired
     private SolicitudCooperativaRepository solicitudCooperativaRepository;
+
+    @Autowired
+    private CooperativeRepository cooperativeRepository;
 
     @Test
     void anonymousUserCannotAccessPrivateCreditsEndpoint() throws Exception {
@@ -134,6 +139,11 @@ class SecurityActivityTest {
 
     @Test
     void cooperativeCanRejectAndClientReceivesReasons() throws Exception {
+        Cooperative cooperativeEntity = new Cooperative();
+        cooperativeEntity.setNombre("Cooperativa de prueba");
+        cooperativeEntity.setMontoMaximoCredito(new BigDecimal("5000.00"));
+        cooperativeEntity = cooperativeRepository.saveAndFlush(cooperativeEntity);
+
         User client = userRepository.saveAndFlush(User.builder()
                 .email("reject-client@example.com")
                 .password(passwordEncoder.encode("test-password"))
@@ -145,7 +155,7 @@ class SecurityActivityTest {
                 .email("reject-cooperative@example.com")
                 .password("not-used-by-this-test")
                 .role(Role.COOPERATIVE)
-                .cooperativaId(1L)
+                .cooperativaId(cooperativeEntity.getId())
                 .status("ACTIVE")
                 .active(true)
                 .build());
@@ -158,7 +168,7 @@ class SecurityActivityTest {
                 .build());
         solicitudCooperativaRepository.saveAndFlush(SolicitudCooperativa.builder()
                 .solicitudId(request.getId())
-                .cooperativaId(1L)
+                .cooperativaId(cooperativeEntity.getId())
                 .estado(SolicitudCooperativaStatus.ENVIADA)
                 .build());
 
@@ -173,6 +183,11 @@ class SecurityActivityTest {
 
         String clientToken = jwtService.generateToken(client);
         mockMvc.perform(get("/api/credits/me")
+                        .header("Authorization", "Bearer " + clientToken))
+                .andExpect(status().isOk())
+                .andExpect(content().json("[{\"estado\":\"RECHAZADA\",\"motivosRechazo\":[\"El solicitante no presentó los documentos requeridos\"]}]", false));
+
+        mockMvc.perform(get("/api/credits/me/{id}/pre-approved", request.getId())
                         .header("Authorization", "Bearer " + clientToken))
                 .andExpect(status().isOk())
                 .andExpect(content().json("[{\"estado\":\"RECHAZADA\",\"motivosRechazo\":[\"El solicitante no presentó los documentos requeridos\"]}]", false));

@@ -17,6 +17,7 @@ class CreditCooperativeStatus {
     this.direccion,
     this.mapsUrl,
     this.requisitos = const [],
+    this.motivosRechazo = const [],
   });
 
   final int cooperativaId;
@@ -34,6 +35,7 @@ class CreditCooperativeStatus {
   final String? direccion;
   final String? mapsUrl;
   final List<CreditRequirement> requisitos;
+  final List<String> motivosRechazo;
 
   factory CreditCooperativeStatus.fromJson(Map<String, dynamic> json) {
     return CreditCooperativeStatus(
@@ -59,6 +61,9 @@ class CreditCooperativeStatus {
             (item) =>
                 CreditRequirement.fromJson(Map<String, dynamic>.from(item)),
           )
+          .toList(),
+      motivosRechazo: (json['motivosRechazo'] as List<dynamic>? ?? const [])
+          .map((item) => item.toString())
           .toList(),
     );
   }
