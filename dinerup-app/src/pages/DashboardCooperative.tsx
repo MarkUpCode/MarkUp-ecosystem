@@ -46,6 +46,7 @@ export default function DashboardCooperative() {
   const [loadingOffer, setLoadingOffer] = useState(false);
   const [applicantDetail, setApplicantDetail] = useState<OnboardingCooperativeDetail | null>(null);
   const [timeline, setTimeline] = useState<CreditTimelineEvent[]>([]);
+  const [showTimeline, setShowTimeline] = useState(false);
   const seenToastIds = useRef(new Set<string>());
   const [toasts, setToasts] = useState<CooperativeNotification[]>([]);
 
@@ -92,6 +93,7 @@ export default function DashboardCooperative() {
       // all guarantee decisions made from this modal.
       setApplicantDetail({ ...onboarding, solicitudId: id });
       setTimeline(await getCreditRequestTimeline(id));
+      setShowTimeline(true);
     }
     catch (error) { setActionError(getErrorMessage(error, "No se pudo cargar la información del solicitante.")); }
   };
@@ -129,7 +131,7 @@ export default function DashboardCooperative() {
     {applicantDetail && <ApplicantModal detail={applicantDetail} onClose={() => { setApplicantDetail(null); setTimeline([]); }} onDecision={(decision) => decision === "SOLICITAR_NUEVO" ? setRejectingGuaranteeId(applicantDetail.solicitudId) : decision === "RECHAZAR_CREDITO" ? setRejectingCreditDuringGuaranteeId(applicantDetail.solicitudId) : void decideGuarantee(applicantDetail.solicitudId, decision)} processing={processingId === applicantDetail.solicitudId} />}
     <RejectGuarantorModal open={rejectingGuaranteeId !== null} loading={processingId === rejectingGuaranteeId} onClose={() => setRejectingGuaranteeId(null)} onConfirm={(reasons, otherReason) => { if (rejectingGuaranteeId !== null) void decideGuarantee(rejectingGuaranteeId, "SOLICITAR_NUEVO", reasons, otherReason); }} />
     <RejectCreditModal open={rejectingCreditDuringGuaranteeId !== null} loading={processingId === rejectingCreditDuringGuaranteeId} onClose={() => setRejectingCreditDuringGuaranteeId(null)} onConfirm={(reasons, otherReason) => { if (rejectingCreditDuringGuaranteeId !== null) void decideGuarantee(rejectingCreditDuringGuaranteeId, "RECHAZAR_CREDITO", reasons, otherReason); }} />
-    {applicantDetail && <TimelinePanel events={timeline} />}
+    {applicantDetail && showTimeline && <TimelinePanel events={timeline} onClose={() => setShowTimeline(false)} />}
     <div className="fixed right-4 top-24 z-[100] flex w-[min(92vw,390px)] flex-col gap-3 sm:right-6">{toasts.map((toast) => <div key={toast.id} className="flex items-start gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-xl transition hover:-translate-y-0.5"><span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-[#e8f4fb] text-[#1261a0]"><Bell className="h-5 w-5" /></span><button type="button" onClick={() => { markRead(toast.id); setFilter("all"); setSearch(String(toast.requestId)); openSection("requests"); setToasts((current) => current.filter((item) => item.id !== toast.id)); }} className="min-w-0 flex-1 text-left"><span className="block text-sm font-extrabold text-[#173b57]">{toast.title}</span><span className="mt-1 block text-xs leading-5 text-slate-600">{toast.message}</span><span className="mt-2 block text-[10px] font-bold text-[#1f6577]">Ver solicitud #{toast.requestId}</span></button><button type="button" onClick={() => setToasts((current) => current.filter((item) => item.id !== toast.id))} className="rounded-md p-1 text-slate-400 hover:bg-slate-100" aria-label="Cerrar aviso"><X className="h-4 w-4" /></button></div>)}</div>
   </div>;
 }
@@ -153,12 +155,52 @@ function Progress({ label, value, total, color }: { label: string; value: number
 function Info({ label, value }: { label: string; value: string }) { return <div className="rounded-xl bg-slate-50 p-4"><p className="text-xs text-slate-400">{label}</p><p className="mt-1 text-sm font-bold text-slate-700">{value}</p></div>; }
 function Loading() { return <div className="py-10 text-center text-sm font-medium text-slate-500"><div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-sky-100 border-t-sky-600" /><p className="mt-3">Cargando solicitudes...</p></div>; }
 function Empty() { return <div className="py-12 text-center"><FileCheck2 className="mx-auto h-10 w-10 text-slate-300" /><p className="mt-3 font-bold text-slate-600">No hay solicitudes para mostrar</p><p className="mt-1 text-sm text-slate-400">Cuando llegue una nueva solicitud aparecerá aquí.</p></div>; }
-function TimelinePanel({ events }: { events: CreditTimelineEvent[] }) {
-  if (!events.length) return null;
-  return <div className="fixed bottom-5 right-5 z-[90] hidden w-80 rounded-2xl border border-slate-200 bg-white p-5 shadow-2xl lg:block">
-    <p className="text-xs font-bold uppercase tracking-[0.16em] text-slate-400">Historial del proceso</p>
-    <div className="mt-4 space-y-4">{events.map((event, index) => <div key={`${event.fecha}-${index}`} className="relative pl-5"><span className="absolute left-0 top-1.5 h-2.5 w-2.5 rounded-full bg-[#1f6577]" /><p className="text-sm font-extrabold text-[#173b57]">{event.tipo.replace(/_/g, " ")}</p><p className="mt-1 text-xs leading-5 text-slate-500">{event.detalle}</p><p className="mt-1 text-[10px] text-slate-400">{new Date(event.fecha).toLocaleString("es-EC")}</p></div>)}</div>
+function TimelinePanel({ events, onClose }: { events: CreditTimelineEvent[]; onClose: () => void }) {
+  const chronologicalEvents = [...events].reverse();
+  return <div className="fixed inset-0 z-[90] flex justify-end bg-slate-950/35 backdrop-blur-[2px]" onMouseDown={(event) => { if (event.target === event.currentTarget) onClose(); }}>
+    <aside className="flex h-full w-full max-w-[460px] flex-col border-l border-slate-200 bg-[#f8fafc] shadow-2xl" aria-label="Historial de la solicitud">
+      <header className="flex items-start justify-between border-b border-slate-200 bg-white px-5 py-5 sm:px-7">
+        <div><p className="text-[11px] font-extrabold uppercase tracking-[0.16em] text-[#1f6577]">Seguimiento</p><h2 className="mt-1 text-xl font-extrabold text-[#173b57]">Historial del proceso</h2><p className="mt-1 text-sm text-slate-500">Cada paso registrado en esta solicitud.</p></div>
+        <button type="button" onClick={onClose} className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-slate-200 text-slate-500 transition hover:bg-slate-50 hover:text-slate-800" aria-label="Cerrar historial"><X className="h-5 w-5" /></button>
+      </header>
+      <div className="flex-1 overflow-y-auto px-5 py-6 sm:px-7">
+        {!chronologicalEvents.length ? <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-6 text-center"><Clock3 className="mx-auto h-8 w-8 text-slate-300" /><p className="mt-3 font-bold text-slate-700">Aún no hay movimientos</p><p className="mt-1 text-sm text-slate-500">Cuando la solicitud avance, verás aquí cada actualización.</p></div> : <ol className="relative space-y-0 before:absolute before:bottom-5 before:left-[17px] before:top-5 before:w-px before:bg-slate-200">
+          {chronologicalEvents.map((event, index) => {
+            const title = timelineTitle(event.tipo);
+            const accent = timelineAccent(event.tipo);
+            const timestamp = new Date(event.fecha);
+            const dateLabel = Number.isNaN(timestamp.getTime()) ? event.fecha : timestamp.toLocaleString("es-EC", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" });
+            return <li key={`${event.fecha}-${index}`} className="relative flex gap-4 pb-7 last:pb-0">
+              <span className={`relative z-10 mt-0.5 grid h-9 w-9 shrink-0 place-items-center rounded-full border-4 border-[#f8fafc] text-[11px] font-black ${accent}`}>{index === 0 ? <CheckCircle2 className="h-4 w-4" /> : index + 1}</span>
+              <article className={`min-w-0 flex-1 rounded-2xl border bg-white p-4 shadow-sm ${index === 0 ? "border-[#b9d9d7] ring-1 ring-[#d9eceb]" : "border-slate-200"}`}>
+                <div className="flex flex-wrap items-center justify-between gap-2"><h3 className="text-sm font-extrabold text-[#173b57]">{title}</h3>{index === 0 && <span className="rounded-full bg-[#e8f4f1] px-2 py-1 text-[10px] font-extrabold uppercase tracking-wide text-[#1f6b5d]">Más reciente</span>}</div>
+                <p className="mt-2 text-sm leading-6 text-slate-600">{event.detalle}</p>
+                <p className="mt-3 flex items-center gap-1.5 text-xs font-semibold text-slate-400"><Clock3 className="h-3.5 w-3.5" />{dateLabel}</p>
+              </article>
+            </li>;
+          })}
+        </ol>}
+      </div>
+    </aside>
   </div>;
+}
+function timelineTitle(type: string) {
+  const titles: Record<string, string> = {
+    SOLICITUD_CREADA: "Solicitud recibida",
+    SOLICITUD_ENVIADA: "Solicitud enviada a la cooperativa",
+    GARANTE_SOLICITADO: "Se solicitó un garante",
+    GARANTE_ENVIADO: "Información del garante recibida",
+    NUEVO_GARANTE_SOLICITADO: "Se solicitaron ajustes al garante",
+    GARANTE_ACEPTADO: "Garante aprobado",
+    CREDITO_RECHAZADO_DURANTE_REVISION_GARANTE: "Crédito rechazado",
+  };
+  return titles[type] ?? type.toLowerCase().replace(/_/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
+}
+function timelineAccent(type: string) {
+  if (type.includes("RECHAZ")) return "bg-rose-100 text-rose-700";
+  if (type.includes("ACEPT")) return "bg-emerald-100 text-emerald-700";
+  if (type.includes("GARANTE")) return "bg-amber-100 text-amber-700";
+  return "bg-sky-100 text-sky-700";
 }
 function ApplicantModal({ detail, onClose, onDecision, processing }: { detail: OnboardingCooperativeDetail; onClose: () => void; onDecision: (decision: GuaranteeDecision) => void; processing: boolean }) { if (!detail.personas.length) return null; const money = (value?: number) => value == null ? "—" : `$${value.toLocaleString("es-EC", { minimumFractionDigits: 2 })}`; const guarantee = detail.personas.find((person) => person.rol === "GARANTE"); return <div className="fixed inset-0 z-[80] flex items-center justify-center bg-slate-950/60 p-4"><div className="max-h-[90vh] w-full max-w-4xl overflow-y-auto rounded-2xl bg-white p-6 shadow-2xl"><div className="mb-6 flex justify-between"><div><p className="text-xs font-bold uppercase tracking-wider text-slate-400">Expediente financiero</p><h2 className="mt-1 text-2xl font-extrabold text-[#0b214c]">Información de la solicitud</h2><p className="text-sm text-slate-500">Solicitud #{detail.solicitudId}</p></div><button onClick={onClose} className="rounded-xl px-3 py-2 text-sm font-bold text-slate-500 hover:bg-slate-100">Cerrar</button></div>{detail.personas.map((person) => <div key={`${person.rol}-${person.cedula}`} className="mb-6"><h3 className="mb-3 text-lg font-extrabold">{person.rol === "GARANTE" ? "Información del garante" : "Información del solicitante"}</h3><div className="grid gap-4 md:grid-cols-2"><DetailSection title="Datos personales"><Detail label="Nombre" value={`${person.nombres} ${person.apellidos}`} /><Detail label="Cédula" value={person.cedula} /><Detail label="Fecha de nacimiento" value={person.fechaNacimiento} /><Detail label="Estado civil" value={person.estadoCivil} /><Detail label="Teléfono" value={person.telefono} /></DetailSection><DetailSection title="Trabajo"><Detail label="Ocupación" value={person.ocupacion} /><Detail label="Empresa" value={person.empresaTrabajo} /><Detail label="Negocio" value={person.actividadEconomica?.nombreNegocio} /></DetailSection><DetailSection title="Dirección"><Detail label="Provincia" value={person.direccion?.provincia} /><Detail label="Cantón" value={person.direccion?.canton} /><Detail label="Barrio" value={person.direccion?.barrio} /><Detail label="Dirección" value={[person.direccion?.callePrincipal, person.direccion?.numero].filter(Boolean).join(" ")} /><Detail label="Calle secundaria" value={person.direccion?.calleSecundaria} /><Detail label="Vivienda" value={person.direccion?.tipoVivienda} /></DetailSection><DetailSection title="Situación económica"><Detail label="Ingreso mensual" value={money(person.ingresoEgreso?.ingresoMensual)} /><Detail label="Egreso mensual" value={money(person.ingresoEgreso?.egresoMensual)} /></DetailSection></div></div>)}{guarantee && <div className="flex gap-3 border-t border-slate-200 pt-5"><button onClick={() => onDecision("SOLICITAR_NUEVO")} disabled={processing} className="rounded-xl bg-amber-600 px-4 py-2.5 text-sm font-bold text-white">Solicitar nuevo garante</button><button onClick={() => onDecision("RECHAZAR_CREDITO")} disabled={processing} className="rounded-xl border border-rose-200 px-4 py-2.5 text-sm font-bold text-rose-700">Rechazar crédito</button><button onClick={() => onDecision("ACEPTAR")} disabled={processing} className="rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-bold text-white">Aceptar garante</button></div>}</div></div>; }
 function DetailSection({ title, children }: { title: string; children: ReactNode }) { return <section className="rounded-xl border border-slate-200 p-4"><h3 className="mb-3 text-sm font-extrabold">{title}</h3>{children}</section>; }

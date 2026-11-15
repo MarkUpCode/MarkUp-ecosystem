@@ -755,8 +755,6 @@ class _OfferCardState extends ConsumerState<_OfferCard> {
                 ],
                 if (needsGuarantor)
                   _GuarantorNotice(
-                    color: color,
-                    soft: soft,
                     message: offer.mensajeGarante,
                   ),
                 if (guaranteeInReview)
@@ -933,44 +931,113 @@ class _OfferStatus extends StatelessWidget {
 }
 
 class _GuarantorNotice extends StatelessWidget {
-  const _GuarantorNotice({required this.color, required this.soft, this.message});
-  final Color color;
-  final Color soft;
+  const _GuarantorNotice({this.message});
   final String? message;
   @override
-  Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.all(14),
-    decoration: BoxDecoration(
-      color: soft,
-      borderRadius: BorderRadius.circular(15),
-    ),
-    child: Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Icon(Icons.group_add_rounded, color: color),
-        const SizedBox(width: 9),
-        Expanded(
-          child: Column(
+  Widget build(BuildContext context) {
+    const requestPrefix = 'La cooperativa solicita otro garante. Motivos:';
+    final details = message?.trim();
+    final hasReasons = details != null && details.startsWith(requestPrefix);
+    final reasonText = hasReasons
+        ? details.substring(requestPrefix.length).trim()
+        : details;
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFFF8E8),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: const Color(0xFFF0D18E)),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x0D7A4B00),
+            blurRadius: 12,
+            offset: Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                'Requiere garante',
-                style: TextStyle(color: color, fontWeight: FontWeight.w900),
+              Container(
+                width: 42,
+                height: 42,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFFE8B3),
+                  borderRadius: BorderRadius.circular(13),
+                ),
+                child: const Icon(
+                  Icons.edit_note_rounded,
+                  color: Color(0xFF9A5B00),
+                  size: 24,
+                ),
               ),
-              const SizedBox(height: 3),
-              Text(
-                message ?? 'La cooperativa necesita un garante para avanzar. Si ya enviaste uno y fue rechazado, registra aquí un nuevo garante.',
-                style: TextStyle(
-                  color: color.withValues(alpha: .9),
-                  fontSize: 12,
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      hasReasons ? 'Acción requerida' : 'Se requiere un garante',
+                      style: const TextStyle(
+                        color: Color(0xFF80500A),
+                        fontSize: 11,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: .7,
+                      ),
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      hasReasons
+                          ? 'Actualiza la información del garante'
+                          : 'Completa la información del garante',
+                      style: const TextStyle(
+                        color: Color(0xFF392B14),
+                        fontSize: 15,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
           ),
-        ),
-      ],
-    ),
-  );
+          const SizedBox(height: 14),
+          Text(
+            hasReasons ? 'Lo que debes corregir' : 'Siguiente paso',
+            style: const TextStyle(
+              color: Color(0xFF80500A),
+              fontSize: 12,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          const SizedBox(height: 7),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: .8),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Text(
+              reasonText?.isNotEmpty == true
+                  ? reasonText!
+                  : 'La cooperativa necesita revisar la información de un garante para continuar con tu solicitud. Puedes volver a registrar los datos desde aquí.',
+              style: const TextStyle(
+                color: Color(0xFF594A32),
+                fontSize: 13,
+                height: 1.45,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 class _GuaranteeReviewNotice extends StatelessWidget {
