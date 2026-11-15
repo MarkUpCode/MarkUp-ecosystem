@@ -131,14 +131,6 @@ public class CooperativeCreditDecisionService {
             sc.setEstado(SolicitudCooperativaStatus.RECHAZADA);
             sc.setMotivosRechazo(List.copyOf(motivosRechazo.stream().distinct().toList()));
             repository.save(sc);
-            var cooperativeName = cooperativeService.getById(cooperativaId).getNombre();
-            var labels = sc.getMotivosRechazo().stream()
-                    .map(CreditRejectionReason::getLabel)
-                    .toList();
-            notificationService.sendCreditRejectionEmail(cr.getEmail(), cooperativeName, labels);
-            if (cr.getClientId() != null) {
-                pushNotificationService.sendCreditRejected(cr.getClientId(), cooperativeName, labels, cr.getId());
-            }
 
         } else {
             throw new IllegalArgumentException("Decision invalida");

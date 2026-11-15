@@ -150,8 +150,7 @@ class CreditRequestCard extends StatelessWidget {
                       ],
                     ),
                     if (!compact) ...[
-                      if (request.estado == CreditRequestStatus.rechazada &&
-                          request.motivosRechazo.isNotEmpty) ...[
+                      if (request.motivosRechazo.isNotEmpty) ...[
                         const SizedBox(height: 16),
                         Text(
                           'Motivos del rechazo',
