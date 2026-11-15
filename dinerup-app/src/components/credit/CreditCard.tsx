@@ -214,16 +214,13 @@ export default function CreditCard({ request }: CreditCardProps) {
           </section>
         ) : null}
 
-        {/* Botón Ver Información - solo si no está rechazada */}
-        {request.estado !== 'RECHAZADA' && (
-          <button 
-            onClick={() => setShowDetailsModal(true)}
-            className="w-full bg-primary-600 hover:bg-primary-700 text-white py-3 rounded-xl font-semibold transition-all flex items-center justify-center gap-2 mt-4"
-          >
-            Detalle de mi solicitud
-            <ArrowRight className="w-4 h-4" />
-          </button>
-        )}
+        <button
+          onClick={() => setShowDetailsModal(true)}
+          className="w-full rounded-xl border border-blue-200 bg-blue-50 py-3 font-semibold text-blue-800 transition-colors hover:bg-blue-100 flex items-center justify-center gap-2 mt-4"
+        >
+          Ver respuestas y detalle
+          <ArrowRight className="w-4 h-4" />
+        </button>
       </div>
     </article>
 

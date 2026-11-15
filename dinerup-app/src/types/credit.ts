@@ -51,7 +51,7 @@ export interface CreditRequirement {
 export interface CreditRequestCooperative {
   cooperativaId: number;
   nombreCooperativa: string;
-  estado: CreditEstado;
+  estado: CreditEstado | "ACEPTADA" | "ENVIADA";
   fechaActualizacion: string;
   monto: number;
   plazoMeses: number;
@@ -63,4 +63,5 @@ export interface CreditRequestCooperative {
   direccion?: string;
   mapsUrl?: string;
   requisitos?: CreditRequirement[];
+  motivosRechazo?: string[];
 }
