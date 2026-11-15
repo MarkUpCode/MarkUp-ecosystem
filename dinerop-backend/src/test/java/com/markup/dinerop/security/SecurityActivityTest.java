@@ -27,6 +27,7 @@ import java.math.BigDecimal;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 
@@ -129,6 +130,52 @@ class SecurityActivityTest {
         mockMvc.perform(get("/api/credits/me")
                         .header("Authorization", "Bearer not.a.valid.jwt"))
                 .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void cooperativeCanRejectAndClientReceivesReasons() throws Exception {
+        User client = userRepository.saveAndFlush(User.builder()
+                .email("reject-client@example.com")
+                .password(passwordEncoder.encode("test-password"))
+                .role(Role.CLIENT)
+                .status("ACTIVE")
+                .active(true)
+                .build());
+        User cooperative = userRepository.saveAndFlush(User.builder()
+                .email("reject-cooperative@example.com")
+                .password("not-used-by-this-test")
+                .role(Role.COOPERATIVE)
+                .cooperativaId(1L)
+                .status("ACTIVE")
+                .active(true)
+                .build());
+        CreditRequest request = creditRequestRepository.saveAndFlush(CreditRequest.builder()
+                .clientId(client.getIdUser())
+                .email(client.getEmail())
+                .identification("0987654321")
+                .amount(new BigDecimal("1000.00"))
+                .tipo(CreditRequestType.CREDITO)
+                .build());
+        solicitudCooperativaRepository.saveAndFlush(SolicitudCooperativa.builder()
+                .solicitudId(request.getId())
+                .cooperativaId(1L)
+                .estado(SolicitudCooperativaStatus.ENVIADA)
+                .build());
+
+        String cooperativeToken = jwtService.generateToken(cooperative);
+        mockMvc.perform(put("/api/credits/cooperative/me/requests/{id}/decision", request.getId())
+                        .header("Authorization", "Bearer " + cooperativeToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"decision":"RECHAZAR","motivosRechazo":["CAPACIDAD_DE_PAGO"]}
+                                """))
+                .andExpect(status().isOk());
+
+        String clientToken = jwtService.generateToken(client);
+        mockMvc.perform(get("/api/credits/me")
+                        .header("Authorization", "Bearer " + clientToken))
+                .andExpect(status().isOk())
+                .andExpect(content().json("[{\"estado\":\"RECHAZADA\",\"motivosRechazo\":[\"El crédito sobrepasa su capacidad de pago\"]}]", false));
     }
 
     @Test

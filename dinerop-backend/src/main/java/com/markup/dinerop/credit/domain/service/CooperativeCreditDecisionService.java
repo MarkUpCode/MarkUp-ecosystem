@@ -20,6 +20,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -129,7 +130,7 @@ public class CooperativeCreditDecisionService {
                 throw new IllegalArgumentException("Puedes seleccionar hasta cuatro motivos de rechazo");
             }
             sc.setEstado(SolicitudCooperativaStatus.RECHAZADA);
-            sc.setMotivosRechazo(List.copyOf(motivosRechazo.stream().distinct().toList()));
+            sc.setMotivosRechazo(new ArrayList<>(motivosRechazo.stream().distinct().toList()));
             repository.save(sc);
 
         } else {
