@@ -30,6 +30,12 @@ public class CreditProcessEvent {
     @Column(nullable = false, length = 500)
     private String detalle;
 
+    @Column(name = "actor_id")
+    private Long actorId;
+
+    @Column(name = "actor_role", length = 20)
+    private String actorRole;
+
     @Column(nullable = false)
     private LocalDateTime fecha;
 

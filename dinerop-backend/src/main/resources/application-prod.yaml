@@ -27,6 +27,11 @@ spring:
         order_inserts: true
         order_updates: true
         generate_statistics: false
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    baseline-version: 0
+    baseline-description: existing Dinerop schema
 
   # Desactiva autoconfiguración de webflux si no se usa directamente
   # (reduce beans cargados en memoria)

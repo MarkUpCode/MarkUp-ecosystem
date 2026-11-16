@@ -16,8 +16,9 @@ public class CompletarFormularioGaranteUseCase {
             Long clientId,
             Long creditRequestId,
             Long cooperativaId,
+            Long guarantorProfileId,
             PersonaOnboardingRequest request
     ) {
-        return service.crearYCompletarGaranteDesdeCliente(clientId, creditRequestId, cooperativaId, request);
+        return service.crearYCompletarGaranteDesdeCliente(clientId, creditRequestId, cooperativaId, guarantorProfileId, request);
     }
 }

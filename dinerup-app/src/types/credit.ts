@@ -17,6 +17,9 @@ export interface CreditRequest extends BaseCreditRequest {
   monto: number;
   cantidadSolicitudesEnviadas: number;
   motivosRechazo?: string[];
+  garanteEnRevision?: boolean;
+  mensajeGarante?: string | null;
+  requiereComparecenciaGarante?: boolean;
 }
 
 /**

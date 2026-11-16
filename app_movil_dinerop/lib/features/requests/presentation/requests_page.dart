@@ -408,6 +408,18 @@ class _OfferCard extends ConsumerStatefulWidget {
 
 class _OfferCardState extends ConsumerState<_OfferCard> {
   bool _accepting = false;
+  bool _showGuarantorHistory = false;
+  Future<List<Map<String, dynamic>>>? _guarantorHistory;
+
+  void _toggleGuarantorHistory() {
+    setState(() {
+      _showGuarantorHistory = !_showGuarantorHistory;
+      _guarantorHistory ??= ref.read(creditRepositoryProvider).loadGuarantorHistory(
+        solicitudId: widget.requestId,
+        cooperativaId: widget.offer.cooperativaId,
+      );
+    });
+  }
 
   Future<void> _accept() async {
     final accepted = await showDialog<bool>(
@@ -759,6 +771,28 @@ class _OfferCardState extends ConsumerState<_OfferCard> {
                   ),
                 if (guaranteeInReview)
                   _GuaranteeReviewNotice(color: color, soft: soft),
+                TextButton.icon(
+                  onPressed: _toggleGuarantorHistory,
+                  icon: Icon(_showGuarantorHistory ? Icons.expand_less_rounded : Icons.history_rounded),
+                  label: Text(_showGuarantorHistory ? 'Ocultar historial del garante' : 'Ver historial del garante'),
+                ),
+                if (_showGuarantorHistory)
+                  FutureBuilder<List<Map<String, dynamic>>>(
+                    future: _guarantorHistory,
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Padding(padding: EdgeInsets.all(12), child: Center(child: CircularProgressIndicator()));
+                      }
+                      if (snapshot.hasError) {
+                        return const _GuarantorHistoryMessage(message: 'No se pudo cargar el historial. Intenta nuevamente más tarde.');
+                      }
+                      final history = snapshot.data ?? const <Map<String, dynamic>>[];
+                      if (history.isEmpty) {
+                        return const _GuarantorHistoryMessage(message: 'Todavía no hay envíos vinculados a esta solicitud. Los datos anteriores se conservan como legado y no se asocian automáticamente a este crédito.');
+                      }
+                      return _GuarantorHistoryView(items: history);
+                    },
+                  ),
                 if (needsGuarantor) const SizedBox(height: 12),
                 if (guaranteeInReview) const SizedBox(height: 12),
                 if (offer.requiereComparecenciaGarante)
@@ -907,6 +941,62 @@ class _OfferCardState extends ConsumerState<_OfferCard> {
   }
 }
 
+class _GuarantorHistoryMessage extends StatelessWidget {
+  const _GuarantorHistoryMessage({required this.message});
+  final String message;
+
+  @override
+  Widget build(BuildContext context) => Container(
+    width: double.infinity,
+    padding: const EdgeInsets.all(13),
+    decoration: BoxDecoration(color: AppColors.infoSoft, borderRadius: BorderRadius.circular(14)),
+    child: Text(message, style: const TextStyle(fontSize: 12, height: 1.45)),
+  );
+}
+
+class _GuarantorHistoryView extends StatelessWidget {
+  const _GuarantorHistoryView({required this.items});
+  final List<Map<String, dynamic>> items;
+
+  @override
+  Widget build(BuildContext context) => Column(
+    children: items.map((item) {
+      final snapshot = Map<String, dynamic>.from(item['fotografia'] as Map? ?? const {});
+      final evaluations = (item['evaluaciones'] as List<dynamic>? ?? const [])
+          .whereType<Map>()
+          .map((value) => Map<String, dynamic>.from(value));
+      final name = '${snapshot['nombres'] ?? ''} ${snapshot['apellidos'] ?? ''}'.trim();
+      final sentAt = item['enviadoEn']?.toString();
+      return Container(
+        width: double.infinity,
+        margin: const EdgeInsets.only(top: 9),
+        padding: const EdgeInsets.all(13),
+        decoration: BoxDecoration(color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: .55), borderRadius: BorderRadius.circular(14)),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text('Intento ${item['intento'] ?? '—'} · ${name.isEmpty ? 'Garante' : name}', style: const TextStyle(fontWeight: FontWeight.w800)),
+          Text('Enviado: ${sentAt ?? 'Fecha no disponible'}', style: Theme.of(context).textTheme.bodySmall),
+          ...evaluations.map((evaluation) {
+            final reasons = (evaluation['motivosRechazo'] as List<dynamic>? ?? const []).join(', ');
+            final other = evaluation['motivoRechazoOtro']?.toString();
+            final observation = evaluation['observacion']?.toString();
+            final explanation = [reasons, other, observation].where((value) => value != null && value.trim().isNotEmpty).join(' · ');
+            return Padding(padding: const EdgeInsets.only(top: 8), child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10)),
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text((evaluation['decision'] ?? 'Revisión').toString().replaceAll('_', ' '), style: const TextStyle(fontWeight: FontWeight.w700, color: AppColors.primary)),
+                Text('Responsable: ${evaluation['actorRole'] ?? '—'} · ID ${evaluation['actorId'] ?? '—'} · ${evaluation['fecha'] ?? ''}', style: Theme.of(context).textTheme.bodySmall),
+                if (explanation.isNotEmpty) Text(explanation, style: const TextStyle(fontSize: 12, height: 1.4)),
+              ]),
+            ));
+          }),
+        ]),
+      );
+    }).toList(),
+  );
+}
+
 class _OfferStatus extends StatelessWidget {
   const _OfferStatus({
     required this.text,
@@ -935,11 +1025,11 @@ class _GuarantorNotice extends StatelessWidget {
   final String? message;
   @override
   Widget build(BuildContext context) {
-    const requestPrefix = 'La cooperativa solicita otro garante. Motivos:';
     final details = message?.trim();
-    final hasReasons = details != null && details.startsWith(requestPrefix);
+    final reasonsIndex = details?.indexOf('Motivos:') ?? -1;
+    final hasReasons = reasonsIndex >= 0;
     final reasonText = hasReasons
-        ? details.substring(requestPrefix.length).trim()
+        ? details!.substring(reasonsIndex + 'Motivos:'.length).trim()
         : details;
 
     return Container(

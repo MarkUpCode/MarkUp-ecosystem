@@ -59,6 +59,20 @@ class CreditRepository {
         .toList();
   }
 
+  Future<List<Map<String, dynamic>>> loadGuarantorHistory({
+    required int solicitudId,
+    required int cooperativaId,
+  }) async {
+    final response = await _client.request<List<dynamic>>(
+      '/api/credits/me/$solicitudId/cooperatives/$cooperativaId/garantes/historial',
+      parser: (data) => List<dynamic>.from(data as List),
+    );
+    return response
+        .whereType<Map>()
+        .map((item) => Map<String, dynamic>.from(item))
+        .toList();
+  }
+
   Future<void> acceptCooperative({
     required int solicitudId,
     required int cooperativaId,

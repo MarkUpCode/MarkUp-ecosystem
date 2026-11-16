@@ -138,6 +138,19 @@ export interface GuaranteeOnboardingResponse {
   fechaCreacion: string;
 }
 
+export interface GuarantorProfileResponse {
+  id: number;
+  persona: OnboardingCooperativeDetail["personas"][number];
+  actualizadoEn: string;
+}
+
+export function getMyGuarantorProfiles(): Promise<GuarantorProfileResponse[]> {
+  return httpClient<GuarantorProfileResponse[]>("/api/onboarding/cliente/garantes", {
+    method: "GET",
+    auth: true,
+  });
+}
+
 export interface PreRegistrationData {
   firstName: string;
   lastName: string;
@@ -162,15 +175,19 @@ export async function submitGuaranteeOnboarding(
   payload: OnboardingPayload,
   solicitudId?: number,
   cooperativaId?: number,
+  guarantorProfileId?: number | null,
 ): Promise<GuaranteeOnboardingResponse> {
-  const query = solicitudId != null && cooperativaId != null
-    ? `?solicitudId=${solicitudId}&cooperativaId=${cooperativaId}`
-    : "";
+  const params = new URLSearchParams();
+  if (solicitudId != null) params.set("solicitudId", String(solicitudId));
+  if (cooperativaId != null) params.set("cooperativaId", String(cooperativaId));
+  if (guarantorProfileId != null) params.set("guarantorProfileId", String(guarantorProfileId));
+  const { email: _email, ...persona } = payload.solicitante;
+  void _email;
   return httpClient<GuaranteeOnboardingResponse>(
-    `/api/onboarding/cliente/garante/completar${query}`,
+    `/api/onboarding/cliente/garante/completar${params.size ? `?${params.toString()}` : ""}`,
     {
       method: "POST",
-      body: payload,
+      body: persona,
       auth: true,
     },
   );

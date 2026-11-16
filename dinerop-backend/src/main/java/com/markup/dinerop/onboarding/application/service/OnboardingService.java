@@ -5,6 +5,8 @@ import com.markup.dinerop.onboarding.dto.request.PersonaOnboardingRequest;
 import com.markup.dinerop.onboarding.dto.request.SolicitudOnboardingRequest;
 import com.markup.dinerop.onboarding.dto.response.FormularioClienteStatusResponse;
 import com.markup.dinerop.onboarding.dto.response.PreRegistrationDataResponse;
+import com.markup.dinerop.onboarding.dto.response.GuarantorProfileResponse;
+import java.util.List;
 
 public interface OnboardingService {
 
@@ -19,8 +21,11 @@ public interface OnboardingService {
             Long clientId,
             Long creditRequestId,
             Long cooperativaId,
+            Long guarantorProfileId,
             PersonaOnboardingRequest request
     );
+
+    List<GuarantorProfileResponse> getGuarantorProfiles(Long clientId);
 
     SolicitudOnboarding obtenerOnboardingUnificado(Long solicitudId);
 

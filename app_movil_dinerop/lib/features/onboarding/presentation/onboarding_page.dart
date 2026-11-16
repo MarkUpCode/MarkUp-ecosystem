@@ -15,6 +15,7 @@ import '../../../shared/widgets/app_text_field.dart';
 import '../../../shared/widgets/step_progress.dart';
 import '../../auth/presentation/auth_controller.dart';
 import '../data/models/onboarding_request.dart';
+import '../data/onboarding_repository.dart' show GuarantorProfile;
 
 class OnboardingPage extends ConsumerStatefulWidget {
   const OnboardingPage({
@@ -68,6 +69,8 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
   final _conyugeEmpresaController = TextEditingController();
 
   final List<_ReferenceDraft> _references = [_ReferenceDraft()];
+  List<GuarantorProfile> _guarantorProfiles = const [];
+  int? _selectedGuarantorProfileId;
 
   DateTime? _fechaNacimiento;
   DateTime? _conyugeFechaNacimiento;
@@ -182,7 +185,15 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
 
   Future<void> _loadInitialData() async {
     if (widget.isGuarantor) {
-      if (mounted) setState(() => _isLoading = false);
+      try {
+        _guarantorProfiles = await ref
+            .read(onboardingRepositoryProvider)
+            .loadMyGuarantorProfiles();
+      } catch (_) {
+        _guarantorProfiles = const [];
+      } finally {
+        if (mounted) setState(() => _isLoading = false);
+      }
       return;
     }
     try {
@@ -208,6 +219,81 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
         setState(() => _isLoading = false);
       }
     }
+  }
+
+  void _selectGuarantorProfile(int? profileId) {
+    final matches = _guarantorProfiles.where((item) => item.id == profileId);
+    final profile = matches.isEmpty ? null : matches.first;
+    setState(() {
+      _selectedGuarantorProfileId = profileId;
+      _step = 0;
+      _acceptedDeclaration = false;
+      _validationAttempt = 0;
+      if (profile == null) {
+        for (final controller in [
+          _nombresController, _apellidosController, _cedulaController,
+          _fechaNacimientoController, _ocupacionController, _empresaController,
+          _telefonoController, _provinciaController, _cantonController,
+          _barrioController, _calleController, _calleSecundariaController,
+          _numeroController, _referenciaUbicacionController, _nombreNegocioController,
+          _direccionNegocioController, _tiempoActividadController,
+          _telefonoNegocioController, _ingresoController, _egresoController,
+        ]) {
+          controller.clear();
+        }
+        _fechaNacimiento = null;
+        _estadoCivil = 'SOLTERO';
+        _tipoVivienda = 'PROPIA';
+        _selectedProvince = null;
+        _selectedCanton = null;
+        _selectedParish = null;
+        for (final reference in _references) { reference.dispose(); }
+        _references
+          ..clear()
+          ..add(_ReferenceDraft());
+        return;
+      }
+
+      final person = profile.persona;
+      final address = person.direccion;
+      final activity = person.actividadEconomica;
+      final income = person.ingresoEgreso;
+      _nombresController.text = person.nombres;
+      _apellidosController.text = person.apellidos;
+      _cedulaController.text = person.cedula;
+      _fechaNacimiento = person.fechaNacimiento;
+      _fechaNacimientoController.text = DateFormat('yyyy-MM-dd').format(person.fechaNacimiento);
+      _estadoCivil = person.estadoCivil;
+      _ocupacionController.text = person.ocupacion ?? '';
+      _empresaController.text = person.empresaTrabajo ?? '';
+      _telefonoController.text = person.telefono ?? '';
+      _provinciaController.text = address.provincia;
+      _cantonController.text = address.canton;
+      _barrioController.text = address.barrio ?? '';
+      _calleController.text = address.callePrincipal ?? '';
+      _calleSecundariaController.text = address.calleSecundaria ?? '';
+      _numeroController.text = address.numero ?? '';
+      _referenciaUbicacionController.text = address.referenciaUbicacion ?? '';
+      _selectedProvince = address.provincia;
+      _selectedCanton = address.canton;
+      _selectedParish = address.barrio;
+      _tipoVivienda = address.tipoVivienda ?? 'PROPIA';
+      _nombreNegocioController.text = activity?.nombreNegocio ?? '';
+      _direccionNegocioController.text = activity?.direccionNegocio ?? '';
+      _tiempoActividadController.text = activity?.tiempoActividad ?? '';
+      _telefonoNegocioController.text = activity?.telefonoNegocio ?? '';
+      _ingresoController.text = income.ingresoMensual.toString();
+      _egresoController.text = income.egresoMensual.toString();
+      for (final reference in _references) { reference.dispose(); }
+      _references
+        ..clear()
+        ..addAll(person.referencias.map((item) => _ReferenceDraft(
+              nombreCompleto: item.nombreCompleto,
+              parentesco: item.parentesco ?? '',
+              telefono: item.telefono ?? '',
+            )..tipo = item.tipo));
+      if (_references.isEmpty) _references.add(_ReferenceDraft());
+    });
   }
 
   List<String> _availableCantons([String? province]) {
@@ -610,6 +696,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
                   solicitante,
                   solicitudId: widget.solicitudId!,
                   cooperativaId: widget.cooperativaId!,
+                  guarantorProfileId: _selectedGuarantorProfileId,
                 )
           : await ref
                 .read(onboardingRepositoryProvider)
@@ -900,6 +987,32 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
   String _formatDate(DateTime dateTime) =>
       DateFormat('yyyy-MM-dd').format(dateTime);
 
+  Widget _buildGuarantorProfileSelector(BuildContext context) {
+    return AppCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Garante registrado', style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w800)),
+          const SizedBox(height: 4),
+          Text('Puedes reutilizar sus datos y actualizarlos antes de enviarlos para este crédito.', style: Theme.of(context).textTheme.bodySmall),
+          const SizedBox(height: 10),
+          DropdownButtonFormField<int?>(
+            initialValue: _selectedGuarantorProfileId,
+            decoration: const InputDecoration(labelText: 'Seleccionar garante'),
+            items: [
+              const DropdownMenuItem<int?>(value: null, child: Text('Registrar un garante nuevo')),
+              ..._guarantorProfiles.map((profile) => DropdownMenuItem<int?>(
+                value: profile.id,
+                child: Text('${profile.persona.nombres} ${profile.persona.apellidos} · ${profile.persona.cedula}', overflow: TextOverflow.ellipsis),
+              )),
+            ],
+            onChanged: _selectGuarantorProfile,
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildHeader(BuildContext context, {bool compact = false}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -941,7 +1054,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
           const SizedBox(height: 8),
           Text(
             widget.isGuarantor
-                ? 'Registra los datos del garante solicitados por la cooperativa. Este formulario se llena una sola vez.'
+                ? 'Selecciona un garante registrado o agrega uno nuevo. Revisa sus datos antes de enviarlos para este crédito.'
                 : 'Este formulario se llena una sola vez. Luego podras solicitar creditos sin volver a ingresar tus datos.',
             style: Theme.of(context).textTheme.bodyLarge,
           ),
@@ -1726,7 +1839,16 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
                               ? 220
                               : 32,
                         ),
-                        child: _buildStepContent(context),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            if (widget.isGuarantor && _guarantorProfiles.isNotEmpty) ...[
+                              _buildGuarantorProfileSelector(context),
+                              const SizedBox(height: 14),
+                            ],
+                            _buildStepContent(context),
+                          ],
+                        ),
                       ),
                     ),
                   ),

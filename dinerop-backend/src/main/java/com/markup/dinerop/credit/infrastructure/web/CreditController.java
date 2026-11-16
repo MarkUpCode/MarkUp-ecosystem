@@ -199,11 +199,32 @@ public class CreditController {
                 user.getCooperativaId(),
                 dto.decision(),
                 dto.motivosRechazo(),
-                dto.motivoRechazoOtro()
+                dto.motivoRechazoOtro(),
+                dto.observacion(),
+                user.getIdUser()
         );
         return ResponseEntity.ok(
                 Map.of("message", "Decisión del garante registrada correctamente")
         );
+    }
+
+    @GetMapping("/cooperative/me/requests/{solicitudId}/garantes/historial")
+    @PreAuthorize("hasRole('COOPERATIVE')")
+    public ResponseEntity<List<com.markup.dinerop.credit.dto.CreditGuarantorHistoryItemDto>> getGuarantorHistoryForCooperative(
+            @PathVariable Long solicitudId,
+            @AuthenticationPrincipal User user
+    ) {
+        return ResponseEntity.ok(creditService.getGuarantorHistoryForCooperative(solicitudId, user.getCooperativaId()));
+    }
+
+    @GetMapping("/me/{solicitudId}/cooperatives/{cooperativaId}/garantes/historial")
+    @PreAuthorize("hasRole('CLIENT')")
+    public ResponseEntity<List<com.markup.dinerop.credit.dto.CreditGuarantorHistoryItemDto>> getGuarantorHistoryForClient(
+            @PathVariable Long solicitudId,
+            @PathVariable Long cooperativaId,
+            @AuthenticationPrincipal User user
+    ) {
+        return ResponseEntity.ok(creditService.getGuarantorHistoryForClient(user.getIdUser(), solicitudId, cooperativaId));
     }
 
     @GetMapping("/cooperative/me/requests/{solicitudId}/timeline")
@@ -223,7 +244,9 @@ public class CreditController {
                 .map(event -> new CreditProcessEventDto(
                         event.getTipo(),
                         event.getDetalle(),
-                        event.getFecha()
+                        event.getFecha(),
+                        event.getActorId(),
+                        event.getActorRole()
                 ))
                 .toList());
     }

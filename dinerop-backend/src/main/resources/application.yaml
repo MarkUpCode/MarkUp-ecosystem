@@ -3,3 +3,5 @@ spring:
     name: dinerop-backend
   profiles:
     active: dev
+  flyway:
+    enabled: false

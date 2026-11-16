@@ -45,16 +45,90 @@ class OnboardingRepository {
     OnboardingPersonRequest request, {
     required int solicitudId,
     required int cooperativaId,
+    int? guarantorProfileId,
   }
   ) {
     return _client.request<OnboardingSubmissionResponse>(
-      '/api/onboarding/cliente/garante/completar?solicitudId=$solicitudId&cooperativaId=$cooperativaId',
+      '/api/onboarding/cliente/garante/completar?solicitudId=$solicitudId&cooperativaId=$cooperativaId${guarantorProfileId == null ? '' : '&guarantorProfileId=$guarantorProfileId'}',
       method: 'POST',
       // PersonaOnboardingRequest in Spring does not contain the email field
       // used by the applicant flow, so keep this body exact.
       body: request.toJson()..remove('email'),
       parser: (data) => OnboardingSubmissionResponse.fromJson(
         Map<String, dynamic>.from(data as Map),
+      ),
+    );
+  }
+
+  Future<List<GuarantorProfile>> loadMyGuarantorProfiles() {
+    return _client.request<List<GuarantorProfile>>(
+      '/api/onboarding/cliente/garantes',
+      parser: (data) => (data as List<dynamic>)
+          .whereType<Map>()
+          .map((item) => GuarantorProfile.fromJson(Map<String, dynamic>.from(item)))
+          .toList(),
+    );
+  }
+}
+
+class GuarantorProfile {
+  const GuarantorProfile({required this.id, required this.persona});
+  final int id;
+  final OnboardingPersonRequest persona;
+
+  factory GuarantorProfile.fromJson(Map<String, dynamic> json) {
+    final persona = Map<String, dynamic>.from(json['persona'] as Map);
+    final direccion = Map<String, dynamic>.from(persona['direccion'] as Map? ?? const {});
+    final actividad = persona['actividadEconomica'] == null
+        ? null
+        : Map<String, dynamic>.from(persona['actividadEconomica'] as Map);
+    final ingreso = Map<String, dynamic>.from(persona['ingresoEgreso'] as Map? ?? const {});
+    final referencias = (persona['referencias'] as List<dynamic>? ?? const [])
+        .whereType<Map>()
+        .map((item) => Map<String, dynamic>.from(item))
+        .map((item) => OnboardingReferenceRequest(
+              nombreCompleto: (item['nombreCompleto'] ?? '').toString(),
+              tipo: (item['tipo'] ?? 'PERSONAL').toString(),
+              parentesco: item['parentesco']?.toString(),
+              telefono: item['telefono']?.toString(),
+            ))
+        .toList();
+    return GuarantorProfile(
+      id: (json['id'] as num).toInt(),
+      persona: OnboardingPersonRequest(
+        nombres: (persona['nombres'] ?? '').toString(),
+        apellidos: (persona['apellidos'] ?? '').toString(),
+        cedula: (persona['cedula'] ?? '').toString(),
+        fechaNacimiento: DateTime.tryParse((persona['fechaNacimiento'] ?? '').toString()) ?? DateTime(2000),
+        estadoCivil: (persona['estadoCivil'] ?? '').toString(),
+        email: '',
+        tieneConyuge: false,
+        ocupacion: persona['ocupacion']?.toString(),
+        empresaTrabajo: persona['empresaTrabajo']?.toString(),
+        telefono: persona['telefono']?.toString(),
+        direccion: OnboardingAddressRequest(
+          provincia: (direccion['provincia'] ?? '').toString(),
+          canton: (direccion['canton'] ?? '').toString(),
+          barrio: direccion['barrio']?.toString(),
+          callePrincipal: direccion['callePrincipal']?.toString(),
+          calleSecundaria: direccion['calleSecundaria']?.toString(),
+          numero: direccion['numero']?.toString(),
+          referenciaUbicacion: direccion['referenciaUbicacion']?.toString(),
+          tipoVivienda: direccion['tipoVivienda']?.toString() ?? 'PROPIA',
+        ),
+        actividadEconomica: actividad == null
+            ? null
+            : OnboardingEconomicRequest(
+                nombreNegocio: actividad['nombreNegocio']?.toString(),
+                direccionNegocio: actividad['direccionNegocio']?.toString(),
+                tiempoActividad: actividad['tiempoActividad']?.toString(),
+                telefonoNegocio: actividad['telefonoNegocio']?.toString(),
+              ),
+        ingresoEgreso: OnboardingIncomeRequest(
+          ingresoMensual: (ingreso['ingresoMensual'] as num?)?.toDouble() ?? 0,
+          egresoMensual: (ingreso['egresoMensual'] as num?)?.toDouble() ?? 0,
+        ),
+        referencias: referencias,
       ),
     );
   }

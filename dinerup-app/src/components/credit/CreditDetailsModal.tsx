@@ -14,6 +14,8 @@ import { CreditEstado } from "../../types/creditEstado";
 import {
   acceptCreditCooperative,
   getCreditRequestCooperatives,
+  getGuarantorHistoryForClient,
+  type CreditGuarantorHistoryItem,
 } from "../../api/creditRequests.api";
 import { getErrorMessage } from "../../api/errors";
 import GuaranteeOnboardingModal from "../onboarding/GuaranteeOnboardingModal";
@@ -59,6 +61,9 @@ export default function CreditDetailsModal({ open, request, onClose }: CreditDet
   const [acceptingCooperativeId, setAcceptingCooperativeId] = useState<number | null>(null);
   const [acceptError, setAcceptError] = useState<string | null>(null);
   const [guaranteeCooperativeId, setGuaranteeCooperativeId] = useState<number | null>(null);
+  const [guarantorHistory, setGuarantorHistory] = useState<Record<number, CreditGuarantorHistoryItem[]>>({});
+  const [historyLoadingId, setHistoryLoadingId] = useState<number | null>(null);
+  const [expandedHistoryId, setExpandedHistoryId] = useState<number | null>(null);
 
   const loadCooperatives = useCallback(async () => {
     setIsLoading(true);
@@ -78,6 +83,8 @@ export default function CreditDetailsModal({ open, request, onClose }: CreditDet
     setSelectedCooperativeId(null);
     setConfirmationCooperativeId(null);
     setAcceptError(null);
+    setGuarantorHistory({});
+    setExpandedHistoryId(null);
     void loadCooperatives();
   }, [open, loadCooperatives]);
 
@@ -103,6 +110,19 @@ export default function CreditDetailsModal({ open, request, onClose }: CreditDet
     } finally {
       setAcceptingCooperativeId(null);
     }
+  };
+
+  const toggleGuarantorHistory = async (cooperativaId: number) => {
+    if (expandedHistoryId === cooperativaId) { setExpandedHistoryId(null); return; }
+    setExpandedHistoryId(cooperativaId);
+    if (guarantorHistory[cooperativaId]) return;
+    setHistoryLoadingId(cooperativaId);
+    try {
+      const items = await getGuarantorHistoryForClient(request.solicitudId, cooperativaId);
+      setGuarantorHistory((current) => ({ ...current, [cooperativaId]: items }));
+    } catch (historyError) {
+      setError(getErrorMessage(historyError, "No se pudo cargar el historial del garante."));
+    } finally { setHistoryLoadingId(null); }
   };
 
   if (!open) return null;
@@ -225,9 +245,13 @@ export default function CreditDetailsModal({ open, request, onClose }: CreditDet
                             ) : <p className="mt-1 text-sm text-rose-700">La cooperativa no indicó un motivo adicional.</p>}
                           </div>
                         ) : needsGuarantor ? (
-                          <div className="flex flex-col gap-3 rounded-xl border border-amber-100 bg-amber-50 p-4 sm:flex-row sm:items-center sm:justify-between">
-                            <p className="text-sm leading-5 text-amber-900">Esta cooperativa necesita información de un garante para continuar.</p>
-                            <button type="button" onClick={() => setGuaranteeCooperativeId(coop.cooperativaId)} className="shrink-0 rounded-xl bg-amber-600 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-amber-700">Completar garante</button>
+                          <div className="space-y-3 rounded-xl border border-amber-100 bg-amber-50 p-4">
+                            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                              <div><p className="text-sm font-bold text-amber-950">{coop.garanteEnRevision ? "Garante en revisión" : "Acción requerida"}</p><p className="mt-1 text-sm leading-5 text-amber-900">{coop.mensajeGarante || "Esta cooperativa necesita información de un garante para continuar."}</p></div>
+                              {!coop.garanteEnRevision && <button type="button" onClick={() => setGuaranteeCooperativeId(coop.cooperativaId)} className="shrink-0 rounded-xl bg-amber-600 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-amber-700">Completar o corregir garante</button>}
+                            </div>
+                            <button type="button" onClick={() => void toggleGuarantorHistory(coop.cooperativaId)} className="text-sm font-bold text-amber-900 underline decoration-amber-400 underline-offset-4">{expandedHistoryId === coop.cooperativaId ? "Ocultar historial" : "Consultar historial del garante"}</button>
+                            {expandedHistoryId === coop.cooperativaId && <div className="space-y-3 border-t border-amber-200 pt-3">{historyLoadingId === coop.cooperativaId ? <p className="text-sm text-amber-900">Cargando historial…</p> : (guarantorHistory[coop.cooperativaId] ?? []).length === 0 ? <p className="rounded-lg bg-white/70 p-3 text-sm leading-5 text-amber-950">No hay envíos asociados a este crédito. Los datos antiguos se conservan como legado y no se vinculan automáticamente.</p> : guarantorHistory[coop.cooperativaId].map((attempt) => <article key={attempt.id} className="rounded-lg bg-white/80 p-3"><p className="text-sm font-bold text-slate-800">Intento {attempt.intento}: {attempt.fotografia.nombres} {attempt.fotografia.apellidos}</p><p className="text-xs text-slate-500">Enviado {formatDate(attempt.enviadoEn)}</p>{attempt.evaluaciones.map((evaluation) => <div key={evaluation.id} className="mt-2 rounded-md bg-slate-50 p-2"><p className="text-sm font-semibold text-slate-800">{evaluation.decision.replaceAll("_", " ")} · {formatDate(evaluation.fecha)}</p><p className="text-xs text-slate-500">Responsable: {evaluation.actorRole} · ID {evaluation.actorId}</p>{evaluation.motivosRechazo?.length ? <p className="mt-1 text-sm text-slate-700">Motivos: {evaluation.motivosRechazo.join(", ")}{evaluation.motivoRechazoOtro ? ` · ${evaluation.motivoRechazoOtro}` : ""}</p> : null}{evaluation.observacion && <p className="mt-1 text-sm text-slate-700">Observación: {evaluation.observacion}</p>}</div>)}</article>)}</div>}
                           </div>
                         ) : (
                           <>
@@ -276,6 +300,10 @@ export default function CreditDetailsModal({ open, request, onClose }: CreditDet
                           </>
                         )}
                       </div>
+                      {!needsGuarantor && <details className="mx-4 mb-4 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 sm:mx-5">
+                        <summary className="cursor-pointer text-sm font-bold text-slate-700" onClick={() => { if (!guarantorHistory[coop.cooperativaId] && historyLoadingId !== coop.cooperativaId) void toggleGuarantorHistory(coop.cooperativaId); }}>Historial de evaluaciones del garante</summary>
+                        {historyLoadingId === coop.cooperativaId ? <p className="mt-3 text-sm text-slate-500">Cargando historial…</p> : (guarantorHistory[coop.cooperativaId] ?? []).length === 0 ? <p className="mt-3 rounded-lg bg-white p-3 text-sm text-slate-600">No hay evaluaciones vinculadas a este crédito.</p> : <div className="mt-3 space-y-3">{guarantorHistory[coop.cooperativaId].map((attempt) => <article key={attempt.id} className="rounded-lg bg-white p-3"><p className="text-sm font-bold text-slate-800">Intento {attempt.intento}: {attempt.fotografia.nombres} {attempt.fotografia.apellidos}</p><p className="text-xs text-slate-500">Enviado {formatDate(attempt.enviadoEn)}</p>{attempt.evaluaciones.map((evaluation) => <div key={evaluation.id} className="mt-2 rounded-md bg-slate-50 p-2"><p className="text-sm font-semibold">{evaluation.decision.replaceAll("_", " ")} · {formatDate(evaluation.fecha)}</p><p className="text-xs text-slate-500">Responsable: {evaluation.actorRole} · ID {evaluation.actorId}</p>{evaluation.motivosRechazo?.length ? <p className="mt-1 text-sm text-slate-700">Motivos: {evaluation.motivosRechazo.join(", ")}{evaluation.motivoRechazoOtro ? ` · ${evaluation.motivoRechazoOtro}` : ""}</p> : null}{evaluation.observacion && <p className="mt-1 text-sm text-slate-700">Observación: {evaluation.observacion}</p>}</div>)}</article>)}</div>}
+                      </details>}
                     </article>
                   );
                 })}

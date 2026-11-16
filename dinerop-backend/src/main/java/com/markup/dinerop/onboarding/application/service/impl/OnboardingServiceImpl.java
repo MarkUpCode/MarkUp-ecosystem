@@ -21,6 +21,10 @@ import com.markup.dinerop.onboarding.exception.ResourceNotFoundException;
 import com.markup.dinerop.onboarding.infrastructure.mapper.OnboardingMapper;
 import com.markup.dinerop.onboarding.infrastructure.repository.PersonaOnboardingRepository;
 import com.markup.dinerop.onboarding.infrastructure.repository.SolicitudOnboardingRepository;
+import com.markup.dinerop.onboarding.infrastructure.repository.GuarantorProfileRepository;
+import com.markup.dinerop.onboarding.domain.entity.GuarantorProfile;
+import com.markup.dinerop.onboarding.dto.response.GuarantorProfileResponse;
+import com.markup.dinerop.credit.domain.service.CreditGuarantorWorkflowService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,6 +50,8 @@ public class OnboardingServiceImpl implements OnboardingService {
     private final CreditRequestRepository creditRequestRepository;
     private final CreditProcessEventRepository creditProcessEventRepository;
     private final SolicitudCooperativaRepository solicitudCooperativaRepository;
+    private final GuarantorProfileRepository guarantorProfileRepository;
+    private final CreditGuarantorWorkflowService guarantorWorkflowService;
 
     @Override
     public SolicitudOnboarding crearSolicitudConSolicitante(
@@ -105,15 +111,12 @@ public class OnboardingServiceImpl implements OnboardingService {
         SolicitudOnboarding solicitud = solicitudRepo.findByUsuarioId(clientId)
                 .orElseThrow(() -> new ResourceNotFoundException("Onboarding no encontrado para la solicitud"));
 
-        if (solicitud.getEstado() == EstadoOnboarding.SOLICITANDO_GARANTE) {
-            return solicitud;
-        }
-
-        if (solicitud.getEstado() != EstadoOnboarding.COMPLETADO) {
+        boolean applicantComplete = personaRepo.existsBySolicitudIdAndRolAndEstadoFormulario(
+                solicitud.getId(), RolPersona.SOLICITANTE, EstadoFormulario.COMPLETO
+        );
+        if (!applicantComplete) {
             throw new BusinessException("No se puede solicitar garante en el estado actual");
         }
-
-        solicitud.setEstado(EstadoOnboarding.SOLICITANDO_GARANTE);
 
         // Llamada directa al CreditService del monolito
         creditService.solicitarGarante(solicitudId, cooperativaId);
@@ -122,10 +125,12 @@ public class OnboardingServiceImpl implements OnboardingService {
     }
 
     @Override
+    @Transactional
     public SolicitudOnboarding crearYCompletarGaranteDesdeCliente(
             Long clientId,
             Long creditRequestId,
             Long cooperativaId,
+            Long guarantorProfileId,
             PersonaOnboardingRequest request
     ) {
         SolicitudOnboarding solicitud = solicitudRepo
@@ -158,37 +163,52 @@ public class OnboardingServiceImpl implements OnboardingService {
                         .filter(candidate -> cooperativaId.equals(candidate.getCooperativaId()))
                         .findFirst()
                         .orElseThrow(() -> new BusinessException("Esta cooperativa no tiene una solicitud de garante pendiente"));
-        var latestGuaranteeEvent = creditProcessEventRepository
-                .findTopBySolicitudCooperativaIdOrderByFechaDescIdDesc(cooperativeRequest.getId())
-                .orElse(null);
-        if (latestGuaranteeEvent != null && "GARANTE_ENVIADO".equals(latestGuaranteeEvent.getTipo())) {
-            throw new BusinessException("La información del garante ya está en revisión");
+        GuarantorProfile profile = null;
+        if (guarantorProfileId != null) {
+            profile = guarantorProfileRepository.findByIdAndClientUserId(guarantorProfileId, clientId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Perfil de garante no encontrado para este cliente"));
+        } else {
+            profile = guarantorProfileRepository.findFirstByClientUserIdAndCedula(clientId, request.getCedula())
+                    .orElse(null);
         }
 
+        // Always append a new person row. Existing profile versions and any old
+        // onboarding data remain untouched; the profile merely points at the latest version.
         PersonaOnboarding garante = mapper.toPersona(request);
         garante.setSolicitud(solicitud);
         garante.setRol(RolPersona.GARANTE);
         garante.setEstadoFormulario(EstadoFormulario.COMPLETO);
-        garante.setEstadoGarante(EstadoGarante.EN_REVISION);
+        garante.setEstadoGarante(null);
         linkPersonaRelations(garante, request);
         solicitud.getPersonas().add(garante);
-        personaRepo.save(garante);
+        garante = personaRepo.save(garante);
+        if (profile == null) {
+            profile = GuarantorProfile.builder().clientUserId(clientId).cedula(garante.getCedula()).persona(garante).build();
+        } else {
+            profile.setPersona(garante);
+            profile.setCedula(garante.getCedula());
+        }
+        profile = guarantorProfileRepository.save(profile);
+        var submission = guarantorWorkflowService.registerSubmission(
+                creditRequest.getId(), cooperativeRequest.getCooperativaId(), clientId, profile.getId(), garante
+        );
         creditProcessEventRepository.save(CreditProcessEvent.builder()
                 .solicitudId(creditRequest.getId())
                 .solicitudCooperativaId(cooperativeRequest.getId())
                 .tipo("GARANTE_ENVIADO")
-                .detalle("El usuario envió la información de un garante para revisión.")
+                .detalle("El usuario envió el garante (intento " + submission.getAttemptNumber() + ") para revisión.")
                 .build());
 
-        boolean solicitanteCompleto = personaRepo.existsBySolicitudIdAndRolAndEstadoFormulario(
-                solicitud.getId(), RolPersona.SOLICITANTE, EstadoFormulario.COMPLETO
-        );
-
-        if (solicitanteCompleto) {
-            solicitud.setEstado(EstadoOnboarding.SOLICITANDO_GARANTE);
-        }
-
         return solicitud;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<GuarantorProfileResponse> getGuarantorProfiles(Long clientId) {
+        return guarantorProfileRepository.findByClientUserIdOrderByUpdatedAtDescIdDesc(clientId).stream()
+                .map(profile -> new GuarantorProfileResponse(
+                        profile.getId(), mapper.toPersonaResponse(profile.getPersona()), profile.getUpdatedAt()
+                )).toList();
     }
 
     @Override

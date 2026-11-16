@@ -11,18 +11,21 @@ const reasons = [
 interface RejectGuarantorModalProps {
   open: boolean;
   loading: boolean;
+  mode?: "SOLICITAR_CORRECCION" | "RECHAZAR_GARANTE";
   onClose: () => void;
-  onConfirm: (reasons: string[], otherReason: string) => void;
+  onConfirm: (reasons: string[], otherReason: string, observation: string) => void;
 }
 
-export default function RejectGuarantorModal({ open, loading, onClose, onConfirm }: RejectGuarantorModalProps) {
+export default function RejectGuarantorModal({ open, loading, mode = "SOLICITAR_CORRECCION", onClose, onConfirm }: RejectGuarantorModalProps) {
   const [selected, setSelected] = useState<string[]>([]);
   const [otherReason, setOtherReason] = useState("");
+  const [observation, setObservation] = useState("");
 
   useEffect(() => {
     if (open) {
       setSelected([]);
       setOtherReason("");
+      setObservation("");
     }
   }, [open]);
 
@@ -36,7 +39,7 @@ export default function RejectGuarantorModal({ open, loading, onClose, onConfirm
     <div role="dialog" aria-modal="true" aria-labelledby="reject-guarantor-title" className="w-full max-w-lg rounded-3xl bg-white p-6 shadow-2xl">
       <div className="flex items-start gap-3">
         <div className="grid h-11 w-11 place-items-center rounded-2xl bg-amber-50 text-amber-700"><AlertTriangle /></div>
-        <div className="flex-1"><h2 id="reject-guarantor-title" className="text-xl font-extrabold text-[#173b57]">Solicitar corrección del garante</h2><p className="mt-1 text-sm text-slate-500">Selecciona los motivos para que el usuario pueda corregir la información o registrar otro garante.</p></div>
+        <div className="flex-1"><h2 id="reject-guarantor-title" className="text-xl font-extrabold text-[#173b57]">{mode === "RECHAZAR_GARANTE" ? "Rechazar garante" : "Solicitar corrección del garante"}</h2><p className="mt-1 text-sm text-slate-500">Selecciona los motivos que se comunicarán al usuario para que pueda corregir la información o registrar otro garante.</p></div>
         <button type="button" onClick={onClose} disabled={loading} className="rounded-lg p-2 text-slate-400 hover:bg-slate-100" aria-label="Cerrar"><X className="h-5 w-5" /></button>
       </div>
       <div className="mt-6 space-y-3">
@@ -52,9 +55,13 @@ export default function RejectGuarantorModal({ open, loading, onClose, onConfirm
         <textarea id="other-guarantor-reason" value={otherReason} onChange={(event) => setOtherReason(event.target.value)} maxLength={250} rows={3} placeholder="Indica qué debe corregir el usuario…" className="w-full resize-y rounded-xl border border-slate-300 p-3 text-sm outline-none focus:border-amber-500 focus:ring-4 focus:ring-amber-100" />
         <p className="mt-1 text-right text-xs text-slate-400">{otherReason.length}/250</p>
       </div>}
+      <div className="mt-4">
+        <label htmlFor="guarantor-observation" className="mb-2 block text-sm font-bold text-slate-700">Observación para el cliente <span className="font-normal text-slate-400">(opcional)</span></label>
+        <textarea id="guarantor-observation" value={observation} onChange={(event) => setObservation(event.target.value)} maxLength={500} rows={3} placeholder="Explica brevemente qué debe revisar…" className="w-full resize-y rounded-xl border border-slate-300 p-3 text-sm outline-none focus:border-amber-500 focus:ring-4 focus:ring-amber-100" />
+      </div>
       <div className="mt-6 flex justify-end gap-3">
         <button type="button" onClick={onClose} disabled={loading} className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-bold text-slate-600">Cancelar</button>
-        <button type="button" disabled={!selected.length || (otherSelected && !otherReason.trim()) || loading} onClick={() => onConfirm(selected, otherSelected ? otherReason.trim() : "")} className="rounded-xl bg-amber-700 px-4 py-2.5 text-sm font-bold text-white disabled:cursor-not-allowed disabled:opacity-50">{loading ? "Enviando…" : "Solicitar corrección"}</button>
+        <button type="button" disabled={!selected.length || (otherSelected && !otherReason.trim()) || loading} onClick={() => onConfirm(selected, otherSelected ? otherReason.trim() : "", observation.trim())} className="rounded-xl bg-amber-700 px-4 py-2.5 text-sm font-bold text-white disabled:cursor-not-allowed disabled:opacity-50">{loading ? "Enviando…" : mode === "RECHAZAR_GARANTE" ? "Rechazar garante" : "Solicitar corrección"}</button>
       </div>
     </div>
   </div>;

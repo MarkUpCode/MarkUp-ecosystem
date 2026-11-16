@@ -95,6 +95,20 @@ public class PushNotificationService {
         }
     }
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void sendGuaranteeEvaluationUpdate(Long userId, String cooperativeName, List<String> reasons,
+                                              Long solicitudId, boolean correctionRequested) {
+        try {
+            sendToUser(userId,
+                    correctionRequested ? "Corrige la información del garante" : "El garante fue rechazado",
+                    cooperativeName + " indicó: " + String.join("; ", reasons),
+                    correctionRequested ? "GUARANTEE_CORRECTION" : "GUARANTEE_REJECTED",
+                    solicitudId);
+        } catch (RuntimeException exception) {
+            log.error("Could not send guarantor evaluation update to user {}", userId, exception);
+        }
+    }
+
     private void sendToUser(
             Long userId,
             String title,

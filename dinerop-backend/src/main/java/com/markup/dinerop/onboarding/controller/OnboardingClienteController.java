@@ -18,6 +18,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import com.markup.dinerop.onboarding.dto.response.PreRegistrationDataResponse;
+import com.markup.dinerop.onboarding.dto.response.GuarantorProfileResponse;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -51,12 +53,19 @@ public class OnboardingClienteController {
             @AuthenticationPrincipal User user,
             @RequestParam(required = false) Long solicitudId,
             @RequestParam(required = false) Long cooperativaId,
+            @RequestParam(required = false) Long guarantorProfileId,
             @Valid @RequestBody PersonaOnboardingRequest garanteRequest
     ) {
         log.info("[ONBOARDING] Completar garante | clientId={}", user.getIdUser());
         return mapper.toSolicitudResponse(
-                completarGaranteUC.execute(user.getIdUser(), solicitudId, cooperativaId, garanteRequest)
+                completarGaranteUC.execute(user.getIdUser(), solicitudId, cooperativaId, guarantorProfileId, garanteRequest)
         );
+    }
+
+    @GetMapping("/garantes")
+    @PreAuthorize("hasRole('CLIENT')")
+    public List<GuarantorProfileResponse> getMyGuarantors(@AuthenticationPrincipal User user) {
+        return onboardingService.getGuarantorProfiles(user.getIdUser());
     }
 
     @GetMapping("/{solicitudId}")

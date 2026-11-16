@@ -27,6 +27,7 @@ public class ClientCreditCooperativeStatusService {
     private final CooperativeService cooperativeService;
     private final CreditRequirementService requirementService;
     private final CreditProcessEventRepository creditProcessEventRepository;
+    private final CreditGuarantorWorkflowService guarantorWorkflowService;
 
     @Transactional(readOnly = true)
     public List<CooperativeStatusItemDto> getPreApprovedCooperatives(Long clientId, Long solicitudId) {
@@ -44,18 +45,22 @@ public class ClientCreditCooperativeStatusService {
 
         return rows.stream().map(sc -> {
             var coop = cooperativeService.getById(sc.getCooperativaId());
-            var garanteEnRevision = sc.getEstado() == SolicitudCooperativaStatus.SOLICITANDO_GARANTE
-                    && creditProcessEventRepository
-                            .findTopBySolicitudCooperativaIdOrderByFechaDescIdDesc(sc.getId())
-                            .map(event -> "GARANTE_ENVIADO".equals(event.getTipo()))
-                            .orElse(false);
             var lastGuaranteeEvent = creditProcessEventRepository
                     .findTopBySolicitudCooperativaIdOrderByFechaDescIdDesc(sc.getId())
                     .orElse(null);
+            var latestSubmission = guarantorWorkflowService.latestSubmission(sc.getId());
+            var garanteEnRevision = sc.getEstado() == SolicitudCooperativaStatus.SOLICITANDO_GARANTE
+                    && latestSubmission != null
+                    && latestSubmission.getStatus() == com.markup.dinerop.credit.domain.model.enums.CreditGuarantorStatus.EN_REVISION;
             var mensajeGarante = lastGuaranteeEvent != null
-                    && "NUEVO_GARANTE_SOLICITADO".equals(lastGuaranteeEvent.getTipo())
+                    && ("NUEVO_GARANTE_SOLICITADO".equals(lastGuaranteeEvent.getTipo())
+                        || "GARANTE_CORRECCION_SOLICITADA".equals(lastGuaranteeEvent.getTipo())
+                        || "GARANTE_RECHAZADO".equals(lastGuaranteeEvent.getTipo()))
                     ? lastGuaranteeEvent.getDetalle()
-                    : null;
+                    : latestSubmission == null && lastGuaranteeEvent != null
+                        && "GARANTE_ENVIADO".equals(lastGuaranteeEvent.getTipo())
+                        ? "Por una actualización del proceso, vuelve a enviar la información del garante para que quede vinculada a este crédito."
+                        : null;
             var requiereComparecenciaGarante = creditProcessEventRepository
                     .existsBySolicitudCooperativaIdAndTipo(sc.getId(), "GARANTE_ACEPTADO");
                 var cotizacion = sc.getEstado() == SolicitudCooperativaStatus.RECHAZADA

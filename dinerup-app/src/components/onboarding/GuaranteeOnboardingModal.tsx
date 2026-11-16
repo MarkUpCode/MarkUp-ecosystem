@@ -1,11 +1,11 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { X, CheckCircle, AlertCircle } from "lucide-react";
 import Step1Identity from "../../pages/steps/Step1Identity";
 import Step2PersonalDetails from "../../pages/steps/Step2PersonalDetails";
 import Step3Address from "../../pages/steps/Step3Address";
 import Step4Economic from "../../pages/steps/Step4Economic";
 import Step4Review from "../../pages/steps/Step4Review";
-import { submitGuaranteeOnboarding, type OnboardingPayload, type SolicitanteData } from "../../api/onboarding.api";
+import { getMyGuarantorProfiles, submitGuaranteeOnboarding, type GuarantorProfileResponse, type OnboardingPayload, type SolicitanteData } from "../../api/onboarding.api";
 
 interface GuaranteeOnboardingModalProps {
   open: boolean;
@@ -60,6 +60,8 @@ export default function GuaranteeOnboardingModal({ open, solicitudId, cooperativ
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [profiles, setProfiles] = useState<GuarantorProfileResponse[]>([]);
+  const [selectedProfileId, setSelectedProfileId] = useState<number | null>(null);
 
   const [formData, setFormDataRaw] = useState({
     destinoCredito: "CREDITO",
@@ -93,6 +95,45 @@ export default function GuaranteeOnboardingModal({ open, solicitudId, cooperativ
     }
   };
 
+  useEffect(() => {
+    if (!open) return;
+    setStep(1);
+    setSelectedProfileId(null);
+    setFormDataRaw({ destinoCredito: "CREDITO", solicitante: { ...EMPTY_SOLICITANTE }, conyuge: null });
+    getMyGuarantorProfiles().then(setProfiles).catch(() => setProfiles([]));
+  }, [open]);
+
+  const selectProfile = (value: string) => {
+    const profileId = value ? Number(value) : null;
+    setSelectedProfileId(profileId);
+    setStep(1);
+    if (profileId == null) {
+      setFormDataRaw({ destinoCredito: "CREDITO", solicitante: { ...EMPTY_SOLICITANTE }, conyuge: null });
+      return;
+    }
+    const profile = profiles.find((item) => item.id === profileId)?.persona;
+    if (!profile) return;
+    setFormDataRaw({
+      destinoCredito: "CREDITO",
+      conyuge: null,
+      solicitante: {
+        ...EMPTY_SOLICITANTE,
+        ...profile,
+        fechaNacimiento: profile.fechaNacimiento ?? "",
+        estadoCivil: profile.estadoCivil ?? "",
+        ocupacion: profile.ocupacion ?? "",
+        empresaTrabajo: profile.empresaTrabajo ?? "",
+        telefono: profile.telefono ?? "",
+        email: "",
+        tieneConyuge: false,
+        direccion: { ...EMPTY_SOLICITANTE.direccion, ...profile.direccion },
+        actividadEconomica: { ...EMPTY_SOLICITANTE.actividadEconomica, ...profile.actividadEconomica },
+        ingresoEgreso: { ...EMPTY_SOLICITANTE.ingresoEgreso, ...profile.ingresoEgreso },
+        referencias: profile.referencias?.map((item) => ({ ...item, tipo: item.tipo as SolicitanteData["referencias"][number]["tipo"] })) ?? [],
+      } as SolicitanteData,
+    });
+  };
+
   const nextStep = () => setStep((s) => s + 1);
   const prevStep = () => setStep((s) => s - 1);
 
@@ -110,7 +151,7 @@ export default function GuaranteeOnboardingModal({ open, solicitudId, cooperativ
         solicitante: formData.solicitante,
       };
 
-      const response = await submitGuaranteeOnboarding(payload, solicitudId, cooperativaId);
+      const response = await submitGuaranteeOnboarding(payload, solicitudId, cooperativaId, selectedProfileId);
 
       if (response && response.id) {
         setShowSuccessModal(true);
@@ -163,7 +204,7 @@ export default function GuaranteeOnboardingModal({ open, solicitudId, cooperativ
 
               <h1 className="text-3xl font-bold text-gray-800 mb-2">Completar Información del Garante</h1>
               <p className="text-gray-600 mb-4">
-                Este formulario se llena una sola vez. Proporciona tu información como garante.
+                Puedes reutilizar un garante registrado o agregar uno nuevo. Revisa los datos antes de enviarlos para este crédito.
               </p>
             </div>
 
@@ -175,6 +216,15 @@ export default function GuaranteeOnboardingModal({ open, solicitudId, cooperativ
             >
               <X className="w-6 h-6 text-gray-600" />
             </button>
+          </div>
+
+          <div className="mb-6 rounded-xl border border-blue-100 bg-blue-50/70 p-4">
+            <label htmlFor="guarantor-profile" className="mb-2 block text-sm font-bold text-slate-800">Garante registrado</label>
+            <select id="guarantor-profile" value={selectedProfileId ?? ""} onChange={(event) => selectProfile(event.target.value)} className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-800 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100">
+              <option value="">Registrar un garante nuevo</option>
+              {profiles.map((profile) => <option key={profile.id} value={profile.id}>{profile.persona.nombres} {profile.persona.apellidos} · {profile.persona.cedula}</option>)}
+            </select>
+            <p className="mt-2 text-xs leading-5 text-slate-600">Al elegir uno, sus datos se precargan. Puedes corregirlos; cada envío crea una evaluación independiente para este crédito.</p>
           </div>
 
           {error && (

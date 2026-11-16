@@ -18,10 +18,6 @@ import com.markup.dinerop.credit.infrastructure.repository.SolicitudCooperativaC
 import com.markup.dinerop.credit.infrastructure.repository.SolicitudCooperativaRepository;
 import com.markup.dinerop.credit.infrastructure.repository.CreditProcessEventRepository;
 import com.markup.dinerop.credit.domain.model.CreditProcessEvent;
-import com.markup.dinerop.onboarding.domain.enums.RolPersona;
-import com.markup.dinerop.onboarding.domain.enums.EstadoGarante;
-import com.markup.dinerop.onboarding.infrastructure.repository.PersonaOnboardingRepository;
-import com.markup.dinerop.onboarding.infrastructure.repository.SolicitudOnboardingRepository;
 import com.markup.dinerop.auth.repository.UserRepository;
 import com.markup.dinerop.cooperative.domain.service.CooperativeService;
 import com.markup.dinerop.notification.service.NotificationService;
@@ -58,8 +54,7 @@ public class CreditService {
     private final PushNotificationService pushNotificationService;
     private final CreditProcessEventRepository creditProcessEventRepository;
         private final CreditRequirementService creditRequirementService;
-        private final SolicitudOnboardingRepository solicitudOnboardingRepository;
-        private final PersonaOnboardingRepository personaOnboardingRepository;
+    private final CreditGuarantorWorkflowService guarantorWorkflowService;
 
 
 
@@ -523,7 +518,9 @@ public class CreditService {
             Long cooperativaId,
             String decision,
             List<CreditRejectionReason> motivosRechazo,
-            String motivoRechazoOtro
+            String motivoRechazoOtro,
+            String observacion,
+            Long actorId
     ) {
         log.info("[CREDIT_GUARANTEE] Processing decision: requestId={}, cooperativeId={}, decision={}, reasonCount={}",
                 solicitudId, cooperativaId, decision, motivosRechazo == null ? 0 : motivosRechazo.size());
@@ -536,33 +533,44 @@ public class CreditService {
                     "La solicitud no está esperando la revisión de un garante"
             );
         }
-        boolean guarantorWasSubmitted = creditProcessEventRepository
-                .findTopBySolicitudCooperativaIdOrderByFechaDescIdDesc(sc.getId())
-                .map(event -> "GARANTE_ENVIADO".equals(event.getTipo()))
-                .orElse(false);
-        if (!guarantorWasSubmitted) {
-            throw new IllegalStateException("El usuario todavía no ha enviado información de un garante para revisar");
+        String normalizedDecision = normalizeGuarantorDecision(decision);
+        var activeSubmission = guarantorWorkflowService.latestSubmission(sc.getId());
+        if (activeSubmission == null) {
+            if ("SOLICITAR_CORRECCION".equals(normalizedDecision)) {
+                List<CreditRejectionReason> reasons = normalizeGuaranteeDecisionReasons(motivosRechazo);
+                boolean selectedOther = reasons.contains(CreditRejectionReason.OTROS);
+                String other = motivoRechazoOtro == null ? "" : motivoRechazoOtro.trim();
+                if (selectedOther && (other.isBlank() || other.length() > 250)) {
+                    throw new IllegalArgumentException("Describe el otro motivo (máximo 250 caracteres)");
+                }
+                if (!selectedOther && !other.isEmpty()) {
+                    throw new IllegalArgumentException("Selecciona Otros motivos para enviar una descripción");
+                }
+                List<String> labels = reasons.stream().map(reason -> reason == CreditRejectionReason.OTROS ? other : reason.getLabel()).toList();
+                String cooperativeName = cooperativeService.getById(cooperativaId).getNombre();
+                addEvent(solicitudId, sc.getId(), "GARANTE_CORRECCION_SOLICITADA",
+                        "Actualiza y vuelve a enviar la información del garante para registrar una evaluación vinculada a este crédito. Motivos: "
+                                + String.join("; ", labels) + (observacion == null || observacion.isBlank() ? "" : ". Observación: " + observacion),
+                        actorId, "COOPERATIVE");
+                try { notificationService.sendGuaranteeReviewUpdateEmail(sc.getCreditRequest().getEmail(), cooperativeName, labels, true, observacion); }
+                catch (RuntimeException failure) { log.error("Legacy guarantor resubmission email failed for request {}", solicitudId, failure); }
+                if (sc.getCreditRequest().getClientId() != null) {
+                    pushNotificationService.sendGuaranteeEvaluationUpdate(sc.getCreditRequest().getClientId(), cooperativeName, labels, solicitudId, true);
+                }
+                return;
+            }
+            throw new IllegalStateException("Este garante pertenece al historial anterior. Solicita al cliente reenviar sus datos para crear una evaluación vinculada a este crédito.");
         }
-
-        if ("ACEPTAR".equalsIgnoreCase(decision)) {
+        if (activeSubmission.getStatus() != com.markup.dinerop.credit.domain.model.enums.CreditGuarantorStatus.EN_REVISION) {
+            throw new IllegalStateException("La evaluación del garante ya fue resuelta");
+        }
+        if ("ACEPTAR".equals(normalizedDecision)) {
             Long clientId = sc.getCreditRequest().getClientId();
             if (clientId == null) {
                 throw new IllegalStateException("La solicitud no tiene un cliente asociado");
             }
-            Long onboardingId = solicitudOnboardingRepository.findByUsuarioId(clientId)
-                    .map(onboarding -> onboarding.getId())
-                    .orElseThrow(() -> new IllegalStateException("El cliente no tiene onboarding"));
-            var garante = personaOnboardingRepository
-                    .findTopBySolicitudIdAndRolOrderByFechaRegistroDesc(
-                            onboardingId,
-                            RolPersona.GARANTE
-                    )
-                    .orElse(null);
-            if (garante == null) {
-                throw new IllegalStateException("El cliente aún no ha enviado la información del garante");
-            }
-            garante.setEstadoGarante(EstadoGarante.ACEPTADO);
-            personaOnboardingRepository.save(garante);
+            guarantorWorkflowService.recordDecision(activeSubmission.getId(), "ACEPTAR", List.of(), null,
+                    observacion, actorId, "COOPERATIVE");
             sc.setEstado(SolicitudCooperativaStatus.PRE_APROBADA);
             solicitudCooperativaRepository.save(sc);
             addEvent(
@@ -591,7 +599,7 @@ public class CreditService {
             return;
         }
 
-        if ("RECHAZAR_CREDITO".equalsIgnoreCase(decision)) {
+        if ("RECHAZAR_SOLICITUD".equals(normalizedDecision)) {
             Long clientId = sc.getCreditRequest().getClientId();
             List<CreditRejectionReason> normalizedReasons = normalizeGuaranteeDecisionReasons(motivosRechazo);
             boolean selectedOther = normalizedReasons.contains(CreditRejectionReason.OTROS);
@@ -602,6 +610,9 @@ public class CreditService {
             if (!selectedOther && !otherReason.isEmpty()) {
                 throw new IllegalArgumentException("Selecciona Otros motivos para enviar una descripción");
             }
+            guarantorWorkflowService.recordDecision(activeSubmission.getId(), "RECHAZAR_SOLICITUD",
+                    normalizedReasons.stream().map(reason -> reason == CreditRejectionReason.OTROS ? otherReason : reason.getLabel()).toList(), selectedOther ? otherReason : null,
+                    observacion, actorId, "COOPERATIVE");
             sc.setEstado(SolicitudCooperativaStatus.RECHAZADA);
             sc.setMotivosRechazo(new java.util.ArrayList<>(normalizedReasons));
             sc.setMotivoRechazoOtro(selectedOther ? otherReason : null);
@@ -610,7 +621,7 @@ public class CreditService {
                     .map(reason -> reason == CreditRejectionReason.OTROS ? otherReason : reason.getLabel())
                     .toList();
             addEvent(solicitudId, sc.getId(), "CREDITO_RECHAZADO_DURANTE_REVISION_GARANTE",
-                    "La cooperativa rechazó la solicitud después de revisar la información del garante.");
+                    "La cooperativa rechazó la solicitud después de revisar la información del garante.", actorId, "COOPERATIVE");
             String cooperativeName = cooperativeService.getById(cooperativaId).getNombre();
             notificationService.sendCreditRejectionEmail(
                     sc.getCreditRequest().getEmail(), cooperativeName, reasonLabels
@@ -621,7 +632,7 @@ public class CreditService {
             return;
         }
 
-        if ("SOLICITAR_NUEVO".equalsIgnoreCase(decision)) {
+        if ("SOLICITAR_CORRECCION".equals(normalizedDecision) || "RECHAZAR_GARANTE".equals(normalizedDecision)) {
             List<CreditRejectionReason> normalizedReasons = normalizeGuaranteeDecisionReasons(motivosRechazo);
             boolean selectedOther = normalizedReasons.contains(CreditRejectionReason.OTROS);
             String otherReason = motivoRechazoOtro == null ? "" : motivoRechazoOtro.trim();
@@ -632,80 +643,91 @@ public class CreditService {
                 throw new IllegalArgumentException("Selecciona Otros motivos para enviar una descripción");
             }
             Long clientId = sc.getCreditRequest().getClientId();
-            if (clientId == null) {
-                throw new IllegalStateException("La solicitud no tiene un cliente asociado");
-            }
-            Long onboardingId = solicitudOnboardingRepository.findByUsuarioId(clientId)
-                    .map(onboarding -> onboarding.getId())
-                    .orElseThrow(() -> new IllegalStateException("El cliente no tiene onboarding"));
-            personaOnboardingRepository
-                    .findTopBySolicitudIdAndRolOrderByFechaRegistroDesc(
-                            onboardingId,
-                            RolPersona.GARANTE
-                    )
-                    .ifPresent(garante -> {
-                        garante.setEstadoGarante(EstadoGarante.RECHAZADO);
-                        personaOnboardingRepository.save(garante);
-                    });
+            if (clientId == null) throw new IllegalStateException("La solicitud no tiene un cliente asociado");
+            guarantorWorkflowService.recordDecision(activeSubmission.getId(), normalizedDecision,
+                    normalizedReasons.stream().map(reason -> reason == CreditRejectionReason.OTROS ? otherReason : reason.getLabel()).toList(), selectedOther ? otherReason : null,
+                    observacion, actorId, "COOPERATIVE");
             sc.setEstado(SolicitudCooperativaStatus.SOLICITANDO_GARANTE);
             addEvent(
                     solicitudId,
                     sc.getId(),
-                    "NUEVO_GARANTE_SOLICITADO",
-                    buildGuaranteeRejectionDetail(normalizedReasons, otherReason)
+                    "SOLICITAR_CORRECCION".equals(normalizedDecision) ? "GARANTE_CORRECCION_SOLICITADA" : "GARANTE_RECHAZADO",
+                    buildGuaranteeRejectionDetail(normalizedReasons, otherReason, normalizedDecision)
+                            + (observacion == null || observacion.isBlank() ? "" : ". Observación: " + observacion),
+                    actorId, "COOPERATIVE"
             );
             String cooperativeName = cooperativeService.getById(cooperativaId).getNombre();
             List<String> reasonLabels = normalizedReasons.stream()
                     .map(reason -> reason == CreditRejectionReason.OTROS ? otherReason : reason.getLabel())
                     .toList();
             try {
-                notificationService.sendNewGuaranteeRequiredEmail(
-                        sc.getCreditRequest().getEmail(),
-                        cooperativeName,
-                        reasonLabels
-                );
+                notificationService.sendGuaranteeReviewUpdateEmail(sc.getCreditRequest().getEmail(), cooperativeName,
+                        reasonLabels, "SOLICITAR_CORRECCION".equals(normalizedDecision), observacion);
             } catch (RuntimeException notificationFailure) {
                 log.error("[CREDIT_GUARANTEE] Decision saved but retry email failed: requestId={}, cooperativeId={}",
                         solicitudId, cooperativaId, notificationFailure);
             }
             try {
-                pushNotificationService.sendGuaranteeRejected(
-                        clientId,
-                        cooperativeName,
-                        reasonLabels,
-                        solicitudId
-                );
+                pushNotificationService.sendGuaranteeEvaluationUpdate(clientId, cooperativeName, reasonLabels,
+                        solicitudId, "SOLICITAR_CORRECCION".equals(normalizedDecision));
             } catch (RuntimeException notificationFailure) {
                 log.error("[CREDIT_GUARANTEE] Decision saved but push notification failed: requestId={}, cooperativeId={}",
                         solicitudId, cooperativaId, notificationFailure);
             }
-            log.info("[CREDIT_GUARANTEE] New guarantor requested: requestId={}, cooperativeId={}",
-                    solicitudId, cooperativaId);
+            log.info("[CREDIT_GUARANTEE] Decision recorded: requestId={}, cooperativeId={}, decision={}",
+                    solicitudId, cooperativaId, normalizedDecision);
             return;
         }
 
-        throw new IllegalArgumentException(
-                "La decisión del garante debe ser ACEPTAR o SOLICITAR_NUEVO"
-        );
+        throw new IllegalArgumentException("Decisión de garante no válida");
     }
 
     private void addEvent(Long solicitudId, Long solicitudCooperativaId, String tipo, String detalle) {
+        addEvent(solicitudId, solicitudCooperativaId, tipo, detalle, null, null);
+    }
+
+    private void addEvent(Long solicitudId, Long solicitudCooperativaId, String tipo, String detalle,
+                          Long actorId, String actorRole) {
         creditProcessEventRepository.save(CreditProcessEvent.builder()
                 .solicitudId(solicitudId)
                 .solicitudCooperativaId(solicitudCooperativaId)
                 .tipo(tipo)
                 .detalle(detalle)
+                .actorId(actorId)
+                .actorRole(actorRole)
                 .build());
     }
 
-    private String buildGuaranteeRejectionDetail(
-            List<CreditRejectionReason> reasons,
-            String otherReason
-    ) {
+    private String normalizeGuarantorDecision(String decision) {
+        String normalized = decision == null ? "" : decision.trim().toUpperCase(java.util.Locale.ROOT);
+        return switch (normalized) {
+            case "SOLICITAR_NUEVO" -> "SOLICITAR_CORRECCION"; // Compatibilidad con el contrato anterior.
+            case "RECHAZAR_CREDITO" -> "RECHAZAR_SOLICITUD";
+            case "ACEPTAR", "SOLICITAR_CORRECCION", "RECHAZAR_GARANTE", "RECHAZAR_SOLICITUD" -> normalized;
+            default -> throw new IllegalArgumentException("Decisión de garante no válida");
+        };
+    }
+
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    public List<com.markup.dinerop.credit.dto.CreditGuarantorHistoryItemDto> getGuarantorHistoryForCooperative(
+            Long solicitudId, Long cooperativaId) {
+        return guarantorWorkflowService.historyForCooperative(solicitudId, cooperativaId);
+    }
+
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    public List<com.markup.dinerop.credit.dto.CreditGuarantorHistoryItemDto> getGuarantorHistoryForClient(
+            Long clientId, Long solicitudId, Long cooperativaId) {
+        return guarantorWorkflowService.historyForClient(clientId, solicitudId, cooperativaId);
+    }
+
+    private String buildGuaranteeRejectionDetail(List<CreditRejectionReason> reasons, String otherReason, String decision) {
         String labels = reasons.stream()
                 .map(reason -> reason == CreditRejectionReason.OTROS ? otherReason : reason.getLabel())
                 .collect(java.util.stream.Collectors.joining("; "));
-        return "La cooperativa solicita otro garante. Motivos: " + labels;
+        String title = "SOLICITAR_CORRECCION".equals(decision)
+                ? "La cooperativa solicita corregir la información del garante. Motivos: "
+                : "La cooperativa rechazó al garante. Motivos: ";
+        return title + labels;
     }
 
     private List<CreditRejectionReason> normalizeGuaranteeDecisionReasons(

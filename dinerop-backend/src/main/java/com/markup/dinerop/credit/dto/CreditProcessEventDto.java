@@ -5,5 +5,7 @@ import java.time.LocalDateTime;
 public record CreditProcessEventDto(
         String tipo,
         String detalle,
-        LocalDateTime fecha
+        LocalDateTime fecha,
+        Long actorId,
+        String actorRole
 ) {}

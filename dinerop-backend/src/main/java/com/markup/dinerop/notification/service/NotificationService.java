@@ -349,6 +349,16 @@ public class NotificationService {
                         .build());
     }
 
+    public void sendGuaranteeReviewUpdateEmail(String to, String cooperativeName, List<String> reasons,
+                                               boolean correctionRequested, String observation) {
+        EmailTemplate template = creditOfferEmailBuilder.buildGuaranteeReviewUpdate(
+                cooperativeName, clientDashboardUrl(), reasons, correctionRequested, observation);
+        sendEmail(SendEmailDto.builder().to(to)
+                .subject(correctionRequested ? cooperativeName + " solicita corregir los datos del garante"
+                        : cooperativeName + " rechazó al garante")
+                .htmlContent(emailTemplateEngine.render(template)).build());
+    }
+
     private String clientDashboardUrl() {
         return frontendUrl.endsWith("/")
                 ? frontendUrl + "dashboard-client"

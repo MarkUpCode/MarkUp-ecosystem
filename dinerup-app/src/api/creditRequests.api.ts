@@ -114,7 +114,36 @@ export const createCreditRequest = async (
   });
 };
 
-export type GuaranteeDecision = "ACEPTAR" | "SOLICITAR_NUEVO" | "RECHAZAR_CREDITO";
+export type GuaranteeReviewDecision = "ACEPTAR" | "SOLICITAR_CORRECCION" | "RECHAZAR_GARANTE" | "RECHAZAR_SOLICITUD";
+export type GuaranteeDecision = GuaranteeReviewDecision | "SOLICITAR_NUEVO" | "RECHAZAR_CREDITO";
+export interface GuarantorEvaluation {
+  id: number;
+  decision: string;
+  motivosRechazo: string[];
+  motivoRechazoOtro?: string | null;
+  observacion?: string | null;
+  actorId: number;
+  actorRole: string;
+  fecha: string;
+}
+export interface CreditGuarantorHistoryItem {
+  id: number;
+  perfilId: number;
+  solicitudId: number;
+  cooperativaId: number;
+  intento: number;
+  estado: string;
+  enviadoEn: string;
+  fotografia: {
+    nombres: string;
+    apellidos: string;
+    cedula: string;
+    telefono?: string;
+    ocupacion?: string;
+    [key: string]: unknown;
+  };
+  evaluaciones: GuarantorEvaluation[];
+}
 export type CreditTimelineEvent = {
   tipo: string;
   detalle: string;
@@ -130,11 +159,18 @@ export const getCreditRequestTimeline = async (
   );
 };
 
+export const getGuarantorHistoryForCooperative = async (solicitudId: number): Promise<CreditGuarantorHistoryItem[]> =>
+  httpClient<CreditGuarantorHistoryItem[]>(`/api/credits/cooperative/me/requests/${solicitudId}/garantes/historial`, { auth: true });
+
+export const getGuarantorHistoryForClient = async (solicitudId: number, cooperativaId: number): Promise<CreditGuarantorHistoryItem[]> =>
+  httpClient<CreditGuarantorHistoryItem[]>(`/api/credits/me/${solicitudId}/cooperatives/${cooperativaId}/garantes/historial`, { auth: true });
+
 export const decideGuaranteeForCreditRequest = async (
   solicitudId: number,
   decision: GuaranteeDecision,
   motivosRechazo: string[] = [],
   motivoRechazoOtro = "",
+  observacion = "",
 ): Promise<void> => {
   await httpClient<void>(
     `/api/credits/cooperative/me/requests/${solicitudId}/garante-decision`,
@@ -142,7 +178,7 @@ export const decideGuaranteeForCreditRequest = async (
       method: "PUT",
       auth: true,
       logoutOnUnauthorized: false,
-      body: { decision, motivosRechazo, motivoRechazoOtro },
+      body: { decision, motivosRechazo, motivoRechazoOtro, observacion },
     },
   );
 };

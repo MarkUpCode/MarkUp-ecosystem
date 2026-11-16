@@ -41,7 +41,7 @@ public class CreditOfferEmailBuilder {
                 .buttonText("Completar información del garante")
                 .buttonUrl(dashboardUrl)
                 .info1("Ingresa a tu panel para revisar la solicitud.")
-                .info2("Completa los datos del garante una sola vez.")
+                .info2("Puedes reutilizar un perfil anterior, pero debes confirmar el envío para esta solicitud de crédito.")
                 .info3("La cooperativa continuará el análisis cuando reciba la información.")
                 .build();
     }
@@ -64,6 +64,28 @@ public class CreditOfferEmailBuilder {
                 .info1("Motivos: " + reasonList)
                 .info2("Ingresa a tu solicitud y completa nuevamente la información.")
                 .info3("Podrás hacerlo hasta que la cooperativa apruebe un garante.")
+                .build();
+    }
+
+    public EmailTemplate buildGuaranteeReviewUpdate(
+            String cooperativeName,
+            String dashboardUrl,
+            java.util.List<String> reasons,
+            boolean correctionRequested,
+            String observation
+    ) {
+        String reasonList = reasons.stream().map(this::escapeHtml)
+                .collect(java.util.stream.Collectors.joining("; "));
+        return EmailTemplate.builder()
+                .title(correctionRequested ? "Corrige la información del garante" : "Actualización del garante")
+                .message(correctionRequested
+                        ? cooperativeName + " revisó los datos del garante y solicita corregirlos."
+                        : cooperativeName + " no aprobó al garante. Puedes registrar otro si el proceso sigue disponible.")
+                .buttonText(correctionRequested ? "Actualizar información" : "Registrar otro garante")
+                .buttonUrl(dashboardUrl)
+                .info1(reasonList.isBlank() ? "Revisa la observación de la cooperativa." : "Motivos: " + reasonList)
+                .info2(observation == null || observation.isBlank() ? "" : "Observación: " + escapeHtml(observation))
+                .info3("Abre la solicitud en DINEROP para continuar.")
                 .build();
     }
 
