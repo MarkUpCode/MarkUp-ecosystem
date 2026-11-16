@@ -2,10 +2,17 @@ import 'package:flutter/material.dart';
 
 class AppAuthenticatedHeader extends StatelessWidget
     implements PreferredSizeWidget {
-  const AppAuthenticatedHeader({super.key});
+  const AppAuthenticatedHeader({
+    super.key,
+    this.showNotifications = false,
+    this.onNotifications,
+  });
+
+  final bool showNotifications;
+  final VoidCallback? onNotifications;
 
   @override
-  Size get preferredSize => const Size.fromHeight(68);
+  Size get preferredSize => const Size.fromHeight(62);
 
   void _showHelp(BuildContext context) {
     showModalBottomSheet<void>(
@@ -67,35 +74,58 @@ class AppAuthenticatedHeader extends StatelessWidget
       automaticallyImplyLeading: false,
       elevation: 0,
       scrolledUnderElevation: 0,
+      toolbarHeight: 62,
       backgroundColor: colors.surface,
       surfaceTintColor: Colors.transparent,
-      titleSpacing: 20,
+      titleSpacing: 16,
       title: Row(
         children: [
-          Container(
-            width: 38,
-            height: 38,
-            decoration: BoxDecoration(
-              color: colors.primaryContainer,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Icon(
-              Icons.account_balance_rounded,
-              color: colors.primary,
-              size: 21,
+          ClipRRect(
+            borderRadius: BorderRadius.circular(10),
+            child: Image.asset(
+              'assets/icon/app_icon.png',
+              width: 36,
+              height: 36,
+              fit: BoxFit.cover,
             ),
           ),
-          const SizedBox(width: 11),
-          Text(
-            'DINEROP',
-            style: theme.textTheme.titleLarge?.copyWith(
-              fontWeight: FontWeight.w900,
-              letterSpacing: 1.1,
+          const SizedBox(width: 9),
+          Expanded(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'DINEROP',
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    color: const Color(0xFF142B4A),
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: .8,
+                    height: 1.05,
+                  ),
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  'Tu futuro financiero empieza aquí',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: const Color(0xFF718096),
+                    fontSize: 9,
+                  ),
+                ),
+              ],
             ),
           ),
         ],
       ),
       actions: [
+        if (showNotifications)
+          IconButton(
+            onPressed: onNotifications,
+            tooltip: 'Notificaciones',
+            icon: Icon(Icons.notifications_none_rounded, color: colors.primary),
+          ),
         IconButton(
           onPressed: () => _showHelp(context),
           tooltip: 'Ayuda y soporte',

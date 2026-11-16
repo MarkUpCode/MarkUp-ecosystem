@@ -54,10 +54,10 @@
     "semantic_hash": "3000364f3ed8fe263a81320a2f4af1b1"
   },
   "src/api/creditRequests.api.ts": {
-    "mtime": 1794426717.1256652,
-    "seen": 1794463041.1915963,
-    "ast_hash": "d5ee25fe422fb657b68101f37601578a",
-    "semantic_hash": "d5ee25fe422fb657b68101f37601578a"
+    "mtime": 1794795375.5848691,
+    "seen": 1794858879.5067794,
+    "ast_hash": "5d0db0cd3abe4d49232a4f501a83a2df",
+    "semantic_hash": ""
   },
   "src/api/errors.ts": {
     "mtime": 1782016105.1756911,
@@ -72,10 +72,10 @@
     "semantic_hash": "470914ab568afdc91de6780da6614f81"
   },
   "src/api/onboarding.api.ts": {
-    "mtime": 1794426632.3707416,
-    "seen": 1794463041.1916003,
-    "ast_hash": "36acc7486117158484134a71c7ee17c1",
-    "semantic_hash": "36acc7486117158484134a71c7ee17c1"
+    "mtime": 1794794723.7500794,
+    "seen": 1794858879.5067868,
+    "ast_hash": "493bccd18c8e05f116c7b3a3934057a6",
+    "semantic_hash": ""
   },
   "src/components/auth/CompleteRegistrationModal.tsx": {
     "mtime": 1790229369.6127257,
@@ -102,16 +102,16 @@
     "semantic_hash": "a2611d42953255907398623a3e94e64f"
   },
   "src/components/credit/CreditCard.tsx": {
-    "mtime": 1782016105.1782036,
-    "seen": 1794463041.191606,
-    "ast_hash": "7ec9fd8b80693d1654c4b0c7d03d013a",
-    "semantic_hash": "7ec9fd8b80693d1654c4b0c7d03d013a"
+    "mtime": 1794729303.4193487,
+    "seen": 1794858879.5068007,
+    "ast_hash": "cd0eeb8d3b82b3e874ebbda422a4ff51",
+    "semantic_hash": ""
   },
   "src/components/credit/CreditDetailsModal.tsx": {
-    "mtime": 1789961527.012244,
-    "seen": 1794463041.1916072,
-    "ast_hash": "101f7e7982d2d9e0b6659599999b257c",
-    "semantic_hash": "101f7e7982d2d9e0b6659599999b257c"
+    "mtime": 1794795654.2486637,
+    "seen": 1794858879.5068023,
+    "ast_hash": "ea0b85e035e60e5edf2142574d5a04aa",
+    "semantic_hash": ""
   },
   "src/components/credit/NewCreditModal.tsx": {
     "mtime": 1782016105.1782036,
@@ -120,10 +120,10 @@
     "semantic_hash": "b6959b6166fd234ab158b748a7941343"
   },
   "src/components/credit/PreApprovalModal.tsx": {
-    "mtime": 1792507164.5244796,
-    "seen": 1794463041.1916094,
-    "ast_hash": "fd82cca033342f0ad4b20c3830c9413e",
-    "semantic_hash": "fd82cca033342f0ad4b20c3830c9413e"
+    "mtime": 1794728554.7331553,
+    "seen": 1794858879.5068061,
+    "ast_hash": "c05bde926df3232804c8b34d10f8954d",
+    "semantic_hash": ""
   },
   "src/components/credit/PublicCreditRequestModal.tsx": {
     "mtime": 1790227686.5530355,
@@ -174,10 +174,10 @@
     "semantic_hash": "0583d5201856096a0f4708a3444f3c2e"
   },
   "src/components/onboarding/GuaranteeOnboardingModal.tsx": {
-    "mtime": 1782016105.1822104,
-    "seen": 1794463041.19162,
-    "ast_hash": "f6f078fad437ec21c322b904a48dc30b",
-    "semantic_hash": "f6f078fad437ec21c322b904a48dc30b"
+    "mtime": 1794794715.8142881,
+    "seen": 1794858879.5068274,
+    "ast_hash": "162b5874725b31f6bb3e8e52e6585739",
+    "semantic_hash": ""
   },
   "src/components/onboarding/OnboardingPopup.tsx": {
     "mtime": 1782016105.1832163,
@@ -240,10 +240,10 @@
     "semantic_hash": "8a90a55aac051026aa3867779c64cb24"
   },
   "src/pages/DashboardCooperative.tsx": {
-    "mtime": 1794426632.367742,
-    "seen": 1794463041.1916323,
-    "ast_hash": "13e6b4da47655c49e195a2cca5d85bdb",
-    "semantic_hash": "13e6b4da47655c49e195a2cca5d85bdb"
+    "mtime": 1794795710.880255,
+    "seen": 1794858879.5068493,
+    "ast_hash": "eb3314b5597e7cc6649a973a7fb22e58",
+    "semantic_hash": ""
   },
   "src/pages/Login.tsx": {
     "mtime": 1794348818.6006174,
@@ -312,10 +312,10 @@
     "semantic_hash": "4b3009816c6faa41d0d9e25153f66c21"
   },
   "src/types/credit.ts": {
-    "mtime": 1792507892.0870779,
-    "seen": 1794463041.1916702,
-    "ast_hash": "dad091e31f053570479c26ca0c9be1b6",
-    "semantic_hash": "dad091e31f053570479c26ca0c9be1b6"
+    "mtime": 1794795453.3610184,
+    "seen": 1794858879.5068715,
+    "ast_hash": "9650ff844dc17251394a61d08af421a6",
+    "semantic_hash": ""
   },
   "src/types/creditDecision.ts": {
     "mtime": 1782016105.19424,
@@ -388,5 +388,167 @@
     "seen": 1794463041.1916852,
     "ast_hash": "24aad8ca84239666b3e965638ccf64e4",
     "semantic_hash": "24aad8ca84239666b3e965638ccf64e4"
+  },
+  "src/components/cooperative/CooperativeNotificationCenter.tsx": {
+    "mtime": 1794693461.607187,
+    "seen": 1794858879.5067964,
+    "ast_hash": "a6636b56eb6dc2d41a17cc6466016e2d",
+    "semantic_hash": ""
+  },
+  "src/components/credit/RejectCreditModal.tsx": {
+    "mtime": 1794725720.9181979,
+    "seen": 1794858879.506809,
+    "ast_hash": "96c68b9b959fd445b9121c97ee885042",
+    "semantic_hash": ""
+  },
+  "src/components/credit/RejectGuarantorModal.tsx": {
+    "mtime": 1794795710.880255,
+    "seen": 1794858879.506811,
+    "ast_hash": "9dd643fd76b62c31c01a407ec6e18d78",
+    "semantic_hash": ""
+  },
+  "src/hooks/useCooperativeLiveUpdates.ts": {
+    "mtime": 1794693581.413038,
+    "seen": 1794858879.5068421,
+    "ast_hash": "2144cbdc2809f053c080d06c401ef3d6",
+    "semantic_hash": ""
+  },
+  ".github/copilot-instructions.md": {
+    "mtime": 1794463029.5403402,
+    "seen": 1794858879.5068934,
+    "ast_hash": "ec2dc0dc7bef63488889f34de2f5584d",
+    "semantic_hash": ""
+  },
+  "docs/API_INTEGRATION.md": {
+    "mtime": 1794694340.4203672,
+    "seen": 1794858879.5068946,
+    "ast_hash": "252b489ad61adab49a5383b0cb61f6ee",
+    "semantic_hash": ""
+  },
+  "docs/ARCHITECTURE.md": {
+    "mtime": 1794463575.8874092,
+    "seen": 1794858879.5068958,
+    "ast_hash": "324393c36fde1b871c018fa5720e24a8",
+    "semantic_hash": ""
+  },
+  "docs/AUTHENTICATION.md": {
+    "mtime": 1794463577.293196,
+    "seen": 1794858879.5068974,
+    "ast_hash": "85eb0a8be8ad54c414a9f135146406f0",
+    "semantic_hash": ""
+  },
+  "docs/BUSINESS_LOGIC.md": {
+    "mtime": 1794463577.9059763,
+    "seen": 1794858879.5068986,
+    "ast_hash": "19d51b10b4cf7adcf5742eca0b77fb8f",
+    "semantic_hash": ""
+  },
+  "docs/COMPONENTS.md": {
+    "mtime": 1794693581.416039,
+    "seen": 1794858879.5069,
+    "ast_hash": "52554758206b2dc96b0510974d3f786e",
+    "semantic_hash": ""
+  },
+  "docs/DEVELOPMENT_GUIDE.md": {
+    "mtime": 1794693602.092814,
+    "seen": 1794858879.5069013,
+    "ast_hash": "033e0fcb3687608042b03afff4d57843",
+    "semantic_hash": ""
+  },
+  "docs/MODULES.md": {
+    "mtime": 1794463576.1542408,
+    "seen": 1794858879.5069025,
+    "ast_hash": "cd301a22594f41fe8d04f4df55cb267e",
+    "semantic_hash": ""
+  },
+  "docs/PAGES_AND_ROUTES.md": {
+    "mtime": 1794463576.4239247,
+    "seen": 1794858879.506904,
+    "ast_hash": "ae073acc135078192b49f57443de2049",
+    "semantic_hash": ""
+  },
+  "docs/PROJECT_OVERVIEW.md": {
+    "mtime": 1794463575.6147304,
+    "seen": 1794858879.5069053,
+    "ast_hash": "c8fbe6f79265636c8ddb5c3229ccad8b",
+    "semantic_hash": ""
+  },
+  "docs/STATE_MANAGEMENT.md": {
+    "mtime": 1794693581.4150393,
+    "seen": 1794858879.5069065,
+    "ast_hash": "ea0dca10807c8b2d69a1054a0b6916db",
+    "semantic_hash": ""
+  },
+  "docs/superpowers/specs/2026-05-10-credit-request-modal-design.md": {
+    "mtime": 1782016105.1675656,
+    "seen": 1794858879.506908,
+    "ast_hash": "f803393f4a3f41078ce0c9159b82401c",
+    "semantic_hash": ""
+  },
+  "index.html": {
+    "mtime": 1782016105.1690688,
+    "seen": 1794858879.5069091,
+    "ast_hash": "5f37b35ed22618157d9eb0154b261ccd",
+    "semantic_hash": ""
+  },
+  "project_structure.txt": {
+    "mtime": 1782016105.171579,
+    "seen": 1794858879.5069106,
+    "ast_hash": "c45c2715d53c54d1c03b194b4d7e14bd",
+    "semantic_hash": ""
+  },
+  "public/favicon.png": {
+    "mtime": 1782016105.1720831,
+    "seen": 1794858879.5069115,
+    "ast_hash": "753bfc50eb0d8a56bb596eb999982baf",
+    "semantic_hash": ""
+  },
+  "public/favicon1.png": {
+    "mtime": 1782016105.1730893,
+    "seen": 1794858879.506913,
+    "ast_hash": "0b3e3efcab374c1e4dbc1072a4264517",
+    "semantic_hash": ""
+  },
+  "public/logo.png": {
+    "mtime": 1783663204.451521,
+    "seen": 1794858879.5069144,
+    "ast_hash": "df278493195901d3d0c1103e1db166b4",
+    "semantic_hash": ""
+  },
+  "src/images/LogoDinerUp.png": {
+    "mtime": 1782016105.185224,
+    "seen": 1794858879.5069172,
+    "ast_hash": "0b3e3efcab374c1e4dbc1072a4264517",
+    "semantic_hash": ""
+  },
+  "src/images/LogoDinerop.png": {
+    "mtime": 1782016105.1862223,
+    "seen": 1794858879.5069184,
+    "ast_hash": "753bfc50eb0d8a56bb596eb999982baf",
+    "semantic_hash": ""
+  },
+  "src/images/cooperatives/AlianzaDelValle.png": {
+    "mtime": 1782016105.1862223,
+    "seen": 1794858879.5069199,
+    "ast_hash": "44c808f1d6e783272ce2ba92f84f25c7",
+    "semantic_hash": ""
+  },
+  "src/images/cooperatives/Tulcan.png": {
+    "mtime": 1782016105.187223,
+    "seen": 1794858879.5069213,
+    "ast_hash": "d0520b03e8be8b5bec9e060db98bd1eb",
+    "semantic_hash": ""
+  },
+  "src/images/cooperatives/UnionElEjido.png": {
+    "mtime": 1782016105.187223,
+    "seen": 1794858879.5069225,
+    "ast_hash": "8ae203d8d8b6ca892f1626af1748571d",
+    "semantic_hash": ""
+  },
+  "package-lock.json": {
+    "mtime": 1783056599.9492204,
+    "seen": 1794858879.5069234,
+    "ast_hash": "7f6450f3b3e7281e8754b257db4eef39",
+    "semantic_hash": ""
   }
 }

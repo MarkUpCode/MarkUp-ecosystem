@@ -1,206 +1,611 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/utils/formatters.dart';
+import '../../../credit/data/models/client_credit_request.dart';
+import '../../../credit/data/models/credit_enums.dart';
+
 const _navy = Color(0xFF142B4A);
 const _teal = Color(0xFF16B8A6);
 const _muted = Color(0xFF718096);
 const _line = Color(0xFFE8EDF3);
 
-class ProductShowcaseSection extends StatelessWidget {
-  const ProductShowcaseSection({super.key});
+class ProfileStatusRow extends StatelessWidget {
+  const ProfileStatusRow({super.key, required this.complete, this.onComplete});
 
-  static const _products = [
-    (Icons.smartphone_rounded, 'Smartphones', 'Tecnología'),
-    (Icons.laptop_mac_rounded, 'Laptops', 'Computación'),
-    (Icons.tv_rounded, 'Televisores', 'Entretenimiento'),
-    (Icons.kitchen_rounded, 'Hogar', 'Electrodomésticos'),
-  ];
+  final bool complete;
+  final VoidCallback? onComplete;
 
   @override
-  Widget build(BuildContext context) => Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      const _SectionHeading(
-        title: 'Productos para ti',
-        subtitle: 'Descubre productos y oportunidades que podrían interesarte',
-      ),
-      const SizedBox(height: 14),
-      SizedBox(
-        height: 204,
-        child: ListView.separated(
-          scrollDirection: Axis.horizontal,
-          itemCount: _products.length,
-          separatorBuilder: (_, _) => const SizedBox(width: 12),
-          itemBuilder: (context, index) {
-            final product = _products[index];
-            return Container(
-              width: 148,
-              padding: const EdgeInsets.all(14),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: _line),
+  Widget build(BuildContext context) {
+    if (complete) {
+      return Row(
+        children: [
+          const Icon(Icons.check_circle_rounded, color: _teal, size: 17),
+          const SizedBox(width: 6),
+          const Expanded(
+            child: Text(
+              'Perfil completo',
+              style: TextStyle(
+                color: _navy,
+                fontSize: 12,
+                fontWeight: FontWeight.w700,
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    height: 72,
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFEAF8F6),
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    child: Icon(product.$1, size: 38, color: _teal),
-                  ),
-                  const Spacer(),
-                  Text(
-                    product.$2,
-                    style: const TextStyle(
-                      color: _navy,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    product.$3,
-                    style: const TextStyle(color: _muted, fontSize: 11),
-                  ),
-                  const SizedBox(height: 7),
-                  const Text(
-                    'PRÓXIMAMENTE',
-                    style: TextStyle(
-                      color: _teal,
-                      fontSize: 9,
-                      letterSpacing: .7,
-                      fontWeight: FontWeight.w900,
-                    ),
-                  ),
-                ],
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+            decoration: BoxDecoration(
+              color: const Color(0xFFE7F8F5),
+              borderRadius: BorderRadius.circular(99),
+            ),
+            child: const Text(
+              '100%',
+              style: TextStyle(
+                color: _teal,
+                fontSize: 11,
+                fontWeight: FontWeight.w900,
               ),
-            );
-          },
+            ),
+          ),
+        ],
+      );
+    }
+
+    return Row(
+      children: [
+        const Icon(Icons.pending_outlined, color: Color(0xFFD68B28), size: 17),
+        const SizedBox(width: 6),
+        const Expanded(
+          child: Text(
+            'Completa tu información de perfil',
+            style: TextStyle(color: _muted, fontSize: 12),
+          ),
         ),
-      ),
-    ],
-  );
+        TextButton(
+          onPressed: onComplete,
+          style: TextButton.styleFrom(
+            foregroundColor: _navy,
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            minimumSize: const Size(0, 32),
+          ),
+          child: const Text(
+            'Completar',
+            style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800),
+          ),
+        ),
+      ],
+    );
+  }
 }
 
-class FinanceToolsSection extends StatelessWidget {
-  const FinanceToolsSection({super.key});
+class ActiveCreditCarousel extends StatefulWidget {
+  const ActiveCreditCarousel({
+    super.key,
+    required this.requests,
+    required this.profileComplete,
+    required this.onRequestCredit,
+    required this.onViewDetails,
+  });
+
+  final List<ClientCreditRequestSummary> requests;
+  final bool profileComplete;
+  final VoidCallback onRequestCredit;
+  final ValueChanged<ClientCreditRequestSummary> onViewDetails;
+
+  @override
+  State<ActiveCreditCarousel> createState() => _ActiveCreditCarouselState();
+}
+
+class _ActiveCreditCarouselState extends State<ActiveCreditCarousel> {
+  late final PageController _controller;
+  int _page = 0;
+
+  List<ClientCreditRequestSummary> get _activeRequests {
+    final active =
+        widget.requests
+            .where((request) => request.estado != CreditRequestStatus.rechazada)
+            .toList()
+          ..sort(
+            (a, b) => (b.fechaSolicitud ?? DateTime(0)).compareTo(
+              a.fechaSolicitud ?? DateTime(0),
+            ),
+          );
+    return active;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = PageController(viewportFraction: .94);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final active = _activeRequests;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const _SectionHeading(
+          title: 'Mi último crédito',
+          subtitle: 'Conoce cómo avanza tu solicitud',
+        ),
+        const SizedBox(height: 12),
+        if (active.isEmpty)
+          _CreditEmptyState(onRequestCredit: widget.onRequestCredit)
+        else ...[
+          SizedBox(
+            height: 286,
+            child: PageView.builder(
+              controller: _controller,
+              itemCount: active.length,
+              onPageChanged: (page) => setState(() => _page = page),
+              itemBuilder: (context, index) => Padding(
+                padding: const EdgeInsets.only(right: 9),
+                child: _CreditSummaryCard(
+                  request: active[index],
+                  profileComplete: widget.profileComplete,
+                  onViewDetails: () => widget.onViewDetails(active[index]),
+                ),
+              ),
+            ),
+          ),
+          if (active.length > 1) ...[
+            const SizedBox(height: 8),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                for (var index = 0; index < active.length; index++)
+                  AnimatedContainer(
+                    duration: const Duration(milliseconds: 180),
+                    margin: const EdgeInsets.symmetric(horizontal: 3),
+                    width: index == _page ? 17 : 6,
+                    height: 6,
+                    decoration: BoxDecoration(
+                      color: index == _page ? _teal : const Color(0xFFC8D2DE),
+                      borderRadius: BorderRadius.circular(99),
+                    ),
+                  ),
+                const SizedBox(width: 7),
+                Text(
+                  '${_page + 1} de ${active.length}',
+                  style: const TextStyle(
+                    color: _muted,
+                    fontSize: 10,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ],
+      ],
+    );
+  }
+}
+
+class _CreditSummaryCard extends StatelessWidget {
+  const _CreditSummaryCard({
+    required this.request,
+    required this.profileComplete,
+    required this.onViewDetails,
+  });
+
+  final ClientCreditRequestSummary request;
+  final bool profileComplete;
+  final VoidCallback onViewDetails;
+
+  @override
+  Widget build(BuildContext context) {
+    final status = _CreditStatus.from(request.estado);
+    final step = _progressStep(request.estado, profileComplete);
+    final rejected = request.estado == CreditRequestStatus.rechazada;
+
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [_navy, Color(0xFF1E4668)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(21),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x1A142B4A),
+            blurRadius: 17,
+            offset: Offset(0, 7),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  'Solicitud #${request.solicitudId}',
+                  style: const TextStyle(
+                    color: Color(0xFFD5E3EF),
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 5,
+                ),
+                decoration: BoxDecoration(
+                  color: status.color.withValues(alpha: .17),
+                  borderRadius: BorderRadius.circular(99),
+                ),
+                child: Text(
+                  status.shortTitle,
+                  style: TextStyle(
+                    color: status.color,
+                    fontSize: 10,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 5),
+          Text(
+            formatCurrency(request.monto),
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 22,
+              fontWeight: FontWeight.w900,
+              letterSpacing: -.4,
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            'Solicitado el ${formatDate(request.fechaSolicitud)}',
+            style: const TextStyle(color: Color(0xFFB7C8D8), fontSize: 10),
+          ),
+          const SizedBox(height: 8),
+          _CreditStepper(step: step, rejected: rejected),
+          const SizedBox(height: 6),
+          Text(
+            status.message,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 11,
+              height: 1.35,
+            ),
+          ),
+          const Spacer(),
+          Align(
+            alignment: Alignment.centerRight,
+            child: TextButton(
+              onPressed: onViewDetails,
+              style: TextButton.styleFrom(
+                foregroundColor: const Color(0xFF8CE5D9),
+                padding: const EdgeInsets.symmetric(horizontal: 4),
+                minimumSize: const Size(0, 28),
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                visualDensity: VisualDensity.compact,
+              ),
+              child: const Text(
+                'Ver detalles  →',
+                style: TextStyle(fontSize: 11, fontWeight: FontWeight.w900),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _CreditStepper extends StatelessWidget {
+  const _CreditStepper({required this.step, required this.rejected});
+
+  final int step;
+  final bool rejected;
+
+  static const _labels = ['Perfil', 'Solicitud', 'Evaluación', 'Resultado'];
 
   @override
   Widget build(BuildContext context) => Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      const _SectionHeading(title: 'Herramientas financieras'),
-      const SizedBox(height: 12),
-      GridView.count(
-        crossAxisCount: 2,
-        crossAxisSpacing: 10,
-        mainAxisSpacing: 10,
-        childAspectRatio: 1.4,
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
+      SizedBox(
+        height: 28,
+        child: Row(
+          children: [
+            for (var index = 1; index <= _labels.length; index++) ...[
+              _StepDot(index: index, step: step, rejected: rejected),
+              if (index < _labels.length)
+                Expanded(
+                  child: Container(
+                    height: 2,
+                    color: index < step ? _teal : const Color(0xFF49647D),
+                  ),
+                ),
+            ],
+          ],
+        ),
+      ),
+      const SizedBox(height: 4),
+      Row(
         children: [
-          _ToolCard(
-            icon: Icons.add_card_rounded,
-            title: 'Solicitar crédito',
-            onTap: () => context.push('/request-credit'),
-          ),
-          _ToolCard(
-            icon: Icons.receipt_long_rounded,
-            title: 'Mis solicitudes',
-            onTap: () => context.go('/requests'),
-          ),
-          _ToolCard(
-            icon: Icons.calculate_rounded,
-            title: 'Simulador de cuotas',
-            onTap: () => context.push('/simulate-credit'),
-          ),
-          _ToolCard(
-            icon: Icons.person_outline_rounded,
-            title: 'Mi perfil financiero',
-            onTap: () => context.go('/profile'),
-          ),
-          const _ToolCard(
-            icon: Icons.auto_stories_rounded,
-            title: 'Educación financiera',
-            comingSoon: true,
-          ),
+          for (var index = 0; index < _labels.length; index++)
+            Expanded(
+              child: Text(
+                _labels[index],
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: index + 1 <= step
+                      ? Colors.white
+                      : const Color(0xFFABC0D1),
+                  fontSize: 8,
+                  fontWeight: index + 1 == step
+                      ? FontWeight.w900
+                      : FontWeight.w600,
+                ),
+              ),
+            ),
         ],
       ),
     ],
   );
 }
 
-class _ToolCard extends StatelessWidget {
-  const _ToolCard({
+class _StepDot extends StatelessWidget {
+  const _StepDot({
+    required this.index,
+    required this.step,
+    required this.rejected,
+  });
+
+  final int index;
+  final int step;
+  final bool rejected;
+
+  @override
+  Widget build(BuildContext context) {
+    final complete = index < step;
+    final current = index == step;
+    final color = rejected && current
+        ? const Color(0xFFFF8888)
+        : (complete || current)
+        ? _teal
+        : const Color(0xFF49647D);
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 200),
+      width: 26,
+      height: 26,
+      decoration: BoxDecoration(
+        color: color,
+        shape: BoxShape.circle,
+        border: Border.all(
+          color: current ? Colors.white : color,
+          width: current ? 2 : 1,
+        ),
+      ),
+      child: Icon(
+        complete
+            ? Icons.check_rounded
+            : rejected && current
+            ? Icons.close_rounded
+            : Icons.circle,
+        color: Colors.white,
+        size: complete || rejected && current ? 14 : 8,
+      ),
+    );
+  }
+}
+
+class _CreditEmptyState extends StatelessWidget {
+  const _CreditEmptyState({required this.onRequestCredit});
+
+  final VoidCallback onRequestCredit;
+
+  @override
+  Widget build(BuildContext context) => Container(
+    width: double.infinity,
+    padding: const EdgeInsets.all(18),
+    decoration: BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(21),
+      border: Border.all(color: _line),
+    ),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: 42,
+          height: 42,
+          decoration: BoxDecoration(
+            color: const Color(0xFFE7F8F5),
+            borderRadius: BorderRadius.circular(14),
+          ),
+          child: const Icon(
+            Icons.account_balance_wallet_outlined,
+            color: _teal,
+          ),
+        ),
+        const SizedBox(height: 11),
+        const Text(
+          '¡Comienza tu camino financiero!',
+          style: TextStyle(
+            color: _navy,
+            fontSize: 15,
+            fontWeight: FontWeight.w900,
+          ),
+        ),
+        const SizedBox(height: 4),
+        const Text(
+          'Solicita tu primer crédito y descubre nuevas oportunidades.',
+          style: TextStyle(color: _muted, fontSize: 11, height: 1.4),
+        ),
+        const SizedBox(height: 12),
+        FilledButton(
+          onPressed: onRequestCredit,
+          style: FilledButton.styleFrom(
+            backgroundColor: _navy,
+            minimumSize: const Size(0, 40),
+          ),
+          child: const Text('Solicitar crédito'),
+        ),
+      ],
+    ),
+  );
+}
+
+class QuickActionsGrid extends StatelessWidget {
+  const QuickActionsGrid({super.key});
+
+  @override
+  Widget build(BuildContext context) => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      const _SectionHeading(title: '¿Qué quieres hacer?'),
+      const SizedBox(height: 11),
+      LayoutBuilder(
+        builder: (context, constraints) => GridView.count(
+          crossAxisCount: 3,
+          crossAxisSpacing: 9,
+          mainAxisSpacing: 9,
+          childAspectRatio: constraints.maxWidth < 300 ? .82 : 1.03,
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          children: [
+            _ActionTile(
+              icon: Icons.add_card_rounded,
+              label: 'Solicitar crédito',
+              color: const Color(0xFF16B8A6),
+              tint: const Color(0xFFE5F8F5),
+              onTap: () => context.push('/request-credit'),
+            ),
+            _ActionTile(
+              icon: Icons.savings_outlined,
+              label: 'Realizar inversión',
+              color: const Color(0xFF7656C8),
+              tint: const Color(0xFFF0ECFA),
+              comingSoon: true,
+            ),
+            _ActionTile(
+              icon: Icons.fact_check_outlined,
+              label: 'Revisar buró',
+              color: const Color(0xFF3979CC),
+              tint: const Color(0xFFEAF2FD),
+              onTap: () => context.push('/credit-bureau'),
+            ),
+            _ActionTile(
+              icon: Icons.receipt_long_rounded,
+              label: 'Mis solicitudes',
+              color: const Color(0xFFE58C39),
+              tint: const Color(0xFFFFF2E5),
+              onTap: () => context.go('/requests'),
+            ),
+            _ActionTile(
+              icon: Icons.calculate_outlined,
+              label: 'Simulador',
+              color: const Color(0xFF3A9B68),
+              tint: const Color(0xFFE8F6EE),
+              onTap: () => context.push('/simulate-credit'),
+            ),
+            _ActionTile(
+              icon: Icons.person_outline_rounded,
+              label: 'Mi perfil',
+              color: const Color(0xFF5B7792),
+              tint: const Color(0xFFEDF2F6),
+              onTap: () => context.go('/profile'),
+            ),
+          ],
+        ),
+      ),
+    ],
+  );
+}
+
+class _ActionTile extends StatelessWidget {
+  const _ActionTile({
     required this.icon,
-    required this.title,
+    required this.label,
+    required this.color,
+    required this.tint,
     this.onTap,
     this.comingSoon = false,
   });
 
   final IconData icon;
-  final String title;
+  final String label;
+  final Color color;
+  final Color tint;
   final VoidCallback? onTap;
   final bool comingSoon;
 
   @override
   Widget build(BuildContext context) => Material(
-    color: Colors.white,
+    key: ValueKey('quick-action-$label'),
+    color: tint,
     borderRadius: BorderRadius.circular(17),
     child: InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(17),
-      child: Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(17),
-          border: Border.all(color: _line),
-        ),
-        child: Row(
-          children: [
-            Icon(icon, color: _teal, size: 22),
-            const SizedBox(width: 9),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    title,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      color: _navy,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w800,
+      onTap:
+          onTap ??
+          (comingSoon
+              ? () => ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text(
+                      'Las inversiones estarán disponibles próximamente.',
                     ),
                   ),
-                  if (comingSoon)
-                    const Padding(
-                      padding: EdgeInsets.only(top: 4),
-                      child: Text(
-                        'PRÓXIMAMENTE',
-                        style: TextStyle(
-                          color: _muted,
-                          fontSize: 8,
-                          letterSpacing: .5,
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
-                    ),
-                ],
+                )
+              : null),
+      borderRadius: BorderRadius.circular(17),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 9),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(17),
+          border: Border.all(color: color.withValues(alpha: .10)),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, color: color, size: 25),
+            const SizedBox(height: 7),
+            Text(
+              label,
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: _navy,
+                fontSize: 10,
+                height: 1.15,
+                fontWeight: FontWeight.w800,
               ),
             ),
-            if (!comingSoon)
-              const Icon(
-                Icons.arrow_forward_ios_rounded,
-                size: 12,
-                color: _muted,
+            if (comingSoon) ...[
+              const SizedBox(height: 3),
+              Text(
+                'PRÓXIMAMENTE',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: color,
+                  fontSize: 7,
+                  letterSpacing: .35,
+                  fontWeight: FontWeight.w900,
+                ),
               ),
+            ],
           ],
         ),
       ),
@@ -208,155 +613,243 @@ class _ToolCard extends StatelessWidget {
   );
 }
 
-class CreditHealthCard extends StatelessWidget {
-  const CreditHealthCard({super.key});
+class RecentCreditActivity extends StatelessWidget {
+  const RecentCreditActivity({
+    super.key,
+    required this.requests,
+    required this.onViewAll,
+    required this.onOpenRequest,
+  });
+
+  final List<ClientCreditRequestSummary> requests;
+  final VoidCallback onViewAll;
+  final ValueChanged<ClientCreditRequestSummary> onOpenRequest;
 
   @override
-  Widget build(BuildContext context) => Container(
-    width: double.infinity,
-    padding: const EdgeInsets.all(20),
-    decoration: BoxDecoration(
-      gradient: const LinearGradient(
-        colors: [_navy, Color(0xFF1D4567)],
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-      ),
-      borderRadius: BorderRadius.circular(22),
-    ),
-    child: Row(
-      children: [
-        Container(
-          width: 46,
-          height: 46,
-          decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: .12),
-            borderRadius: BorderRadius.circular(15),
-          ),
-          child: const Icon(Icons.insights_rounded, color: Colors.white),
+  Widget build(BuildContext context) {
+    final recent = [...requests]
+      ..sort(
+        (a, b) => (b.fechaSolicitud ?? DateTime(0)).compareTo(
+          a.fechaSolicitud ?? DateTime(0),
         ),
-        const SizedBox(width: 14),
-        const Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Mi perfil crediticio',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w800,
+      );
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            const Expanded(
+              child: _SectionHeading(title: 'Tu actividad reciente'),
+            ),
+            if (recent.isNotEmpty)
+              TextButton(
+                onPressed: onViewAll,
+                style: TextButton.styleFrom(foregroundColor: _teal),
+                child: const Text(
+                  'Ver todo  →',
+                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800),
                 ),
               ),
-              SizedBox(height: 4),
-              Text(
-                'Conoce y mejora tu salud financiera',
-                style: TextStyle(color: Color(0xFFD3E1ED), fontSize: 12),
+          ],
+        ),
+        const SizedBox(height: 9),
+        if (recent.isEmpty)
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(15),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              border: Border.all(color: _line),
+              borderRadius: BorderRadius.circular(17),
+            ),
+            child: const Text(
+              'Tus solicitudes aparecerán aquí.',
+              style: TextStyle(color: _muted, fontSize: 12),
+            ),
+          )
+        else
+          Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(color: _line),
+            ),
+            child: Column(
+              children: [
+                for (var index = 0; index < recent.take(5).length; index++) ...[
+                  _ActivityTile(
+                    request: recent[index],
+                    onTap: () => onOpenRequest(recent[index]),
+                  ),
+                  if (index < recent.take(5).length - 1)
+                    const Divider(
+                      height: 1,
+                      indent: 58,
+                      endIndent: 14,
+                      color: _line,
+                    ),
+                ],
+              ],
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+class _ActivityTile extends StatelessWidget {
+  const _ActivityTile({required this.request, required this.onTap});
+
+  final ClientCreditRequestSummary request;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final status = _CreditStatus.from(request.estado);
+    final label = request.tipo.trim().isEmpty
+        ? 'Crédito'
+        : request.tipo.toLowerCase() == 'credito'
+        ? 'Crédito'
+        : request.tipo;
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(17),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 11),
+        child: Row(
+          children: [
+            Container(
+              width: 36,
+              height: 36,
+              decoration: BoxDecoration(
+                color: const Color(0xFFEAF2FD),
+                borderRadius: BorderRadius.circular(12),
               ),
-              SizedBox(height: 9),
-              Text(
-                'PRÓXIMAMENTE',
+              child: const Icon(
+                Icons.account_balance_outlined,
+                color: Color(0xFF3979CC),
+                size: 19,
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '$label · #${request.solicitudId}',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      color: _navy,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  const SizedBox(height: 3),
+                  Text(
+                    '${formatDate(request.fechaSolicitud)}  ·  ${formatCurrency(request.monto)}',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(color: _muted, fontSize: 10),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 6),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 5),
+              decoration: BoxDecoration(
+                color: status.color.withValues(alpha: .10),
+                borderRadius: BorderRadius.circular(99),
+              ),
+              child: Text(
+                status.shortTitle,
+                maxLines: 1,
                 style: TextStyle(
-                  color: Color(0xFF73E0D1),
-                  fontSize: 10,
-                  letterSpacing: .8,
+                  color: status.color,
+                  fontSize: 8,
                   fontWeight: FontWeight.w900,
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
-      ],
-    ),
-  );
+      ),
+    );
+  }
 }
 
-class FinancialEducationSection extends StatelessWidget {
-  const FinancialEducationSection({super.key});
+int _progressStep(CreditRequestStatus status, bool profileComplete) {
+  if (!profileComplete) return 0;
+  switch (status) {
+    case CreditRequestStatus.creada:
+      return 2;
+    case CreditRequestStatus.enviada:
+    case CreditRequestStatus.solicitandoGarante:
+      return 3;
+    case CreditRequestStatus.preAprobada:
+    case CreditRequestStatus.aceptada:
+    case CreditRequestStatus.rechazada:
+      return 4;
+    case CreditRequestStatus.unknown:
+      return 2;
+  }
+}
 
-  static const _topics = [
-    (
-      Icons.trending_up_rounded,
-      'Cómo mejorar tu historial crediticio',
-      'Paga tus obligaciones a tiempo y revisa tus compromisos con frecuencia.',
-    ),
-    (
-      Icons.fact_check_outlined,
-      'Antes de solicitar un crédito',
-      'Compara el monto y el plazo con lo que puedes pagar cada mes.',
-    ),
-    (
-      Icons.account_balance_wallet_outlined,
-      'Organiza ingresos y gastos',
-      'Anota tus ingresos y gastos para entender cuánto queda disponible.',
-    ),
-    (
-      Icons.calculate_outlined,
-      'Calcula tu capacidad de pago',
-      'Incluye tus cuotas actuales y gastos fijos en tu presupuesto.',
-    ),
-    (
-      Icons.credit_score_rounded,
-      'Maneja tus deudas',
-      'Prioriza tus pagos y evita asumir cuotas que no caben en tu presupuesto.',
-    ),
-  ];
+class _CreditStatus {
+  const _CreditStatus(this.shortTitle, this.message, this.color);
 
-  @override
-  Widget build(BuildContext context) => Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      const _SectionHeading(
-        title: 'Aprende a mejorar tus finanzas',
-        subtitle: 'Consejos prácticos para tomar mejores decisiones',
-      ),
-      const SizedBox(height: 12),
-      for (final topic in _topics) ...[
-        Container(
-          margin: const EdgeInsets.only(bottom: 9),
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: _line),
-          ),
-          child: Row(
-            children: [
-              Icon(topic.$1, color: _teal, size: 21),
-              const SizedBox(width: 11),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      topic.$2,
-                      style: const TextStyle(
-                        color: _navy,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    const SizedBox(height: 3),
-                    Text(
-                      topic.$3,
-                      style: const TextStyle(
-                        color: _muted,
-                        fontSize: 11,
-                        height: 1.3,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-      const Text(
-        'Contenido educativo general; no sustituye asesoría financiera personalizada.',
-        style: TextStyle(color: _muted, fontSize: 10),
-      ),
-    ],
-  );
+  final String shortTitle;
+  final String message;
+  final Color color;
+
+  factory _CreditStatus.from(CreditRequestStatus status) {
+    switch (status) {
+      case CreditRequestStatus.creada:
+        return const _CreditStatus(
+          'Creada',
+          'Tu solicitud fue creada y está lista para continuar.',
+          Color(0xFFFFC16B),
+        );
+      case CreditRequestStatus.enviada:
+        return const _CreditStatus(
+          'En evaluación',
+          '¡Solicitud enviada! La cooperativa está revisando tu información.',
+          Color(0xFF73D8E6),
+        );
+      case CreditRequestStatus.solicitandoGarante:
+        return const _CreditStatus(
+          'Garante requerido',
+          'Necesitamos un garante para continuar con tu solicitud.',
+          Color(0xFFFFC16B),
+        );
+      case CreditRequestStatus.preAprobada:
+        return const _CreditStatus(
+          'Preaprobada',
+          '¡Buenas noticias! Tienes una propuesta de crédito disponible.',
+          Color(0xFF78E0B0),
+        );
+      case CreditRequestStatus.aceptada:
+        return const _CreditStatus(
+          'Aceptada',
+          '¡Excelente! La cooperativa aceptó tu crédito. Consulta los detalles para conocer los siguientes pasos.',
+          Color(0xFF78E0B0),
+        );
+      case CreditRequestStatus.rechazada:
+        return const _CreditStatus(
+          'Rechazada',
+          'Esta solicitud no fue aprobada. Puedes consultar los detalles.',
+          Color(0xFFFF8888),
+        );
+      case CreditRequestStatus.unknown:
+        return const _CreditStatus(
+          'En proceso',
+          'Estamos actualizando el estado de tu solicitud.',
+          Color(0xFFB5C5D4),
+        );
+    }
+  }
 }
 
 class _SectionHeading extends StatelessWidget {
@@ -373,15 +866,16 @@ class _SectionHeading extends StatelessWidget {
         title,
         style: const TextStyle(
           color: _navy,
-          fontSize: 18,
+          fontSize: 17,
           fontWeight: FontWeight.w900,
+          letterSpacing: -.2,
         ),
       ),
       if (subtitle != null) ...[
-        const SizedBox(height: 4),
+        const SizedBox(height: 3),
         Text(
           subtitle!,
-          style: const TextStyle(color: _muted, fontSize: 12, height: 1.35),
+          style: const TextStyle(color: _muted, fontSize: 11, height: 1.3),
         ),
       ],
     ],

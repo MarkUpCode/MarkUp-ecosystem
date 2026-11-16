@@ -1,0 +1,21 @@
+{
+  "0": "DashboardCooperative.tsx",
+  "1": "OnboardingPage.tsx",
+  "2": "CreditDetailsModal.tsx",
+  "3": "DashboardClient.tsx",
+  "4": "httpClient",
+  "5": "mockAPI.ts",
+  "6": "react",
+  "7": "Login.tsx",
+  "8": "compilerOptions",
+  "9": "PublicCreditRequestModal.tsx",
+  "10": "package.json",
+  "11": "compilerOptions",
+  "17": "onboarding.ts",
+  "18": "vercel.json",
+  "19": "vite-env.d.ts",
+  "20": "tsconfig.json",
+  "21": "Footer.tsx",
+  "22": "tailwind.config.js",
+  "23": "postcss.config.js"
+}
