@@ -1,7 +1,7 @@
 # Graph Report - MarkUp-ecosystem  (2026-11-16)
 
 ## Corpus Check
-- 581 files · ~140,702 words
+- 581 files · ~140,717 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 55 file(s) not represented in the graph (top: (none) 14, .xml 7, .log 5)
 
@@ -11,7 +11,7 @@
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `aa4daba1`
+- Built from commit: `31433c60`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -240,19 +240,19 @@
 7. `httpClient()` - 41 edges
 8. `CooperativeService` - 40 edges
 9. `authControllerProvider` - 38 edges
-10. `NotificationService` - 36 edges
+10. `SolicitudOnboarding` - 36 edges
 
 ## Surprising Connections (you probably didn't know these)
+- `Elegir por funcionalidad` --references--> `CooperativeController`  [INFERRED]
+  DINEROP-KNOWLEDGE/AI-INDEX.md → dinerop-backend/src/main/java/com/markup/dinerop/cooperative/infrastructure/web/CooperativeController.java
 - `Formatos y DTO` --references--> `PublicRegistrationRequest`  [INFERRED]
   app_movil_dinerop/docs/API_INTEGRATION.md → dinerop-backend/src/main/java/com/markup/dinerop/auth/dto/PublicRegistrationRequest.java
+- `Catálogo y exploración` --references--> `CooperativeRepository`  [INFERRED]
+  DINEROP-KNOWLEDGE/USER-FLOWS.md → dinerop-backend/src/main/java/com/markup/dinerop/cooperative/domain/repository/CooperativeRepository.java
+- `Roles y límites` --references--> `SecurityConfig`  [INFERRED]
+  DINEROP-KNOWLEDGE/AUTHENTICATION-FLOW.md → dinerop-backend/src/main/java/com/markup/dinerop/auth/config/SecurityConfig.java
 - `Datos de sesión` --references--> `AuthController`  [INFERRED]
   app_movil_dinerop/docs/AUTHENTICATION.md → dinerop-backend/src/main/java/com/markup/dinerop/auth/controller/AuthController.java
-- `Registro, activación y recuperación` --references--> `AuthController`  [INFERRED]
-  app_movil_dinerop/docs/AUTHENTICATION.md → dinerop-backend/src/main/java/com/markup/dinerop/auth/controller/AuthController.java
-- `Router` --references--> `AuthController`  [INFERRED]
-  app_movil_dinerop/docs/NAVIGATION.md → dinerop-backend/src/main/java/com/markup/dinerop/auth/controller/AuthController.java
-- `Estado global / asíncrono` --references--> `AuthController`  [INFERRED]
-  app_movil_dinerop/docs/STATE_MANAGEMENT.md → dinerop-backend/src/main/java/com/markup/dinerop/auth/controller/AuthController.java
 
 ## Import Cycles
 - None detected.
@@ -860,16 +860,16 @@ Nodes (5): fromJson, message, PublicRegistrationResponse, requestId, status
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `Discrepancias que requieren cuidado` connect `org.springframework.http.ResponseEntity` to `lombok.RequiredArgsConstructor`, `httpClient`?**
-  _High betweenness centrality (0.268) - this node is a cross-community bridge._
+  _High betweenness centrality (0.306) - this node is a cross-community bridge._
 - **What connects `_CreditStatus`, `_navy`, `_teal` to the rest of the system?**
   _967 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `onboarding_page.dart` be split into smaller, more focused modules?**
   _Cohesion score 0.018867924528301886 - nodes in this community are weakly interconnected._
 - **Why does `httpClient()` connect `httpClient` to `AuthContext.tsx`, `dinerup-app/docs/ARCHITECTURE.md`, `CreditDetailsModal.tsx`, `DashboardCooperative.tsx`, `PublicCreditRequestModal.tsx`, `org.springframework.http.ResponseEntity`, `OnboardingPage.tsx`, `DashboardClient.tsx`, `Login.tsx`, `Diseño: Consumo de POST /api/credits/me en NewCreditModal`, `Resumen del proyecto`?**
-  _High betweenness centrality (0.266) - this node is a cross-community bridge._
+  _High betweenness centrality (0.303) - this node is a cross-community bridge._
 - **Should `CreditService` be split into smaller, more focused modules?**
   _Cohesion score 0.04807692307692308 - nodes in this community are weakly interconnected._
 - **Why does `AuthController` connect `org.springframework.http.ResponseEntity` to `lombok.RequiredArgsConstructor`, `main.dart`, `auth_repository.dart`, `providers.dart`, `lombok.Builder`, `AuthService`, `org.springframework.transaction.annotation.Transactional`, `secure_token_storage.dart`, `app_shell.dart`?**
-  _High betweenness centrality (0.256) - this node is a cross-community bridge._
+  _High betweenness centrality (0.232) - this node is a cross-community bridge._
 - **Should `lombok.RequiredArgsConstructor` be split into smaller, more focused modules?**
   _Cohesion score 0.06553128470936691 - nodes in this community are weakly interconnected._

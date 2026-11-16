@@ -1,0 +1,525 @@
+{
+  "communities": {
+    "0": [
+      "ref_lucide_react",
+      "src_components_ui_confirmationmodal",
+      "src_components_ui_confirmationmodal_confirmationmodal",
+      "src_components_ui_confirmationmodal_confirmationmodal_handleconfirm",
+      "src_components_ui_confirmationmodal_confirmationmodalprops",
+      "src_components_ui_modal",
+      "src_components_ui_modal_modal",
+      "src_components_ui_modal_modalprops",
+      "src_components_ui_pageheader",
+      "src_components_ui_pageheader_pageheader",
+      "src_components_ui_pageheader_pageheaderprops",
+      "src_components_ui_pagination",
+      "src_components_ui_pagination_pagination",
+      "src_components_ui_pagination_paginationprops",
+      "src_modules_cooperatives_components_cooperativesfilters",
+      "src_modules_cooperatives_components_cooperativesfilters_cooperativesfilters",
+      "src_modules_cooperatives_components_cooperativesfilters_cooperativesfiltersprops",
+      "src_modules_cooperatives_components_cooperativesstats",
+      "src_modules_cooperatives_components_cooperativesstats_card",
+      "src_modules_cooperatives_components_cooperativesstats_cooperativesstats",
+      "src_modules_cooperatives_components_cooperativesstats_cooperativesstatsprops",
+      "src_modules_cooperatives_components_cooperativestable",
+      "src_modules_cooperatives_components_cooperativestable_cooperativestable",
+      "src_modules_cooperatives_pages_cooperativespage",
+      "src_modules_cooperatives_pages_cooperativespage_cooperativespage",
+      "src_modules_users_components_inviteusermodal_inviteusermodal",
+      "src_modules_users_components_inviteusermodal_inviteusermodal_handlesubmit",
+      "src_modules_users_components_usersfilters",
+      "src_modules_users_components_usersfilters_usersfilters",
+      "src_modules_users_components_usersfilters_usersfiltersprops",
+      "src_modules_users_components_usersstats",
+      "src_modules_users_components_usersstats_usersstats",
+      "src_modules_users_components_usersstats_usersstatsprops",
+      "src_modules_users_pages_userspage",
+      "src_modules_users_pages_userspage_userspage",
+      "src_modules_users_pages_userspage_userspage_handletogglestatus"
+    ],
+    "1": [
+      "package",
+      "package_dependencies",
+      "package_dependencies_axios",
+      "package_dependencies_class_variance_authority",
+      "package_dependencies_clsx",
+      "package_dependencies_hookform_resolvers",
+      "package_dependencies_lucide_react",
+      "package_dependencies_radix_ui_react_dialog",
+      "package_dependencies_radix_ui_react_dropdown_menu",
+      "package_dependencies_radix_ui_react_separator",
+      "package_dependencies_react",
+      "package_dependencies_react_dom",
+      "package_dependencies_react_hook_form",
+      "package_dependencies_tailwind_merge",
+      "package_dependencies_tanstack_react_query",
+      "package_dependencies_zod",
+      "package_name",
+      "package_private",
+      "package_type",
+      "package_version",
+      "ref_axios",
+      "ref_class_variance_authority",
+      "ref_clsx",
+      "ref_hookform_resolvers",
+      "ref_radix_ui_react_dialog",
+      "ref_radix_ui_react_dropdown_menu",
+      "ref_radix_ui_react_separator",
+      "ref_react_dom",
+      "ref_react_hook_form",
+      "ref_tailwind_merge",
+      "ref_tanstack_react_query",
+      "ref_zod"
+    ],
+    "2": [
+      "package_dependencies_react_router_dom",
+      "ref_react_router_dom",
+      "src_app_app",
+      "src_app_app_app",
+      "src_contexts_auth_context_authcontext",
+      "src_contexts_useauth",
+      "src_contexts_useauth_useauth",
+      "src_hooks_usetheme_usetheme",
+      "src_layouts_mainlayout",
+      "src_layouts_mainlayout_mainlayout",
+      "src_layouts_mainlayout_menuitems",
+      "src_modules_leads_pages_leadspage",
+      "src_modules_leads_pages_leadspage_leadspage",
+      "src_modules_products_pages_productspage",
+      "src_modules_products_pages_productspage_productspage",
+      "src_modules_profile_pages_profilepage",
+      "src_modules_profile_pages_profilepage_profilepage",
+      "src_modules_reports_pages_reportspage",
+      "src_modules_reports_pages_reportspage_reportspage",
+      "src_modules_requests_pages_requestspage",
+      "src_modules_requests_pages_requestspage_requestspage",
+      "src_modules_settings_pages_settingspage",
+      "src_modules_settings_pages_settingspage_settingspage",
+      "src_modules_statistics_pages_statisticspage",
+      "src_modules_statistics_pages_statisticspage_statisticspage",
+      "src_routes_protectedroute",
+      "src_routes_protectedroute_protectedroute",
+      "src_routes_publicroute",
+      "src_routes_publicroute_publicroute",
+      "src_types_auth_isadminrole"
+    ],
+    "3": [
+      "ref_react",
+      "src_assets_logo_markup",
+      "src_components_ui_button",
+      "src_components_ui_button_button",
+      "src_components_ui_card",
+      "src_components_ui_card_card",
+      "src_components_ui_input",
+      "src_components_ui_input_input",
+      "src_modules_auth_components_loginbackground",
+      "src_modules_auth_components_loginbackground_loginbackground",
+      "src_modules_auth_components_logincard",
+      "src_modules_auth_components_logincard_logincard",
+      "src_modules_auth_components_logincard_logincardprops",
+      "src_modules_auth_components_logininput",
+      "src_modules_auth_components_logininput_logininput",
+      "src_modules_auth_components_logininput_logininputprops",
+      "src_modules_auth_pages_loginpage",
+      "src_modules_auth_pages_loginpage_loginform",
+      "src_modules_auth_pages_loginpage_loginpage",
+      "src_modules_auth_pages_loginpage_schema",
+      "src_modules_dashboard_api_dashboard_api",
+      "src_modules_dashboard_api_dashboard_api_dashboarddata",
+      "src_modules_dashboard_api_dashboard_api_getdashboard",
+      "src_modules_dashboard_pages_dashboardpage",
+      "src_modules_dashboard_pages_dashboardpage_dashboardpage",
+      "src_services_axios_api",
+      "src_utils_cn",
+      "src_utils_cn_cn"
+    ],
+    "4": [
+      "src_components_ui_badge",
+      "src_components_ui_badge_badge",
+      "src_components_ui_badge_badgeprops",
+      "src_components_ui_icon_button",
+      "src_components_ui_icon_button_iconbutton",
+      "src_components_ui_icon_button_iconbuttonprops",
+      "src_components_ui_useractions",
+      "src_components_ui_useractions_useractions",
+      "src_components_ui_useractions_useractionsprops",
+      "src_components_ui_useravatar",
+      "src_components_ui_useravatar_useravatar",
+      "src_components_ui_useravatar_useravatarprops",
+      "src_modules_users_components_rolebadge",
+      "src_modules_users_components_rolebadge_rolebadge",
+      "src_modules_users_components_rolebadge_rolebadgeprops",
+      "src_modules_users_components_statusbadge",
+      "src_modules_users_components_statusbadge_statusbadge",
+      "src_modules_users_components_statusbadge_statusbadgeprops",
+      "src_modules_users_components_userstable",
+      "src_modules_users_components_userstable_userstable",
+      "src_modules_users_components_userstable_userstableprops",
+      "src_modules_users_types_user_userrole",
+      "src_modules_users_types_user_userstatus"
+    ],
+    "5": [
+      "tsconfig_app",
+      "tsconfig_app_compileroptions",
+      "tsconfig_app_compileroptions_allowjs",
+      "tsconfig_app_compileroptions_allowsyntheticdefaultimports",
+      "tsconfig_app_compileroptions_baseurl",
+      "tsconfig_app_compileroptions_esmoduleinterop",
+      "tsconfig_app_compileroptions_forceconsistentcasinginfilenames",
+      "tsconfig_app_compileroptions_isolatedmodules",
+      "tsconfig_app_compileroptions_jsx",
+      "tsconfig_app_compileroptions_lib",
+      "tsconfig_app_compileroptions_module",
+      "tsconfig_app_compileroptions_moduleresolution",
+      "tsconfig_app_compileroptions_noemit",
+      "tsconfig_app_compileroptions_paths",
+      "tsconfig_app_compileroptions_resolvejsonmodule",
+      "tsconfig_app_compileroptions_skiplibcheck",
+      "tsconfig_app_compileroptions_strict",
+      "tsconfig_app_compileroptions_target",
+      "tsconfig_app_compileroptions_usedefineforclassfields",
+      "tsconfig_app_include",
+      "tsconfig_app_references"
+    ],
+    "6": [
+      "src_contexts_auth_context",
+      "src_contexts_auth_context_authcontextvalue",
+      "src_contexts_auth_context_authprovider",
+      "src_services_api",
+      "src_services_api_api_base_url",
+      "src_services_auth_service",
+      "src_services_auth_service_login",
+      "src_services_axios",
+      "src_services_session_service",
+      "src_services_session_service_clearsession",
+      "src_services_session_service_getstoredsession",
+      "src_services_session_service_getstoreduser",
+      "src_services_session_service_gettoken",
+      "src_services_session_service_setstoredsession",
+      "src_types_auth",
+      "src_types_auth_adminrole",
+      "src_types_auth_authstate",
+      "src_types_auth_authuser",
+      "src_types_auth_loginrequest",
+      "src_types_auth_loginresponse"
+    ],
+    "7": [
+      "src_modules_users_api_users_api",
+      "src_modules_users_api_users_api_changeuserstatus",
+      "src_modules_users_api_users_api_getuserbyid",
+      "src_modules_users_api_users_api_getusers",
+      "src_modules_users_api_users_api_inviteuser",
+      "src_modules_users_components_inviteuserform",
+      "src_modules_users_components_inviteuserform_inviteuserform",
+      "src_modules_users_components_inviteuserform_inviteuserform_handlesubmit",
+      "src_modules_users_components_inviteuserform_inviteuserformprops",
+      "src_modules_users_components_inviteusermodal",
+      "src_modules_users_components_inviteusermodal_inviteusermodalprops",
+      "src_modules_users_hooks_useusers",
+      "src_modules_users_hooks_useusers_useusers",
+      "src_modules_users_types_user",
+      "src_modules_users_types_user_changestatusrequest",
+      "src_modules_users_types_user_inviteuserrequest",
+      "src_modules_users_types_user_userlistitem",
+      "src_modules_users_types_user_userspageresponse",
+      "src_modules_users_types_user_userstats"
+    ],
+    "8": [
+      "package_devdependencies",
+      "package_devdependencies_autoprefixer",
+      "package_devdependencies_eslint",
+      "package_devdependencies_postcss",
+      "package_devdependencies_tailwindcss",
+      "package_devdependencies_types_node",
+      "package_devdependencies_types_react",
+      "package_devdependencies_types_react_dom",
+      "package_devdependencies_typescript",
+      "package_devdependencies_vite",
+      "ref_autoprefixer",
+      "ref_eslint",
+      "ref_postcss",
+      "ref_tailwindcss",
+      "ref_types_node",
+      "ref_types_react",
+      "ref_types_react_dom",
+      "ref_typescript"
+    ],
+    "9": [
+      "src_components_ui_toast",
+      "src_components_ui_toast_toast",
+      "src_components_ui_toast_toastprops",
+      "src_components_ui_toast_toastvariant",
+      "src_contexts_theme_context",
+      "src_contexts_theme_context_themecontext",
+      "src_contexts_theme_context_themecontextvalue",
+      "src_contexts_theme_context_themeprovider",
+      "src_contexts_toastcontext",
+      "src_contexts_toastcontext_toastcontext",
+      "src_contexts_toastcontext_toastcontextvalue",
+      "src_contexts_toastcontext_toastitem",
+      "src_contexts_toastcontext_toastprovider",
+      "src_hooks_usetheme",
+      "src_hooks_usetoast",
+      "src_main",
+      "src_main_queryclient",
+      "src_styles_global"
+    ],
+    "10": [
+      "src_hooks_usetoast_usetoast",
+      "src_modules_cooperatives_api_cooperatives_api",
+      "src_modules_cooperatives_api_cooperatives_api_createcooperative",
+      "src_modules_cooperatives_api_cooperatives_api_deletecooperative",
+      "src_modules_cooperatives_api_cooperatives_api_getcooperativebyid",
+      "src_modules_cooperatives_api_cooperatives_api_getcooperatives",
+      "src_modules_cooperatives_api_cooperatives_api_updatecooperative",
+      "src_modules_cooperatives_components_cooperativestable_cooperativestableprops",
+      "src_modules_cooperatives_hooks_usecooperatives",
+      "src_modules_cooperatives_hooks_usecooperatives_usecooperatives",
+      "src_modules_cooperatives_types_cooperative",
+      "src_modules_cooperatives_types_cooperative_cooperative",
+      "src_modules_cooperatives_types_cooperative_cooperativeformdata",
+      "src_modules_cooperatives_types_cooperative_cooperativelistitem",
+      "src_modules_cooperatives_types_cooperative_cooperativespageresponse",
+      "src_modules_cooperatives_types_cooperative_createcooperativerequest",
+      "src_modules_cooperatives_types_cooperative_updatecooperativerequest"
+    ],
+    "11": [
+      "eslint_config",
+      "package_devdependencies_eslint_js",
+      "package_devdependencies_eslint_plugin_react_hooks",
+      "package_devdependencies_eslint_plugin_react_refresh",
+      "package_devdependencies_typescript_eslint",
+      "ref_eslint_js",
+      "ref_eslint_plugin_react_hooks",
+      "ref_eslint_plugin_react_refresh",
+      "ref_globals",
+      "ref_typescript_eslint"
+    ],
+    "12": [
+      "tsconfig_node",
+      "tsconfig_node_compileroptions",
+      "tsconfig_node_compileroptions_allowsyntheticdefaultimports",
+      "tsconfig_node_compileroptions_composite",
+      "tsconfig_node_compileroptions_module",
+      "tsconfig_node_compileroptions_moduleresolution",
+      "tsconfig_node_compileroptions_skiplibcheck",
+      "tsconfig_node_include"
+    ],
+    "13": [
+      "package_devdependencies_vitejs_plugin_react",
+      "ref_node_path",
+      "ref_vite",
+      "ref_vitejs_plugin_react",
+      "vite_config_js_vite_config",
+      "vite_config_ts_vite_config"
+    ],
+    "14": [
+      "package_scripts",
+      "package_scripts_build",
+      "package_scripts_dev",
+      "package_scripts_lint",
+      "package_scripts_preview"
+    ],
+    "15": [
+      "vercel",
+      "vercel_buildcommand",
+      "vercel_headers",
+      "vercel_outputdirectory",
+      "vercel_rewrites"
+    ],
+    "16": [
+      "src_vite_env_d",
+      "src_vite_env_d_importmeta",
+      "src_vite_env_d_importmetaenv"
+    ],
+    "17": [
+      "tsconfig",
+      "tsconfig_files",
+      "tsconfig_references"
+    ],
+    "18": [
+      "tailwind_config",
+      "tailwindcss"
+    ],
+    "19": [
+      "postcss_config"
+    ],
+    "20": [
+      "src_modules_cooperatives_components_cooperativemodal"
+    ],
+    "21": [
+      "vite_config_d"
+    ]
+  },
+  "cohesion": {
+    "0": 0.1111111111111111,
+    "1": 0.08669354838709678,
+    "2": 0.1471264367816092,
+    "3": 0.1402116402116402,
+    "4": 0.1541501976284585,
+    "5": 0.09523809523809523,
+    "6": 0.22105263157894736,
+    "7": 0.22807017543859648,
+    "8": 0.1111111111111111,
+    "9": 0.16339869281045752,
+    "10": 0.2647058823529412,
+    "11": 0.2,
+    "12": 0.25,
+    "13": 0.4666666666666667,
+    "14": 0.4,
+    "15": 0.4,
+    "16": 0.6666666666666666,
+    "17": 0.6666666666666666,
+    "18": 1.0,
+    "19": 1.0,
+    "20": 1.0,
+    "21": 1.0
+  },
+  "gods": [
+    {
+      "id": "ref_react",
+      "label": "react",
+      "degree": 25
+    },
+    {
+      "id": "ref_lucide_react",
+      "label": "lucide-react",
+      "degree": 20
+    },
+    {
+      "id": "tsconfig_app_compileroptions",
+      "label": "compilerOptions",
+      "degree": 18
+    },
+    {
+      "id": "src_app_app_app",
+      "label": "App()",
+      "degree": 16
+    },
+    {
+      "id": "src_modules_users_pages_userspage_userspage",
+      "label": "UsersPage()",
+      "degree": 12
+    },
+    {
+      "id": "src_modules_cooperatives_pages_cooperativespage_cooperativespage",
+      "label": "CooperativesPage()",
+      "degree": 9
+    },
+    {
+      "id": "src_contexts_useauth_useauth",
+      "label": "useAuth()",
+      "degree": 9
+    },
+    {
+      "id": "src_types_auth_isadminrole",
+      "label": "isAdminRole()",
+      "degree": 9
+    },
+    {
+      "id": "src_modules_auth_pages_loginpage_loginpage",
+      "label": "LoginPage()",
+      "degree": 9
+    },
+    {
+      "id": "src_modules_cooperatives_hooks_usecooperatives_usecooperatives",
+      "label": "useCooperatives()",
+      "degree": 8
+    }
+  ],
+  "surprises": [
+    {
+      "source": "UsersTableProps",
+      "target": "UserListItem",
+      "source_files": [
+        "src/modules/users/components/UsersTable.tsx",
+        "src/modules/users/types/user.ts"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "references",
+      "why": "bridges separate communities; peripheral node `UsersTableProps` unexpectedly reaches hub `UserListItem`"
+    },
+    {
+      "source": "InviteUserFormProps",
+      "target": "InviteUserRequest",
+      "source_files": [
+        "src/modules/users/components/InviteUserForm.tsx",
+        "src/modules/users/types/user.ts"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "references",
+      "why": "peripheral node `InviteUserFormProps` unexpectedly reaches hub `InviteUserRequest`"
+    },
+    {
+      "source": "InviteUserModalProps",
+      "target": "InviteUserRequest",
+      "source_files": [
+        "src/modules/users/components/InviteUserModal.tsx",
+        "src/modules/users/types/user.ts"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "references",
+      "why": "peripheral node `InviteUserModalProps` unexpectedly reaches hub `InviteUserRequest`"
+    },
+    {
+      "source": "App()",
+      "target": "CooperativesPage()",
+      "source_files": [
+        "src/app/App.tsx",
+        "src/modules/cooperatives/pages/CooperativesPage.tsx"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "calls",
+      "why": "bridges separate communities"
+    },
+    {
+      "source": "CooperativesPage()",
+      "target": "useCooperatives()",
+      "source_files": [
+        "src/modules/cooperatives/pages/CooperativesPage.tsx",
+        "src/modules/cooperatives/hooks/useCooperatives.ts"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "calls",
+      "why": "bridges separate communities"
+    }
+  ],
+  "questions": [
+    {
+      "type": "bridge_node",
+      "question": "Why does `react` connect `Community 3` to `Community 0`, `Community 1`, `Community 2`, `Community 4`, `Community 6`, `Community 7`, `Community 9`, `Community 10`?",
+      "why": "High betweenness centrality (0.233) - this node is a cross-community bridge."
+    },
+    {
+      "type": "low_cohesion",
+      "question": "Should `Community 0` be split into smaller, more focused modules?",
+      "why": "Cohesion score 0.1111111111111111 - nodes in this community are weakly interconnected."
+    },
+    {
+      "type": "bridge_node",
+      "question": "Why does `lucide-react` connect `Community 0` to `Community 1`, `Community 2`, `Community 3`, `Community 4`, `Community 9`?",
+      "why": "High betweenness centrality (0.154) - this node is a cross-community bridge."
+    },
+    {
+      "type": "low_cohesion",
+      "question": "Should `Community 1` be split into smaller, more focused modules?",
+      "why": "Cohesion score 0.08669354838709678 - nodes in this community are weakly interconnected."
+    },
+    {
+      "type": "bridge_node",
+      "question": "Why does `react-router-dom` connect `Community 2` to `Community 1`, `Community 3`, `Community 9`?",
+      "why": "High betweenness centrality (0.040) - this node is a cross-community bridge."
+    },
+    {
+      "type": "low_cohesion",
+      "question": "Should `Community 2` be split into smaller, more focused modules?",
+      "why": "Cohesion score 0.1471264367816092 - nodes in this community are weakly interconnected."
+    },
+    {
+      "type": "low_cohesion",
+      "question": "Should `Community 3` be split into smaller, more focused modules?",
+      "why": "Cohesion score 0.1402116402116402 - nodes in this community are weakly interconnected."
+    }
+  ]
+}
