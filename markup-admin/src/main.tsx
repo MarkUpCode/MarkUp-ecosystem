@@ -16,16 +16,10 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
       <ThemeProvider>
         <AuthProvider>
           <BrowserRouter>
-            <AuthProvider>
-
-                <ToastProvider>
-
-                    <App />
-
-                </ToastProvider>
-
-            </AuthProvider>
-        </BrowserRouter>
+            <ToastProvider>
+              <App />
+            </ToastProvider>
+          </BrowserRouter>
         </AuthProvider>
       </ThemeProvider>
     </QueryClientProvider>

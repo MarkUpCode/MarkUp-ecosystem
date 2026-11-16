@@ -12,10 +12,10 @@ export function DashboardPage() {
   }, []);
 
   const metrics = data ? [
-    { label: "Usuarios registrados", value: data.users.total.toLocaleString("es-EC"), icon: Users, tone: "text-cyan-300 bg-cyan-400/15" },
-    { label: "Cooperativas", value: data.cooperatives.total.toLocaleString("es-EC"), icon: Building2, tone: "text-violet-300 bg-violet-400/15" },
-    { label: "Solicitudes totales", value: data.credits.total.toLocaleString("es-EC"), icon: BarChart3, tone: "text-amber-300 bg-amber-400/15" },
-    { label: "Visitas a la plataforma", value: data.visits.total.toLocaleString("es-EC"), icon: Eye, tone: "text-emerald-300 bg-emerald-400/15" },
+    { label: "Usuarios registrados", value: Number(data.users?.total ?? 0).toLocaleString("es-EC"), icon: Users, tone: "text-cyan-300 bg-cyan-400/15" },
+    { label: "Cooperativas", value: Number(data.cooperatives?.total ?? 0).toLocaleString("es-EC"), icon: Building2, tone: "text-violet-300 bg-violet-400/15" },
+    { label: "Solicitudes totales", value: Number(data.credits?.total ?? 0).toLocaleString("es-EC"), icon: BarChart3, tone: "text-amber-300 bg-amber-400/15" },
+    { label: "Visitas a la plataforma", value: Number(data.visits?.total ?? 0).toLocaleString("es-EC"), icon: Eye, tone: "text-emerald-300 bg-emerald-400/15" },
   ] : [];
 
   return (
@@ -29,6 +29,7 @@ export function DashboardPage() {
         <ArrowUpRight className="absolute -bottom-5 right-7 h-40 w-40 text-white/5" />
       </div>
       {error && <div className="rounded-2xl border border-red-400/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">{error}</div>}
+      {error && !data && <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-6 text-sm text-slate-300">El panel está disponible, pero no se pudieron obtener las métricas. Comprueba tu sesión e inténtalo de nuevo.</div>}
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         {metrics.map((item) => {
           const Icon = item.icon;
@@ -69,8 +70,8 @@ export function DashboardPage() {
           <div className="flex items-center justify-between"><div><h2 className="text-lg font-semibold">Actividad reciente</h2><p className="mt-1 text-sm text-slate-400">Últimos movimientos del ecosistema</p></div><Clock3 className="text-cyan-300" /></div>
           <div className="mt-6 space-y-3 text-sm text-slate-300">
             {data?.recentCredits.slice(0, 4).map((credit) => <div key={credit.id} className="rounded-2xl border border-white/10 bg-black/20 p-4"><div className="flex items-center justify-between"><span className="font-medium text-white">{credit.email}</span><span className="text-xs text-cyan-300">{credit.status}</span></div><p className="mt-2 text-slate-400">${Number(credit.amount ?? 0).toLocaleString("es-EC")} · Solicitud #{credit.id}</p></div>)}
-            {!data && <div className="h-40 animate-pulse rounded-2xl bg-white/5" />}
-            {data?.recentCredits.length === 0 && <p className="rounded-2xl border border-white/10 p-4 text-slate-400">No hay actividad registrada.</p>}
+            {!data && !error && <div className="h-40 animate-pulse rounded-2xl bg-white/5" />}
+            {data?.recentCredits?.length === 0 && <p className="rounded-2xl border border-white/10 p-4 text-slate-400">No hay actividad registrada.</p>}
           </div>
         </Card>
       </div>

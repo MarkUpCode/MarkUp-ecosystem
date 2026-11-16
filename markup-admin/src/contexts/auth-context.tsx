@@ -37,6 +37,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsLoading(false);
   }, []);
 
+  useEffect(() => {
+    const handleUnauthorized = () => {
+      setUser(null);
+      setToken(null);
+    };
+
+    window.addEventListener("markup-admin-logout", handleUnauthorized);
+    return () => window.removeEventListener("markup-admin-logout", handleUnauthorized);
+  }, []);
+
   const login = async (email: string, password: string) => {
     const response = await loginRequest({ email, password });
 

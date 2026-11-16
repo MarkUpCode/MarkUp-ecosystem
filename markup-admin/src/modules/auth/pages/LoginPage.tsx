@@ -8,7 +8,6 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/useAuth";
 import { Button } from "@/components/ui/button";
 import { LoginInput } from "../components/LoginInput";
-import { isAdminRole } from "@/types/auth";
 import { LoginBackground } from "../components/LoginBackground";
 import { LoginCard } from "../components/LoginCard";
 
@@ -33,7 +32,7 @@ type LoginForm = z.infer<typeof schema>;
 
 export function LoginPage() {
   const navigate = useNavigate();
-  const { login, user } = useAuth();
+  const { login } = useAuth();
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<LoginForm>({
@@ -45,10 +44,6 @@ export function LoginPage() {
     setError("");
     try {
       await login(values.email, values.password);
-      if (!isAdminRole(user?.role)) {
-        setError("Acceso denegado");
-        return;
-      }
       navigate("/dashboard");
     } catch (error) {
       setError(error instanceof Error ? error.message : "No fue posible iniciar sesión");
