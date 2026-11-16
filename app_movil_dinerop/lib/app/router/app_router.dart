@@ -18,6 +18,7 @@ import '../../features/credit/presentation/credit_bureau_page.dart';
 import '../../features/credit/presentation/investment_simulator_page.dart';
 import '../../features/credit/presentation/request_credit_page.dart';
 import '../../features/dashboard/presentation/dashboard_page.dart';
+import '../../features/notifications/presentation/notifications_page.dart';
 import '../../features/onboarding/presentation/onboarding_page.dart';
 import '../../features/profile/presentation/profile_page.dart';
 import '../../features/requests/presentation/requests_page.dart';
@@ -199,6 +200,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: '/profile',
             builder: (context, state) => const ProfilePage(),
+          ),
+          GoRoute(
+            path: '/notifications',
+            builder: (context, state) => const NotificationsPage(),
           ),
         ],
       ),

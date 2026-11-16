@@ -12,6 +12,10 @@ import '../../auth/presentation/auth_controller.dart';
 import '../../credit/data/models/client_credit_request.dart';
 import '../../credit/data/models/credit_enums.dart';
 import '../../../core/widgets/cooperative_logo_marquee.dart';
+import 'sections/dashboard_exploration_sections.dart';
+
+const _dashboardNavy = Color(0xFF142B4A);
+const _dashboardTeal = Color(0xFF16B8A6);
 
 class DashboardPage extends ConsumerWidget {
   const DashboardPage({super.key});
@@ -25,6 +29,7 @@ class DashboardPage extends ConsumerWidget {
     final profileComplete = onboarding.valueOrNull?.formularioCompleto == true;
 
     return Scaffold(
+      backgroundColor: const Color(0xFFF7F9FC),
       body: SafeArea(
         child: RefreshIndicator(
           onRefresh: () async {
@@ -37,7 +42,7 @@ class DashboardPage extends ConsumerWidget {
             physics: const AlwaysScrollableScrollPhysics(),
             children: [
               const CooperativeLogoMarquee(),
-              const SizedBox(height: 12),
+              const SizedBox(height: 18),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Column(
@@ -50,18 +55,21 @@ class DashboardPage extends ConsumerWidget {
                               ? data.firstName!.trim()
                               : 'cliente',
                           profileComplete: profileComplete,
+                          onNotifications: () => context.push('/notifications'),
                         ),
                         loading: () => _WelcomeHeader(
                           name: 'cliente',
                           profileComplete: profileComplete,
+                          onNotifications: () => context.push('/notifications'),
                         ),
                         error: (_, _) => _WelcomeHeader(
                           name: 'cliente',
                           profileComplete: profileComplete,
+                          onNotifications: () => context.push('/notifications'),
                         ),
                       ),
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 22),
                     onboarding.when(
                       data: (status) => status.formularioCompleto
                           ? const SizedBox.shrink()
@@ -95,6 +103,14 @@ class DashboardPage extends ConsumerWidget {
                             : AppErrorMessages.generic,
                       ),
                     ),
+                    const SizedBox(height: 26),
+                    const ProductShowcaseSection(),
+                    const SizedBox(height: 28),
+                    const FinanceToolsSection(),
+                    const SizedBox(height: 28),
+                    const CreditHealthCard(),
+                    const SizedBox(height: 28),
+                    const FinancialEducationSection(),
                     const SizedBox(height: 28),
                   ],
                 ),
@@ -140,39 +156,8 @@ class _DashboardContent extends StatelessWidget {
           onViewRequests: onViewRequests,
           onRequestCredit: onRequestCredit,
         ),
-        const SizedBox(height: 22),
-        Text(
-          'Acciones',
-          style: Theme.of(
-            context,
-          ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800),
-        ),
-        const SizedBox(height: 10),
-        Row(
-          children: [
-            Expanded(
-              child: _QuickAction(
-                icon: Icons.add_rounded,
-                label: 'Solicitar crédito',
-                onTap: onRequestCredit,
-              ),
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: _QuickAction(
-                icon: Icons.receipt_long_outlined,
-                label: 'Mis solicitudes',
-                onTap: onViewRequests,
-              ),
-            ),
-          ],
-        ),
         const SizedBox(height: 24),
-        _RecentRequests(
-          requests: requests,
-          onViewRequests: onViewRequests,
-          onRequestCredit: onRequestCredit,
-        ),
+        _RecentRequests(requests: requests, onViewRequests: onViewRequests),
       ],
     );
   }
@@ -213,9 +198,10 @@ class _CreditProgressSection extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Tu proceso de crédito',
+            'Mi actividad crediticia',
             style: theme.textTheme.titleLarge?.copyWith(
-              fontWeight: FontWeight.w800,
+              color: _dashboardNavy,
+              fontWeight: FontWeight.w900,
             ),
           ),
           const SizedBox(height: 6),
@@ -238,7 +224,7 @@ class _CreditProgressSection extends StatelessWidget {
                 minHeight: 8,
                 value: value,
                 backgroundColor: theme.colorScheme.surfaceContainerHighest,
-                color: AppColors.primary,
+                color: _dashboardTeal,
               ),
             ),
           ),
@@ -324,7 +310,7 @@ class _ProgressStage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final color = active ? AppColors.success : theme.colorScheme.outline;
+    final color = active ? _dashboardTeal : theme.colorScheme.outline;
     return _DelayedFade(
       delay: delay,
       child: Column(
@@ -504,15 +490,10 @@ _StatusPresentation _statusPresentation(CreditRequestStatus status) {
 }
 
 class _RecentRequests extends StatelessWidget {
-  const _RecentRequests({
-    required this.requests,
-    required this.onViewRequests,
-    required this.onRequestCredit,
-  });
+  const _RecentRequests({required this.requests, required this.onViewRequests});
 
   final List<ClientCreditRequestSummary> requests;
   final VoidCallback onViewRequests;
-  final VoidCallback onRequestCredit;
 
   @override
   Widget build(BuildContext context) {
@@ -612,12 +593,20 @@ class _RequestTile extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Solicitud de crédito',
+                      'Solicitud #${request.solicitudId}',
                       style: theme.textTheme.bodyMedium?.copyWith(
+                        color: _dashboardNavy,
                         fontWeight: FontWeight.w700,
                       ),
                     ),
-                    const SizedBox(height: 6),
+                    const SizedBox(height: 3),
+                    Text(
+                      '${request.tipo.isEmpty ? 'Solicitud' : request.tipo} · ${formatDate(request.fechaSolicitud)}',
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: const Color(0xFF718096),
+                      ),
+                    ),
+                    const SizedBox(height: 7),
                     Text(
                       formatCurrency(request.monto),
                       style: theme.textTheme.titleMedium?.copyWith(
@@ -653,6 +642,35 @@ class _RequestTile extends StatelessWidget {
   }
 }
 
+class _NotificationBell extends StatelessWidget {
+  const _NotificationBell({required this.onTap});
+
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) => Material(
+    color: Colors.white,
+    shape: const CircleBorder(),
+    child: InkWell(
+      onTap: onTap,
+      customBorder: const CircleBorder(),
+      child: Container(
+        width: 46,
+        height: 46,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          border: Border.all(color: const Color(0xFFE8EDF3)),
+        ),
+        child: const Icon(
+          Icons.notifications_none_rounded,
+          color: _dashboardNavy,
+          size: 23,
+        ),
+      ),
+    ),
+  );
+}
+
 String _shortStatus(CreditRequestStatus status) {
   switch (status) {
     case CreditRequestStatus.preAprobada:
@@ -683,53 +701,18 @@ class _SurfacePanel extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
+        color: Colors.white,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
+        border: Border.all(color: const Color(0xFFE8EDF3)),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x080E2440),
+            blurRadius: 18,
+            offset: Offset(0, 7),
+          ),
+        ],
       ),
       child: child,
-    );
-  }
-}
-
-class _QuickAction extends StatelessWidget {
-  const _QuickAction({
-    required this.icon,
-    required this.label,
-    required this.onTap,
-  });
-
-  final IconData icon;
-  final String label;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Material(
-      color: theme.colorScheme.surface,
-      borderRadius: BorderRadius.circular(16),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(16),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 13),
-          child: Row(
-            children: [
-              Icon(icon, color: AppColors.primary, size: 20),
-              const SizedBox(width: 7),
-              Expanded(
-                child: Text(
-                  label,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(fontWeight: FontWeight.w700),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
     );
   }
 }
@@ -784,10 +767,15 @@ class _DelayedFadeState extends State<_DelayedFade> {
 }
 
 class _WelcomeHeader extends StatelessWidget {
-  const _WelcomeHeader({required this.name, this.profileComplete = false});
+  const _WelcomeHeader({
+    required this.name,
+    required this.onNotifications,
+    this.profileComplete = false,
+  });
 
   final String name;
   final bool profileComplete;
+  final VoidCallback onNotifications;
 
   @override
   Widget build(BuildContext context) => Row(
@@ -819,9 +807,10 @@ class _WelcomeHeader extends StatelessWidget {
             Text(
               'Hola, $name',
               overflow: TextOverflow.ellipsis,
-              style: Theme.of(
-                context,
-              ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w900),
+              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                color: _dashboardNavy,
+                fontWeight: FontWeight.w900,
+              ),
             ),
 
             if (profileComplete) ...[
@@ -831,7 +820,7 @@ class _WelcomeHeader extends StatelessWidget {
                 children: [
                   const Icon(
                     Icons.check_circle_rounded,
-                    color: AppColors.success,
+                    color: _dashboardTeal,
                     size: 17,
                   ),
                   const SizedBox(width: 4),
@@ -839,7 +828,7 @@ class _WelcomeHeader extends StatelessWidget {
                     'Perfil completo',
                     overflow: TextOverflow.ellipsis,
                     style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                      color: AppColors.success,
+                      color: _dashboardTeal,
                       fontWeight: FontWeight.w700,
                     ),
                   ),
@@ -850,18 +839,17 @@ class _WelcomeHeader extends StatelessWidget {
             const SizedBox(height: 3),
 
             Text(
-              'Tu centro de crédito personal',
+              'Este es el resumen de tu actividad financiera.',
               overflow: TextOverflow.ellipsis,
-              style: Theme.of(context).textTheme.bodyMedium,
+              style: Theme.of(
+                context,
+              ).textTheme.bodySmall?.copyWith(color: const Color(0xFF718096)),
             ),
           ],
         ),
       ),
 
-      IconButton(
-        onPressed: () {},
-        icon: const Icon(Icons.notifications_none_rounded),
-      ),
+      _NotificationBell(onTap: onNotifications),
     ],
   );
 }
@@ -924,7 +912,7 @@ class _ProfileProgressCard extends StatelessWidget {
                     Text(
                       complete
                           ? 'Tu información está al día.'
-                          : 'Mejora tus opciones con las cooperativas.',
+                          : 'Completa tu información para avanzar en tu experiencia financiera.',
                       style: TextStyle(
                         color: color.withValues(alpha: .92),
                         fontSize: 12,
@@ -934,7 +922,23 @@ class _ProfileProgressCard extends StatelessWidget {
                 ),
               ),
 
-              if (!complete) Icon(Icons.arrow_forward_rounded, color: color),
+              if (!complete) ...[
+                const SizedBox(width: 8),
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'Completar perfil',
+                      style: TextStyle(
+                        color: color,
+                        fontSize: 10,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                    Icon(Icons.arrow_forward_rounded, color: color, size: 19),
+                  ],
+                ),
+              ],
             ],
           ),
         ),

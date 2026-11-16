@@ -8,7 +8,7 @@ import '../features/cooperative/data/cooperative_repository.dart';
 import '../features/credit/data/credit_repository.dart';
 import '../features/onboarding/data/models/pre_registration_data.dart';
 
-void _refreshWhileObserved(AutoDisposeRef ref) {
+void _refreshWhileObserved(Ref ref) {
   final timer = Timer.periodic(const Duration(seconds: 30), (_) {
     ref.invalidateSelf();
   });
