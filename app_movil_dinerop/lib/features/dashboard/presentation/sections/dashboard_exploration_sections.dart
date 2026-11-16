@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -222,83 +224,97 @@ class _CreditSummaryCard extends StatelessWidget {
           ),
         ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Stack(
         children: [
-          Row(
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded(
-                child: Text(
-                  'Solicitud #${request.solicitudId}',
-                  style: const TextStyle(
-                    color: _muted,
-                    fontSize: 11,
-                    fontWeight: FontWeight.w700,
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      'Solicitud #${request.solicitudId}',
+                      style: const TextStyle(
+                        color: _muted,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
                   ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 5,
+                    ),
+                    decoration: BoxDecoration(
+                      color: status.color.withValues(alpha: .17),
+                      borderRadius: BorderRadius.circular(99),
+                    ),
+                    child: Text(
+                      status.shortTitle,
+                      style: TextStyle(
+                        color: status.color,
+                        fontSize: 10,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 3),
+              Text(
+                formatCurrency(request.monto),
+                style: const TextStyle(
+                  color: _navy,
+                  fontSize: 22,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: -.4,
                 ),
               ),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 5,
+              const SizedBox(height: 1),
+              Text(
+                'Solicitado el ${formatDate(request.fechaSolicitud)}',
+                style: const TextStyle(color: _muted, fontSize: 10),
+              ),
+              const SizedBox(height: 4),
+              _CreditStepper(step: step, rejected: rejected),
+              const SizedBox(height: 3),
+              Text(
+                status.message,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  color: _navy,
+                  fontSize: 11,
+                  height: 1.35,
                 ),
-                decoration: BoxDecoration(
-                  color: status.color.withValues(alpha: .17),
-                  borderRadius: BorderRadius.circular(99),
-                ),
-                child: Text(
-                  status.shortTitle,
-                  style: TextStyle(
-                    color: status.color,
-                    fontSize: 10,
-                    fontWeight: FontWeight.w900,
+              ),
+              const Spacer(),
+              Align(
+                alignment: Alignment.centerRight,
+                child: TextButton(
+                  onPressed: onViewDetails,
+                  style: TextButton.styleFrom(
+                    foregroundColor: const Color(0xFF087E8B),
+                    padding: const EdgeInsets.symmetric(horizontal: 4),
+                    minimumSize: const Size(0, 28),
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    visualDensity: VisualDensity.compact,
+                  ),
+                  child: const Text(
+                    'Ver detalles  →',
+                    style: TextStyle(fontSize: 11, fontWeight: FontWeight.w900),
                   ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 3),
-          Text(
-            formatCurrency(request.monto),
-            style: const TextStyle(
-              color: _navy,
-              fontSize: 22,
-              fontWeight: FontWeight.w900,
-              letterSpacing: -.4,
-            ),
-          ),
-          const SizedBox(height: 1),
-          Text(
-            'Solicitado el ${formatDate(request.fechaSolicitud)}',
-            style: const TextStyle(color: _muted, fontSize: 10),
-          ),
-          const SizedBox(height: 4),
-          _CreditStepper(step: step, rejected: rejected),
-          const SizedBox(height: 3),
-          Text(
-            status.message,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(color: _navy, fontSize: 11, height: 1.35),
-          ),
-          const Spacer(),
-          Align(
-            alignment: Alignment.centerRight,
-            child: TextButton(
-              onPressed: onViewDetails,
-              style: TextButton.styleFrom(
-                foregroundColor: const Color(0xFF087E8B),
-                padding: const EdgeInsets.symmetric(horizontal: 4),
-                minimumSize: const Size(0, 28),
-                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                visualDensity: VisualDensity.compact,
-              ),
-              child: const Text(
-                'Ver detalles  →',
-                style: TextStyle(fontSize: 11, fontWeight: FontWeight.w900),
+          if (request.estado == CreditRequestStatus.aceptada)
+            Positioned.fill(
+              child: IgnorePointer(
+                child: _CelebrationConfetti(key: ValueKey(request.solicitudId)),
               ),
             ),
-          ),
         ],
       ),
     );
@@ -797,6 +813,83 @@ int _progressStep(CreditRequestStatus status, bool profileComplete) {
   }
 }
 
+class _CelebrationConfetti extends StatefulWidget {
+  const _CelebrationConfetti({super.key});
+
+  @override
+  State<_CelebrationConfetti> createState() => _CelebrationConfettiState();
+}
+
+class _CelebrationConfettiState extends State<_CelebrationConfetti>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 2400),
+  )..forward();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => AnimatedBuilder(
+    animation: _controller,
+    builder: (context, _) => CustomPaint(
+      key: const ValueKey('accepted-credit-confetti'),
+      painter: _ConfettiPainter(_controller.value),
+      child: const SizedBox.expand(),
+    ),
+  );
+}
+
+class _ConfettiPainter extends CustomPainter {
+  const _ConfettiPainter(this.progress);
+
+  final double progress;
+  static const _colors = [
+    Color(0xFF16B8A6),
+    Color(0xFF3B82F6),
+    Color(0xFFF4B740),
+    Color(0xFFEC6B87),
+    Color(0xFF8B7CF6),
+  ];
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    for (var index = 0; index < 32; index++) {
+      final delay = (index % 8) * .055;
+      final pieceProgress = ((progress - delay) / (1 - delay)).clamp(0.0, 1.0);
+      final direction = index.isEven ? 1.0 : -1.0;
+      final startX = ((index * 37) % 101) / 100 * size.width;
+      final x =
+          startX +
+          math.sin(pieceProgress * math.pi * 2 + index) * 12 +
+          direction * pieceProgress * 18;
+      final y = -8 + pieceProgress * (size.height + 18);
+      final fade = (1 - pieceProgress).clamp(0.0, 1.0);
+      final paint = Paint()
+        ..color = _colors[index % _colors.length].withValues(alpha: fade);
+      canvas.save();
+      canvas.translate(x, y);
+      canvas.rotate(pieceProgress * 5 + index * .7);
+      canvas.drawRRect(
+        RRect.fromRectAndRadius(
+          Rect.fromCenter(center: Offset.zero, width: 5, height: 8),
+          const Radius.circular(1.5),
+        ),
+        paint,
+      );
+      canvas.restore();
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _ConfettiPainter oldDelegate) =>
+      oldDelegate.progress != progress;
+}
+
 class _CreditStatus {
   const _CreditStatus(this.shortTitle, this.message, this.color);
 
@@ -833,7 +926,7 @@ class _CreditStatus {
       case CreditRequestStatus.aceptada:
         return const _CreditStatus(
           'Aceptada',
-          'Tu crédito fue aceptado. Consulta los detalles para conocer los siguientes pasos.',
+          '¡Felicidades! Tu crédito fue aceptado. Revisa los requisitos para retirarlo.',
           Color(0xFF16845B),
         );
       case CreditRequestStatus.rechazada:

@@ -83,6 +83,14 @@ public class ClientCreditQueryService {
             return cr.getEstado().name();
         }
 
+        // La aceptación del cliente es el resultado final y debe prevalecer
+        // sobre cualquier otra distribución que permanezca en evaluación.
+        boolean anyAccepted = distribuciones.stream()
+                .anyMatch(sc -> sc.getEstado() == SolicitudCooperativaStatus.ACEPTADA);
+        if (anyAccepted) {
+            return SolicitudCooperativaStatus.ACEPTADA.name();
+        }
+
         boolean anyPreApproved = distribuciones.stream()
                 .anyMatch(sc -> sc.getEstado() == SolicitudCooperativaStatus.PRE_APROBADA);
         if (anyPreApproved) {

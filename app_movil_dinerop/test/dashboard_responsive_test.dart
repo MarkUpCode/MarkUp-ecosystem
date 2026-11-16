@@ -266,6 +266,18 @@ void main() async {
       expect(find.text(label), findsOneWidget);
       final resultLabel = tester.widget<Text>(find.text('Resultado'));
       expect(resultLabel.style?.fontWeight, FontWeight.w900);
+      if (status == CreditRequestStatus.aceptada) {
+        expect(
+          find.byKey(const ValueKey('accepted-credit-confetti')),
+          findsOneWidget,
+        );
+        expect(
+          find.text(
+            '¡Felicidades! Tu crédito fue aceptado. Revisa los requisitos para retirarlo.',
+          ),
+          findsOneWidget,
+        );
+      }
       expect(tester.takeException(), isNull);
     }
   });

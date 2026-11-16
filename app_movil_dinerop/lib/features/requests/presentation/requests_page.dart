@@ -511,6 +511,33 @@ class _OfferCardState extends ConsumerState<_OfferCard> {
                   controller: controller,
                   padding: const EdgeInsets.fromLTRB(20, 4, 20, 20),
                   children: [
+                    Container(
+                      margin: const EdgeInsets.only(bottom: 14),
+                      padding: const EdgeInsets.all(14),
+                      decoration: BoxDecoration(
+                        color: AppColors.successSoft,
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Icon(
+                            Icons.celebration_rounded,
+                            color: AppColors.success,
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Text(
+                              '¡Felicidades! ${widget.offer.nombreCooperativa} aceptó tu oferta. Acércate con los requisitos indicados para completar el trámite y retirar tu dinero.',
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w700,
+                                height: 1.4,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                     const Text('Presenta estos documentos en la oficina:'),
                     const SizedBox(height: 12),
                     ...widget.offer.requisitos.map(
@@ -1228,7 +1255,7 @@ class _AcceptedOfferNotice extends StatelessWidget {
             const SizedBox(width: 9),
             Expanded(
               child: Text(
-                'Oferta aceptada. Presenta únicamente los documentos indicados en esta lista en la oficina de ${offer.nombreCooperativa}.',
+                '¡Felicidades! Tu crédito fue aceptado. Acércate a ${offer.nombreCooperativa} con los requisitos indicados para completar el trámite y retirar tu dinero.',
                 style: const TextStyle(fontWeight: FontWeight.w700),
               ),
             ),

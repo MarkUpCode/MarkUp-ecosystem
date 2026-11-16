@@ -360,9 +360,9 @@
     "semantic_hash": ""
   },
   "app_movil_dinerop/lib/features/dashboard/presentation/sections/dashboard_exploration_sections.dart": {
-    "mtime": 1794859218.4559598,
-    "seen": 1794859818.5218775,
-    "ast_hash": "bd0c707fa3aa9972149f00fe1cf7d792",
+    "mtime": 1794860328.0966482,
+    "seen": 1794860720.3200443,
+    "ast_hash": "35662f8b1e1a0af7c61a52f832d8b891",
     "semantic_hash": ""
   },
   "app_movil_dinerop/lib/features/notifications/presentation/notifications_page.dart": {
@@ -528,9 +528,9 @@
     "semantic_hash": ""
   },
   "app_movil_dinerop/test/dashboard_responsive_test.dart": {
-    "mtime": 1794859332.7298388,
-    "seen": 1794859818.5219276,
-    "ast_hash": "338c64b58ef96f070c63f5a73ec6c987",
+    "mtime": 1794860252.873606,
+    "seen": 1794860720.3201425,
+    "ast_hash": "76bec58404b2d15a442dac3b101fde94",
     "semantic_hash": ""
   },
   "app_movil_dinerop/test/widget_test.dart": {

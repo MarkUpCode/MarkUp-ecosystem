@@ -1,50 +1,50 @@
 # Graph Report - MarkUp-ecosystem  (2026-11-16)
 
 ## Corpus Check
-- 580 files · ~140,097 words
+- 580 files · ~140,225 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 55 file(s) not represented in the graph (top: (none) 14, .xml 7, .log 5)
 
 ## Summary
-- 4412 nodes · 8545 edges · 268 communities (163 shown, 105 thin omitted)
+- 4413 nodes · 8546 edges · 249 communities (155 shown, 94 thin omitted)
 - Extraction: 95% EXTRACTED · 5% INFERRED · 0% AMBIGUOUS · INFERRED: 423 edges (avg confidence: 0.88)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `c114bfa3`
+- Built from commit: `8588d865`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
 ## Community Hubs (Navigation)
 - onboarding_page.dart
-- SolicitudCooperativaRepository
+- SolicitudCooperativa
 - lombok.RequiredArgsConstructor
 - complete_registration_page.dart
-- OnboardingServiceImpl.java
+- CreditService
 - DashboardCooperative.tsx
 - StatelessWidget
 - authControllerProvider
 - OnboardingPage.tsx
 - app_shell.dart
 - User
-- inversionistas/page.tsx
+- ref_lucide_react
 - profile_page.dart
-- AdminGlobalExceptionHandler.java
+- InternalCooperativeDto
 - AuthService
 - markup/package.json
 - requests_page.dart
 - auth_controller.dart
 - Dinerop Backend — API Documentation
-- CreditRequestRepository
+- build
 - org.junit.jupiter.api.Test
 - user.ts
 - register_page.dart
 - onboarding_request.dart
 - AI-INDEX.md
-- CreditOfferEmailBuilder
+- NotificationService
 - PersonaOnboarding
 - auth_repository.dart
-- ref_react
+- DashboardPage.tsx
 - app_colors.dart
 - login_page.dart
 - dependencies
@@ -61,7 +61,7 @@
 - mockAPI.ts
 - DashboardClient.tsx
 - app_movil_dinerop/docs/PROJECT_OVERVIEW.md
-- docs/README.md
+- CooperativesPage.tsx
 - java.util.List
 - Login.tsx
 - onboarding_repository.dart
@@ -69,8 +69,9 @@
 - request_credit_page.dart
 - credit_request_card.dart
 - cooperative_partners_view.dart
-- MODULES
-- CooperativeService
+- lombok
+- CooperativeController
+- CooperativeRate
 - api_client.dart
 - auth/config/SecurityConfig.java
 - secure_token_storage.dart
@@ -89,15 +90,14 @@
 - main.dart
 - org.springframework.context.annotation.Bean
 - ReferenciaPersonal
-- dinerup-app/docs/ARCHITECTURE.md
 - app_user.dart
-- OnboardingClienteController
+- SolicitudOnboarding
 - notblank
 - lombok.Builder
 - nosotros/page.tsx
 - components.json
 - app_text_field.dart
-- Cooperative
+- CooperativeDetailResponse
 - auth-context.tsx
 - compilerOptions
 - cooperative_logo_marquee.dart
@@ -105,7 +105,7 @@
 - dependencies
 - devDependencies
 - compilerOptions
-- CreditGuarantorWorkflowService.java
+- CreditRequirement
 - cooperative_logo_card.dart
 - JwtService
 - ref_react_router_dom
@@ -114,7 +114,7 @@
 - useCooperatives.ts
 - compilerOptions
 - State
-- GuarantorProfile
+- CooperativeDto
 - dependencies
 - PublicCreditRequestModal.tsx
 - dependencies
@@ -125,23 +125,23 @@
 - postgres
 - OnboardingMapper
 - providers.dart
-- InternalCreditController
+- CustomUserDetailsService
 - application-prod.yaml
 - devDependencies
 - devDependencies
 - credit_request_cooperative.dart
-- user.ts
+- .getCooperatives
 - .application
 - public_registration_request.dart
 - cooperative_summary.dart
-- PersonaOnboardingRequest
-- jakarta.servlet.http.HttpServletRequest
-- SolicitudOnboarding
+- Diseño: Consumo de POST /api/credits/me en NewCreditModal
+- org.springframework.http.ResponseEntity
+- CreditProcessEvent
 - ActividadEconomica
 - IngresoEgreso
 - Resumen del proyecto
-- PageVisit
-- NotificationService
+- lombok.Data
+- layout.tsx
 - formatters.dart
 - CreditService
 - OnboardingUnificadoResponse
@@ -150,21 +150,22 @@
 - credit_request_payload.dart
 - pre_registration_data.dart
 - app_authenticated_header.dart
-- SolicitudOnboardingRequest
-- ToastContext.tsx
+- SolicitudOnboardingResponse
+- markup-admin/src/main.tsx
 - CreditRequestForm.tsx
 - app_spacing.dart
 - credit_enums.dart
 - FirebaseConfig.java
 - Role
+- ActivationToken
 - tomcat
-- dinerup-app/package.json
-- markup-landing/package.json
+- CooperativeAdminService.java
+- eslint@^9.9.1
 - onboarding_submission_response.dart
 - AuthServiceSecurityActivityTest
 - PasswordResetToken
-- PagedUsersResponse
-- 5. Credits
+- AdminBootstrapRunner.java
+- Cooperative
 - spring
 - hikari
 - management
@@ -176,19 +177,19 @@
 - PreRegisterRequest
 - PublicRegistrationResponse
 - EmailVerificationOtp
-- CreditExceptionHandler.java
+- .createCooperative
 - PreRegisterRequest
 - PreRegisterResponse
-- org.springframework.web.bind.annotation.ResponseStatus
+- lucide-react@^0.539.0
 - AuthController
-- DEVELOPMENT_GUIDE
-- ActividadEconomicaRequest
+- react-dom@^19.1.1
+- react-hook-form@^7.62.0
 - IngresoEgresoRequest
 - level
-- Lógica de negocio observada
+- tailwind-merge@^3.3.1
 - scripts
 - datasource
-- Componentes
+- eslint@^9.34.0
 - onboarding.ts
 - scripts
 - markup-admin/vercel.json
@@ -206,42 +207,23 @@
 - LaunchImage.imageset/README.md
 - dinerop-backend/.github/copilot-instructions.md
 - dinerup-app/.github/copilot-instructions.md
-- @supabase/supabase-js@^2.57.4
-- eslint-plugin-react-hooks@^5.1.0-rc.0
-- tailwindcss@^3.4.1
-- @types/react@^18.3.5
-- @types/react-dom@^18.3.0
-- typescript@^5.5.3
-- @hookform/resolvers@^5.2.1
-- react-router-dom@^7.8.0
-- zod@^4.1.5
-- eslint-plugin-react-refresh@^0.4.20
-- tailwindcss@^3.4.17
-- @types/react-dom@^19.1.7
-- typescript@^5.9.2
-- @vitejs/plugin-react@^5.0.2
-- AGENTS.md
-- swiper@^12.0.2
+- typescript-eslint@^8.39.1
 - @eslint/js@^9.9.1
+- eslint-plugin-react-refresh@^0.4.11
+- @types/react-dom@^18.3.0
+- typescript@^5.9.2
+- AGENTS.md
 - globals@^15.9.0
-- tailwindcss@^3.4.1
-- @types/react@^18.3.5
 - typescript@^5.5.3
 - ciudadesEcuador.ts
 - markup-landing/vercel.json
 - postcss.config.mjs
 - README.md
 - com.markup:dinerop-backend
-- EmailTemplateEngine.java
-- LinkClientRequestDto
 - DINEROP: visión del ecosistema
-- TestEmailController
 - Índice de investigación para IA
-- Dependencias entre repositorios
 - Arquitectura global
 - Flujos principales de usuario
-- scripts
-- DATABASE
 
 ## God Nodes (most connected - your core abstractions)
 1. `User` - 79 edges
@@ -256,8 +238,6 @@
 10. `authControllerProvider` - 38 edges
 
 ## Surprising Connections (you probably didn't know these)
-- `Catálogo y exploración` --references--> `CooperativeRepository`  [INFERRED]
-  DINEROP-KNOWLEDGE/USER-FLOWS.md → dinerop-backend/src/main/java/com/markup/dinerop/cooperative/domain/repository/CooperativeRepository.java
 - `Formatos y DTO` --references--> `PublicRegistrationRequest`  [INFERRED]
   app_movil_dinerop/docs/API_INTEGRATION.md → dinerop-backend/src/main/java/com/markup/dinerop/auth/dto/PublicRegistrationRequest.java
 - `Datos de sesión` --references--> `AuthController`  [INFERRED]
@@ -266,35 +246,37 @@
   app_movil_dinerop/docs/AUTHENTICATION.md → dinerop-backend/src/main/java/com/markup/dinerop/auth/controller/AuthController.java
 - `Router` --references--> `AuthController`  [INFERRED]
   app_movil_dinerop/docs/NAVIGATION.md → dinerop-backend/src/main/java/com/markup/dinerop/auth/controller/AuthController.java
+- `Estado global / asíncrono` --references--> `AuthController`  [INFERRED]
+  app_movil_dinerop/docs/STATE_MANAGEMENT.md → dinerop-backend/src/main/java/com/markup/dinerop/auth/controller/AuthController.java
 
 ## Import Cycles
 - None detected.
 
-## Communities (268 total, 105 thin omitted)
+## Communities (249 total, 94 thin omitted)
 
 ### Community 0 - "onboarding_page.dart"
 Cohesion: 0.02
 Nodes (99): _acceptedDeclaration, _apellidosController, _availableCantons, _availableParishes, _barrioController, build, _buildAddressStep, _buildBenefit (+91 more)
 
-### Community 1 - "SolicitudCooperativaRepository"
-Cohesion: 0.06
-Nodes (20): Decisiones y aceptación, CreditRequest, SolicitudCooperativaStatus, ACEPTADA, ENVIADA, PRE_APROBADA, RECHAZADA, SOLICITANDO_GARANTE (+12 more)
+### Community 1 - "SolicitudCooperativa"
+Cohesion: 0.05
+Nodes (13): BUSINESS_LOGIC, Onboarding y distribución, Solicitud pública de crédito, RecentCreditDto, CreditRequest, CreditRequestStatus, CREADA, ENVIADA (+5 more)
 
 ### Community 2 - "lombok.RequiredArgsConstructor"
-Cohesion: 0.05
-Nodes (20): Correspondencia backend y límites, Rutas consumidas y correspondencia, Administración, Administración, BUSINESS_LOGIC, Integraciones, Solicitud pública de crédito, CooperativeAdminController (+12 more)
+Cohesion: 0.10
+Nodes (8): Administración, Administración, CooperativeAdminController, CooperativeAdminService, DashboardController, DashboardService, InternalAuthController, ObtenerOnboardingUnificadoUseCase
 
 ### Community 3 - "complete_registration_page.dart"
 Cohesion: 0.04
-Nodes (46): _activate, createState, _done, _error, initState, _message, token, build (+38 more)
+Nodes (53): fromJson, message, PublicRegistrationResponse, requestId, status, _activate, createState, _done (+45 more)
 
-### Community 4 - "OnboardingServiceImpl.java"
-Cohesion: 0.11
-Nodes (9): Onboarding y distribución, UserPreRegistrationRepository, CooperativeCreditQueryService, CooperativeCreditRequestItemDto, OnboardingServiceImpl, BusinessException, ResourceNotFoundException, PersonaOnboardingRepository (+1 more)
+### Community 4 - "CreditService"
+Cohesion: 0.08
+Nodes (36): ARCHITECTURE, Estilo, Graphify, Paquetes y errores, Relaciones y dependencias, Decisiones y aceptación, Integraciones, MODULES (+28 more)
 
 ### Community 5 - "DashboardCooperative.tsx"
-Cohesion: 0.06
-Nodes (60): Componentes reutilizables, CreateCreditRequestPayload, CreditGuarantorHistoryItem, CreditTimelineEvent, decideCreditRequest(), decideGuaranteeForCreditRequest(), getCooperativeOfferDefaults(), getCreditRequestTimeline() (+52 more)
+Cohesion: 0.05
+Nodes (68): Componentes reutilizables, CreateCreditRequestPayload, CreditGuarantorHistoryItem, CreditTimelineEvent, decideCreditRequest(), decideGuaranteeForCreditRequest(), getCooperativeOfferDefaults(), getCreditRequestTimeline() (+60 more)
 
 ### Community 6 - "StatelessWidget"
 Cohesion: 0.03
@@ -302,39 +284,35 @@ Nodes (62): _ActionTile, _ActivityTile, build, color, comingSoon, complete, _con
 
 ### Community 7 - "authControllerProvider"
 Cohesion: 0.06
-Nodes (31): _navigate, authControllerProvider, _submit, _submit, build, _changeEmail, _codeController, _confirmController (+23 more)
+Nodes (46): DineropApp, _DineropAppState, authControllerProvider, ActivationPage, _ActivationPageState, CompleteRegistrationPage, _CompleteRegistrationPageState, _LoginSheet (+38 more)
 
 ### Community 8 - "OnboardingPage.tsx"
-Cohesion: 0.05
-Nodes (54): Onboarding, ActividadEconomicaData, ClientePerfilUbicacion, DireccionData, FormularioClienteStatus, getMyGuarantorProfiles(), getOnboardingForCooperative(), getPreRegistrationData() (+46 more)
+Cohesion: 0.06
+Nodes (53): Onboarding, ActividadEconomicaData, ClientePerfilUbicacion, DireccionData, FormularioClienteStatus, getMyGuarantorProfiles(), getPreRegistrationData(), GuaranteeOnboardingResponse (+45 more)
 
 ### Community 9 - "app_shell.dart"
 Cohesion: 0.05
-Nodes (36): Enlaces de implementación, Pantallas y navegación, Router, Componentes de interfaz, Patrones en páginas, Referencias, Sistema visual, AppShell (+28 more)
+Nodes (33): Componentes de interfaz, Patrones en páginas, Referencias, Sistema visual, AppShell, build, child, icon (+25 more)
 
-### Community 10 - "User"
-Cohesion: 0.05
-Nodes (10): Graphify, CooperativeStatsDto, CreditStatsDto, DashboardResponseDto, RecentUserDto, UserStatsDto, VisitStatsDto, User (+2 more)
-
-### Community 11 - "inversionistas/page.tsx"
-Cohesion: 0.13
-Nodes (19): arguments_, kpis, thesisParagraphs, fraunces, inter, interTight, metadata, RootLayout() (+11 more)
+### Community 11 - "ref_lucide_react"
+Cohesion: 0.14
+Nodes (10): productDetails, CooperativeFormModalProps, SuccessModalProps, ecosystem, metrics, navigation, pillars, siteConfig (+2 more)
 
 ### Community 12 - "profile_page.dart"
-Cohesion: 0.06
-Nodes (31): clientProfileProvider, dashboardCreditRequestsProvider, dashboardOnboardingStatusProvider, themeModeProvider, LoginPage, SplashPage, _loadLocationData, _ActivityLoadingState (+23 more)
+Cohesion: 0.05
+Nodes (26): Enlaces de implementación, Pantallas y navegación, Router, _ActivityLoadingState, _CreditLoadingState, _DashboardGreeting, _muted, name (+18 more)
 
-### Community 13 - "AdminGlobalExceptionHandler.java"
+### Community 13 - "InternalCooperativeDto"
 Cohesion: 0.16
-Nodes (5): AppException, ApiErrorResponse, AdminGlobalExceptionHandler, InvalidUserRoleException, UserAlreadyExistsException
+Nodes (7): 4. Internal Cooperatives, GET `/internal/cooperatives/by-city`, GET `/internal/cooperatives/eligible`, GET `/internal/cooperatives/{id}`, GET `/internal/cooperatives/{id}/rates/{tipoCredito}`, InternalCooperativeDto, InternalCooperativeController
 
 ### Community 14 - "AuthService"
-Cohesion: 0.12
-Nodes (5): PublicRegistrationRequest, UserAlreadyActiveException, EmailVerificationOtpRepository, AuthService, PublicCreditRequestResult
+Cohesion: 0.14
+Nodes (4): PublicRegistrationRequest, UserAlreadyActiveException, AuthService, PublicCreditRequestResult
 
 ### Community 15 - "markup/package.json"
 Cohesion: 0.06
-Nodes (43): eslintConfig, dependencies, @base-ui/react@^1.4.1, class-variance-authority@^0.7.1, clsx@^2.1.1, framer-motion@^12.38.0, lucide-react@^0.483.0, next@15.3.6 (+35 more)
+Nodes (46): eslintConfig, dependencies, class-variance-authority@^0.7.1, clsx@^2.1.1, framer-motion@^12.38.0, lucide-react@^0.483.0, next@15.3.6, react@19.1.2 (+38 more)
 
 ### Community 16 - "requests_page.dart"
 Cohesion: 0.05
@@ -346,43 +324,51 @@ Nodes (37): activate, AuthController, authRemoteDataSourceProvider, _authReposit
 
 ### Community 18 - "Dinerop Backend — API Documentation"
 Cohesion: 0.06
-Nodes (31): 1. Auth, 2. Internal Auth, 3. Cooperatives, 4. Internal Cooperatives, 6. Internal Credits, 9. Security & CORS, CORS — Orígenes permitidos, Dinerop Backend — API Documentation (+23 more)
+Nodes (35): 1. Auth, 2. Internal Auth, 3. Cooperatives, 5. Credits, 6. Internal Credits, 9. Security & CORS, CORS — Orígenes permitidos, Dinerop Backend — API Documentation (+27 more)
 
-### Community 19 - "CreditRequestRepository"
-Cohesion: 0.12
-Nodes (7): RecentCreditDto, CreditRequestStatus, CREADA, ENVIADA, AuthenticatedRequestResult, CreditRequestRepository, Datos de crédito
+### Community 19 - "build"
+Cohesion: 0.14
+Nodes (13): clientProfileProvider, dashboardCreditRequestsProvider, dashboardOnboardingStatusProvider, _navigate, themeModeProvider, LoginPage, SplashPage, _loadLocationData (+5 more)
 
 ### Community 21 - "user.ts"
 Cohesion: 0.15
-Nodes (17): Badge(), BadgeProps, IconButton(), IconButtonProps, UserActions(), UserActionsProps, UserAvatar(), UserAvatarProps (+9 more)
+Nodes (16): Badge(), BadgeProps, IconButton(), IconButtonProps, UserActions(), UserActionsProps, UserAvatar(), UserAvatarProps (+8 more)
 
 ### Community 22 - "register_page.dart"
 Cohesion: 0.05
-Nodes (39): build, _submit, build, _acceptedTerms, _amount, _amountValidator, build, _buildStep (+31 more)
+Nodes (37): build, _submit, build, _acceptedTerms, _amount, _amountValidator, build, _buildStep (+29 more)
 
 ### Community 23 - "onboarding_request.dart"
 Cohesion: 0.05
 Nodes (40): actividadEconomica, apellidos, barrio, callePrincipal, calleSecundaria, canton, cedula, conyuge (+32 more)
 
+### Community 24 - "AI-INDEX.md"
+Cohesion: 0.15
+Nodes (11): Decisiones arquitectónicas identificadas, Decisiones que siguen abiertas/no demostradas, Acoplamiento por contrato, Dependencias entre repositorios, Grafo global, Huecos, Matriz de evidencia, Base y otras salidas (+3 more)
+
+### Community 25 - "NotificationService"
+Cohesion: 0.05
+Nodes (22): DATABASE, Fuente y cautelas, Grupos, Restricciones y clases, Comandos habituales, Configuración, DEVELOPMENT_GUIDE, Diagnóstico seguro (+14 more)
+
 ### Community 26 - "PersonaOnboarding"
-Cohesion: 0.07
-Nodes (15): PersonaOnboarding, EstadoFormulario, COMPLETO, PENDIENTE, SOLICITADO, EstadoGarante, ACEPTADO, EN_REVISION (+7 more)
+Cohesion: 0.05
+Nodes (15): GuarantorProfile, PersonaOnboarding, EstadoFormulario, COMPLETO, PENDIENTE, SOLICITADO, RolPersona, CONYUGE_GARANTE (+7 more)
 
 ### Community 27 - "auth_repository.dart"
 Cohesion: 0.06
 Nodes (30): Autenticación y sesión, Consideraciones observadas, Datos de sesión, Flujo, Referencias, Registro, activación y recuperación, activate, AuthRemoteDataSource (+22 more)
 
-### Community 28 - "ref_react"
-Cohesion: 0.10
-Nodes (17): Button(), Card(), Input(), LoginBackground(), LoginCard(), LoginCardProps, LoginInput, LoginInputProps (+9 more)
+### Community 28 - "DashboardPage.tsx"
+Cohesion: 0.24
+Nodes (7): Button(), Card(), Input(), DashboardData, getDashboard(), DashboardPage(), cn()
 
 ### Community 29 - "app_colors.dart"
 Cohesion: 0.06
 Nodes (34): accent, accentSoft, AppColors, background, border, borderSubtle, darkAccent, darkAccentSoft (+26 more)
 
 ### Community 30 - "login_page.dart"
-Cohesion: 0.05
-Nodes (31): build, buttonBackground, buttonIconColor, buttonText, buttonTextColor, createState, _CreditServiceCard, description (+23 more)
+Cohesion: 0.06
+Nodes (29): build, buttonBackground, buttonIconColor, buttonText, buttonTextColor, createState, _CreditServiceCard, description (+21 more)
 
 ### Community 31 - "dependencies"
 Cohesion: 0.06
@@ -393,16 +379,12 @@ Cohesion: 0.06
 Nodes (8): CooperativeRequiredException, UserPreRegistration, AccountDisabledException, CooperativeNotFoundException, OtpAttemptsExceededException, OtpExpiredException, OtpInvalidException, OtpRateLimitException
 
 ### Community 33 - "app/App.tsx"
-Cohesion: 0.17
-Nodes (15): App(), useAuth(), useTheme(), MainLayout(), menuItems, LeadsPage(), ProductsPage(), ProfilePage() (+7 more)
-
-### Community 34 - "AuthServiceOtpFlowTest.java"
-Cohesion: 0.13
-Nodes (3): ActivationTokenRepository, AuthServiceOtpFlowTest, ClientCreditQuerySecurityTest
+Cohesion: 0.10
+Nodes (23): App(), useAuth(), useTheme(), MainLayout(), menuItems, LoginBackground(), LoginCard(), LoginCardProps (+15 more)
 
 ### Community 35 - "AuthContext.tsx"
-Cohesion: 0.11
-Nodes (24): Módulos, Referencias, Relaciones principales, Tipos compartidos, loginRequest(), AUTH_UNAUTHORIZED_EVENT, resetUnauthorizedEventState(), AuthUser (+16 more)
+Cohesion: 0.10
+Nodes (29): Componentes, Componentes de páginas, Hooks, Patrones observados, Referencias, Módulos, Referencias, Relaciones principales (+21 more)
 
 ### Community 36 - "welcome_page.dart"
 Cohesion: 0.06
@@ -414,39 +396,43 @@ Nodes (29): Endpoints observados en el frontend, Esquema de llamada, Integració
 
 ### Community 38 - "UsersPage.tsx"
 Cohesion: 0.11
-Nodes (21): ConfirmationModal(), ConfirmationModalProps, Modal(), ModalProps, PageHeader(), PageHeaderProps, Pagination(), PaginationProps (+13 more)
+Nodes (22): ConfirmationModal(), ConfirmationModalProps, Modal(), ModalProps, changeUserStatus(), getUsers(), inviteUser(), InviteUserForm() (+14 more)
 
 ### Community 39 - "package:flutter/material.dart"
-Cohesion: 0.05
-Nodes (31): AppTheme, dark, light, build, CooperativesPage, build, CreditBureauPage, AppBadge (+23 more)
+Cohesion: 0.06
+Nodes (26): AppTheme, dark, light, build, CooperativesPage, build, CreditBureauPage, AppCard (+18 more)
 
 ### Community 40 - "CreditGuarantorSubmission"
-Cohesion: 0.06
-Nodes (11): CreditGuarantorEvaluation, CreditGuarantorSubmission, CreditGuarantorStatus, ACEPTADO, CORRECCION_SOLICITADA, EN_REVISION, RECHAZADO, SOLICITUD_RECHAZADA (+3 more)
+Cohesion: 0.05
+Nodes (16): CreditGuarantorEvaluation, CreditGuarantorSubmission, CreditGuarantorStatus, ACEPTADO, CORRECCION_SOLICITADA, EN_REVISION, RECHAZADO, SOLICITUD_RECHAZADA (+8 more)
 
 ### Community 41 - "org.springframework.transaction.annotation.Transactional"
-Cohesion: 0.13
-Nodes (3): PushDeviceToken, PushDeviceTokenRepository, PushNotificationService
+Cohesion: 0.09
+Nodes (3): PushDeviceToken, PushDeviceTokenRepository, VisitService
 
 ### Community 42 - "mockAPI.ts"
-Cohesion: 0.07
-Nodes (38): Autenticación, Flujo de protección, Flujos de credenciales, Referencias, Sesión en cliente, 1. `src/api/creditRequests.api.ts`, 2. `src/components/credit/NewCreditModal.tsx`, 3. `src/pages/DashboardClient.tsx` (+30 more)
+Cohesion: 0.10
+Nodes (27): Autenticación, Flujo de protección, Flujos de credenciales, Referencias, Sesión en cliente, cooperativesData, Cooperative, CreditRequest (+19 more)
 
 ### Community 43 - "DashboardClient.tsx"
-Cohesion: 0.11
-Nodes (22): getCooperatives(), createCreditRequest(), getMyCreditRequests(), getFormularioClienteStatus(), CooperativeCard(), CooperativeCardProps, CreditModalSubmitData, creditTypes (+14 more)
+Cohesion: 0.19
+Nodes (16): getCooperatives(), createCreditRequest(), getMyCreditRequests(), getFormularioClienteStatus(), CooperativeCard(), CooperativeCardProps, CooperativeLogoMarquee(), CreditCard() (+8 more)
 
 ### Community 44 - "app_movil_dinerop/docs/PROJECT_OVERVIEW.md"
 Cohesion: 0.08
-Nodes (19): include, linter, rules, Cliente HTTP y ambiente, Errores, Formatos y DTO, Integración con API, Referencias (+11 more)
+Nodes (21): include, linter, rules, Configuración sensible, Convenciones comprobables, Guía de desarrollo, Mapa, Orientación del código (+13 more)
 
-### Community 45 - "docs/README.md"
-Cohesion: 0.12
-Nodes (8): ARCHITECTURE, Paquetes y errores, Relaciones y dependencias, Alcance, Fuentes y límites, PROJECT_OVERVIEW, Stack comprobado, Documentación técnica de Dinerop
+### Community 45 - "CooperativesPage.tsx"
+Cohesion: 0.21
+Nodes (11): PageHeader(), PageHeaderProps, Pagination(), PaginationProps, CooperativesFilters(), CooperativesFiltersProps, Card(), CooperativesStats() (+3 more)
+
+### Community 46 - "java.util.List"
+Cohesion: 0.11
+Nodes (5): EstadoGarante, ACEPTADO, EN_REVISION, RECHAZADO, PageVisitRepository
 
 ### Community 47 - "Login.tsx"
-Cohesion: 0.09
-Nodes (19): Estado global, Estado local, Formularios, Gestión de estado, Persistencia del navegador, Referencias, CooperativeLogoMarquee(), cooperatives (+11 more)
+Cohesion: 0.10
+Nodes (18): Estado global, Estado local, Formularios, Gestión de estado, Persistencia del navegador, Referencias, cooperatives, Cooperative (+10 more)
 
 ### Community 48 - "onboarding_repository.dart"
 Cohesion: 0.07
@@ -454,35 +440,39 @@ Nodes (23): Crédito e inversión, Dependencias de negocio, Lógica de negocio v
 
 ### Community 49 - "Map.tsx"
 Cohesion: 0.21
-Nodes (10): Hero(), getCitiesByProvince(), getUniqueProvinces(), Location, locations, Map(), MapCenterUpdater(), redIcon (+2 more)
+Nodes (11): leaflet@^1.9.4, react-leaflet@^4.2.1, getCitiesByProvince(), getUniqueProvinces(), Location, locations, Map(), MapCenterUpdater() (+3 more)
 
 ### Community 50 - "request_credit_page.dart"
-Cohesion: 0.06
-Nodes (36): DineropApp, _DineropAppState, ActivationPage, _ActivationPageState, CompleteRegistrationPage, _CompleteRegistrationPageState, ForgotPasswordPage, _ForgotPasswordPageState (+28 more)
+Cohesion: 0.07
+Nodes (24): _amountController, build, _cityController, _cityNames, createState, _creditType, dispose, _error (+16 more)
 
 ### Community 51 - "credit_request_card.dart"
 Cohesion: 0.05
-Nodes (29): cantidadSolicitudesEnviadas, ClientCreditRequestSummary, estado, fechaSolicitud, fromJson, monto, motivosRechazo, solicitudId (+21 more)
+Nodes (30): cantidadSolicitudesEnviadas, ClientCreditRequestSummary, estado, fechaSolicitud, fromJson, monto, motivosRechazo, solicitudId (+22 more)
 
 ### Community 52 - "cooperative_partners_view.dart"
 Cohesion: 0.07
 Nodes (26): _AnimatedCooperativeNode, _AnimatedUserNode, animation, build, _buildLogo, _connectionAnimations, connectionProgress, _controller (+18 more)
 
-### Community 54 - "MODULES"
-Cohesion: 0.18
-Nodes (5): Otros, MODULES, PageVisitRepository, VisitService, VisitController
+### Community 53 - "lombok"
+Cohesion: 0.12
+Nodes (4): EstadoOnboarding, COMPLETADO, EN_PROCESO, SOLICITANDO_GARANTE
 
-### Community 55 - "CooperativeService"
+### Community 54 - "CooperativeController"
 Cohesion: 0.07
-Nodes (13): Cooperativas, CooperativeAdminService, CooperativeRate, CreditType, CONSUMO, MICROCREDITO, CooperativeRateRepository, CooperativeRepository (+5 more)
+Nodes (19): Cliente HTTP y ambiente, Correspondencia backend y límites, Errores, Formatos y DTO, Integración con API, Referencias, Rutas consumidas y correspondencia, API_ENDPOINTS (+11 more)
+
+### Community 55 - "CooperativeRate"
+Cohesion: 0.12
+Nodes (6): CooperativeRate, CreditType, CONSUMO, MICROCREDITO, CooperativeRateRepository, CooperativeRateDto
 
 ### Community 56 - "api_client.dart"
-Cohesion: 0.10
+Cohesion: 0.11
 Nodes (10): _dio, _fieldLabel, _mapError, TokenProvider, _client, initializeAndRegister, _localNotifications, PushNotificationService (+2 more)
 
 ### Community 57 - "auth/config/SecurityConfig.java"
 Cohesion: 0.13
-Nodes (4): API_ENDPOINTS, Crédito — `CreditController` (`/api/credits`), Verificación de permisos, SecurityConfig
+Nodes (3): Crédito — `CreditController` (`/api/credits`), Verificación de permisos, SecurityConfig
 
 ### Community 58 - "secure_token_storage.dart"
 Cohesion: 0.05
@@ -493,8 +483,8 @@ Cohesion: 0.08
 Nodes (25): category, cooperativaId, CreditCooperativeStatus, CreditRequirement, cuotaMensual, description, direccion, estado (+17 more)
 
 ### Community 60 - "cn"
-Cohesion: 0.15
-Nodes (19): Button(), buttonVariants, Card(), CardAction(), CardContent(), CardDescription(), CardFooter(), CardHeader() (+11 more)
+Cohesion: 0.14
+Nodes (22): Button(), buttonVariants, Card(), CardAction(), CardContent(), CardDescription(), CardFooter(), CardHeader() (+14 more)
 
 ### Community 61 - "app_router.dart"
 Cohesion: 0.05
@@ -514,23 +504,23 @@ Nodes (12): ApiClient, _client, CooperativeRepository, loadCooperatives, acceptC
 
 ### Community 65 - "credit_simulator_page.dart"
 Cohesion: 0.08
-Nodes (23): _amount, _amountController, build, color, createState, _CreditData, _CreditOffer, _CreditOfferCard (+15 more)
+Nodes (25): _amount, _amountController, build, color, createState, _CreditData, _CreditOffer, _CreditOfferCard (+17 more)
 
 ### Community 66 - "CreditRequestType"
 Cohesion: 0.07
-Nodes (8): CreditRequestType, CREDITO, INVERSION, CreditType, CONSUMO, MICROCREDITO, ClientCreditRequestDto, PublicCreditRequestDto
+Nodes (9): CreditRequestType, CREDITO, INVERSION, CreditType, CONSUMO, MICROCREDITO, ClientCreditRequestDto, CooperativeCreditRequestItemDto (+1 more)
 
 ### Community 67 - "DireccionOnboarding"
-Cohesion: 0.13
-Nodes (6): DireccionOnboarding, TipoVivienda, ARRENDADA, PROPIA, DireccionOnboardingResponse, DireccionOnboardingRepository
+Cohesion: 0.10
+Nodes (7): DireccionOnboarding, TipoVivienda, ARRENDADA, PROPIA, DireccionRequest, DireccionOnboardingResponse, DireccionOnboardingRepository
 
 ### Community 68 - "dinerup-app/src/App.tsx"
-Cohesion: 0.17
-Nodes (18): Onboarding por pasos, Páginas y rutas, Referencias, activateAccount(), forgotPassword(), resetPassword(), getErrorMessage(), App() (+10 more)
+Cohesion: 0.10
+Nodes (27): Arquitectura, Arranque, Capas y dependencias, Construcción y despliegue, Estilo y ejecución, Límites de evidencia, Referencias, Crédito (+19 more)
 
 ### Community 69 - "CreditDetailsModal.tsx"
-Cohesion: 0.14
-Nodes (21): acceptCreditCooperative(), getCreditRequestCooperatives(), getGuarantorHistoryForClient(), CreditCard(), CreditCardProps, statusMap, tipoMap, cooperativeStatus (+13 more)
+Cohesion: 0.23
+Nodes (13): acceptCreditCooperative(), getCreditRequestCooperatives(), getGuarantorHistoryForClient(), CreditCardProps, statusMap, tipoMap, cooperativeStatus, CreditDetailsModal() (+5 more)
 
 ### Community 70 - "welcome_trust_view.dart"
 Cohesion: 0.09
@@ -548,25 +538,21 @@ Nodes (5): OpenApiConfig, WebClientConfig, PasswordEncoderConfig, ResendConfig, 
 Cohesion: 0.14
 Nodes (6): ReferenciaPersonal, TipoReferencia, FAMILIAR, PERSONAL, ReferenciaPersonalResponse, ReferenciaPersonalRepository
 
-### Community 74 - "dinerup-app/docs/ARCHITECTURE.md"
-Cohesion: 0.10
-Nodes (14): Arquitectura, Arranque, Capas y dependencias, Construcción y despliegue, Estilo y ejecución, Límites de evidencia, Referencias, Comandos existentes (+6 more)
-
 ### Community 75 - "app_user.dart"
 Cohesion: 0.09
 Nodes (18): AppUser, AppUserRole, AppUserStatus, email, fromJson, id, isActive, isClient (+10 more)
 
-### Community 76 - "OnboardingClienteController"
-Cohesion: 0.12
-Nodes (10): Onboarding, ActivationEmailBuilder, OnboardingService, CompletarFormularioGaranteUseCase, CrearSolicitudConSolicitanteUseCase, ObtenerOnboardingUnificadoUseCase, SolicitarGaranteUseCase, OnboardingClienteController (+2 more)
+### Community 76 - "SolicitudOnboarding"
+Cohesion: 0.08
+Nodes (10): OnboardingService, CompletarFormularioGaranteUseCase, CrearSolicitudConSolicitanteUseCase, SolicitarGaranteUseCase, OnboardingClienteController, SolicitudOnboarding, SolicitudOnboardingRequest, FormularioClienteStatusResponse (+2 more)
 
 ### Community 78 - "lombok.Builder"
-Cohesion: 0.14
-Nodes (16): ChangeRegistrationEmailRequest, CompleteRegistrationRequest, JwtResponse, LoginRequest, LoginResponse, UserInfo, OtpRegistrationStartResponse, OtpResendRequest (+8 more)
+Cohesion: 0.18
+Nodes (13): ChangeRegistrationEmailRequest, CompleteRegistrationRequest, JwtResponse, LoginResponse, UserInfo, OtpRegistrationStartResponse, OtpResendRequest, OtpVerificationRequest (+5 more)
 
 ### Community 79 - "nosotros/page.tsx"
-Cohesion: 0.15
-Nodes (21): EcosistemaPage(), productDetails, articles, featured, InsightsPage(), InversionistasPage(), NosotrosPage(), team (+13 more)
+Cohesion: 0.13
+Nodes (24): EcosistemaPage(), articles, featured, InsightsPage(), arguments_, InversionistasPage(), kpis, thesisParagraphs (+16 more)
 
 ### Community 80 - "components.json"
 Cohesion: 0.09
@@ -576,9 +562,9 @@ Nodes (21): aliases, components, hooks, lib, ui, utils, iconLibrary, menuAccent 
 Cohesion: 0.08
 Nodes (21): build, controller, createState, didUpdateWidget, dispose, enabled, errorAnimationKey, hasError (+13 more)
 
-### Community 82 - "Cooperative"
-Cohesion: 0.08
-Nodes (9): CreateCooperativeRequest, UpdateCooperativeRequest, CooperativeDetailResponse, CooperativeListItemResponse, PagedCooperativesResponse, CooperativeNotFoundException, CooperativeAdminMapper, CooperativeSpecification (+1 more)
+### Community 82 - "CooperativeDetailResponse"
+Cohesion: 0.23
+Nodes (3): UpdateCooperativeRequest, CooperativeDetailResponse, CooperativeNotFoundException
 
 ### Community 83 - "auth-context.tsx"
 Cohesion: 0.19
@@ -598,38 +584,34 @@ Nodes (7): cantones, EcuadorCanton, EcuadorProvincia, ecuadorProvincias, nombre,
 
 ### Community 87 - "dependencies"
 Cohesion: 0.11
-Nodes (19): dependencies, axios@^1.11.0, clsx@^2.1.1, lucide-react@^0.539.0, @radix-ui/react-dialog@^1.1.15, @radix-ui/react-dropdown-menu@^2.1.16, @radix-ui/react-separator@^1.1.7, react-hook-form@^7.62.0 (+11 more)
+Nodes (19): dependencies, axios@^1.11.0, class-variance-authority@^0.7.1, @hookform/resolvers@^5.2.1, @radix-ui/react-dialog@^1.1.15, @radix-ui/react-dropdown-menu@^2.1.16, @radix-ui/react-separator@^1.1.7, react@^19.1.1 (+11 more)
 
 ### Community 88 - "devDependencies"
 Cohesion: 0.11
-Nodes (19): devDependencies, autoprefixer@^10.4.21, eslint@^9.34.0, @eslint/js@^9.34.0, eslint-plugin-react-hooks@^5.2.0, postcss@^8.5.6, @types/node@^24.3.0, @types/react@^19.1.11 (+11 more)
+Nodes (19): devDependencies, autoprefixer@^10.4.21, eslint-plugin-react-hooks@^5.2.0, eslint-plugin-react-refresh@^0.4.20, postcss@^8.5.6, tailwindcss@^3.4.17, @types/react@^19.1.11, @types/react-dom@^19.1.7 (+11 more)
 
 ### Community 89 - "compilerOptions"
 Cohesion: 0.11
 Nodes (18): compilerOptions, allowJs, esModuleInterop, incremental, isolatedModules, jsx, lib, module (+10 more)
-
-### Community 90 - "CreditGuarantorWorkflowService.java"
-Cohesion: 0.17
-Nodes (4): CreditGuarantorWorkflowService, TypeReference<>, CreditGuarantorEvaluationDto, CreditGuarantorHistoryItemDto
 
 ### Community 91 - "cooperative_logo_card.dart"
 Cohesion: 0.11
 Nodes (12): assetPath, CooperativePartner, id, initialPartners, logoUrl, nombre, subtitulo, build (+4 more)
 
 ### Community 93 - "ref_react_router_dom"
-Cohesion: 0.14
-Nodes (9): ThemeContext, ThemeContextValue, ThemeProvider(), queryClient, App(), Footer(), Header(), Popup() (+1 more)
+Cohesion: 0.13
+Nodes (11): Onboarding por pasos, Páginas y rutas, Referencias, App(), Footer(), Header(), Hero(), Services() (+3 more)
 
 ### Community 94 - "UserAdminService"
-Cohesion: 0.16
-Nodes (7): UserAdminController, ChangeStatusRequest, CreateUserRequest, UserDetailResponse, UserNotFoundException, UserAdminService, InviteUserRequest
+Cohesion: 0.10
+Nodes (11): UserAdminController, ChangeStatusRequest, CreateUserRequest, PagedUsersResponse, UserDetailResponse, UserListItemResponse, UserStatsResponse, UserNotFoundException (+3 more)
 
 ### Community 95 - "compilerOptions"
 Cohesion: 0.11
 Nodes (17): compilerOptions, allowImportingTsExtensions, isolatedModules, jsx, lib, module, moduleDetection, moduleResolution (+9 more)
 
 ### Community 96 - "useCooperatives.ts"
-Cohesion: 0.26
+Cohesion: 0.25
 Nodes (13): useToast(), createCooperative(), deleteCooperative(), getCooperatives(), updateCooperative(), CooperativesTableProps, useCooperatives(), Cooperative (+5 more)
 
 ### Community 97 - "compilerOptions"
@@ -637,28 +619,24 @@ Cohesion: 0.11
 Nodes (17): compilerOptions, allowImportingTsExtensions, isolatedModules, jsx, lib, module, moduleDetection, moduleResolution (+9 more)
 
 ### Community 98 - "State"
-Cohesion: 0.18
-Nodes (14): CooperativeLogoMarquee, _CooperativeLogoMarqueeState, CreditSimulatorPage, _CreditSimulatorPageState, ActiveCreditCarousel, _ActiveCreditCarouselState, _StoryProgressBar, _StoryProgressBarState (+6 more)
+Cohesion: 0.24
+Nodes (10): CooperativeLogoMarquee, _CooperativeLogoMarqueeState, ActiveCreditCarousel, _ActiveCreditCarouselState, _StoryProgressBar, _StoryProgressBarState, CooperativePartnersView, _CooperativePartnersViewState (+2 more)
 
 ### Community 100 - "dependencies"
 Cohesion: 0.12
-Nodes (17): dependencies, @hookform/resolvers@^5.2.2, lucide-react@^0.344.0, react@^18.3.1, react-dom@^18.3.1, react-hook-form@^7.65.0, react-router-dom@^7.9.4, swiper@^12.1.2 (+9 more)
+Nodes (23): dependencies, @hookform/resolvers@^5.2.2, lucide-react@^0.344.0, react@^18.3.1, react-dom@^18.3.1, react-hook-form@^7.65.0, react-router-dom@^7.9.4, @supabase/supabase-js@^2.57.4 (+15 more)
 
 ### Community 101 - "PublicCreditRequestModal.tsx"
-Cohesion: 0.18
-Nodes (15): creditTypes, FormData, FormErrors, getInitialFormState(), Input(), InputProps, isValidEcuadorId(), onlyLetters() (+7 more)
+Cohesion: 0.10
+Nodes (24): CreditModalSubmitData, creditTypes, EMPTY_ERRORS, NewCreditModalProps, plazosOptions, creditTypes, FormData, FormErrors (+16 more)
 
 ### Community 102 - "dependencies"
-Cohesion: 0.12
-Nodes (17): dependencies, leaflet@^1.9.4, lucide-react@^0.344.0, react@^18.3.1, react-dom@^18.3.1, @react-google-maps/api@^2.20.7, react-leaflet@^4.2.1, react-router-dom@^7.9.6 (+9 more)
+Cohesion: 0.14
+Nodes (19): dependencies, lucide-react@^0.344.0, react@^18.3.1, react-dom@^18.3.1, @react-google-maps/api@^2.20.7, react-router-dom@^7.9.6, @supabase/supabase-js@^2.57.4, swiper@^12.0.2 (+11 more)
 
 ### Community 103 - "app_exception.dart"
-Cohesion: 0.25
-Nodes (7): AppErrorMessages, generic, message, network, statusCode, toString, unauthorized
-
-### Community 104 - "JwtAuthenticationFilter.java"
-Cohesion: 0.11
-Nodes (3): Mecanismo, AdminBootstrapRunner, JwtAuthenticationFilter
+Cohesion: 0.20
+Nodes (8): AppErrorMessages, AppException, generic, message, network, statusCode, toString, unauthorized
 
 ### Community 105 - "compilerOptions"
 Cohesion: 0.12
@@ -672,29 +650,33 @@ Nodes (15): compilerOptions, allowImportingTsExtensions, isolatedModules, lib, m
 Cohesion: 0.13
 Nodes (14): POSTGRES_DB, POSTGRES_PASSWORD, POSTGRES_USER, container_name, environment, image, ports, restart (+6 more)
 
+### Community 108 - "OnboardingMapper"
+Cohesion: 0.07
+Nodes (9): 7. Onboarding — Cliente, GET `/api/onboarding/cliente/formulario-status`, GET `/api/onboarding/cliente/{solicitudId}`, POST `/api/onboarding/cliente/garante/completar`, POST `/api/onboarding/cliente/solicitante`, ActividadEconomicaRequest, PersonaOnboardingRequest, ReferenciaRequest (+1 more)
+
 ### Community 109 - "providers.dart"
 Cohesion: 0.11
 Nodes (11): Estado global / asíncrono, Fuentes, Gestión del estado, Invalidez y actualización, Mecanismos presentes, cooperativeRepositoryProvider, cooperativesProvider, _refreshWhileObserved (+3 more)
+
+### Community 110 - "CustomUserDetailsService"
+Cohesion: 0.21
+Nodes (6): AUTHENTICATION, Autorización, Límites de certeza, Mecanismo, Registro y recuperación, CustomUserDetailsService
 
 ### Community 111 - "application-prod.yaml"
 Cohesion: 0.13
 Nodes (14): app, email-enabled, frontend-url, cors, allowed-origins, firebase, service-account-base64, jwt (+6 more)
 
 ### Community 112 - "devDependencies"
-Cohesion: 0.13
-Nodes (15): devDependencies, autoprefixer@^10.4.18, @eslint/js@^9.9.1, eslint-plugin-react-refresh@^0.4.11, globals@^15.9.0, typescript-eslint@^8.3.0, vite@^5.4.2, @vitejs/plugin-react@^4.3.1 (+7 more)
+Cohesion: 0.09
+Nodes (23): devDependencies, autoprefixer@^10.4.18, eslint@^9.9.1, eslint-plugin-react-refresh@^0.4.11, globals@^15.9.0, postcss@^8.4.35, tailwindcss@^3.4.1, @types/react@^18.3.5 (+15 more)
 
 ### Community 113 - "devDependencies"
-Cohesion: 0.13
-Nodes (15): devDependencies, autoprefixer@^10.4.18, eslint-plugin-react-hooks@^5.1.0-rc.0, eslint-plugin-react-refresh@^0.4.11, postcss@^8.4.35, typescript-eslint@^8.3.0, vite@^5.4.2, @vitejs/plugin-react@^4.3.1 (+7 more)
+Cohesion: 0.11
+Nodes (19): devDependencies, autoprefixer@^10.4.18, @eslint/js@^9.9.1, eslint-plugin-react-hooks@^5.1.0-rc.0, postcss@^8.4.35, tailwindcss@^3.4.1, @types/react-dom@^18.3.0, typescript-eslint@^8.3.0 (+11 more)
 
 ### Community 114 - "credit_request_cooperative.dart"
 Cohesion: 0.14
 Nodes (13): cooperativaId, CreditRequestCooperative, cuotaMensual, estado, fechaActualizacion, fromJson, interesTotal, monto (+5 more)
-
-### Community 115 - "user.ts"
-Cohesion: 0.24
-Nodes (11): changeUserStatus(), getUsers(), inviteUser(), InviteUserForm(), InviteUserFormProps, InviteUserModalProps, useUsers(), ChangeStatusRequest (+3 more)
 
 ### Community 116 - ".application"
 Cohesion: 0.17
@@ -708,13 +690,13 @@ Nodes (12): amount, city, creditType, email, firstName, identification, lastName
 Cohesion: 0.15
 Nodes (11): calificacion, ciudad, CooperativeSummary, direccion, fromJson, id, logoUrl, nombre (+3 more)
 
-### Community 119 - "PersonaOnboardingRequest"
-Cohesion: 0.13
-Nodes (7): 7. Onboarding — Cliente, GET `/api/onboarding/cliente/formulario-status`, GET `/api/onboarding/cliente/{solicitudId}`, POST `/api/onboarding/cliente/garante/completar`, POST `/api/onboarding/cliente/solicitante`, DireccionRequest, PersonaOnboardingRequest
+### Community 119 - "Diseño: Consumo de POST /api/credits/me en NewCreditModal"
+Cohesion: 0.17
+Nodes (11): 1. `src/api/creditRequests.api.ts`, 2. `src/components/credit/NewCreditModal.tsx`, 3. `src/pages/DashboardClient.tsx`, Cambios por archivo, Campos que NO cambian, Casos cubiertos, Contexto, Diseño: Consumo de POST /api/credits/me en NewCreditModal (+3 more)
 
-### Community 121 - "SolicitudOnboarding"
-Cohesion: 0.12
-Nodes (6): SolicitudOnboarding, Base y otras salidas, Datos de onboarding, Flujo de datos y persistencia, Límites verificados, Recorrido típico
+### Community 120 - "org.springframework.http.ResponseEntity"
+Cohesion: 0.05
+Nodes (11): ApiErrorResponse, AdminGlobalExceptionHandler, InvalidUserRoleException, UserAlreadyExistsException, GlobalExceptionHandler, LinkClientRequestDto, LinkClientResponseDto, ApiError (+3 more)
 
 ### Community 122 - "ActividadEconomica"
 Cohesion: 0.17
@@ -728,16 +710,24 @@ Nodes (3): IngresoEgreso, IngresoEgresoResponse, IngresoEgresoRepository
 Cohesion: 0.15
 Nodes (11): Arquitectura en una vista, Estructura, Graphify, Identidad técnica, Referencias, Resumen del proyecto, Áreas de producto observables, buildCommand (+3 more)
 
+### Community 125 - "lombok.Data"
+Cohesion: 0.20
+Nodes (5): LoginRequest, CreateCooperativeDto, ActualizarEstadoSolicitudRequest, TestEmailRequest, PageVisit
+
+### Community 126 - "layout.tsx"
+Cohesion: 0.24
+Nodes (7): fraunces, inter, interTight, metadata, RootLayout(), Footer(), Navbar()
+
 ### Community 127 - "formatters.dart"
 Cohesion: 0.18
 Nodes (7): _currencyFormatter, _dateFormatter, _dateTimeFormatter, format, formatCurrency, formatDate, formatDateTime
 
 ### Community 128 - "CreditService"
-Cohesion: 0.05
-Nodes (14): Estilo, CreditProcessEvent, CreditRejectionReason, BURO_DEL_CREDITO, CAPACIDAD_DE_PAGO, OTROS, TIEMPO_DE_NEGOCIO, SolicitudCooperativaCotizacion (+6 more)
+Cohesion: 0.04
+Nodes (12): CreditRejectionReason, BURO_DEL_CREDITO, CAPACIDAD_DE_PAGO, OTROS, TIEMPO_DE_NEGOCIO, SolicitudCooperativaCotizacion, LoanCalculationResult, CooperativeDecisionRequestDto (+4 more)
 
 ### Community 129 - "OnboardingUnificadoResponse"
-Cohesion: 0.20
+Cohesion: 0.22
 Nodes (4): 8. Onboarding — Cooperativa, GET `/api/onboarding/cooperativa/{solicitudId}`, POST `/api/onboarding/cooperativa/{solicitudId}/solicitar-garante`, OnboardingUnificadoResponse
 
 ### Community 130 - "flyway"
@@ -746,7 +736,7 @@ Nodes (11): baseline-description, baseline-on-migrate, baseline-version, enabled
 
 ### Community 131 - "markup-admin/package.json"
 Cohesion: 0.18
-Nodes (10): class-variance-authority@^0.7.1, react@^19.1.1, react-dom@^19.1.1, class-variance-authority, react, react-dom, name, private (+2 more)
+Nodes (10): clsx@^2.1.1, @eslint/js@^9.34.0, @types/node@^24.3.0, clsx, @eslint/js, @types/node, name, private (+2 more)
 
 ### Community 132 - "credit_request_payload.dart"
 Cohesion: 0.20
@@ -760,13 +750,9 @@ Nodes (9): city, email, firstName, fromJson, identification, lastName, phone, Pr
 Cohesion: 0.20
 Nodes (6): AppAuthenticatedHeader, build, onNotifications, preferredSize, _showHelp, showNotifications
 
-### Community 136 - "SolicitudOnboardingRequest"
-Cohesion: 0.12
-Nodes (6): EstadoOnboarding, COMPLETADO, EN_PROCESO, SOLICITANDO_GARANTE, SolicitudOnboardingRequest, SolicitudOnboardingResponse
-
-### Community 137 - "ToastContext.tsx"
-Cohesion: 0.31
-Nodes (7): Toast(), ToastProps, ToastVariant, ToastContext, ToastContextValue, ToastItem, ToastProvider()
+### Community 137 - "markup-admin/src/main.tsx"
+Cohesion: 0.14
+Nodes (13): @tanstack/react-query@^5.85.6, Toast(), ToastProps, ToastVariant, ThemeContext, ThemeContextValue, ThemeProvider(), ToastContext (+5 more)
 
 ### Community 138 - "CreditRequestForm.tsx"
 Cohesion: 0.27
@@ -781,20 +767,16 @@ Cohesion: 0.22
 Nodes (8): CreditDecision, creditDecisionToApiValue, CreditRequestStatus, creditRequestStatusFromJson, CreditRequestType, creditRequestTypeFromJson, CreditType, creditTypeFromJson
 
 ### Community 142 - "Role"
-Cohesion: 0.20
-Nodes (9): AUTHENTICATION, Autorización, Límites de certeza, Registro y recuperación, ChangeRoleRequest, Role, ADMIN, CLIENT (+1 more)
+Cohesion: 0.12
+Nodes (11): CooperativeStatsDto, CreditStatsDto, DashboardResponseDto, RecentUserDto, UserStatsDto, VisitStatsDto, ChangeRoleRequest, Role (+3 more)
 
 ### Community 144 - "tomcat"
 Cohesion: 0.22
 Nodes (9): server, port, tomcat, max, min-spare, accept-count, connection-timeout, max-connections (+1 more)
 
-### Community 145 - "dinerup-app/package.json"
-Cohesion: 0.22
-Nodes (8): eslint@^9.9.1, postcss@^8.4.35, eslint, postcss, name, private, type, version
-
-### Community 146 - "markup-landing/package.json"
-Cohesion: 0.22
-Nodes (8): eslint@^9.9.1, @types/react-dom@^18.3.0, eslint, @types/react-dom, name, private, type, version
+### Community 146 - "eslint@^9.9.1"
+Cohesion: 0.33
+Nodes (4): eslint@^9.9.1, @types/react@^18.3.5, eslint, @types/react
 
 ### Community 147 - "onboarding_submission_response.dart"
 Cohesion: 0.25
@@ -803,14 +785,6 @@ Nodes (6): destinoCredito, estado, fechaCreacion, fromJson, id, OnboardingSubmis
 ### Community 149 - "PasswordResetToken"
 Cohesion: 0.12
 Nodes (3): ResetPasswordRequest, PasswordResetToken, PasswordResetTokenRepository
-
-### Community 150 - "PagedUsersResponse"
-Cohesion: 0.22
-Nodes (4): PagedUsersResponse, UserListItemResponse, UserStatsResponse, UserAdminMapper
-
-### Community 151 - "5. Credits"
-Cohesion: 0.22
-Nodes (9): 5. Credits, GET `/api/credits/cooperative/me/requests`, GET `/api/credits/me`, GET `/api/credits/me/{solicitudId}/pre-approved`, POST `/api/credits/me`, POST `/api/credits/public-request`, PUT `/api/credits/cooperative/me/requests/{solicitudId}/decision`, PUT `/api/credits/cooperative/me/requests/{solicitudId}/solicitar-garante` (+1 more)
 
 ### Community 152 - "spring"
 Cohesion: 0.25
@@ -834,31 +808,19 @@ Nodes (7): compilerOptions, allowSyntheticDefaultImports, composite, module, mod
 
 ### Community 158 - "Guía de desarrollo"
 Cohesion: 0.29
-Nodes (7): Configuración sensible, Convenciones comprobables, Guía de desarrollo, Mapa, Orientación del código, Requisitos y arranque, Verificación disponible
+Nodes (7): Comandos existentes, Graphify, Guía de desarrollo, Notas de arquitectura para quien mantenga el proyecto, Orientación de cambios, Referencias, Requisitos y configuración
 
 ### Community 159 - "String?"
-Cohesion: 0.14
-Nodes (11): fromJson, message, PublicRegistrationResponse, requestId, status, cooperativasNotificadas, CreditRequestResponse, estado (+3 more)
-
-### Community 161 - "PreRegisterRequest"
-Cohesion: 0.11
-Nodes (4): Autenticación — `AuthController` (`/api/auth`), InternalAuthController, PreRegisterRequest, PreRegisterResponse
+Cohesion: 0.25
+Nodes (6): cooperativasNotificadas, CreditRequestResponse, estado, fromJson, message, requestId
 
 ### Community 168 - "AuthController"
 Cohesion: 0.11
 Nodes (6): AuthController, ForgotPasswordRequest, Auth y registro, Contratos backend sin consumidor identificado, Discrepancias que requieren cuidado, Integraciones API entre repositorios
 
-### Community 169 - "DEVELOPMENT_GUIDE"
-Cohesion: 0.29
-Nodes (7): Comandos habituales, Configuración, DEVELOPMENT_GUIDE, Diagnóstico seguro, Orientación de cambios, Pruebas presentes, Requisitos observados
-
 ### Community 172 - "level"
 Cohesion: 0.33
 Nodes (6): com.markup.dinerop, com.zaxxer.hikari, org.hibernate, org.springframework, root, level
-
-### Community 173 - "Lógica de negocio observada"
-Cohesion: 0.33
-Nodes (6): Crédito, Estados, Lógica de negocio observada, Recuperación de errores, Referencias, Validación y territorio
 
 ### Community 174 - "scripts"
 Cohesion: 0.33
@@ -867,10 +829,6 @@ Nodes (6): scripts, build, dev, lint, preview, typecheck
 ### Community 175 - "datasource"
 Cohesion: 0.40
 Nodes (5): driver-class-name, password, url, username, datasource
-
-### Community 176 - "Componentes"
-Cohesion: 0.40
-Nodes (5): Componentes, Componentes de páginas, Hooks, Patrones observados, Referencias
 
 ### Community 177 - "onboarding.ts"
 Cohesion: 0.40
@@ -896,6 +854,10 @@ Nodes (4): Diferencias entre clientes, Flujo de autenticación, Registro y recup
 Cohesion: 0.50
 Nodes (3): Deploy on Vercel, Getting Started, Learn More
 
+### Community 198 - "@eslint/js@^9.9.1"
+Cohesion: 0.33
+Nodes (4): @eslint/js@^9.9.1, eslint-plugin-react-hooks@^5.1.0-rc.0, @eslint/js, eslint-plugin-react-hooks
+
 ### Community 259 - "DINEROP: visión del ecosistema"
 Cohesion: 0.33
 Nodes (6): Cómo investigar una funcionalidad sin recorrer todo, DINEROP: visión del ecosistema, Evidencia y límites, Mapa de esta documentación, Propósito, Repositorios y responsabilidades observadas
@@ -903,10 +865,6 @@ Nodes (6): Cómo investigar una funcionalidad sin recorrer todo, DINEROP: visió
 ### Community 261 - "Índice de investigación para IA"
 Cohesion: 0.40
 Nodes (5): Elegir por funcionalidad, Grafos Graphify disponibles, Mapa de documentos del ecosistema, Reglas para una investigación segura, Índice de investigación para IA
-
-### Community 262 - "Dependencias entre repositorios"
-Cohesion: 0.40
-Nodes (5): Acoplamiento por contrato, Dependencias entre repositorios, Grafo global, Huecos, Matriz de evidencia
 
 ### Community 263 - "Arquitectura global"
 Cohesion: 0.40
@@ -916,33 +874,25 @@ Nodes (5): Arquitectura global, Clientes, Entornos y despliegue observables, Gra
 Cohesion: 0.40
 Nodes (5): Catálogo y exploración, Cliente: registro, onboarding y solicitud, Cooperativa: revisar, decidir y atender garante, Flujos principales de usuario, Recuperación de cuenta
 
-### Community 265 - "scripts"
-Cohesion: 0.40
-Nodes (5): scripts, build, dev, lint, start
-
-### Community 266 - "DATABASE"
-Cohesion: 0.50
-Nodes (4): DATABASE, Fuente y cautelas, Grupos, Restricciones y clases
-
 ## Knowledge Gaps
-- **963 isolated node(s):** `child`, `index`, `selectedIndex`, `icon`, `selectedIcon` (+958 more)
-  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 2165 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
-- **105 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **963 isolated node(s):** `_CreditStatus`, `_navy`, `_teal`, `_muted`, `_line` (+958 more)
+  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 2166 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
+- **94 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `Discrepancias que requieren cuidado` connect `AuthController` to `auth/config/SecurityConfig.java`, `OnboardingClienteController`, `httpClient`?**
-  _High betweenness centrality (0.307) - this node is a cross-community bridge._
-- **What connects `child`, `index`, `selectedIndex` to the rest of the system?**
+- **Why does `Módulos y responsabilidades` connect `secure_token_storage.dart` to `AuthController`, `AuthServiceOtpFlowTest.java`?**
+  _High betweenness centrality (0.281) - this node is a cross-community bridge._
+- **What connects `_CreditStatus`, `_navy`, `_teal` to the rest of the system?**
   _963 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `onboarding_page.dart` be split into smaller, more focused modules?**
   _Cohesion score 0.018867924528301886 - nodes in this community are weakly interconnected._
-- **Why does `httpClient()` connect `httpClient` to `AuthContext.tsx`, `dinerup-app/src/App.tsx`, `DashboardCooperative.tsx`, `CreditDetailsModal.tsx`, `PublicCreditRequestModal.tsx`, `AuthController`, `OnboardingPage.tsx`, `dinerup-app/docs/ARCHITECTURE.md`, `mockAPI.ts`, `DashboardClient.tsx`, `Lógica de negocio observada`, `Login.tsx`, `Resumen del proyecto`?**
-  _High betweenness centrality (0.306) - this node is a cross-community bridge._
-- **Should `SolicitudCooperativaRepository` be split into smaller, more focused modules?**
-  _Cohesion score 0.05777345017851347 - nodes in this community are weakly interconnected._
-- **Why does `AuthController` connect `AuthController` to `PreRegisterRequest`, `lombok.RequiredArgsConstructor`, `main.dart`, `org.springframework.context.annotation.Bean`, `app_shell.dart`, `providers.dart`, `Role`, `.activate`, `AuthService`, `PasswordResetToken`, `MODULES`, `secure_token_storage.dart`, `auth_repository.dart`?**
-  _High betweenness centrality (0.287) - this node is a cross-community bridge._
+- **Why does `AuthController` connect `AuthController` to `lombok.RequiredArgsConstructor`, `CreditService`, `main.dart`, `org.springframework.context.annotation.Bean`, `profile_page.dart`, `providers.dart`, `CustomUserDetailsService`, `ActivationToken`, `AuthService`, `PasswordResetToken`, `CooperativeController`, `secure_token_storage.dart`, `auth_repository.dart`?**
+  _High betweenness centrality (0.281) - this node is a cross-community bridge._
+- **Should `SolicitudCooperativa` be split into smaller, more focused modules?**
+  _Cohesion score 0.05027322404371585 - nodes in this community are weakly interconnected._
+- **Why does `Discrepancias que requieren cuidado` connect `AuthController` to `auth/config/SecurityConfig.java`, `SolicitudOnboarding`, `httpClient`?**
+  _High betweenness centrality (0.275) - this node is a cross-community bridge._
 - **Should `lombok.RequiredArgsConstructor` be split into smaller, more focused modules?**
-  _Cohesion score 0.0515406162464986 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.09898989898989899 - nodes in this community are weakly interconnected._
