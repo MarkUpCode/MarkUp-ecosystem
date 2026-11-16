@@ -102,15 +102,12 @@ class _ActiveCreditCarouselState extends State<ActiveCreditCarousel> {
   int _page = 0;
 
   List<ClientCreditRequestSummary> get _activeRequests {
-    final active =
-        widget.requests
-            .where((request) => request.estado != CreditRequestStatus.rechazada)
-            .toList()
-          ..sort(
-            (a, b) => (b.fechaSolicitud ?? DateTime(0)).compareTo(
-              a.fechaSolicitud ?? DateTime(0),
-            ),
-          );
+    final active = widget.requests.toList()
+      ..sort(
+        (a, b) => (b.fechaSolicitud ?? DateTime(0)).compareTo(
+          a.fechaSolicitud ?? DateTime(0),
+        ),
+      );
     return active;
   }
 
@@ -141,7 +138,7 @@ class _ActiveCreditCarouselState extends State<ActiveCreditCarousel> {
           _CreditEmptyState(onRequestCredit: widget.onRequestCredit)
         else ...[
           SizedBox(
-            height: 286,
+            height: 252,
             child: PageView.builder(
               controller: _controller,
               itemCount: active.length,
@@ -208,19 +205,20 @@ class _CreditSummaryCard extends StatelessWidget {
     final rejected = request.estado == CreditRequestStatus.rechazada;
 
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [_navy, Color(0xFF1E4668)],
+          colors: [Colors.white, Color(0xFFF5FAFC)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
+        border: Border.all(color: const Color(0xFFE4EBF1)),
         borderRadius: BorderRadius.circular(21),
         boxShadow: const [
           BoxShadow(
-            color: Color(0x1A142B4A),
-            blurRadius: 17,
-            offset: Offset(0, 7),
+            color: Color(0x0D142B4A),
+            blurRadius: 12,
+            offset: Offset(0, 4),
           ),
         ],
       ),
@@ -233,7 +231,7 @@ class _CreditSummaryCard extends StatelessWidget {
                 child: Text(
                   'Solicitud #${request.solicitudId}',
                   style: const TextStyle(
-                    color: Color(0xFFD5E3EF),
+                    color: _muted,
                     fontSize: 11,
                     fontWeight: FontWeight.w700,
                   ),
@@ -259,33 +257,29 @@ class _CreditSummaryCard extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 5),
+          const SizedBox(height: 3),
           Text(
             formatCurrency(request.monto),
             style: const TextStyle(
-              color: Colors.white,
+              color: _navy,
               fontSize: 22,
               fontWeight: FontWeight.w900,
               letterSpacing: -.4,
             ),
           ),
-          const SizedBox(height: 2),
+          const SizedBox(height: 1),
           Text(
             'Solicitado el ${formatDate(request.fechaSolicitud)}',
-            style: const TextStyle(color: Color(0xFFB7C8D8), fontSize: 10),
+            style: const TextStyle(color: _muted, fontSize: 10),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 4),
           _CreditStepper(step: step, rejected: rejected),
-          const SizedBox(height: 6),
+          const SizedBox(height: 3),
           Text(
             status.message,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 11,
-              height: 1.35,
-            ),
+            style: const TextStyle(color: _navy, fontSize: 11, height: 1.35),
           ),
           const Spacer(),
           Align(
@@ -293,7 +287,7 @@ class _CreditSummaryCard extends StatelessWidget {
             child: TextButton(
               onPressed: onViewDetails,
               style: TextButton.styleFrom(
-                foregroundColor: const Color(0xFF8CE5D9),
+                foregroundColor: const Color(0xFF087E8B),
                 padding: const EdgeInsets.symmetric(horizontal: 4),
                 minimumSize: const Size(0, 28),
                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -332,7 +326,7 @@ class _CreditStepper extends StatelessWidget {
                 Expanded(
                   child: Container(
                     height: 2,
-                    color: index < step ? _teal : const Color(0xFF49647D),
+                    color: index < step ? _teal : const Color(0xFFD9E2EA),
                   ),
                 ),
             ],
@@ -350,9 +344,11 @@ class _CreditStepper extends StatelessWidget {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
-                  color: index + 1 <= step
-                      ? Colors.white
-                      : const Color(0xFFABC0D1),
+                  color: index + 1 == step && rejected
+                      ? const Color(0xFFB42318)
+                      : index + 1 <= step
+                      ? _navy
+                      : const Color(0xFF98A2B3),
                   fontSize: 8,
                   fontWeight: index + 1 == step
                       ? FontWeight.w900
@@ -385,7 +381,7 @@ class _StepDot extends StatelessWidget {
         ? const Color(0xFFFF8888)
         : (complete || current)
         ? _teal
-        : const Color(0xFF49647D);
+        : const Color(0xFFD9E2EA);
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
       width: 26,
@@ -781,6 +777,10 @@ class _ActivityTile extends StatelessWidget {
 }
 
 int _progressStep(CreditRequestStatus status, bool profileComplete) {
+  if (status == CreditRequestStatus.aceptada ||
+      status == CreditRequestStatus.rechazada) {
+    return 4;
+  }
   if (!profileComplete) return 0;
   switch (status) {
     case CreditRequestStatus.creada:
@@ -809,44 +809,44 @@ class _CreditStatus {
       case CreditRequestStatus.creada:
         return const _CreditStatus(
           'Creada',
-          'Tu solicitud fue creada y está lista para continuar.',
-          Color(0xFFFFC16B),
+          'Tu solicitud está creada. Revisa los detalles para ver si falta completar algún paso.',
+          Color(0xFF9A5B00),
         );
       case CreditRequestStatus.enviada:
         return const _CreditStatus(
           'En evaluación',
-          '¡Solicitud enviada! La cooperativa está revisando tu información.',
-          Color(0xFF73D8E6),
+          'La cooperativa está revisando tu solicitud. Te avisaremos cuando haya novedades.',
+          Color(0xFF087E8B),
         );
       case CreditRequestStatus.solicitandoGarante:
         return const _CreditStatus(
           'Garante requerido',
-          'Necesitamos un garante para continuar con tu solicitud.',
-          Color(0xFFFFC16B),
+          'Se requiere un garante. Abre los detalles para conocer cómo continuar.',
+          Color(0xFF9A5B00),
         );
       case CreditRequestStatus.preAprobada:
         return const _CreditStatus(
           'Preaprobada',
-          '¡Buenas noticias! Tienes una propuesta de crédito disponible.',
-          Color(0xFF78E0B0),
+          'Tienes una propuesta disponible. Revisa sus condiciones y los pasos para aceptarla.',
+          Color(0xFF16845B),
         );
       case CreditRequestStatus.aceptada:
         return const _CreditStatus(
           'Aceptada',
-          '¡Excelente! La cooperativa aceptó tu crédito. Consulta los detalles para conocer los siguientes pasos.',
-          Color(0xFF78E0B0),
+          'Tu crédito fue aceptado. Consulta los detalles para conocer los siguientes pasos.',
+          Color(0xFF16845B),
         );
       case CreditRequestStatus.rechazada:
         return const _CreditStatus(
           'Rechazada',
-          'Esta solicitud no fue aprobada. Puedes consultar los detalles.',
-          Color(0xFFFF8888),
+          'Esta solicitud fue rechazada. Consulta los motivos y el detalle de esta decisión.',
+          Color(0xFFB42318),
         );
       case CreditRequestStatus.unknown:
         return const _CreditStatus(
           'En proceso',
-          'Estamos actualizando el estado de tu solicitud.',
-          Color(0xFFB5C5D4),
+          'Consulta los detalles para ver el estado y la información más reciente.',
+          Color(0xFF667085),
         );
     }
   }

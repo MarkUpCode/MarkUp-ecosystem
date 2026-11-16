@@ -228,6 +228,48 @@ void main() async {
     },
   );
 
+  testWidgets('accepted and rejected credits show the result stage', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(390, 700);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    for (final (status, label) in [
+      (CreditRequestStatus.aceptada, 'Aceptada'),
+      (CreditRequestStatus.rechazada, 'Rechazada'),
+    ]) {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: ActiveCreditCarousel(
+              requests: [
+                ClientCreditRequestSummary(
+                  solicitudId: 101,
+                  estado: status,
+                  monto: 2500,
+                  tipo: 'CREDITO',
+                  fechaSolicitud: DateTime(2026, 11, 14),
+                  cantidadSolicitudesEnviadas: 1,
+                ),
+              ],
+              profileComplete: false,
+              onRequestCredit: () {},
+              onViewDetails: (_) {},
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text(label), findsOneWidget);
+      final resultLabel = tester.widget<Text>(find.text('Resultado'));
+      expect(resultLabel.style?.fontWeight, FontWeight.w900);
+      expect(tester.takeException(), isNull);
+    }
+  });
+
   testWidgets(
     'navigation shell exposes five destinations and keeps products pending',
     (tester) async {

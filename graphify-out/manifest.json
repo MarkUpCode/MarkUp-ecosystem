@@ -84,9 +84,9 @@
     "semantic_hash": ""
   },
   "app_movil_dinerop/lib/app/shell/app_shell.dart": {
-    "mtime": 1794858886.732626,
-    "seen": 1794858910.9773815,
-    "ast_hash": "b6f424bb05e8894d5c49c96b61f42998",
+    "mtime": 1794859005.5955865,
+    "seen": 1794859818.5217376,
+    "ast_hash": "1011a8d727a860fa9c26500b213ae241",
     "semantic_hash": ""
   },
   "app_movil_dinerop/lib/core/config/api_config.dart": {
@@ -354,15 +354,15 @@
     "semantic_hash": ""
   },
   "app_movil_dinerop/lib/features/dashboard/presentation/dashboard_page.dart": {
-    "mtime": 1794858812.554026,
-    "seen": 1794858910.977448,
-    "ast_hash": "1e62a28bdbfa68b60be18ff2390919fc",
+    "mtime": 1794859332.7163277,
+    "seen": 1794859818.5218756,
+    "ast_hash": "e8cd1222deed195787b1c1a2a37b3c9f",
     "semantic_hash": ""
   },
   "app_movil_dinerop/lib/features/dashboard/presentation/sections/dashboard_exploration_sections.dart": {
-    "mtime": 1794858769.0663698,
-    "seen": 1794858910.9774492,
-    "ast_hash": "fa2d1d4fb3a61a2cfeb7df00eeeec60a",
+    "mtime": 1794859218.4559598,
+    "seen": 1794859818.5218775,
+    "ast_hash": "bd0c707fa3aa9972149f00fe1cf7d792",
     "semantic_hash": ""
   },
   "app_movil_dinerop/lib/features/notifications/presentation/notifications_page.dart": {
@@ -528,9 +528,9 @@
     "semantic_hash": ""
   },
   "app_movil_dinerop/test/dashboard_responsive_test.dart": {
-    "mtime": 1794800801.414279,
-    "seen": 1794858910.9775572,
-    "ast_hash": "5c720212ae2f8365d612ffcad8530cd0",
+    "mtime": 1794859332.7298388,
+    "seen": 1794859818.5219276,
+    "ast_hash": "338c64b58ef96f070c63f5a73ec6c987",
     "semantic_hash": ""
   },
   "app_movil_dinerop/test/widget_test.dart": {
@@ -3867,6 +3867,24 @@
     "mtime": 1782016122.9557018,
     "seen": 1794858910.9788685,
     "ast_hash": "a2760511c65806022ad20adf74370ff3",
+    "semantic_hash": ""
+  },
+  "DINEROP-KNOWLEDGE/global-graph.json": {
+    "mtime": 1794503199.402245,
+    "seen": 1794859818.52167,
+    "ast_hash": "b995611f998fbff249feee5df4c7c466",
+    "semantic_hash": ""
+  },
+  "dinerop-backend/schema.sql": {
+    "mtime": 1794762623.0603564,
+    "seen": 1794859818.5219383,
+    "ast_hash": "868b1b24379b638a656f41a1f3e11859",
+    "semantic_hash": ""
+  },
+  "dinerop-backend/src/main/resources/db/migration/V1__guarantor_profiles_and_credit_evaluations.sql": {
+    "mtime": 1794794622.767991,
+    "seen": 1794859818.5223327,
+    "ast_hash": "68d883866880907dbbe826cb8d24eac3",
     "semantic_hash": ""
   },
   "dinerup-app/package-lock.json": {
