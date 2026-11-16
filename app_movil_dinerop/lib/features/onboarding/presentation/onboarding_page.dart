@@ -614,6 +614,19 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
     });
 
     try {
+      // El backend valida provincia y cantón también dentro del cónyuge.
+      // Como el formulario recoge un solo domicilio familiar, se comparte.
+      final domicilio = OnboardingAddressRequest(
+        provincia: _provinciaController.text.trim(),
+        canton: _cantonController.text.trim(),
+        barrio: _barrioController.text.trim(),
+        callePrincipal: _calleController.text.trim(),
+        calleSecundaria: _calleSecundariaController.text.trim(),
+        numero: _numeroController.text.trim(),
+        referenciaUbicacion: _referenciaUbicacionController.text.trim(),
+        tipoVivienda: _tipoVivienda,
+      );
+
       final solicitante = OnboardingPersonRequest(
         nombres: _nombresController.text.trim(),
         apellidos: _apellidosController.text.trim(),
@@ -625,16 +638,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
         empresaTrabajo: _empresaController.text.trim(),
         telefono: _telefonoController.text.trim(),
         tieneConyuge: _tieneConyuge,
-        direccion: OnboardingAddressRequest(
-          provincia: _provinciaController.text.trim(),
-          canton: _cantonController.text.trim(),
-          barrio: _barrioController.text.trim(),
-          callePrincipal: _calleController.text.trim(),
-          calleSecundaria: _calleSecundariaController.text.trim(),
-          numero: _numeroController.text.trim(),
-          referenciaUbicacion: _referenciaUbicacionController.text.trim(),
-          tipoVivienda: _tipoVivienda,
-        ),
+        direccion: domicilio,
         actividadEconomica: OnboardingEconomicRequest(
           nombreNegocio: _nombreNegocioController.text.trim(),
           direccionNegocio: _direccionNegocioController.text.trim(),
@@ -665,16 +669,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
               empresaTrabajo: _conyugeEmpresaController.text.trim(),
               telefono: _conyugeTelefonoController.text.trim(),
               tieneConyuge: false,
-              direccion: OnboardingAddressRequest(
-                provincia: '',
-                canton: '',
-                barrio: '',
-                callePrincipal: '',
-                calleSecundaria: '',
-                numero: '',
-                referenciaUbicacion: '',
-                tipoVivienda: 'PROPIA',
-              ),
+              direccion: domicilio,
               actividadEconomica: OnboardingEconomicRequest(
                 nombreNegocio: '',
                 direccionNegocio: '',

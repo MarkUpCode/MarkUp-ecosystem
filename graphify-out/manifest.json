@@ -360,9 +360,9 @@
     "semantic_hash": ""
   },
   "app_movil_dinerop/lib/features/dashboard/presentation/sections/dashboard_exploration_sections.dart": {
-    "mtime": 1794860328.0966482,
-    "seen": 1794860720.3200443,
-    "ast_hash": "35662f8b1e1a0af7c61a52f832d8b891",
+    "mtime": 1794861024.397508,
+    "seen": 1794862462.218071,
+    "ast_hash": "94323c0b0f4f61212ce5d8e0d7bd0766",
     "semantic_hash": ""
   },
   "app_movil_dinerop/lib/features/notifications/presentation/notifications_page.dart": {
@@ -414,9 +414,9 @@
     "semantic_hash": ""
   },
   "app_movil_dinerop/lib/features/requests/presentation/requests_page.dart": {
-    "mtime": 1794795544.3874598,
-    "seen": 1794858910.9774616,
-    "ast_hash": "640a5299d52ce12a9307898f59572f70",
+    "mtime": 1794861154.7592287,
+    "seen": 1794862462.218098,
+    "ast_hash": "4e338ac807e4c9caa7407b9a2ec802fd",
     "semantic_hash": ""
   },
   "app_movil_dinerop/lib/features/welcome/data/models/cooperative_partner.dart": {
@@ -528,9 +528,9 @@
     "semantic_hash": ""
   },
   "app_movil_dinerop/test/dashboard_responsive_test.dart": {
-    "mtime": 1794860252.873606,
-    "seen": 1794860720.3201425,
-    "ast_hash": "76bec58404b2d15a442dac3b101fde94",
+    "mtime": 1794860994.105715,
+    "seen": 1794862462.2181585,
+    "ast_hash": "989d13ea75ddc380e7d1259b8a0259df",
     "semantic_hash": ""
   },
   "app_movil_dinerop/test/widget_test.dart": {
@@ -1230,9 +1230,9 @@
     "semantic_hash": ""
   },
   "dinerop-backend/src/main/java/com/markup/dinerop/credit/domain/service/ClientCreditQueryService.java": {
-    "mtime": 1794725694.3292427,
-    "seen": 1794858910.977842,
-    "ast_hash": "abdd878355c12e45f3aa934b15ed59cf",
+    "mtime": 1794860872.462217,
+    "seen": 1794862462.2185955,
+    "ast_hash": "5fe1f3d36a72f153dfca459930923372",
     "semantic_hash": ""
   },
   "dinerop-backend/src/main/java/com/markup/dinerop/credit/domain/service/CooperativeCreditDecisionService.java": {
@@ -3885,6 +3885,12 @@
     "mtime": 1794794622.767991,
     "seen": 1794859818.5223327,
     "ast_hash": "68d883866880907dbbe826cb8d24eac3",
+    "semantic_hash": ""
+  },
+  "dinerop-backend/src/test/java/com/markup/dinerop/credit/domain/service/ClientCreditQueryAcceptedStatusTest.java": {
+    "mtime": 1794860891.18001,
+    "seen": 1794862462.2189915,
+    "ast_hash": "d4b659c6866567aa5b87612ec2ef0e55",
     "semantic_hash": ""
   },
   "dinerup-app/package-lock.json": {

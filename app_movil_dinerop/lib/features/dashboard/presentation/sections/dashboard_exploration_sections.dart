@@ -140,7 +140,7 @@ class _ActiveCreditCarouselState extends State<ActiveCreditCarousel> {
           _CreditEmptyState(onRequestCredit: widget.onRequestCredit)
         else ...[
           SizedBox(
-            height: 252,
+            height: 236,
             child: PageView.builder(
               controller: _controller,
               itemCount: active.length,
@@ -207,7 +207,7 @@ class _CreditSummaryCard extends StatelessWidget {
     final rejected = request.estado == CreditRequestStatus.rechazada;
 
     return Container(
-      padding: const EdgeInsets.all(10),
+      padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
           colors: [Colors.white, Color(0xFFF5FAFC)],
@@ -261,35 +261,36 @@ class _CreditSummaryCard extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 3),
+              const SizedBox(height: 2),
               Text(
                 formatCurrency(request.monto),
                 style: const TextStyle(
                   color: _navy,
-                  fontSize: 22,
+                  fontSize: 20,
                   fontWeight: FontWeight.w900,
                   letterSpacing: -.4,
                 ),
               ),
-              const SizedBox(height: 1),
+              const SizedBox(height: 0),
               Text(
                 'Solicitado el ${formatDate(request.fechaSolicitud)}',
                 style: const TextStyle(color: _muted, fontSize: 10),
               ),
-              const SizedBox(height: 4),
-              _CreditStepper(step: step, rejected: rejected),
               const SizedBox(height: 3),
+              _CreditStepper(step: step, rejected: rejected),
+              const SizedBox(height: 2),
               Text(
                 status.message,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
                   color: _navy,
-                  fontSize: 11,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
                   height: 1.35,
                 ),
               ),
-              const Spacer(),
+              const SizedBox(height: 4),
               Align(
                 alignment: Alignment.centerRight,
                 child: TextButton(
@@ -333,7 +334,7 @@ class _CreditStepper extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     children: [
       SizedBox(
-        height: 28,
+        height: 24,
         child: Row(
           children: [
             for (var index = 1; index <= _labels.length; index++) ...[
@@ -349,7 +350,7 @@ class _CreditStepper extends StatelessWidget {
           ],
         ),
       ),
-      const SizedBox(height: 4),
+      const SizedBox(height: 2),
       Row(
         children: [
           for (var index = 0; index < _labels.length; index++)
@@ -400,8 +401,8 @@ class _StepDot extends StatelessWidget {
         : const Color(0xFFD9E2EA);
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
-      width: 26,
-      height: 26,
+      width: 20,
+      height: 20,
       decoration: BoxDecoration(
         color: color,
         shape: BoxShape.circle,
