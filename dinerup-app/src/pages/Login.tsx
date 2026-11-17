@@ -159,9 +159,13 @@ export default function Login() {
               <span>Solicitar crédito</span>
             </button>
 
+            <button type="button" onClick={() => navigate("/credit-simulator")} className="left-btn-shimmer" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, background: "rgba(255,255,255,0.12)", color: "#fff", fontWeight: 700, fontSize: "0.85rem", padding: "12px 14px", borderRadius: 14, border: "1px solid rgba(255,255,255,0.2)", cursor: "pointer" }}>
+              <span>Simular crédito</span>
+            </button>
+
             <button
               className="left-btn-shimmer"
-              onClick={() => navigate("/investments")}
+              onClick={() => { navigate("/login?returnTo=%2Finvestments"); setShowCompleteRegistration(true); }}
               style={{
                 display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
                 background: "linear-gradient(135deg, #f59e0b, #d97706)",
@@ -177,6 +181,10 @@ export default function Login() {
                 <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" /><polyline points="17 6 23 6 23 12" />
               </svg>
               <span>Realizar inversión</span>
+            </button>
+
+            <button type="button" onClick={() => navigate("/investments")} className="left-btn-shimmer" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, background: "rgba(255,255,255,0.12)", color: "#fff", fontWeight: 700, fontSize: "0.85rem", padding: "12px 14px", borderRadius: 14, border: "1px solid rgba(255,255,255,0.2)", cursor: "pointer" }}>
+              <span>Simulador de inversión</span>
             </button>
           </div>
 

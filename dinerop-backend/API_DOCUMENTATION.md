@@ -812,3 +812,8 @@ Retorna la información de onboarding de una solicitud (vista cooperativa).
 - La aceptación guarda mensaje, requisitos, agencia, ciudad, dirección, enlace HTTPS de Maps e instrucciones en una respuesta asociada a la solicitud; no formaliza el depósito. El endpoint valida la propiedad de la solicitud y bloquea respuestas duplicadas concurrentes. La tasa confirmada por la cooperativa es opcional.
 - La comparación solo devuelve productos activos, rangos y tasas vigentes. Tasas sin método explícito de cálculo no muestran ganancia. Los estados terminales son `CONDITIONS_CONFIRMED` (no equivale a contrato) y `DECLINED`. Las solicitudes guardan snapshot de condiciones y solo entregan datos de contacto a la cooperativa seleccionada tras consentimiento.
 - Plazos disponibles en la versión actual se expresan en meses; operaciones con días aún no están representadas por el esquema de condiciones existente.
+
+## Comparación pública de crédito y categoría de producto
+
+- Público y sin datos personales: `GET /api/credits/public-offers?creditCategory={CONSUMO|MICROCREDITO}&amount={USD}&termMonths={1..60}`. Devuelve únicamente productos activos y condiciones vigentes que coinciden con el monto y plazo. No calcula cuotas y no representa aprobación.
+- `FinancialProductType` conserva `CREDIT` e `INVESTMENT`; los productos `CREDIT` nuevos requieren `creditCategory` (`CONSUMO` o `MICROCREDITO`). El tipo `INVESTMENT` no admite categoría de crédito.

@@ -18,9 +18,9 @@
     "semantic_hash": "33fad9c02cb0ec6d6030369ef6347d57"
   },
   "src/App.tsx": {
-    "mtime": 1794937024.739749,
-    "seen": 1794937289.3158045,
-    "ast_hash": "9c568d59d2ca2b6f14998fc41d120cf6",
+    "mtime": 1794949309.8239124,
+    "seen": 1794949995.6619496,
+    "ast_hash": "18bd9d55f70eb5f71455e0b9af997781",
     "semantic_hash": ""
   },
   "src/api/auth/auth.api.ts": {
@@ -126,10 +126,10 @@
     "semantic_hash": ""
   },
   "src/components/credit/PublicCreditRequestModal.tsx": {
-    "mtime": 1790227686.5530355,
-    "seen": 1794463041.1916106,
-    "ast_hash": "32488c599b7a05dc5011936a19471c71",
-    "semantic_hash": "32488c599b7a05dc5011936a19471c71"
+    "mtime": 1794949906.6056821,
+    "seen": 1794949995.6624799,
+    "ast_hash": "b4e52bf720e14b7ab040c30d0c255e3d",
+    "semantic_hash": ""
   },
   "src/components/credit/SuccessRequestModal.tsx": {
     "mtime": 1790227686.559557,
@@ -246,9 +246,9 @@
     "semantic_hash": ""
   },
   "src/pages/Login.tsx": {
-    "mtime": 1794937030.648429,
-    "seen": 1794937289.3158836,
-    "ast_hash": "4f592f8d2fa0a311a11d9fd0aece7f28",
+    "mtime": 1794949304.5255353,
+    "seen": 1794949995.6625803,
+    "ast_hash": "9ef7af750fe4d07102ceccadf9c63a50",
     "semantic_hash": ""
   },
   "src/pages/OnboardingPage.tsx": {
@@ -420,9 +420,9 @@
     "semantic_hash": ""
   },
   "docs/API_INTEGRATION.md": {
-    "mtime": 1794694340.4203672,
-    "seen": 1794858879.5068946,
-    "ast_hash": "252b489ad61adab49a5383b0cb61f6ee",
+    "mtime": 1794949950.1256492,
+    "seen": 1794949995.66277,
+    "ast_hash": "1dc171af50b762a2be7127bd228479b5",
     "semantic_hash": ""
   },
   "docs/ARCHITECTURE.md": {
@@ -567,6 +567,18 @@
     "mtime": 1794937019.3226385,
     "seen": 1794937289.3158865,
     "ast_hash": "7c7aa70407b499c59e7cfbbe93bfb6d4",
+    "semantic_hash": ""
+  },
+  "src/api/creditSimulator.api.ts": {
+    "mtime": 1794949246.7770588,
+    "seen": 1794949995.6619968,
+    "ast_hash": "aa6366d0eab61fcd3fb6cb85f41d8081",
+    "semantic_hash": ""
+  },
+  "src/pages/PublicCreditSimulator.tsx": {
+    "mtime": 1794949287.2155762,
+    "seen": 1794949995.6625881,
+    "ast_hash": "83d2dec2ec9888fa019966d3f801f4bb",
     "semantic_hash": ""
   },
   "package-lock.json": {

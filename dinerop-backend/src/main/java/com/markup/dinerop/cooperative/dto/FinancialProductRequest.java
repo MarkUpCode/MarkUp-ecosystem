@@ -1,6 +1,7 @@
 package com.markup.dinerop.cooperative.dto;
 
 import com.markup.dinerop.cooperative.domain.entity.FinancialProductType;
+import com.markup.dinerop.cooperative.domain.entity.CreditProductCategory;
 import com.markup.dinerop.cooperative.domain.entity.InterestPaymentOption;
 import com.markup.dinerop.cooperative.domain.entity.InvestmentCalculationMethod;
 import jakarta.validation.Valid;
@@ -11,6 +12,7 @@ import java.util.Set;
 
 public record FinancialProductRequest(
         @NotNull FinancialProductType type,
+        CreditProductCategory creditCategory,
         @NotBlank @Size(max = 120) String name,
         @Size(max = 2000) String description,
         @NotNull @DecimalMin("0.01") BigDecimal minimumAmount,
@@ -26,7 +28,8 @@ public record FinancialProductRequest(
     public FinancialProductRequest(FinancialProductType type, String name, String description,
             BigDecimal minimumAmount, BigDecimal maximumAmount, Boolean active,
             List<FinancialProductConditionRequest> conditions) {
-        this(type, name, description, minimumAmount, maximumAmount, active, conditions,
+        this(type, type == FinancialProductType.CREDIT ? CreditProductCategory.CONSUMO : null,
+                name, description, minimumAmount, maximumAmount, active, conditions,
                 null, null, null, null, null);
     }
 }

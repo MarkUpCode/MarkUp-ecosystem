@@ -75,15 +75,15 @@
     "semantic_hash": ""
   },
   "lib/app/providers.dart": {
-    "mtime": 1794874012.3847733,
-    "seen": 1794874787.7017145,
-    "ast_hash": "fc22108241f64670e642d904fe6e3cf6",
+    "mtime": 1794949604.1647325,
+    "seen": 1794949999.0819929,
+    "ast_hash": "0bff1eb5f0f60ba0af80555fd6c10af9",
     "semantic_hash": ""
   },
   "lib/app/router/app_router.dart": {
-    "mtime": 1794800725.2298427,
-    "seen": 1794858958.938932,
-    "ast_hash": "860304470f5d10b13836d4879305c842",
+    "mtime": 1794949804.1932545,
+    "seen": 1794949999.081998,
+    "ast_hash": "9bfdb8a5690991a53d92b4d7a5f964b6",
     "semantic_hash": ""
   },
   "lib/app/shell/app_shell.dart": {
@@ -231,9 +231,9 @@
     "semantic_hash": "11fcb39c4f5f8d80625fd5e726fa784c"
   },
   "lib/features/auth/presentation/screens/login_page.dart": {
-    "mtime": 1794936947.4834065,
-    "seen": 1794937289.9322855,
-    "ast_hash": "5b7e48212d0624f2e5f2f0d1098b6df6",
+    "mtime": 1794949804.3805203,
+    "seen": 1794949999.0820928,
+    "ast_hash": "24abf7c897d11a9f9785a9dd0abf8bfa",
     "semantic_hash": ""
   },
   "lib/features/auth/presentation/screens/pending_activation_page.dart": {
@@ -249,9 +249,9 @@
     "semantic_hash": "0337b355a49dd0ad7177c0107f41bcb8"
   },
   "lib/features/auth/presentation/screens/registration_verification_page.dart": {
-    "mtime": 1794936947.5054133,
-    "seen": 1794937289.932291,
-    "ast_hash": "52d1b47e587f19ab6b679ec1a06f2660",
+    "mtime": 1794949804.4472406,
+    "seen": 1794949999.0821626,
+    "ast_hash": "862a6c249647e6080a1a6ddfe5dafe8e",
     "semantic_hash": ""
   },
   "lib/features/auth/presentation/screens/reset_password_page.dart": {
@@ -285,9 +285,9 @@
     "semantic_hash": "fe8fb49b64c58d5ca59e59fd28d0dd70"
   },
   "lib/features/credit/data/credit_repository.dart": {
-    "mtime": 1794795196.9927564,
-    "seen": 1794858958.9389818,
-    "ast_hash": "b46d93af3aee01ece85f45299c80a87a",
+    "mtime": 1794949803.9578605,
+    "seen": 1794949999.0822659,
+    "ast_hash": "d7f6659dbd68d46bb1e3d3ba8db0b77e",
     "semantic_hash": ""
   },
   "lib/features/credit/data/models/client_credit_request.dart": {
@@ -327,10 +327,10 @@
     "semantic_hash": "3781d6b269efbe4022619eb94c89e9e1"
   },
   "lib/features/credit/presentation/credit_simulator_page.dart": {
-    "mtime": 1787848569.3483975,
-    "seen": 1794462526.8657417,
-    "ast_hash": "cc21eea8772bf1ccb8559e080018a2ed",
-    "semantic_hash": "cc21eea8772bf1ccb8559e080018a2ed"
+    "mtime": 1794949977.1180453,
+    "seen": 1794949999.0823119,
+    "ast_hash": "3784f1924cc672873d031da71bbf679a",
+    "semantic_hash": ""
   },
   "lib/features/credit/presentation/investment_simulator_page.dart": {
     "mtime": 1794937266.5907385,
@@ -339,9 +339,9 @@
     "semantic_hash": ""
   },
   "lib/features/credit/presentation/request_credit_page.dart": {
-    "mtime": 1794893693.2773845,
-    "seen": 1794933852.2301617,
-    "ast_hash": "0cb3701f7e3d7804a0f83c1de13621ad",
+    "mtime": 1794949976.8491085,
+    "seen": 1794949999.0823202,
+    "ast_hash": "7eef5189fd8f25cba398836435705339",
     "semantic_hash": ""
   },
   "lib/features/credit/presentation/widgets/credit_request_card.dart": {
@@ -387,9 +387,9 @@
     "semantic_hash": ""
   },
   "lib/features/onboarding/presentation/onboarding_page.dart": {
-    "mtime": 1794936947.6914842,
-    "seen": 1794937289.9323525,
-    "ast_hash": "93f66567fb31147d9198b13286801ddf",
+    "mtime": 1794949804.877333,
+    "seen": 1794949999.0826666,
+    "ast_hash": "a3888d115942f6fbb7dee913d54d761d",
     "semantic_hash": ""
   },
   "lib/features/profile/presentation/profile_page.dart": {
@@ -555,9 +555,9 @@
     "semantic_hash": ""
   },
   "docs/API_INTEGRATION.md": {
-    "mtime": 1794937249.2355068,
-    "seen": 1794937289.9323945,
-    "ast_hash": "50321a61bd150e9883a5a4661845442a",
+    "mtime": 1794949940.0627062,
+    "seen": 1794949999.0827782,
+    "ast_hash": "a1a3939aea7876fd055bdf8ab5bd0547",
     "semantic_hash": ""
   },
   "docs/ARCHITECTURE.md": {
@@ -831,9 +831,9 @@
     "semantic_hash": ""
   },
   "lib/features/dolarito/models/dolarito_reaction.dart": {
-    "mtime": 1794937208.4300518,
-    "seen": 1794937289.9323268,
-    "ast_hash": "4b71c50987d2706edf1d1c42b89a86e3",
+    "mtime": 1794949758.4704132,
+    "seen": 1794949999.0823464,
+    "ast_hash": "fa20a760090c64afb6d925096c2cc50d",
     "semantic_hash": ""
   },
   "lib/features/dolarito/models/dolarito_state.dart": {
@@ -849,9 +849,9 @@
     "semantic_hash": ""
   },
   "lib/features/dolarito/services/dolarito_service.dart": {
-    "mtime": 1794937266.6372497,
-    "seen": 1794937289.9323313,
-    "ast_hash": "7c1c1f8d029e7d58615cc8f7c9c1e768",
+    "mtime": 1794949805.065579,
+    "seen": 1794949999.0826116,
+    "ast_hash": "3c3033985b61eaca9e368c5e64b42358",
     "semantic_hash": ""
   },
   "lib/features/dolarito/widgets/dolarito_message.dart": {
@@ -960,6 +960,18 @@
     "mtime": 1794936947.8555348,
     "seen": 1794937289.932336,
     "ast_hash": "9f250135eda816fe7470e112f437cd07",
+    "semantic_hash": ""
+  },
+  "lib/features/credit/data/credit_simulation_draft_store.dart": {
+    "mtime": 1794949804.0145829,
+    "seen": 1794949999.0822709,
+    "ast_hash": "67c8b412e8315850fe86c34ad13471ec",
+    "semantic_hash": ""
+  },
+  "lib/features/credit/data/models/public_credit_offer.dart": {
+    "mtime": 1794949503.1350415,
+    "seen": 1794949999.082302,
+    "ast_hash": "3614f805cb0578db46d20195b01ec6b8",
     "semantic_hash": ""
   }
 }

@@ -10,6 +10,7 @@ import '../../data/models/app_user.dart';
 import '../../../../core/widgets/cooperative_logo_marquee.dart';
 import '../auth_controller.dart';
 import '../../../investment/providers/investment_providers.dart';
+import '../../../../app/providers.dart';
 
 /// ═══════════════════════════════════════════════════════════
 /// LANDING / LOGIN PAGE
@@ -495,12 +496,19 @@ class _LoginSheetState extends ConsumerState<_LoginSheet> {
       } else {
         Navigator.of(context).pop();
         final draft = await ref.read(investmentDraftStoreProvider).read();
+        final creditDraft = await ref
+            .read(creditSimulationDraftStoreProvider)
+            .read();
         if (!mounted) return;
-        final next = draft == null
-            ? '/dashboard'
-            : (controller.requiresOnboarding
+        final next = draft != null
+            ? (controller.requiresOnboarding
                   ? '/onboarding'
-                  : '/simulate-investment');
+                  : '/simulate-investment')
+            : creditDraft != null
+            ? (controller.requiresOnboarding
+                  ? '/onboarding'
+                  : '/simulate-credit')
+            : '/dashboard';
         context.go(next);
       }
     } catch (error) {

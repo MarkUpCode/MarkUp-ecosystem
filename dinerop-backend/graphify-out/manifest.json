@@ -264,9 +264,9 @@
     "semantic_hash": "845c67440607e06f2a3d8e6b53a1cc33"
   },
   "src/main/java/com/markup/dinerop/auth/config/SecurityConfig.java": {
-    "mtime": 1794933602.985664,
-    "seen": 1794933844.3005204,
-    "ast_hash": "7324321513de2a6faaff899adaf5b60a",
+    "mtime": 1794948731.2758284,
+    "seen": 1794950006.7974603,
+    "ast_hash": "37bb4f91d1fde709251f2c0568984ee5",
     "semantic_hash": ""
   },
   "src/main/java/com/markup/dinerop/auth/config/WebClientConfig.java": {
@@ -1458,9 +1458,9 @@
     "semantic_hash": ""
   },
   "API_DOCUMENTATION.md": {
-    "mtime": 1794937235.5451572,
-    "seen": 1794937291.4409099,
-    "ast_hash": "774c3890698d3a0ff6a6f5f92ef525d3",
+    "mtime": 1794949932.580645,
+    "seen": 1794950007.0318289,
+    "ast_hash": "405b0e350527160d52f2521d30dc4827",
     "semantic_hash": ""
   },
   "docs/API_ENDPOINTS.md": {
@@ -1566,9 +1566,9 @@
     "semantic_hash": ""
   },
   "src/main/java/com/markup/dinerop/cooperative/domain/entity/FinancialProduct.java": {
-    "mtime": 1794932496.516997,
-    "seen": 1794933844.3135269,
-    "ast_hash": "81e28128e13d3ce6943979c98359f73c",
+    "mtime": 1794948656.642745,
+    "seen": 1794950006.8571339,
+    "ast_hash": "3a44c1dde86fd2045790b65bb478a384",
     "semantic_hash": ""
   },
   "src/main/java/com/markup/dinerop/cooperative/domain/entity/FinancialProductCondition.java": {
@@ -1596,9 +1596,9 @@
     "semantic_hash": ""
   },
   "src/main/java/com/markup/dinerop/cooperative/domain/service/FinancialProductService.java": {
-    "mtime": 1794932537.2083821,
-    "seen": 1794933844.316692,
-    "ast_hash": "400eab18327e831fc3003a3fb1931e1d",
+    "mtime": 1794948716.7930646,
+    "seen": 1794950006.8733597,
+    "ast_hash": "f4ea3f60e78c592507a7eedb701712ee",
     "semantic_hash": ""
   },
   "src/main/java/com/markup/dinerop/cooperative/dto/FinancialProductConditionRequest.java": {
@@ -1608,15 +1608,15 @@
     "semantic_hash": ""
   },
   "src/main/java/com/markup/dinerop/cooperative/dto/FinancialProductRequest.java": {
-    "mtime": 1794932537.206382,
-    "seen": 1794933844.3175771,
-    "ast_hash": "09489a06fe7ae996e7d407d03535c4bc",
+    "mtime": 1794948691.3966281,
+    "seen": 1794950006.8772638,
+    "ast_hash": "a8ca63556e42fa03ae1aa44fcabef40f",
     "semantic_hash": ""
   },
   "src/main/java/com/markup/dinerop/cooperative/dto/FinancialProductResponse.java": {
-    "mtime": 1794932496.5179994,
-    "seen": 1794933844.3175795,
-    "ast_hash": "9c9f7b95bad3d7cc461adbb8b5f65e6b",
+    "mtime": 1794948666.2077737,
+    "seen": 1794950006.8772697,
+    "ast_hash": "37d00069b5fdee9f981f45636d2a3c84",
     "semantic_hash": ""
   },
   "src/main/java/com/markup/dinerop/cooperative/infrastructure/web/FinancialProductController.java": {
@@ -1767,6 +1767,24 @@
     "mtime": 1794936221.9460433,
     "seen": 1794937291.4000034,
     "ast_hash": "0fac6e10e739005341a2ec5cc66cdb9c",
+    "semantic_hash": ""
+  },
+  "src/main/java/com/markup/dinerop/cooperative/domain/entity/CreditProductCategory.java": {
+    "mtime": 1794948653.474586,
+    "seen": 1794950006.8571272,
+    "ast_hash": "11ea51a8dadbb9fca2660a415220e246",
+    "semantic_hash": ""
+  },
+  "src/main/java/com/markup/dinerop/cooperative/dto/PublicCreditOfferResponse.java": {
+    "mtime": 1794948705.0349247,
+    "seen": 1794950006.8841805,
+    "ast_hash": "a84e13076d311a8b8d75f7adfd85b2b6",
+    "semantic_hash": ""
+  },
+  "src/main/java/com/markup/dinerop/cooperative/infrastructure/web/PublicCreditOffersController.java": {
+    "mtime": 1794948726.0060866,
+    "seen": 1794950006.8919013,
+    "ast_hash": "fc9b01e033eceba070cc5fccc4137a09",
     "semantic_hash": ""
   }
 }

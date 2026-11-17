@@ -17,6 +17,7 @@ import '../../features/credit/presentation/credit_simulator_page.dart';
 import '../../features/credit/presentation/credit_bureau_page.dart';
 import '../../features/credit/presentation/investment_simulator_page.dart';
 import '../../features/credit/presentation/request_credit_page.dart';
+import '../../features/credit/data/models/credit_enums.dart';
 import '../../features/dashboard/presentation/dashboard_page.dart';
 import '../../features/notifications/presentation/notifications_page.dart';
 import '../../features/onboarding/presentation/onboarding_page.dart';
@@ -169,13 +170,31 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: '/guarantor-onboarding',
         builder: (context, state) => OnboardingPage(
           isGuarantor: true,
-          solicitudId: int.tryParse(state.uri.queryParameters['solicitudId'] ?? ''),
-          cooperativaId: int.tryParse(state.uri.queryParameters['cooperativaId'] ?? ''),
+          solicitudId: int.tryParse(
+            state.uri.queryParameters['solicitudId'] ?? '',
+          ),
+          cooperativaId: int.tryParse(
+            state.uri.queryParameters['cooperativaId'] ?? '',
+          ),
         ),
       ),
       GoRoute(
         path: '/request-credit',
-        builder: (context, state) => const RequestCreditPage(),
+        builder: (context, state) {
+          final extra = state.extra is Map
+              ? state.extra! as Map
+              : const <String, dynamic>{};
+          final category = switch (extra['creditCategory']) {
+            'CONSUMO' => CreditType.consumo,
+            'MICROCREDITO' => CreditType.microcredito,
+            _ => null,
+          };
+          return RequestCreditPage(
+            initialAmount: (extra['amount'] as num?)?.toDouble(),
+            initialTermMonths: (extra['termMonths'] as num?)?.toInt(),
+            initialCreditType: category,
+          );
+        },
       ),
       GoRoute(
         path: '/credit-bureau',

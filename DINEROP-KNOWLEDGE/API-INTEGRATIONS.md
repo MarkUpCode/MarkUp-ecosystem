@@ -61,3 +61,9 @@ Los clientes móvil y DinerUp usan los nuevos endpoints definidos en `dinerop-ba
 - `/api/credits/cooperative/me/investment-requests/{id}/acceptance` registra la respuesta de aceptación, requisitos y ubicación de agencia, restringida a la cooperativa propietaria y protegida ante doble aceptación concurrente. `CONDITIONS_CONFIRMED` significa aceptación pendiente de formalización en la cooperativa, no depósito constituido.
 - Las experiencias web y móvil conservan un borrador de simulación por hasta 30 minutos durante el acceso/registro y vuelven a consultar ofertas vigentes al regresar; el cliente debe revisar las condiciones actualizadas antes de consentir y enviar.
 - Graphify local actualizado en los tres proyectos. Verifica controladores y servicios Java antes de interpretar los enlaces del grafo como llamadas entre repositorios.
+
+## Crédito público y catálogo de productos (noviembre de 2026)
+
+- `GET /api/credits/public-offers?creditCategory={CONSUMO|MICROCREDITO}&amount={USD}&termMonths={meses}` entrega productos de crédito activos que cubren el monto/plazo y tienen una tasa vigente. No recibe PII ni calcula cuota estimada; la oferta no representa aprobación.
+- `financial_products.credit_category` distingue categorías de crédito sin ampliar `FinancialProductType`, que sigue permitiendo solamente `CREDIT` e `INVESTMENT`. La API exige categoría nueva para productos `CREDIT`; productos existentes pueden quedar sin clasificar hasta ser editados por el administrador. `INVESTMENT` corresponde al depósito a plazo fijo en las interfaces actuales.
+- Administración de productos vacíos vive en `markup-admin`; su lista distingue array vacío, error HTTP y respuestas de datos inválidas, y muestra datos de la cooperativa seleccionada antes de ofrecer acciones para crear productos.

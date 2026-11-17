@@ -1,6 +1,7 @@
 import { api } from "@/services/axios";
 
 export type ProductType = "CREDIT" | "INVESTMENT";
+export type CreditProductCategory = "CONSUMO" | "MICROCREDITO";
 export interface ProductCondition {
   id?: number;
   minimumAmount: number;
@@ -15,6 +16,7 @@ export interface FinancialProduct {
   id: number;
   cooperativeId: number;
   type: ProductType;
+  creditCategory: CreditProductCategory | null;
   name: string;
   description?: string;
   minimumAmount: number;
@@ -26,7 +28,8 @@ export type FinancialProductRequest = Omit<FinancialProduct, "id" | "cooperative
 
 export async function getProducts(cooperativeId: number) {
   const { data } = await api.get<FinancialProduct[]>(`/api/admin/cooperatives/${cooperativeId}/products`);
-  return data;
+  if (!Array.isArray(data)) throw new Error("El servidor devolvió una respuesta de productos inválida.");
+  return data.map((product) => ({ ...product, conditions: Array.isArray(product.conditions) ? product.conditions : [] }));
 }
 export async function createProduct(cooperativeId: number, request: FinancialProductRequest) {
   const { data } = await api.post<FinancialProduct>(`/api/admin/cooperatives/${cooperativeId}/products`, request);

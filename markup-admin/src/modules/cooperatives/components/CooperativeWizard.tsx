@@ -3,10 +3,10 @@ import { createProduct, type FinancialProductRequest, type ProductCondition, typ
 import type { CreateCooperativeRequest } from "../types/cooperative";
 
 type ProductDraft = {
-  type: ProductType; name: string; description: string; min: string; max: string;
+  type: ProductType; creditCategory: "CONSUMO" | "MICROCREDITO" | ""; name: string; description: string; min: string; max: string;
   termMin: string; termMax: string; rate: string; from: string; until: string;
 };
-const draftProduct = (type: ProductType): ProductDraft => ({ type, name: "", description: "", min: "", max: "", termMin: "", termMax: "", rate: "", from: "", until: "" });
+const draftProduct = (type: ProductType): ProductDraft => ({ type, creditCategory: type === "CREDIT" ? "CONSUMO" : "", name: "", description: "", min: "", max: "", termMin: "", termMax: "", rate: "", from: "", until: "" });
 const input = "mt-1 w-full rounded-xl border border-white/10 bg-slate-950 px-3 py-2.5 text-white";
 
 export function CooperativeWizard({ open, onClose, onCreate }: {
@@ -33,7 +33,7 @@ export function CooperativeWizard({ open, onClose, onCreate }: {
     const invalid = rows.some((p) => {
       const min = Number(p.min); const max = Number(p.max);
       const termMin = Number(p.termMin); const termMax = Number(p.termMax); const rate = Number(p.rate);
-      return !p.name.trim() || !(min > 0) || max < min || !(termMin > 0) || !Number.isInteger(termMin) || !Number.isInteger(termMax) || termMax < termMin || !(rate > 0 && rate <= 100) || !p.from || Number.isNaN(Date.parse(p.from)) || (p.until && Date.parse(p.until) <= Date.parse(p.from));
+      return !p.name.trim() || (p.type === "CREDIT" && !p.creditCategory) || !(min > 0) || max < min || !(termMin > 0) || !Number.isInteger(termMin) || !Number.isInteger(termMax) || termMax < termMin || !(rate > 0 && rate <= 100) || !p.from || Number.isNaN(Date.parse(p.from)) || (p.until && Date.parse(p.until) <= Date.parse(p.from));
     });
     if (invalid) { setError("Completa cada producto con montos, plazos, tasa y vigencia válidos, o quítalo para continuar."); return; }
     setStep((current) => current + 1);
@@ -51,7 +51,7 @@ export function CooperativeWizard({ open, onClose, onCreate }: {
         const p = drafts[index];
         const min = Number(p.min); const max = Number(p.max);
         const condition: ProductCondition = { minimumAmount: min, maximumAmount: max, minimumTermMonths: Number(p.termMin), maximumTermMonths: Number(p.termMax), annualRate: Number(p.rate), validFrom: new Date(p.from).toISOString(), validUntil: p.until ? new Date(p.until).toISOString() : null };
-        const request: FinancialProductRequest = { type: p.type, name: p.name, description: p.description, minimumAmount: min, maximumAmount: max, active: true, conditions: [condition] };
+        const request: FinancialProductRequest = { type: p.type, creditCategory: p.type === "CREDIT" ? p.creditCategory || null : null, name: p.name, description: p.description, minimumAmount: min, maximumAmount: max, active: true, conditions: [condition] };
         await createProduct(cooperative.id, request);
         setPendingProductIndex(index + 1);
       }
@@ -64,6 +64,7 @@ export function CooperativeWizard({ open, onClose, onCreate }: {
   const productsForm = (type: ProductType) => <div className="space-y-4">
     <button type="button" onClick={() => setList(type, (items) => [...items, draftProduct(type)])} className="rounded-xl border border-cyan-400/30 px-4 py-2 text-sm text-cyan-200">+ Agregar producto</button>
     {list(type).map((p, i) => <div key={i} className="grid gap-3 rounded-2xl border border-white/10 p-4 sm:grid-cols-2 lg:grid-cols-3">
+      {type === "CREDIT" && <label className="text-xs text-slate-400">Tipo de crédito<select required className={input} value={p.creditCategory} onChange={(e) => setList(type, (items) => items.map((item, index) => index === i ? { ...item, creditCategory: e.target.value as ProductDraft["creditCategory"] } : item))}><option value="">Selecciona</option><option value="CONSUMO">Consumo</option><option value="MICROCREDITO">Microcrédito</option></select></label>}
       {([["name","Nombre"],["description","Descripción"],["min","Monto mínimo"],["max","Monto máximo"],["termMin","Plazo desde (meses)"],["termMax","Plazo hasta (meses)"],["rate","Tasa anual (%)"]] as const).map(([key,label]) => <label key={key} className="text-xs text-slate-400">{label}<input required type={key === "name" || key === "description" ? "text" : "number"} min={key === "termMin" || key === "termMax" ? 1 : 0.01} step={key === "termMin" || key === "termMax" ? "1" : "0.01"} className={input} value={p[key]} onChange={(e) => editProduct(type,i,key,e.target.value)} /></label>)}
       <label className="text-xs text-slate-400">Vigente desde<input required type="datetime-local" className={input} value={p.from} onChange={(e) => editProduct(type,i,"from",e.target.value)} /></label>
       <label className="text-xs text-slate-400">Vigente hasta (opcional)<input type="datetime-local" className={input} value={p.until} onChange={(e) => editProduct(type,i,"until",e.target.value)} /></label>

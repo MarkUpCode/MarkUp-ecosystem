@@ -834,8 +834,17 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
           context.pop(true);
         } else {
           final draft = await ref.read(investmentDraftStoreProvider).read();
+          final creditDraft = await ref
+              .read(creditSimulationDraftStoreProvider)
+              .read();
           if (mounted)
-            context.go(draft == null ? '/dashboard' : '/simulate-investment');
+            context.go(
+              draft != null
+                  ? '/simulate-investment'
+                  : creditDraft != null
+                  ? '/simulate-credit'
+                  : '/dashboard',
+            );
         }
       }
     } on AppException catch (error) {
@@ -872,8 +881,17 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
         );
         if (mounted && !widget.isGuarantor) {
           final draft = await ref.read(investmentDraftStoreProvider).read();
+          final creditDraft = await ref
+              .read(creditSimulationDraftStoreProvider)
+              .read();
           if (mounted)
-            context.go(draft == null ? '/dashboard' : '/simulate-investment');
+            context.go(
+              draft != null
+                  ? '/simulate-investment'
+                  : creditDraft != null
+                  ? '/simulate-credit'
+                  : '/dashboard',
+            );
         }
         return;
       }

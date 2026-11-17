@@ -21,7 +21,15 @@ import '../data/models/credit_enums.dart';
 import '../data/models/credit_request_payload.dart';
 
 class RequestCreditPage extends ConsumerStatefulWidget {
-  const RequestCreditPage({super.key});
+  const RequestCreditPage({
+    super.key,
+    this.initialAmount,
+    this.initialTermMonths,
+    this.initialCreditType,
+  });
+  final double? initialAmount;
+  final int? initialTermMonths;
+  final CreditType? initialCreditType;
 
   @override
   ConsumerState<RequestCreditPage> createState() => _RequestCreditPageState();
@@ -45,6 +53,12 @@ class _RequestCreditPageState extends ConsumerState<RequestCreditPage> {
   @override
   void initState() {
     super.initState();
+    if (widget.initialAmount != null)
+      _amountController.text = widget.initialAmount!.toStringAsFixed(2);
+    if (widget.initialTermMonths != null)
+      _plazoController.text = widget.initialTermMonths.toString();
+    if (widget.initialCreditType != null)
+      _creditType = widget.initialCreditType!;
     WidgetsBinding.instance.addPostFrameCallback((_) => _loadLocationData());
   }
 

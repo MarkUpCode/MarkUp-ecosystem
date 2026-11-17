@@ -2,6 +2,7 @@ import { Navigate, Outlet, Routes, Route } from "react-router-dom";
 import Login from "./pages/Login";
 import DashboardClient from "./pages/DashboardClient";
 import PublicInvestments from "./pages/PublicInvestments";
+import PublicCreditSimulator from "./pages/PublicCreditSimulator";
 import DashboardCooperative from "./pages/DashboardCooperative";
 import OnboardingPage from "./pages/OnboardingPage";
 import ActivateAccount from "./pages/ActivateAccount";
@@ -56,6 +57,7 @@ function App() {
         <Route path="/login" element={<Login />} />
       </Route>
       <Route path="/investments" element={<PublicInvestments />} />
+      <Route path="/credit-simulator" element={<PublicCreditSimulator />} />
       <Route path="/activate" element={<ActivateAccount />} />
       <Route path="/activate-invitation" element={<ActivateInvitation />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />

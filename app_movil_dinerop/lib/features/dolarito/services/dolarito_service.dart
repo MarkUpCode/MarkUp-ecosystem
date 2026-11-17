@@ -233,6 +233,43 @@ class DolaritoService {
     scopeKey: 'investment',
   );
 
+  DolaritoReaction creditSimulationThinking() => const DolaritoReaction(
+    mood: DolaritoMood.thinking,
+    message:
+        'Estoy revisando las opciones vigentes para ese monto, tipo y plazo.',
+    event: DolaritoEvent.creditSimulationThinking,
+    priority: DolaritoPriority.informative,
+    scopeKey: 'credit-simulator',
+  );
+
+  DolaritoReaction creditSimulationOffers(int count) => DolaritoReaction(
+    mood: DolaritoMood.excited,
+    message: count == 1
+        ? 'Encontré una alternativa compatible. Revisa sus condiciones.'
+        : 'Encontré $count alternativas compatibles. Compáralas antes de iniciar tu solicitud.',
+    event: DolaritoEvent.creditSimulationOffers,
+    priority: DolaritoPriority.motivation,
+    scopeKey: 'credit-simulator',
+  );
+
+  DolaritoReaction creditSimulationNoOffers() => const DolaritoReaction(
+    mood: DolaritoMood.thinking,
+    message:
+        'No encontré una oferta vigente para esos datos. Puedes probar otro monto o plazo.',
+    event: DolaritoEvent.creditSimulationNoOffers,
+    priority: DolaritoPriority.informative,
+    scopeKey: 'credit-simulator',
+  );
+
+  DolaritoReaction creditApplicationMotivation() => const DolaritoReaction(
+    mood: DolaritoMood.motivated,
+    message:
+        'Vamos a continuar con tu solicitud. Mantendré el monto y el plazo de tu simulación.',
+    event: DolaritoEvent.creditApplicationMotivation,
+    priority: DolaritoPriority.actionable,
+    scopeKey: 'credit-simulator',
+  );
+
   DolaritoReaction investmentThinking() => const DolaritoReaction(
     mood: DolaritoMood.thinking,
     message:

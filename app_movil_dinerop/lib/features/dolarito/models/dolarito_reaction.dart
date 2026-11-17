@@ -34,6 +34,10 @@ enum DolaritoEvent {
   investmentRequestStatus,
   investmentAccountRequired,
   investmentAccountReady,
+  creditSimulationThinking,
+  creditSimulationOffers,
+  creditSimulationNoOffers,
+  creditApplicationMotivation,
 }
 
 enum DolaritoAction { completeProfile, viewRequests, retry }

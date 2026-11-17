@@ -8,13 +8,11 @@
   "6": "react",
   "7": "react",
   "8": "compilerOptions",
-  "9": "PublicCreditRequestModal.tsx",
+  "9": "package.json",
   "10": "dependencies",
   "11": "compilerOptions",
-  "12": "creditRequests.api.ts",
   "13": "eslint.config.js",
   "14": "devDependencies",
-  "15": "useCooperativeLiveUpdates.ts",
   "16": "scripts",
   "17": "onboarding.ts",
   "18": "vercel.json",
@@ -23,9 +21,5 @@
   "21": "Footer.tsx",
   "22": "tailwind.config.js",
   "23": "postcss.config.js",
-  "24": "vite",
-  "25": "lucide-react",
-  "26": "PreApprovalModal.tsx",
-  "27": "RejectCreditModal.tsx",
-  "28": "RejectGuarantorModal.tsx"
+  "24": "vite"
 }

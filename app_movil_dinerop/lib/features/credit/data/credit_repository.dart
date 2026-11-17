@@ -4,6 +4,7 @@ import 'models/client_credit_request.dart';
 import 'models/credit_cooperative_status.dart';
 import 'models/credit_request_payload.dart';
 import 'models/credit_request_response.dart';
+import 'models/public_credit_offer.dart';
 import 'dart:typed_data';
 import 'package:dio/dio.dart';
 
@@ -11,6 +12,30 @@ class CreditRepository {
   CreditRepository(this._client);
 
   final ApiClient _client;
+
+  Future<List<PublicCreditOffer>> loadPublicOffers({
+    required String creditCategory,
+    required double amount,
+    required int termMonths,
+  }) async {
+    final data = await _client.request<List<dynamic>>(
+      '/api/credits/public-offers',
+      authenticated: false,
+      queryParameters: {
+        'creditCategory': creditCategory,
+        'amount': amount,
+        'termMonths': termMonths,
+      },
+      parser: (data) => List<dynamic>.from(data as List),
+    );
+    return data
+        .map(
+          (item) => PublicCreditOffer.fromJson(
+            Map<String, dynamic>.from(item as Map),
+          ),
+        )
+        .toList();
+  }
 
   Future<CreditRequestResponse> createCreditRequest(
     CreditRequestPayload payload,

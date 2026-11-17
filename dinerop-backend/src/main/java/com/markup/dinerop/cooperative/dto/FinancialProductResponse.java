@@ -1,6 +1,7 @@
 package com.markup.dinerop.cooperative.dto;
 
 import com.markup.dinerop.cooperative.domain.entity.FinancialProductType;
+import com.markup.dinerop.cooperative.domain.entity.CreditProductCategory;
 import com.markup.dinerop.cooperative.domain.entity.InterestPaymentOption;
 import com.markup.dinerop.cooperative.domain.entity.InvestmentCalculationMethod;
 import java.math.BigDecimal;
@@ -9,7 +10,7 @@ import java.util.List;
 import java.util.Set;
 
 public record FinancialProductResponse(
-        Long id, Long cooperativeId, FinancialProductType type, String name, String description,
+        Long id, Long cooperativeId, FinancialProductType type, CreditProductCategory creditCategory, String name, String description,
         BigDecimal minimumAmount, BigDecimal maximumAmount, boolean active, List<Condition> conditions,
         Set<InterestPaymentOption> interestPaymentOptions,
         InvestmentCalculationMethod calculationMethod,

@@ -11,6 +11,7 @@ import '../../../../shared/widgets/app_error_view.dart';
 import '../../../../shared/widgets/app_text_field.dart';
 import '../auth_controller.dart';
 import '../../../investment/providers/investment_providers.dart';
+import '../../../../app/providers.dart';
 
 class RegistrationVerificationPage extends ConsumerStatefulWidget {
   const RegistrationVerificationPage({super.key, required this.email});
@@ -187,11 +188,17 @@ class _RegistrationVerificationPageState
           .setRegistrationPassword(email: _email, password: password);
       await ref.read(authControllerProvider).login(_email, password);
       final draft = await ref.read(investmentDraftStoreProvider).read();
-      final next = draft == null
-          ? '/dashboard'
-          : (ref.read(authControllerProvider).requiresOnboarding
-                ? '/onboarding'
-                : '/simulate-investment');
+      final creditDraft = await ref
+          .read(creditSimulationDraftStoreProvider)
+          .read();
+      final needsOnboarding = ref
+          .read(authControllerProvider)
+          .requiresOnboarding;
+      final next = draft != null
+          ? (needsOnboarding ? '/onboarding' : '/simulate-investment')
+          : creditDraft != null
+          ? (needsOnboarding ? '/onboarding' : '/simulate-credit')
+          : '/dashboard';
       if (mounted) context.go(next);
     } catch (error) {
       if (mounted) {

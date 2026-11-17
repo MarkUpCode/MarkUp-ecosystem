@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { X, Loader, User, MapPin, Wallet } from "lucide-react";
 import { httpClient } from "../../api/httpClient";
 import { getErrorMessage } from "../../api/errors";
@@ -10,6 +10,7 @@ interface PublicCreditRequestModalProps {
   open: boolean;
   onClose: () => void;
   type: "CREDITO" | "INVERSION";
+  initialCredit?: { amount: number; termMonths: number; creditType: "CONSUMO" | "MICROCREDITO" };
 }
 
 interface FormData {
@@ -134,8 +135,16 @@ export default function PublicCreditRequestModal({
   open,
   onClose,
   type,
+  initialCredit,
 }: PublicCreditRequestModalProps) {
   const [formData, setFormData] = useState<FormData>(getInitialFormState(type));
+  const initialAmount = initialCredit?.amount;
+  const initialTermMonths = initialCredit?.termMonths;
+  const initialCreditType = initialCredit?.creditType;
+  useEffect(() => {
+    if (!open || initialAmount == null || initialTermMonths == null || initialCreditType == null) return;
+    setFormData((current) => ({ ...current, type: "CREDITO", amount: String(initialAmount), plazoMeses: String(initialTermMonths), creditType: initialCreditType }));
+  }, [open, initialAmount, initialTermMonths, initialCreditType]);
   // canton y parroquia son estados visuales intermedios — solo canton se envía como "city"
   const [canton, setCanton] = useState<string>("");
   const [parroquia, setParroquia] = useState<string>("");

@@ -6,6 +6,7 @@ import '../core/di.dart';
 import '../features/auth/presentation/auth_controller.dart';
 import '../features/cooperative/data/cooperative_repository.dart';
 import '../features/credit/data/credit_repository.dart';
+import '../features/credit/data/credit_simulation_draft_store.dart';
 import '../features/onboarding/data/models/pre_registration_data.dart';
 
 void _refreshWhileObserved(Ref ref) {
@@ -18,6 +19,10 @@ void _refreshWhileObserved(Ref ref) {
 final creditRepositoryProvider = Provider<CreditRepository>((ref) {
   return CreditRepository(ref.watch(apiClientProvider));
 });
+
+final creditSimulationDraftStoreProvider = Provider<CreditSimulationDraftStore>(
+  (ref) => CreditSimulationDraftStore(ref.watch(flutterSecureStorageProvider)),
+);
 
 final cooperativeRepositoryProvider = Provider<CooperativeRepository>((ref) {
   return CooperativeRepository(ref.watch(apiClientProvider));
