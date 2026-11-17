@@ -64,6 +64,7 @@ flutter:
 
   assets:
     - assets/images/cooperatives/
+    - assets/images/dolarito/
     - assets/icon/app_icon.png
 
 

@@ -7,6 +7,9 @@ import '../../../core/errors/app_exception.dart';
 import '../../../core/widgets/cooperative_logo_marquee.dart';
 import '../../../shared/widgets/app_error_view.dart';
 import '../../../shared/widgets/app_loader.dart';
+import '../../dolarito/models/dolarito_reaction.dart';
+import '../../dolarito/providers/dolarito_provider.dart';
+import '../../dolarito/widgets/dolarito_widget.dart';
 import '../../auth/presentation/auth_controller.dart';
 import 'sections/dashboard_exploration_sections.dart';
 
@@ -22,7 +25,35 @@ class DashboardPage extends ConsumerWidget {
     final profile = ref.watch(clientProfileProvider);
     final requests = ref.watch(dashboardCreditRequestsProvider);
     final onboarding = ref.watch(dashboardOnboardingStatusProvider);
+    final dolaritoService = ref.watch(dolaritoServiceProvider);
+    final dolaritoState = ref.watch(dolaritoProvider);
     final profileComplete = onboarding.valueOrNull?.formularioCompleto == true;
+    DolaritoReaction? dolaritoReaction;
+    if (onboarding.hasError) {
+      dolaritoReaction = dolaritoService.profileStatusError();
+    } else if (onboarding.valueOrNull?.formularioCompleto == false) {
+      dolaritoReaction = dolaritoService.onboardingRequired();
+    } else if (profileComplete && requests.hasError) {
+      dolaritoReaction = dolaritoService.creditLoadError();
+    } else if (profileComplete && requests.hasValue) {
+      dolaritoReaction = dolaritoService.dashboard(
+        profileComplete: true,
+        requests: requests.value ?? const [],
+      );
+      final latest = [...?requests.value]
+        ..sort(
+          (a, b) => (b.fechaSolicitud ?? DateTime(0)).compareTo(
+            a.fechaSolicitud ?? DateTime(0),
+          ),
+        );
+      if (latest.isNotEmpty &&
+          dolaritoState.scopeKey == 'credit:${latest.first.solicitudId}' &&
+          dolaritoState.eventId > 0) {
+        dolaritoReaction = dolaritoState.toReaction();
+      }
+    } else if (profileComplete) {
+      dolaritoReaction = dolaritoService.profileComplete();
+    }
 
     return Scaffold(
       backgroundColor: const Color(0xFFF7F9FC),
@@ -81,6 +112,29 @@ class DashboardPage extends ConsumerWidget {
                         style: const TextStyle(color: _muted, fontSize: 11),
                       ),
                     ),
+                    if (dolaritoReaction != null) ...[
+                      const SizedBox(height: 12),
+                      DolaritoWidget(
+                        mood: dolaritoReaction.mood,
+                        message: dolaritoReaction.message,
+                        compact: true,
+                        imageSize: 58,
+                        actionLabel: dolaritoReaction.actionLabel,
+                        onAction: switch (dolaritoReaction.action) {
+                          DolaritoAction.completeProfile => () => context.push(
+                            '/onboarding',
+                          ),
+                          DolaritoAction.viewRequests => () => context.go(
+                            '/requests',
+                          ),
+                          DolaritoAction.retry => () {
+                            ref.invalidate(dashboardOnboardingStatusProvider);
+                            ref.invalidate(dashboardCreditRequestsProvider);
+                          },
+                          null => null,
+                        },
+                      ),
+                    ],
                     const SizedBox(height: 20),
                     requests.when(
                       data: (items) => ActiveCreditCarousel(

@@ -8,6 +8,8 @@ import '../../../core/theme/theme_provider.dart';
 import '../../../shared/widgets/app_button.dart';
 import '../../../shared/widgets/app_card.dart';
 import '../../auth/presentation/auth_controller.dart';
+import '../../dolarito/providers/dolarito_provider.dart';
+import '../../dolarito/widgets/dolarito_widget.dart';
 import '../../onboarding/data/models/pre_registration_data.dart';
 
 class ProfilePage extends ConsumerWidget {
@@ -17,6 +19,12 @@ class ProfilePage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final auth = ref.watch(authControllerProvider);
     final profile = ref.watch(clientProfileProvider);
+    final onboarding = ref.watch(dashboardOnboardingStatusProvider);
+    final dolaritoService = ref.watch(dolaritoServiceProvider);
+    final onboardingComplete = onboarding.valueOrNull?.formularioCompleto;
+    final dolarito = dolaritoService.profile(
+      profileComplete: onboardingComplete,
+    );
     final mode = ref.watch(themeModeProvider);
     final theme = Theme.of(context);
 
@@ -40,13 +48,28 @@ class ProfilePage extends ConsumerWidget {
             profile.when(
               data: (data) => _ProfileHero(
                 data: data,
-                onboardingComplete: auth.onboardingComplete,
+                onboardingComplete: onboardingComplete,
               ),
-              loading: () => const _ProfileHero(onboardingComplete: false),
+              loading: () =>
+                  _ProfileHero(onboardingComplete: onboardingComplete),
               error: (_, _) => _ProfileHero(
                 email: auth.user?.email,
-                onboardingComplete: auth.onboardingComplete,
+                onboardingComplete: onboardingComplete,
               ),
+            ),
+            const SizedBox(height: 12),
+            DolaritoWidget(
+              mood: dolarito.mood,
+              message: dolarito.message,
+              compact: true,
+              actionLabel: onboarding.hasError
+                  ? 'Volver a comprobar'
+                  : dolarito.actionLabel,
+              onAction: onboarding.hasError
+                  ? () => ref.invalidate(dashboardOnboardingStatusProvider)
+                  : onboardingComplete == false
+                  ? () => context.push('/onboarding')
+                  : null,
             ),
             const SizedBox(height: 22),
             Text(
@@ -123,7 +146,7 @@ class _ProfileHero extends StatelessWidget {
   const _ProfileHero({this.data, this.email, required this.onboardingComplete});
   final PreRegistrationData? data;
   final String? email;
-  final bool onboardingComplete;
+  final bool? onboardingComplete;
 
   @override
   Widget build(BuildContext context) {
@@ -192,7 +215,11 @@ class _ProfileHero extends StatelessWidget {
                     borderRadius: BorderRadius.circular(99),
                   ),
                   child: Text(
-                    onboardingComplete ? 'Perfil completo' : 'Perfil pendiente',
+                    onboardingComplete == true
+                        ? 'Perfil completo'
+                        : onboardingComplete == false
+                        ? 'Perfil pendiente'
+                        : 'Verificando perfil',
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 11,

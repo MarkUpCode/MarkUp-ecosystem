@@ -2,8 +2,10 @@ import 'package:app_movil_dinerop/features/credit/data/models/client_credit_requ
 import 'package:app_movil_dinerop/features/credit/data/models/credit_enums.dart';
 import 'package:app_movil_dinerop/features/dashboard/presentation/sections/dashboard_exploration_sections.dart';
 import 'package:app_movil_dinerop/app/shell/app_shell.dart';
+import 'package:app_movil_dinerop/features/dolarito/providers/dolarito_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
@@ -55,7 +57,14 @@ void main() async {
       );
       addTearDown(router.dispose);
 
-      await tester.pumpWidget(MaterialApp.router(routerConfig: router));
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            dolaritoProvider.overrideWith((ref) => DolaritoNotifier()),
+          ],
+          child: MaterialApp.router(routerConfig: router),
+        ),
+      );
       await tester.pumpAndSettle();
 
       expect(find.text('DINEROP'), findsOneWidget);
@@ -317,7 +326,14 @@ void main() async {
       );
       addTearDown(router.dispose);
 
-      await tester.pumpWidget(MaterialApp.router(routerConfig: router));
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            dolaritoProvider.overrideWith((ref) => DolaritoNotifier()),
+          ],
+          child: MaterialApp.router(routerConfig: router),
+        ),
+      );
       await tester.pumpAndSettle();
       expect(find.text('Inicio'), findsOneWidget);
       expect(find.text('Productos'), findsOneWidget);

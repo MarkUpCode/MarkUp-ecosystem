@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class NotificationsPage extends StatelessWidget {
+import '../../dolarito/models/dolarito_mood.dart';
+import '../../dolarito/widgets/dolarito_widget.dart';
+
+class NotificationsPage extends ConsumerWidget {
   const NotificationsPage({super.key});
 
   static const _navy = Color(0xFF142B4A);
   static const _teal = Color(0xFF16B8A6);
 
   @override
-  Widget build(BuildContext context) => Scaffold(
+  Widget build(BuildContext context, WidgetRef ref) => Scaffold(
     backgroundColor: const Color(0xFFF7F9FC),
     appBar: AppBar(
       backgroundColor: const Color(0xFFF7F9FC),
@@ -25,6 +29,8 @@ class NotificationsPage extends StatelessWidget {
           style: TextStyle(color: Color(0xFF718096), fontSize: 14),
         ),
         const SizedBox(height: 22),
+        const DolaritoStateWidget(compact: true),
+        const SizedBox(height: 18),
         Wrap(
           spacing: 8,
           runSpacing: 8,
@@ -45,6 +51,13 @@ class NotificationsPage extends StatelessWidget {
           ),
           child: Column(
             children: [
+              const DolaritoWidget(
+                mood: DolaritoMood.waiting,
+                message:
+                    'Cuando llegue una novedad, te avisaré y podrás consultar tus solicitudes desde aquí.',
+                compact: true,
+              ),
+              const SizedBox(height: 16),
               Container(
                 width: 64,
                 height: 64,

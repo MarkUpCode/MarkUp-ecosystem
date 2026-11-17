@@ -74,6 +74,7 @@ class AuthController extends ChangeNotifier {
       if (_user?.isClient == true && _user?.isActive == true) {
         debugPrint('[BOOT 9] Calling API to refresh onboarding status');
         unawaited(_refreshOnboardingStateFromBackend());
+        unawaited(_pushNotificationService.initializeAndRegister());
       }
     } catch (error, stackTrace) {
       debugPrint('[BOOT] Bootstrap failed: $error');
@@ -366,11 +367,11 @@ class AuthController extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> refreshOnboardingState() async {
+  Future<OnboardingStatusResponse?> refreshOnboardingState() async {
     if (!isAuthenticated ||
         _user?.isClient != true ||
         _user?.isActive != true) {
-      return;
+      return null;
     }
     final status = await _safeLoadOnboardingStatus();
     if (status != null) {
@@ -378,6 +379,7 @@ class AuthController extends ChangeNotifier {
       await _persistCurrentSession();
       notifyListeners();
     }
+    return status;
   }
 }
 
@@ -400,6 +402,6 @@ final authControllerProvider = ChangeNotifierProvider<AuthController>((ref) {
   return AuthController(
     ref.watch(authRepositoryProvider),
     ref.watch(onboardingRepositoryProvider),
-    PushNotificationService(ref.watch(apiClientProvider)),
+    ref.watch(pushNotificationServiceProvider),
   );
 });

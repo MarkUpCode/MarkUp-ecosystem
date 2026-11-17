@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 
 import '../../../core/data/locations/ecuador_locations.dart';
 import '../../../core/errors/app_exception.dart';
+import '../../../app/providers.dart';
 import '../../../shared/widgets/app_button.dart';
 import '../../../shared/widgets/app_card.dart';
 import '../../../shared/widgets/app_error_view.dart';
@@ -14,6 +15,10 @@ import '../../../shared/widgets/app_loader.dart';
 import '../../../shared/widgets/app_text_field.dart';
 import '../../../shared/widgets/step_progress.dart';
 import '../../auth/presentation/auth_controller.dart';
+import '../../dolarito/models/dolarito_mood.dart';
+import '../../dolarito/models/dolarito_reaction.dart';
+import '../../dolarito/providers/dolarito_provider.dart';
+import '../../dolarito/widgets/dolarito_widget.dart';
 import '../data/models/onboarding_request.dart';
 import '../data/onboarding_repository.dart' show GuarantorProfile;
 
@@ -211,9 +216,24 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
       _selectedCanton = data.city;
       _provinciaController.text = data.province ?? '';
       _cantonController.text = data.city ?? '';
+      final status = await ref.read(onboardingRepositoryProvider).loadStatus();
+      ref
+          .read(dolaritoProvider.notifier)
+          .show(
+            status.formularioCompleto
+                ? ref.read(dolaritoServiceProvider).profileComplete()
+                : ref.read(dolaritoServiceProvider).onboardingStep(_step),
+            force: true,
+          );
     } catch (_) {
       _emailController.text =
           ref.read(authControllerProvider).user?.email ?? '';
+      ref
+          .read(dolaritoProvider.notifier)
+          .show(
+            ref.read(dolaritoServiceProvider).profileStatusError(),
+            force: true,
+          );
     } finally {
       if (mounted) {
         setState(() => _isLoading = false);
@@ -231,13 +251,26 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
       _validationAttempt = 0;
       if (profile == null) {
         for (final controller in [
-          _nombresController, _apellidosController, _cedulaController,
-          _fechaNacimientoController, _ocupacionController, _empresaController,
-          _telefonoController, _provinciaController, _cantonController,
-          _barrioController, _calleController, _calleSecundariaController,
-          _numeroController, _referenciaUbicacionController, _nombreNegocioController,
-          _direccionNegocioController, _tiempoActividadController,
-          _telefonoNegocioController, _ingresoController, _egresoController,
+          _nombresController,
+          _apellidosController,
+          _cedulaController,
+          _fechaNacimientoController,
+          _ocupacionController,
+          _empresaController,
+          _telefonoController,
+          _provinciaController,
+          _cantonController,
+          _barrioController,
+          _calleController,
+          _calleSecundariaController,
+          _numeroController,
+          _referenciaUbicacionController,
+          _nombreNegocioController,
+          _direccionNegocioController,
+          _tiempoActividadController,
+          _telefonoNegocioController,
+          _ingresoController,
+          _egresoController,
         ]) {
           controller.clear();
         }
@@ -247,7 +280,9 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
         _selectedProvince = null;
         _selectedCanton = null;
         _selectedParish = null;
-        for (final reference in _references) { reference.dispose(); }
+        for (final reference in _references) {
+          reference.dispose();
+        }
         _references
           ..clear()
           ..add(_ReferenceDraft());
@@ -262,7 +297,9 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
       _apellidosController.text = person.apellidos;
       _cedulaController.text = person.cedula;
       _fechaNacimiento = person.fechaNacimiento;
-      _fechaNacimientoController.text = DateFormat('yyyy-MM-dd').format(person.fechaNacimiento);
+      _fechaNacimientoController.text = DateFormat(
+        'yyyy-MM-dd',
+      ).format(person.fechaNacimiento);
       _estadoCivil = person.estadoCivil;
       _ocupacionController.text = person.ocupacion ?? '';
       _empresaController.text = person.empresaTrabajo ?? '';
@@ -284,14 +321,20 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
       _telefonoNegocioController.text = activity?.telefonoNegocio ?? '';
       _ingresoController.text = income.ingresoMensual.toString();
       _egresoController.text = income.egresoMensual.toString();
-      for (final reference in _references) { reference.dispose(); }
+      for (final reference in _references) {
+        reference.dispose();
+      }
       _references
         ..clear()
-        ..addAll(person.referencias.map((item) => _ReferenceDraft(
+        ..addAll(
+          person.referencias.map(
+            (item) => _ReferenceDraft(
               nombreCompleto: item.nombreCompleto,
               parentesco: item.parentesco ?? '',
               telefono: item.telefono ?? '',
-            )..tipo = item.tipo));
+            )..tipo = item.tipo,
+          ),
+        );
       if (_references.isEmpty) _references.add(_ReferenceDraft());
     });
   }
@@ -344,6 +387,14 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
           ..clear()
           ..addAll(_invalidControllersForCurrentStep());
       });
+      ref
+          .read(dolaritoProvider.notifier)
+          .show(
+            ref
+                .read(dolaritoServiceProvider)
+                .onboardingError(validationMessage),
+            force: true,
+          );
       return;
     }
     setState(() {
@@ -351,6 +402,12 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
       _invalidFields.clear();
       _step = math.min(_step + 1, _totalSteps - 1);
     });
+    ref
+        .read(dolaritoProvider.notifier)
+        .show(
+          ref.read(dolaritoServiceProvider).onboardingStep(_step),
+          force: true,
+        );
   }
 
   bool _hasFieldError(TextEditingController controller) =>
@@ -499,6 +556,12 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
     setState(() {
       _step = math.max(_step - 1, 0);
     });
+    ref
+        .read(dolaritoProvider.notifier)
+        .show(
+          ref.read(dolaritoServiceProvider).onboardingStep(_step),
+          force: true,
+        );
   }
 
   void _updateProvince(String? value) {
@@ -574,6 +637,15 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
     });
   }
 
+  void _showOnboardingError(String? detail) {
+    ref
+        .read(dolaritoProvider.notifier)
+        .show(
+          ref.read(dolaritoServiceProvider).onboardingError(detail),
+          force: true,
+        );
+  }
+
   void _ensureSpouseFields() {
     if (_conyugeNombresController.text.isEmpty &&
         _conyugeApellidosController.text.isEmpty &&
@@ -591,6 +663,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
       setState(() {
         _error = 'Debes aceptar la declaración para continuar.';
       });
+      _showOnboardingError(_error);
       return;
     }
 
@@ -598,6 +671,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
       setState(() {
         _error = 'Selecciona la fecha de nacimiento.';
       });
+      _showOnboardingError(_error);
       return;
     }
 
@@ -605,6 +679,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
       setState(() {
         _error = 'Selecciona la fecha de nacimiento del cónyuge.';
       });
+      _showOnboardingError(_error);
       return;
     }
 
@@ -703,8 +778,46 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
                   ),
                 );
 
+      var profileVerified = widget.isGuarantor;
       if (!widget.isGuarantor) {
-        await ref.read(authControllerProvider).refreshOnboardingState();
+        final status = await ref
+            .read(authControllerProvider)
+            .refreshOnboardingState();
+        ref.invalidate(dashboardOnboardingStatusProvider);
+        profileVerified = status?.formularioCompleto == true;
+        if (!profileVerified) {
+          setState(() {
+            _error =
+                'Guardamos tu información, pero no pudimos confirmar el estado de tu perfil. Vuelve a intentarlo en unos momentos.';
+          });
+          ref
+              .read(dolaritoProvider.notifier)
+              .show(
+                ref.read(dolaritoServiceProvider).profileStatusError(),
+                force: true,
+              );
+          return;
+        }
+        ref
+            .read(dolaritoProvider.notifier)
+            .show(
+              ref.read(dolaritoServiceProvider).onboardingCompleted(),
+              force: true,
+            );
+      } else {
+        ref
+            .read(dolaritoProvider.notifier)
+            .show(
+              DolaritoReaction(
+                mood: DolaritoMood.proud,
+                message:
+                    'La información del garante quedó enviada para revisión.',
+                event: DolaritoEvent.onboardingProgress,
+                priority: DolaritoPriority.informative,
+                scopeKey: 'onboarding-guarantor',
+              ),
+              force: true,
+            );
       }
       if (!mounted) return;
 
@@ -712,6 +825,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
         alreadyCompleted: _showAlreadyCompleted,
         responseId: response.id,
         responseEstado: response.estado,
+        profileVerified: profileVerified,
       );
 
       if (mounted) {
@@ -728,13 +842,30 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
             'ya ha completado el formulario de onboarding',
           );
       if (alreadyCompleted) {
-        setState(() {
-          _showAlreadyCompleted = true;
-        });
+        final status = await ref
+            .read(authControllerProvider)
+            .refreshOnboardingState();
+        ref.invalidate(dashboardOnboardingStatusProvider);
+        if (status?.formularioCompleto != true) {
+          setState(
+            () => _error =
+                'No pude confirmar el estado del formulario. Comprueba tu conexión e inténtalo de nuevo.',
+          );
+          _showOnboardingError(_error);
+          return;
+        }
+        setState(() => _showAlreadyCompleted = true);
+        ref
+            .read(dolaritoProvider.notifier)
+            .show(
+              ref.read(dolaritoServiceProvider).onboardingCompleted(),
+              force: true,
+            );
         await _showSuccessDialog(
           alreadyCompleted: true,
           responseId: null,
           responseEstado: null,
+          profileVerified: true,
         );
         if (mounted && !widget.isGuarantor) {
           context.go('/dashboard');
@@ -745,10 +876,12 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
       setState(() {
         _error = error.message;
       });
+      _showOnboardingError(error.message);
     } catch (_) {
       setState(() {
         _error = AppErrorMessages.generic;
       });
+      _showOnboardingError(_error);
     } finally {
       if (mounted) {
         setState(() => _isSubmitting = false);
@@ -760,6 +893,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
     required bool alreadyCompleted,
     required int? responseId,
     required String? responseEstado,
+    required bool profileVerified,
   }) async {
     await showDialog<void>(
       context: context,
@@ -868,6 +1002,15 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
+                      if (profileVerified && !widget.isGuarantor) ...[
+                        const DolaritoWidget(
+                          mood: DolaritoMood.excited,
+                          message:
+                              '¡Perfil completo! Ya puedes continuar con tu solicitud de crédito.',
+                          compact: true,
+                        ),
+                        const SizedBox(height: 14),
+                      ],
                       Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
@@ -987,19 +1130,35 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Garante registrado', style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w800)),
+          Text(
+            'Garante registrado',
+            style: Theme.of(
+              context,
+            ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w800),
+          ),
           const SizedBox(height: 4),
-          Text('Puedes reutilizar sus datos y actualizarlos antes de enviarlos para este crédito.', style: Theme.of(context).textTheme.bodySmall),
+          Text(
+            'Puedes reutilizar sus datos y actualizarlos antes de enviarlos para este crédito.',
+            style: Theme.of(context).textTheme.bodySmall,
+          ),
           const SizedBox(height: 10),
           DropdownButtonFormField<int?>(
             initialValue: _selectedGuarantorProfileId,
             decoration: const InputDecoration(labelText: 'Seleccionar garante'),
             items: [
-              const DropdownMenuItem<int?>(value: null, child: Text('Registrar un garante nuevo')),
-              ..._guarantorProfiles.map((profile) => DropdownMenuItem<int?>(
-                value: profile.id,
-                child: Text('${profile.persona.nombres} ${profile.persona.apellidos} · ${profile.persona.cedula}', overflow: TextOverflow.ellipsis),
-              )),
+              const DropdownMenuItem<int?>(
+                value: null,
+                child: Text('Registrar un garante nuevo'),
+              ),
+              ..._guarantorProfiles.map(
+                (profile) => DropdownMenuItem<int?>(
+                  value: profile.id,
+                  child: Text(
+                    '${profile.persona.nombres} ${profile.persona.apellidos} · ${profile.persona.cedula}',
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ),
             ],
             onChanged: _selectGuarantorProfile,
           ),
@@ -1813,6 +1972,11 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
                   SizedBox(height: compactLayout ? 8 : 20),
                   StepProgress(currentStep: _step + 1, totalSteps: _totalSteps),
                   SizedBox(height: compactLayout ? 8 : 16),
+                  if (!keyboardVisible && !widget.isGuarantor)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 12),
+                      child: DolaritoStateWidget(compact: true),
+                    ),
                   if (_error != null) ...[
                     AppErrorView(message: _error!),
                     const SizedBox(height: 12),
@@ -1837,7 +2001,8 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            if (widget.isGuarantor && _guarantorProfiles.isNotEmpty) ...[
+                            if (widget.isGuarantor &&
+                                _guarantorProfiles.isNotEmpty) ...[
                               _buildGuarantorProfileSelector(context),
                               const SizedBox(height: 14),
                             ],

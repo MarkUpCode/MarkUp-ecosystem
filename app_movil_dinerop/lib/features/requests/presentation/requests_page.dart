@@ -15,6 +15,8 @@ import '../../credit/data/models/client_credit_request.dart';
 import '../../credit/data/models/credit_cooperative_status.dart';
 import '../../credit/data/models/credit_enums.dart';
 import '../../credit/presentation/widgets/credit_request_card.dart';
+import '../../dolarito/providers/dolarito_provider.dart';
+import '../../dolarito/widgets/dolarito_widget.dart';
 
 class RequestsPage extends ConsumerStatefulWidget {
   const RequestsPage({super.key});
@@ -255,10 +257,23 @@ class _RequestsPageState extends ConsumerState<RequestsPage> {
             );
           },
           loading: () => const AppLoader(label: 'Cargando solicitudes...'),
-          error: (error, _) => AppErrorView(
-            message: error is AppException
-                ? error.message
-                : AppErrorMessages.generic,
+          error: (error, _) => ListView(
+            padding: const EdgeInsets.all(20),
+            children: [
+              DolaritoWidget(
+                mood: ref.read(dolaritoServiceProvider).creditLoadError().mood,
+                message: ref.read(dolaritoServiceProvider).creditLoadError().message,
+                compact: true,
+                actionLabel: 'Reintentar',
+                onAction: () => ref.invalidate(requestsProvider),
+              ),
+              const SizedBox(height: 14),
+              AppErrorView(
+                message: error is AppException
+                    ? error.message
+                    : AppErrorMessages.generic,
+              ),
+            ],
           ),
         ),
       ),
@@ -322,6 +337,26 @@ class _RequestDetailsSheet extends ConsumerWidget {
               ],
             ),
             const SizedBox(height: 18),
+            Builder(
+              builder: (context) {
+                final reaction = ref.read(dolaritoServiceProvider).creditStatus(
+                  request.estado,
+                  requestId: request.solicitudId,
+                );
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 16),
+                  child: DolaritoWidget(
+                    mood: reaction.mood,
+                    message: reaction.message,
+                    compact: true,
+                    actionLabel: reaction.actionLabel,
+                    onAction: reaction.action == null
+                        ? null
+                        : () => context.go('/requests'),
+                  ),
+                );
+              },
+            ),
             if (offers.isEmpty)
               _NoOffersCard(request: request)
             else ...[

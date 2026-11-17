@@ -21,6 +21,7 @@ import java.util.Map;
 import com.markup.dinerop.credit.dto.CreditProcessEventDto;
 import com.markup.dinerop.credit.infrastructure.repository.CreditProcessEventRepository;
 import com.markup.dinerop.credit.infrastructure.repository.SolicitudCooperativaRepository;
+import com.markup.dinerop.onboarding.application.service.OnboardingService;
 import com.markup.dinerop.credit.service.CreditRequirementService;
 import com.markup.dinerop.credit.service.CreditReferralPdfService;
 import org.springframework.http.HttpHeaders;
@@ -41,6 +42,7 @@ public class CreditController {
         private final CreditReferralPdfService creditReferralPdfService;
             private final CreditProcessEventRepository creditProcessEventRepository;
             private final SolicitudCooperativaRepository solicitudCooperativaRepository;
+    private final OnboardingService onboardingService;
 
 
 
@@ -84,6 +86,14 @@ public class CreditController {
             @Valid @RequestBody ClientCreditRequestDto dto,
             @AuthenticationPrincipal User user
     ) {
+        if (!onboardingService.getFormularioClienteStatus(user.getIdUser()).isFormularioCompleto()) {
+            return ResponseEntity.status(org.springframework.http.HttpStatus.CONFLICT)
+                    .body(Map.of(
+                            "message",
+                            "Completa tu perfil antes de enviar una solicitud de crédito."
+                    ));
+        }
+
         CreditService.AuthenticatedRequestResult result = creditService.createAuthenticatedRequest(
                 dto, user.getIdUser(), user.getEmail()
         );

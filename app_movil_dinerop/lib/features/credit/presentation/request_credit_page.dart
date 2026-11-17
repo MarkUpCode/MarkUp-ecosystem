@@ -7,11 +7,16 @@ import 'package:go_router/go_router.dart';
 import '../../../app/providers.dart';
 import '../../../core/data/locations/ecuador_locations.dart';
 import '../../../core/errors/app_exception.dart';
+import '../../../shared/widgets/app_loader.dart';
 import '../../../shared/widgets/app_badge.dart';
 import '../../../shared/widgets/app_button.dart';
 import '../../../shared/widgets/app_card.dart';
 import '../../../shared/widgets/app_error_view.dart';
 import '../../../shared/widgets/app_text_field.dart';
+import '../../auth/presentation/auth_controller.dart';
+import '../../dolarito/models/dolarito_mood.dart';
+import '../../dolarito/providers/dolarito_provider.dart';
+import '../../dolarito/widgets/dolarito_widget.dart';
 import '../data/models/credit_enums.dart';
 import '../data/models/credit_request_payload.dart';
 
@@ -68,6 +73,10 @@ class _RequestCreditPageState extends ConsumerState<RequestCreditPage> {
 
   Future<void> _loadLocationData() async {
     try {
+      final onboarding = await ref
+          .read(onboardingRepositoryProvider)
+          .loadStatus();
+      if (!onboarding.formularioCompleto) return;
       final profile = await ref.read(clientProfileProvider.future);
       final province = profile.province?.trim();
       final city = profile.city?.trim();
@@ -120,6 +129,41 @@ class _RequestCreditPageState extends ConsumerState<RequestCreditPage> {
   }
 
   Future<void> _submit() async {
+    try {
+      final onboarding = await ref
+          .read(onboardingRepositoryProvider)
+          .loadStatus();
+      if (!onboarding.formularioCompleto) {
+        ref
+            .read(dolaritoProvider.notifier)
+            .show(
+              ref.read(dolaritoServiceProvider).onboardingRequired(),
+              force: true,
+            );
+        if (mounted) {
+          setState(
+            () => _error = 'Completa tu perfil antes de enviar una solicitud.',
+          );
+        }
+        return;
+      }
+    } catch (error) {
+      ref
+          .read(dolaritoProvider.notifier)
+          .show(
+            ref.read(dolaritoServiceProvider).profileStatusError(),
+            force: true,
+          );
+      if (mounted) {
+        setState(
+          () => _error = error is AppException
+              ? error.message
+              : 'No pudimos comprobar el estado de tu perfil.',
+        );
+      }
+      return;
+    }
+
     if (!_formKey.currentState!.validate()) return;
 
     setState(() {
@@ -143,12 +187,19 @@ class _RequestCreditPageState extends ConsumerState<RequestCreditPage> {
           .read(creditRepositoryProvider)
           .createCreditRequest(payload);
       ref.invalidate(dashboardCreditRequestsProvider);
+      ref.invalidate(requestsProvider);
 
       if (!mounted) return;
       await _showSubmissionConfirmation(response.cooperativasNotificadas);
       if (mounted) context.go('/dashboard');
     } catch (error) {
       if (!mounted) return;
+      ref
+          .read(dolaritoProvider.notifier)
+          .show(
+            ref.read(dolaritoServiceProvider).creditLoadError(),
+            force: true,
+          );
       setState(() {
         _error = error is AppException
             ? error.message
@@ -205,6 +256,53 @@ class _RequestCreditPageState extends ConsumerState<RequestCreditPage> {
 
   @override
   Widget build(BuildContext context) {
+    final onboarding = ref.watch(dashboardOnboardingStatusProvider);
+    if (onboarding.isLoading) {
+      return const Scaffold(
+        appBar: null,
+        body: AppLoader(label: 'Verificando que tu perfil esté completo...'),
+      );
+    }
+    if (onboarding.hasError) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('Solicitar crédito')),
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: DolaritoWidget(
+              mood: DolaritoMood.worried,
+              message:
+                  'No pudimos comprobar tu perfil con el servidor. Vuelve a intentarlo antes de enviar una solicitud.',
+              compact: true,
+              actionLabel: 'Volver a comprobar',
+              onAction: () => ref.invalidate(dashboardOnboardingStatusProvider),
+            ),
+          ),
+        ),
+      );
+    }
+    if (onboarding.value?.formularioCompleto != true) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('Completa tu perfil')),
+        body: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 520),
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: DolaritoWidget(
+                mood: DolaritoMood.explaining,
+                message:
+                    'Antes de enviar tu solicitud, completemos tu perfil. Las cooperativas necesitan esta información para evaluar tu crédito.',
+                compact: true,
+                actionLabel: 'Completar mi perfil',
+                onAction: () => context.push('/onboarding'),
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(title: const Text('Solicitar crédito')),
       body: SafeArea(
@@ -216,6 +314,13 @@ class _RequestCreditPageState extends ConsumerState<RequestCreditPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
+                  DolaritoWidget(
+                    mood: DolaritoMood.motivated,
+                    message:
+                        'Tu perfil está listo. Revisemos juntos la información de tu solicitud.',
+                    compact: true,
+                  ),
+                  const SizedBox(height: 14),
                   Text(
                     'Completa la información mínima.',
                     style: Theme.of(context).textTheme.bodyMedium,

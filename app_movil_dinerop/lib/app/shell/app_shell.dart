@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../features/dolarito/providers/dolarito_provider.dart';
 import '../../shared/widgets/app_authenticated_header.dart';
 
-class AppShell extends StatelessWidget {
+class AppShell extends ConsumerWidget {
   const AppShell({super.key, required this.child});
 
   final Widget child;
@@ -43,7 +45,28 @@ class AppShell extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    ref.listen(dolaritoProvider, (previous, next) {
+      if (next.navigateToRequests && previous?.eventId != next.eventId) {
+        ref.read(dolaritoProvider.notifier).consumeNavigation(next.eventId);
+        if (GoRouterState.of(context).uri.path != '/requests') {
+          context.go('/requests');
+        }
+      }
+    });
+    final dolaritoState = ref.watch(dolaritoProvider);
+    if (dolaritoState.navigateToRequests) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!context.mounted) return;
+        if (GoRouterState.of(context).uri.path != '/requests') {
+          context.go('/requests');
+        }
+        ref
+            .read(dolaritoProvider.notifier)
+            .consumeNavigation(dolaritoState.eventId);
+      });
+    }
+
     final location = GoRouterState.of(context).uri.path;
     final selectedIndex = _selectedIndex(location);
 

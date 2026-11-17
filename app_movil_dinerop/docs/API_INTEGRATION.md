@@ -36,6 +36,8 @@ Base URL es solo host/base; las rutas abajo incluyen `/api/...`. No se asume que
 
 † La app usa valor por defecto `authenticated: true`; el interceptor añade token si hay. Backend security/`API_DOCUMENTATION.md` considera público `/api/cooperatives/**`, por lo que el bearer es incidental.
 
+El `POST /api/credits/me` autenticado consulta el estado real de onboarding antes de distribuir la solicitud. Si el formulario está incompleto, responde `409 Conflict` con el mensaje `Completa tu perfil antes de enviar una solicitud de crédito.`. La app también bloquea el formulario y vuelve a comprobar el estado antes del envío; la validación del servidor protege esta ruta para cualquier cliente autenticado.
+
 ## Formatos y DTO
 
 - Login envía `{email,password}` y parsea `{accessToken,user}` (`LoginResponse`, `AppUser`).
