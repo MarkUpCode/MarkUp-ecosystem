@@ -12,8 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import com.markup.dinerop.admin.users.dto.request.CreateUserRequest;
-import com.markup.dinerop.auth.dto.InviteUserRequest;
-import com.markup.dinerop.auth.service.AuthService;
+import com.markup.dinerop.auth.service.InvitationService;
 import com.markup.dinerop.admin.users.dto.response.UserStatsResponse;
 
 @Service
@@ -22,7 +21,7 @@ public class UserAdminService {
 
     private final UserRepository userRepository;
     private final UserAdminMapper mapper;
-    private final AuthService authService;
+    private final InvitationService invitationService;
 
     public PagedUsersResponse getUsers(int page, int size) {
 
@@ -62,22 +61,15 @@ public class UserAdminService {
     }
     public UserDetailResponse createUser(CreateUserRequest request) {
 
-        InviteUserRequest inviteRequest =
-                new InviteUserRequest(
-
-                        request.email(),
-
-                        request.role(),
-
-                        request.cooperativaId()
-
-                );
-
-        User user = authService.inviteUser(inviteRequest);
+        User user = invitationService.invite(request);
 
         return mapper.toDetail(user);
 
     }
+
+    public void resendInvitation(Long id) { invitationService.resend(id); }
+
+    public void revokeInvitation(Long id) { invitationService.revoke(id); }
 
     public UserDetailResponse changeStatus(
             Long id,
@@ -86,6 +78,8 @@ public class UserAdminService {
 
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));
+
+        if (!Boolean.TRUE.equals(active)) invitationService.revoke(id);
 
         user.setActive(active);
 

@@ -47,6 +47,14 @@ export async function inviteUser(
   return data;
 }
 
+export async function resendInvitation(id: number): Promise<void> {
+  await api.post(`/api/admin/users/${id}/invitation`);
+}
+
+export async function revokeInvitation(id: number): Promise<void> {
+  await api.delete(`/api/admin/users/${id}/invitation`);
+}
+
 /**
  * Cambiar estado
  */

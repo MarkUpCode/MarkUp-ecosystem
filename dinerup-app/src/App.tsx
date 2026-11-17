@@ -6,6 +6,7 @@ import OnboardingPage from "./pages/OnboardingPage";
 import ActivateAccount from "./pages/ActivateAccount";
 import ForgotPassword from "./pages/password/ForgotPassword";
 import ResetPassword from "./pages/password/ResetPassword";
+import ActivateInvitation from "./pages/ActivateInvitation";
 import { useAuth } from "./context/useAuth";
 
 function AuthLoadingScreen() {
@@ -54,6 +55,7 @@ function App() {
         <Route path="/login" element={<Login />} />
       </Route>
       <Route path="/activate" element={<ActivateAccount />} />
+      <Route path="/activate-invitation" element={<ActivateInvitation />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route element={<ProtectedRoute allowedRole="client" />}>

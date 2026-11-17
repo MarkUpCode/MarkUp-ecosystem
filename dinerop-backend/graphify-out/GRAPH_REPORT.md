@@ -1,24 +1,23 @@
 # Graph Report - dinerop-backend  (2026-11-16)
 
 ## Corpus Check
-- 244 files · ~30,093 words
+- 265 files · ~33,373 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 7 file(s) not represented in the graph (top: (none) 4, .properties 1, .cmd 1)
 
 ## Summary
-- 1592 nodes · 3961 edges · 117 communities (48 shown, 69 thin omitted)
-- Extraction: 93% EXTRACTED · 7% INFERRED · 0% AMBIGUOUS · INFERRED: 282 edges (avg confidence: 0.85)
+- 1812 nodes · 4670 edges · 121 communities (52 shown, 69 thin omitted)
+- Extraction: 93% EXTRACTED · 7% INFERRED · 0% AMBIGUOUS · INFERRED: 329 edges (avg confidence: 0.85)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `e0dc7a77`
+- Built from commit: `105f90ed`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
 ## Community Hubs (Navigation)
-- lombok.Builder
+- lombok.AllArgsConstructor
 - CreditOfferEmailBuilder
-- SolicitudOnboarding
 - CooperativeAdminService
 - AuthService
 - PersonaOnboarding
@@ -28,7 +27,7 @@
 - AuthService.java
 - CreditType
 - SecurityActivityTest.java
-- PushDeviceToken
+- localdatetime
 - CooperativeService
 - PersonaOnboardingRequest
 - CreditRequest
@@ -40,7 +39,7 @@
 - SolicitudCooperativaRepository
 - PageVisitRepository
 - UserDetailResponse
-- AuthController
+- ForgotPasswordRequest
 - CreditRequirement
 - ReferenciaPersonal
 - auth/config/SecurityConfig.java
@@ -49,31 +48,33 @@
 - SolicitudCooperativaCotizacion
 - jakarta.servlet.http.HttpServletRequest
 - org.springframework.data.jpa.repository.JpaRepository
-- PublicRegistrationRequest
-- EstadoOnboarding
-- UserPreRegistration
+- AuthController
+- FinancialProductService
+- UserAdminController.java
 - DireccionOnboarding
 - org.springframework.context.annotation.Bean
 - SolicitudCooperativaStatus
 - postgres
 - OnboardingMapper
-- org.springframework.stereotype.Service
+- CreditService
 - JwtAuthenticationFilter.java
 - CreditGuarantorWorkflowService.java
 - application-prod.yaml
 - bigdecimal
 - notblank
+- CreditGuarantorHistoryItemDto
 - UserRepository
 - ActividadEconomica
 - UserAdminService.java
 - PasswordResetToken
-- CreditRejectionReason
+- .decide
 - CreditProcessEventRepository
 - IngresoEgreso
+- CooperativeInvitation
 - InternalCooperativeController
-- CooperativeCreditQueryService.java
-- CooperativeCreditDecisionServiceTest.java
-- CreditRequestStatus
+- SolicitudOnboarding
+- CreditService.java
+- lombok.Builder
 - PersonaOnboardingResponse
 - FirebaseConfig.java
 - Role
@@ -96,195 +97,215 @@
 - level
 - org.springframework.transaction.annotation.Transactional
 - DineropBackendApplication.java
-- AuthServiceSecurityActivityTest
+- .login
 - spring
+- ActivationToken
 - datasource
 - CreditGuarantorSubmission
 - com.markup:dinerop-backend
 - AdminBootstrapRunner.java
 - CreditGuarantorWorkflowServiceTest
-- CreditGuarantorStatus
-- CreditRequestType
+- ClientCreditQueryService.java
+- InvitationService.java
 - LinkClientResponseDto
-- VisitController
+- InvitationService
 - EmailTemplateEngine.java
 - LinkClientRequestDto
-- PublicCreditRequestDto
-- IngresoEgresoRequest
+- CreditRequest.java
+- EmailVerificationOtp
 - TipoVivienda
+- .preRegister
+- PublicRegistrationRequest
+- .sendTestEmail
 
 ## God Nodes (most connected - your core abstractions)
-1. `User` - 53 edges
-2. `SolicitudCooperativaRepository` - 43 edges
-3. `AuthService` - 42 edges
-4. `CreditService` - 38 edges
-5. `SolicitudCooperativa` - 34 edges
-6. `NotificationService` - 33 edges
-7. `Cooperative` - 31 edges
-8. `UserRepository` - 30 edges
-9. `Role` - 30 edges
-10. `CreditController` - 28 edges
+1. `User` - 62 edges
+2. `AuthService` - 49 edges
+3. `CreditService` - 46 edges
+4. `SolicitudCooperativaRepository` - 43 edges
+5. `NotificationService` - 39 edges
+6. `UserRepository` - 36 edges
+7. `CooperativeService` - 35 edges
+8. `SolicitudCooperativa` - 34 edges
+9. `CooperativeRepository` - 32 edges
+10. `Cooperative` - 31 edges
 
 ## Surprising Connections (you probably didn't know these)
+- `CooperativeAdminController` --references--> `CooperativeAdminService`  [EXTRACTED]
+  src/main/java/com/markup/dinerop/admin/cooperative/controller/CooperativeAdminController.java → dinerop-backend/src/main/java/com/markup/dinerop/admin/cooperative/service/CooperativeAdminService.java
+- `CooperativeAdminService` --references--> `CooperativeRateRepository`  [EXTRACTED]
+  dinerop-backend/src/main/java/com/markup/dinerop/admin/cooperative/service/CooperativeAdminService.java → src/main/java/com/markup/dinerop/cooperative/domain/repository/CooperativeRateRepository.java
+- `CreateUserRequest` --references--> `Role`  [EXTRACTED]
+  dinerop-backend/src/main/java/com/markup/dinerop/admin/users/dto/request/CreateUserRequest.java → src/main/java/com/markup/dinerop/auth/entity/Role.java
 - `SecurityConfig` --references--> `JwtAuthenticationFilter`  [EXTRACTED]
-  src/main/java/com/markup/dinerop/auth/config/SecurityConfig.java → src/main/java/com/markup/dinerop/auth/config/JwtAuthenticationFilter.java
-- `CreditGuarantorSubmission` --references--> `CreditGuarantorStatus`  [EXTRACTED]
-  src/main/java/com/markup/dinerop/credit/domain/model/CreditGuarantorSubmission.java → src/main/java/com/markup/dinerop/credit/domain/model/enums/CreditGuarantorStatus.java
-- `CreditGuarantorSubmissionRepository` --references--> `CreditGuarantorSubmission`  [EXTRACTED]
-  src/main/java/com/markup/dinerop/credit/infrastructure/repository/CreditGuarantorSubmissionRepository.java → src/main/java/com/markup/dinerop/credit/domain/model/CreditGuarantorSubmission.java
-- `SolicitudCooperativa` --references--> `CreditRequest`  [EXTRACTED]
-  src/main/java/com/markup/dinerop/credit/domain/model/SolicitudCooperativa.java → src/main/java/com/markup/dinerop/credit/domain/model/CreditRequest.java
-- `SolicitudCooperativa` --references--> `CreditRejectionReason`  [EXTRACTED]
-  src/main/java/com/markup/dinerop/credit/domain/model/SolicitudCooperativa.java → src/main/java/com/markup/dinerop/credit/domain/model/enums/CreditRejectionReason.java
+  dinerop-backend/src/main/java/com/markup/dinerop/auth/config/SecurityConfig.java → src/main/java/com/markup/dinerop/auth/config/JwtAuthenticationFilter.java
+- `ActivationToken` --references--> `User`  [EXTRACTED]
+  src/main/java/com/markup/dinerop/auth/entity/ActivationToken.java → dinerop-backend/src/main/java/com/markup/dinerop/auth/entity/User.java
 
 ## Import Cycles
 - None detected.
 
-## Communities (117 total, 69 thin omitted)
+## Communities (121 total, 69 thin omitted)
 
-### Community 0 - "lombok.Builder"
-Cohesion: 0.11
-Nodes (18): ChangeRegistrationEmailRequest, CompleteRegistrationRequest, JwtResponse, LoginResponse, UserInfo, OtpRegistrationStartResponse, OtpResendRequest, OtpVerificationRequest (+10 more)
-
-### Community 1 - "CreditOfferEmailBuilder"
-Cohesion: 0.17
-Nodes (3): ActivationEmailBuilder, CreditOfferEmailBuilder, EmailTemplate
+### Community 0 - "lombok.AllArgsConstructor"
+Cohesion: 0.22
+Nodes (9): ChangeRegistrationEmailRequest, JwtResponse, LoginRequest, LoginResponse, UserInfo, ClientCreditResponseDto, CooperativeDto, CooperativeStatusItemDto (+1 more)
 
 ### Community 3 - "CooperativeAdminService"
-Cohesion: 0.13
-Nodes (6): CooperativeAdminController, CreateCooperativeRequest, UpdateCooperativeRequest, CooperativeDetailResponse, CooperativeNotFoundException, CooperativeAdminService
-
-### Community 4 - "AuthService"
-Cohesion: 0.22
-Nodes (4): UserAlreadyActiveException, EmailVerificationOtpRepository, AuthService, PublicCreditRequestResult
+Cohesion: 0.14
+Nodes (6): CreateCooperativeRequest, UpdateCooperativeRequest, CooperativeDetailResponse, CooperativeNotFoundException, CooperativeAdminMapper, CooperativeAdminService
 
 ### Community 5 - "PersonaOnboarding"
-Cohesion: 0.08
-Nodes (15): PersonaOnboarding, EstadoFormulario, COMPLETO, PENDIENTE, SOLICITADO, EstadoGarante, ACEPTADO, EN_REVISION (+7 more)
+Cohesion: 0.12
+Nodes (7): PersonaOnboarding, RolPersona, CONYUGE_GARANTE, CONYUGE_SOLICITANTE, GARANTE, SOLICITANTE, PersonaOnboardingRepository
 
 ### Community 6 - "lombok.RequiredArgsConstructor"
-Cohesion: 0.11
-Nodes (7): DashboardController, DashboardService, UserAdminController, UserAdminService, InternalAuthController, TestEmailController, TestEmailRequest
+Cohesion: 0.10
+Nodes (7): CooperativeAdminController, FinancialProductAdminController, DashboardController, DashboardService, InternalAuthController, InvitationController, TestEmailController
+
+### Community 7 - "AuthServiceOtpFlowTest.java"
+Cohesion: 0.17
+Nodes (7): EmailVerificationOtpRepository, PasswordResetTokenRepository, UserPreRegistrationRepository, AuthServiceOtpFlowTest, AuthServiceSecurityActivityTest, InvitationServiceTest, ClientCreditQuerySecurityTest
 
 ### Community 8 - "CooperativeRate"
 Cohesion: 0.10
 Nodes (6): CooperativeRate, CreditType, CONSUMO, MICROCREDITO, CooperativeRateRepository, CooperativeRateDto
 
 ### Community 9 - "AuthService.java"
-Cohesion: 0.08
-Nodes (8): CooperativeRequiredException, InviteUserRequest, AccountDisabledException, CooperativeNotFoundException, OtpAttemptsExceededException, OtpExpiredException, OtpInvalidException, OtpRateLimitException
+Cohesion: 0.07
+Nodes (6): CooperativeRequiredException, CooperativeNotFoundException, OtpAttemptsExceededException, OtpExpiredException, OtpInvalidException, OtpRateLimitException
 
 ### Community 10 - "CreditType"
-Cohesion: 0.18
-Nodes (4): CreditType, CONSUMO, MICROCREDITO, ClientCreditRequestDto
+Cohesion: 0.20
+Nodes (4): CreditRequestType, CREDITO, INVERSION, ClientCreditRequestDto
+
+### Community 12 - "localdatetime"
+Cohesion: 0.06
+Nodes (9): UserPreRegistration, CreditProcessEventDto, PushDeviceToken, PushDeviceTokenRepository, EstadoOnboarding, COMPLETADO, EN_PROCESO, SOLICITANDO_GARANTE (+1 more)
 
 ### Community 13 - "CooperativeService"
-Cohesion: 0.17
-Nodes (4): CooperativeService, CooperativeDto, CreateCooperativeDto, CooperativeController
+Cohesion: 0.25
+Nodes (3): CooperativeService, CooperativeDto, CreateCooperativeDto
 
 ### Community 14 - "PersonaOnboardingRequest"
 Cohesion: 0.10
-Nodes (4): ActividadEconomicaRequest, PersonaOnboardingRequest, ReferenciaRequest, SolicitudOnboardingRequest
+Nodes (4): ActividadEconomicaRequest, IngresoEgresoRequest, PersonaOnboardingRequest, ReferenciaRequest
+
+### Community 15 - "CreditRequest"
+Cohesion: 0.10
+Nodes (6): RecentCreditDto, CreditRequest, CreditRequestStatus, CREADA, ENVIADA, CreditRequestRepository
 
 ### Community 16 - ".getDashboard"
 Cohesion: 0.17
 Nodes (5): CooperativeStatsDto, CreditStatsDto, DashboardResponseDto, UserStatsDto, VisitStatsDto
 
 ### Community 19 - "org.springframework.stereotype.Component"
-Cohesion: 0.21
-Nodes (5): OnboardingService, CompletarFormularioGaranteUseCase, CrearSolicitudConSolicitanteUseCase, ObtenerOnboardingUnificadoUseCase, SolicitarGaranteUseCase
+Cohesion: 0.14
+Nodes (6): ActivationEmailBuilder, OnboardingService, CompletarFormularioGaranteUseCase, CrearSolicitudConSolicitanteUseCase, SolicitarGaranteUseCase, SolicitudOnboardingRequest
 
 ### Community 21 - "SolicitudCooperativaRepository"
-Cohesion: 0.11
-Nodes (3): SolicitudCooperativa, ClientCreditQueryService, SolicitudCooperativaRepository
+Cohesion: 0.08
+Nodes (3): SolicitudCooperativa, CreditDistributionService, SolicitudCooperativaRepository
 
 ### Community 22 - "PageVisitRepository"
-Cohesion: 0.29
-Nodes (3): PageVisit, PageVisitRepository, VisitService
+Cohesion: 0.15
+Nodes (4): PageVisit, PageVisitRepository, VisitService, VisitController
 
 ### Community 23 - "UserDetailResponse"
-Cohesion: 0.19
-Nodes (4): ChangeStatusRequest, CreateUserRequest, UserDetailResponse, UserNotFoundException
+Cohesion: 0.23
+Nodes (4): ChangeStatusRequest, UserDetailResponse, UserAdminMapper, UserAdminService
 
 ### Community 26 - "CreditRequirement"
-Cohesion: 0.17
+Cohesion: 0.16
 Nodes (4): CreditRequirement, CreditRequirementDto, CreditRequirementRepository, CreditRequirementService
 
 ### Community 27 - "ReferenciaPersonal"
-Cohesion: 0.14
+Cohesion: 0.13
 Nodes (6): ReferenciaPersonal, TipoReferencia, FAMILIAR, PERSONAL, ReferenciaPersonalResponse, ReferenciaPersonalRepository
 
 ### Community 32 - "jakarta.servlet.http.HttpServletRequest"
-Cohesion: 0.07
-Nodes (10): ApiErrorResponse, AdminGlobalExceptionHandler, InvalidUserRoleException, UserAlreadyExistsException, GlobalExceptionHandler, ApiError, CreditExceptionHandler, BusinessException (+2 more)
+Cohesion: 0.08
+Nodes (8): ApiErrorResponse, AdminGlobalExceptionHandler, InvalidUserRoleException, UserAlreadyExistsException, GlobalExceptionHandler, CooperativeController, ApiError, CreditExceptionHandler
 
-### Community 35 - "EstadoOnboarding"
-Cohesion: 0.20
-Nodes (5): EstadoOnboarding, COMPLETADO, EN_PROCESO, SOLICITANDO_GARANTE, SolicitudOnboardingResponse
+### Community 34 - "AuthController"
+Cohesion: 0.15
+Nodes (3): AuthController, OtpRegistrationStartResponse, PublicRegistrationResponse
+
+### Community 35 - "FinancialProductService"
+Cohesion: 0.07
+Nodes (14): FinancialProduct, FinancialProductCondition, FinancialProductType, CREDIT, INVESTMENT, FinancialProductConditionRepository, FinancialProductRepository, FinancialProductService (+6 more)
+
+### Community 36 - "UserAdminController.java"
+Cohesion: 0.10
+Nodes (4): UserAdminController, BusinessException, OnboardingExceptionHandler, ResourceNotFoundException
 
 ### Community 37 - "DireccionOnboarding"
-Cohesion: 0.12
-Nodes (4): DireccionOnboarding, DireccionRequest, DireccionOnboardingResponse, DireccionOnboardingRepository
+Cohesion: 0.17
+Nodes (3): DireccionOnboarding, DireccionOnboardingResponse, DireccionOnboardingRepository
 
 ### Community 38 - "org.springframework.context.annotation.Bean"
 Cohesion: 0.15
 Nodes (4): OpenApiConfig, WebClientConfig, PasswordEncoderConfig, ResendConfig
 
 ### Community 39 - "SolicitudCooperativaStatus"
-Cohesion: 0.22
-Nodes (7): SolicitudCooperativaStatus, ACEPTADA, ENVIADA, PRE_APROBADA, RECHAZADA, SOLICITANDO_GARANTE, ActualizarEstadoSolicitudRequest
+Cohesion: 0.20
+Nodes (8): SolicitudCooperativaStatus, ACEPTADA, ENVIADA, PRE_APROBADA, RECHAZADA, SOLICITANDO_GARANTE, ActualizarEstadoSolicitudRequest, CooperativeCreditRequestItemDto
 
 ### Community 40 - "postgres"
 Cohesion: 0.13
 Nodes (14): POSTGRES_DB, POSTGRES_PASSWORD, POSTGRES_USER, container_name, environment, image, ports, restart (+6 more)
 
-### Community 42 - "org.springframework.stereotype.Service"
-Cohesion: 0.15
-Nodes (5): CreditDistributionService, AuthenticatedRequestResult, CreditService, CreditReferralPdfService, OnboardingServiceImpl
+### Community 42 - "CreditService"
+Cohesion: 0.13
+Nodes (7): CreditRejectionReason, BURO_DEL_CREDITO, CAPACIDAD_DE_PAGO, OTROS, TIEMPO_DE_NEGOCIO, AuthenticatedRequestResult, CreditService
 
 ### Community 44 - "CreditGuarantorWorkflowService.java"
 Cohesion: 0.14
-Nodes (5): CreditGuarantorWorkflowService, TypeReference<>, CreditGuarantorEvaluationDto, CreditGuarantorHistoryItemDto, CreditGuarantorSubmissionRepository
+Nodes (5): CreditGuarantorWorkflowService, TypeReference<>, CreditGuarantorEvaluationDto, CreditReferralPdfService, OnboardingServiceImpl
 
 ### Community 45 - "application-prod.yaml"
 Cohesion: 0.13
 Nodes (14): app, email-enabled, frontend-url, cors, allowed-origins, firebase, service-account-base64, jwt (+6 more)
 
 ### Community 46 - "bigdecimal"
-Cohesion: 0.14
-Nodes (5): CooperativeListItemResponse, PagedCooperativesResponse, CooperativeAdminMapper, CooperativeSpecification, CooperativeOfferDefaultsDto
+Cohesion: 0.12
+Nodes (3): CooperativeListItemResponse, PagedCooperativesResponse, CooperativeSpecification
 
 ### Community 50 - "ActividadEconomica"
-Cohesion: 0.17
+Cohesion: 0.15
 Nodes (3): ActividadEconomica, ActividadEconomicaResponse, ActividadEconomicaRepository
 
 ### Community 51 - "UserAdminService.java"
-Cohesion: 0.18
-Nodes (4): PagedUsersResponse, UserListItemResponse, UserStatsResponse, UserAdminMapper
-
-### Community 52 - "PasswordResetToken"
-Cohesion: 0.12
-Nodes (3): ResetPasswordRequest, PasswordResetToken, PasswordResetTokenRepository
-
-### Community 53 - "CreditRejectionReason"
-Cohesion: 0.11
-Nodes (6): CreditRejectionReason, BURO_DEL_CREDITO, CAPACIDAD_DE_PAGO, OTROS, TIEMPO_DE_NEGOCIO, LoanCalculationResult
-
-### Community 58 - "CooperativeCreditQueryService.java"
-Cohesion: 0.13
-Nodes (4): CooperativeCreditQueryService, OnboardingCooperativaController, OnboardingUnificadoResponse, SolicitudOnboardingRepository
-
-### Community 59 - "CooperativeCreditDecisionServiceTest.java"
 Cohesion: 0.16
-Nodes (5): LoanCalculator, ClientCreditCooperativeStatusService, CooperativeCreditDecisionService, ClientCreditQuerySecurityTest, CooperativeCreditDecisionServiceTest
+Nodes (4): PagedUsersResponse, UserListItemResponse, UserStatsResponse, UserNotFoundException
 
-### Community 60 - "CreditRequestStatus"
-Cohesion: 0.29
-Nodes (4): RecentCreditDto, CreditRequestStatus, CREADA, ENVIADA
+### Community 55 - "IngresoEgreso"
+Cohesion: 0.15
+Nodes (3): IngresoEgreso, IngresoEgresoResponse, IngresoEgresoRepository
+
+### Community 56 - "CooperativeInvitation"
+Cohesion: 0.12
+Nodes (3): InvitationActivationRequest, CooperativeInvitation, CooperativeInvitationRepository
+
+### Community 58 - "SolicitudOnboarding"
+Cohesion: 0.08
+Nodes (5): ObtenerOnboardingUnificadoUseCase, OnboardingCooperativaController, SolicitudOnboarding, OnboardingUnificadoResponse, SolicitudOnboardingRepository
+
+### Community 59 - "CreditService.java"
+Cohesion: 0.23
+Nodes (4): LoanCalculator, ClientCreditCooperativeStatusService, CooperativeCreditDecisionService, CooperativeCreditDecisionServiceTest
+
+### Community 60 - "lombok.Builder"
+Cohesion: 0.26
+Nodes (7): CompleteRegistrationRequest, OtpResendRequest, OtpVerificationRequest, InternalCooperativeDto, InternalOnboardingCompletedRequest, FormularioClienteStatusResponse, PreRegistrationDataResponse
+
+### Community 62 - "PersonaOnboardingResponse"
+Cohesion: 0.11
+Nodes (9): EstadoFormulario, COMPLETO, PENDIENTE, SOLICITADO, EstadoGarante, ACEPTADO, EN_REVISION, RECHAZADO (+1 more)
 
 ### Community 64 - "Role"
-Cohesion: 0.28
-Nodes (6): RecentUserDto, ChangeRoleRequest, Role, ADMIN, CLIENT, COOPERATIVE
+Cohesion: 0.24
+Nodes (7): RecentUserDto, ChangeRoleRequest, InviteUserRequest, Role, ADMIN, CLIENT, COOPERATIVE
 
 ### Community 65 - "tomcat"
 Cohesion: 0.22
@@ -298,6 +319,10 @@ Nodes (8): hikari, connection-test-query, connection-timeout, idle-timeout, max-
 Cohesion: 0.25
 Nodes (8): health, web, include, show-details, management, endpoint, endpoints, exposure
 
+### Community 72 - "CooperativeDecisionRequestDto.java"
+Cohesion: 0.13
+Nodes (3): CooperativeDecisionRequestDto, CooperativeOfferDefaultsDto, GuaranteeDecisionRequestDto
+
 ### Community 79 - "flyway"
 Cohesion: 0.18
 Nodes (11): baseline-description, baseline-on-migrate, baseline-version, enabled, ddl-auto, hibernate, open-in-view, show-sql (+3 more)
@@ -310,10 +335,6 @@ Nodes (8): format_sql, generate_statistics, jdbc, order_inserts, order_updates, 
 Cohesion: 0.33
 Nodes (6): com.markup.dinerop, com.zaxxer.hikari, org.hibernate, org.springframework, root, level
 
-### Community 84 - "AuthServiceSecurityActivityTest"
-Cohesion: 0.27
-Nodes (3): LoginRequest, AccountNotActiveException, AuthServiceSecurityActivityTest
-
 ### Community 85 - "spring"
 Cohesion: 0.25
 Nodes (7): name, enabled, active, spring, application, flyway, profiles
@@ -322,37 +343,37 @@ Nodes (7): name, enabled, active, spring, application, flyway, profiles
 Cohesion: 0.40
 Nodes (5): driver-class-name, password, url, username, datasource
 
-### Community 105 - "CreditGuarantorStatus"
-Cohesion: 0.29
-Nodes (6): CreditGuarantorStatus, ACEPTADO, CORRECCION_SOLICITADA, EN_REVISION, RECHAZADO, SOLICITUD_RECHAZADA
+### Community 88 - "CreditGuarantorSubmission"
+Cohesion: 0.11
+Nodes (7): CreditGuarantorSubmission, CreditGuarantorStatus, ACEPTADO, CORRECCION_SOLICITADA, EN_REVISION, RECHAZADO, SOLICITUD_RECHAZADA
 
-### Community 106 - "CreditRequestType"
-Cohesion: 0.33
-Nodes (4): CreditRequestType, CREDITO, INVERSION, CooperativeCreditRequestItemDto
+### Community 112 - "CreditRequest.java"
+Cohesion: 0.16
+Nodes (4): CreditType, CONSUMO, MICROCREDITO, PublicCreditRequestDto
 
 ### Community 114 - "TipoVivienda"
 Cohesion: 0.50
 Nodes (3): TipoVivienda, ARRENDADA, PROPIA
 
 ## Knowledge Gaps
-- **43 isolated node(s):** `com.markup:dinerop-backend`, `EN_REVISION`, `CORRECCION_SOLICITADA`, `RECHAZADO`, `ACEPTADO` (+38 more)
-  These have ≤1 connection - possible missing edges. (Counts symbols only; 552 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
+- **45 isolated node(s):** `CREDIT`, `INVESTMENT`, `CONSUMO`, `MICROCREDITO`, `ACEPTADO` (+40 more)
+  These have ≤1 connection - possible missing edges. (Counts symbols only; 621 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
 - **69 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `User` connect `User` to `lombok.Builder`, `AuthService`, `lombok.RequiredArgsConstructor`, `AuthServiceOtpFlowTest.java`, `AuthService.java`, `SecurityActivityTest.java`, `PushDeviceToken`, `.getDashboard`, `UserDetailResponse`, `lombok`, `JwtService`, `UserRepository`, `UserAdminService.java`, `PasswordResetToken`, `CooperativeCreditQueryService.java`, `Role`, `CustomUserDetailsService.java`, `PushNotificationController`, `AuthServiceSecurityActivityTest`, `AdminBootstrapRunner.java`?**
-  _High betweenness centrality (0.056) - this node is a cross-community bridge._
-- **What connects `com.markup:dinerop-backend`, `EN_REVISION`, `CORRECCION_SOLICITADA` to the rest of the system?**
-  _43 weakly-connected nodes found - possible missing edges._
-- **Should `lombok.Builder` be split into smaller, more focused modules?**
-  _Cohesion score 0.10909090909090909 - nodes in this community are weakly interconnected._
-- **Why does `PersonaOnboarding` connect `PersonaOnboarding` to `SolicitudOnboarding`, `DireccionOnboarding`, `GuarantorProfile`, `OnboardingMapper`, `ActividadEconomica`, `IngresoEgreso`, `lombok`, `CooperativeCreditQueryService.java`, `ReferenciaPersonal`, `PersonaOnboardingResponse`?**
-  _High betweenness centrality (0.040) - this node is a cross-community bridge._
-- **Should `SolicitudOnboarding` be split into smaller, more focused modules?**
-  _Cohesion score 0.13725490196078433 - nodes in this community are weakly interconnected._
-- **Why does `SolicitudCooperativaRepository` connect `SolicitudCooperativaRepository` to `org.springframework.data.jpa.repository.JpaRepository`, `CreditGuarantorWorkflowServiceTest`, `org.springframework.stereotype.Service`, `SecurityActivityTest.java`, `CreditGuarantorWorkflowService.java`, `org.springframework.transaction.annotation.Transactional`, `org.springframework.http.ResponseEntity`, `CreditRejectionReason`, `org.springframework.data.jpa.repository.Query`, `CreditGuarantorWorkflowServiceTest.java`, `CooperativeCreditQueryService.java`, `CooperativeCreditDecisionServiceTest.java`?**
-  _High betweenness centrality (0.035) - this node is a cross-community bridge._
+- **Why does `User` connect `User` to `AuthService`, `AuthServiceOtpFlowTest.java`, `AuthService.java`, `localdatetime`, `.getDashboard`, `UserDetailResponse`, `JwtService`, `jakarta.servlet.http.HttpServletRequest`, `org.springframework.data.jpa.repository.JpaRepository`, `UserRepository`, `UserAdminService.java`, `PasswordResetToken`, `CooperativeInvitation`, `SolicitudOnboarding`, `CreditService.java`, `Role`, `CustomUserDetailsService.java`, `PushNotificationController`, `ActivationToken`, `InvitationServiceTest.java`, `AdminBootstrapRunner.java`, `CreditGuarantorWorkflowServiceTest`, `InvitationService`, `.generateToken`?**
+  _High betweenness centrality (0.052) - this node is a cross-community bridge._
+- **What connects `CREDIT`, `INVESTMENT`, `CONSUMO` to the rest of the system?**
+  _45 weakly-connected nodes found - possible missing edges._
 - **Should `CooperativeAdminService` be split into smaller, more focused modules?**
-  _Cohesion score 0.1339031339031339 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.1396011396011396 - nodes in this community are weakly interconnected._
+- **Why does `AuthService` connect `AuthService` to `lombok.RequiredArgsConstructor`, `AuthServiceOtpFlowTest.java`, `AuthService.java`, `CreditRequest`, `Cooperative`, `UserDetailResponse`, `ForgotPasswordRequest`, `JwtService`, `AuthController`, `CreditService`, `CreditGuarantorWorkflowService.java`, `UserRepository`, `UserAdminService.java`, `PasswordResetToken`, `CreditService.java`, `NotificationService`, `.login`, `ActivationToken`, `AdminBootstrapRunner.java`, `.preRegister`?**
+  _High betweenness centrality (0.044) - this node is a cross-community bridge._
+- **Should `AuthService` be split into smaller, more focused modules?**
+  _Cohesion score 0.12605042016806722 - nodes in this community are weakly interconnected._
+- **Why does `CooperativeRepository` connect `Cooperative` to `org.springframework.data.jpa.repository.JpaRepository`, `CooperativeAdminService`, `AuthService`, `FinancialProductService`, `lombok.RequiredArgsConstructor`, `AuthServiceOtpFlowTest.java`, `AuthService.java`, `InvitationService.java`, `InvitationService`, `CooperativeService`, `bigdecimal`, `PageVisitRepository`, `InvitationServiceTest.java`?**
+  _High betweenness centrality (0.036) - this node is a cross-community bridge._
+- **Should `PersonaOnboarding` be split into smaller, more focused modules?**
+  _Cohesion score 0.12 - nodes in this community are weakly interconnected._

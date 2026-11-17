@@ -11,12 +11,16 @@ interface UsersTableProps {
   onToggleStatus: (user: UserListItem) => void;
 
   onView?: (user: UserListItem) => void;
+  onResendInvitation?: (user: UserListItem) => void;
+  onRevokeInvitation?: (user: UserListItem) => void;
 }
 
 export function UsersTable({
   users,
   onToggleStatus,
   onView,
+  onResendInvitation,
+  onRevokeInvitation,
 }: UsersTableProps) {
   return (
     <div className="overflow-hidden rounded-3xl border border-white/10 bg-slate-900">
@@ -106,6 +110,7 @@ export function UsersTable({
                     onView={() => onView?.(user)}
 
                 />
+                {user.status === "PENDING_ACTIVATION" && <div className="mt-2 flex justify-end gap-3 text-xs"><button type="button" onClick={() => onResendInvitation?.(user)} className="text-cyan-300 hover:text-cyan-200">Reenviar invitación</button><button type="button" onClick={() => onRevokeInvitation?.(user)} className="text-red-300 hover:text-red-200">Revocar enlace</button></div>}
 
               </td>
 

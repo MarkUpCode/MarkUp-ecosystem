@@ -47,6 +47,10 @@ final cooperativesProvider = FutureProvider.autoDispose((ref) {
   return ref.watch(cooperativeRepositoryProvider).loadCooperatives();
 });
 
+final investmentProductsProvider = FutureProvider.autoDispose((ref) {
+  return ref.watch(cooperativeRepositoryProvider).loadInvestmentCatalog();
+});
+
 final requestsProvider = FutureProvider.autoDispose((ref) {
   _refreshWhileObserved(ref);
   return ref.watch(creditRepositoryProvider).loadMyRequests();

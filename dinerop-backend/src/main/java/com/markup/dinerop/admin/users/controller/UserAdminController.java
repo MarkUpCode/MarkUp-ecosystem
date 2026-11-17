@@ -52,6 +52,14 @@ public class UserAdminController {
         return userAdminService.createUser(request);
     }
 
+    @PostMapping("/{id}/invitation")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void resendInvitation(@PathVariable Long id) { userAdminService.resendInvitation(id); }
+
+    @DeleteMapping("/{id}/invitation")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void revokeInvitation(@PathVariable Long id) { userAdminService.revokeInvitation(id); }
+
     @PatchMapping("/{id}/status")
     public UserDetailResponse changeStatus(
 

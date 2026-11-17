@@ -23,6 +23,7 @@ public class CooperativeService {
 
     private final CooperativeRepository cooperativeRepository;
     private final CooperativeRateRepository cooperativeRateRepository;
+    private final FinancialProductService financialProductService;
 
     public List<CooperativeDto> getAll() {
         return cooperativeRepository.findAll()
@@ -139,6 +140,12 @@ public class CooperativeService {
             com.markup.dinerop.credit.domain.model.enums.CreditType creditType
     ) {
         return getActiveRate(cooperativeId, CreditType.valueOf(creditType.name()));
+    }
+
+    public Double getOfferRate(Long cooperativeId, BigDecimal amount, Integer months,
+                               com.markup.dinerop.credit.domain.model.enums.CreditType creditType) {
+        return financialProductService.applicableCreditRate(cooperativeId, amount, months)
+                .orElseGet(() -> BigDecimal.valueOf(getActiveRate(cooperativeId, creditType))).doubleValue();
     }
 
     public CooperativeRateDto getActiveRateDto(Long cooperativeId, CreditType creditType) {

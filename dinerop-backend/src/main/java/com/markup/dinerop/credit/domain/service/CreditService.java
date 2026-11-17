@@ -469,7 +469,7 @@ public class CreditService {
 
         if (cotizacionRepository.findBySolicitudCooperativaId(sc.getId()).isEmpty()) {
             BigDecimal tasaAnual = BigDecimal.valueOf(
-                    cooperativeService.getActiveRate(cooperativaId, creditRequest.getCreditType())
+                    cooperativeService.getOfferRate(cooperativaId, creditRequest.getAmount(), creditRequest.getPlazoMeses(), creditRequest.getCreditType())
             );
             var calculation = LoanCalculator.calculate(
                     creditRequest.getAmount(),

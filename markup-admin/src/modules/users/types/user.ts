@@ -51,6 +51,9 @@ export interface UsersPageResponse {
 
 export interface InviteUserRequest {
   email: string;
+  firstName: string;
+  lastName: string;
+  phone?: string;
   role: UserRole;
   cooperativaId?: number | null;
 }

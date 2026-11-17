@@ -49,6 +49,15 @@ public class User implements UserDetails {
     @Column(name = "cooperativa_id")
     private Long cooperativaId;
 
+    @Column(name = "first_name", length = 100)
+    private String firstName;
+
+    @Column(name = "last_name", length = 100)
+    private String lastName;
+
+    @Column(length = 30)
+    private String phone;
+
     // ===== Spring Security =====
 
     @Override

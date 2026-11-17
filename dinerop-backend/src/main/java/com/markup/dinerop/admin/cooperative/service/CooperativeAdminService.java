@@ -109,7 +109,9 @@ public class CooperativeAdminService {
 
         cooperative = cooperativeRepository.save(cooperative);
 
-        createDefaultRates(cooperative.getId(), request.tasaAnual());
+        if (request.tasaAnual() != null) {
+            createDefaultRates(cooperative.getId(), request.tasaAnual());
+        }
 
         return mapper.toDetail(cooperative, request.tasaAnual());
 

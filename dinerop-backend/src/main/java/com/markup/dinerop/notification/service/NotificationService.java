@@ -121,6 +121,17 @@ public class NotificationService {
                         .build()
         );
     }
+
+    public void sendInvitationEmail(String to, String firstName, String token) {
+        String link = frontendUrl + "/activate-invitation?token=" + java.net.URLEncoder.encode(token, java.nio.charset.StandardCharsets.UTF_8);
+        if (!emailEnabled) {
+            log.info("Invitation email suppressed in development for {}", to);
+            return;
+        }
+        String safeName = firstName == null ? "" : firstName.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
+        String html = "<div style=\"font-family:Arial,sans-serif;max-width:560px;margin:auto;padding:32px\"><h2>Activa tu cuenta DINEROP</h2><p>Hola " + safeName + ", recibiste una invitación para acceder al panel de tu cooperativa.</p><p><a href=\"" + link + "\">Revisar invitación y crear contraseña</a></p><p>El enlace vence en 48 horas y solo puede utilizarse una vez.</p></div>";
+        sendEmail(SendEmailDto.builder().to(to).subject("Invitación para activar tu cuenta DINEROP").htmlContent(html).build());
+    }
     
     public void sendTestEmail(String to) {
 

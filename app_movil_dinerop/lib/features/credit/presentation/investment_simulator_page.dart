@@ -1,43 +1,28 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../app/providers.dart';
+import '../../cooperative/data/cooperative_repository.dart';
 import '../../../shared/widgets/app_card.dart';
 import '../../../shared/widgets/app_text_field.dart';
 
-class InvestmentSimulatorPage extends StatefulWidget {
+class InvestmentSimulatorPage extends ConsumerStatefulWidget {
   const InvestmentSimulatorPage({super.key});
 
   @override
-  State<InvestmentSimulatorPage> createState() =>
+  ConsumerState<InvestmentSimulatorPage> createState() =>
       _InvestmentSimulatorPageState();
 }
 
 class _InvestmentSimulatorPageState
-    extends State<InvestmentSimulatorPage> {
+    extends ConsumerState<InvestmentSimulatorPage> {
   final _amountController = TextEditingController(text: '5000');
   final _termController = TextEditingController(text: '12');
 
   double _amount = 5000;
   int _months = 12;
-
-  final List<_InvestmentOffer> _offers = const [
-    _InvestmentOffer(
-      name: 'Alianza del Valle',
-      rate: 0.08,
-      color: Color(0xFF07865D),
-    ),
-    _InvestmentOffer(
-      name: 'Tulcán Ltda.',
-      rate: 0.075,
-      color: Color(0xFF087F8C),
-    ),
-    _InvestmentOffer(
-      name: 'Unión El Ejido',
-      rate: 0.085,
-      color: Color(0xFF16826D),
-    ),
-  ];
 
   @override
   void initState() {
@@ -91,6 +76,19 @@ class _InvestmentSimulatorPageState
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final catalog = ref.watch(investmentProductsProvider);
+    final matchingProducts = catalog.valueOrNull
+        ?.where((product) => _amount >= product.minimumAmount &&
+            _amount <= product.maximumAmount &&
+            _months >= product.minimumMonths &&
+            _months <= product.maximumMonths)
+        .toList() ?? const <InvestmentProductOffer>[];
+    final offers = List.generate(matchingProducts.length, (index) {
+      final product = matchingProducts[index];
+      final colors = [const Color(0xFF07865D), const Color(0xFF087F8C), const Color(0xFF16826D)];
+      return _InvestmentOffer(name: product.cooperativeName, productName: product.productName,
+          rate: product.annualRate, color: colors[index % colors.length]);
+    });
 
     return Scaffold(
       appBar: AppBar(
@@ -280,7 +278,7 @@ class _InvestmentSimulatorPageState
                       borderRadius: BorderRadius.circular(99),
                     ),
                     child: Text(
-                      '${_offers.length} opciones',
+                      '${offers.length} opciones',
                       style:
                       theme.textTheme.labelMedium?.copyWith(
                         color: const Color(0xFF087A53),
@@ -308,7 +306,13 @@ class _InvestmentSimulatorPageState
               // INVESTMENT OFFERS
               // ─────────────────────────────────────────────
 
-              ..._offers.map(
+              if (catalog.isLoading)
+                const Center(child: Padding(padding: EdgeInsets.all(24), child: CircularProgressIndicator()))
+              else if (catalog.hasError)
+                const Text('No pudimos cargar las condiciones de inversión. Inténtalo nuevamente.')
+              else if (offers.isEmpty)
+                const Padding(padding: EdgeInsets.all(18), child: Text('No hay productos vigentes para el monto y plazo seleccionados.')),
+              ...offers.map(
                     (offer) => Padding(
                   padding: const EdgeInsets.only(bottom: 14),
                   child: _InvestmentOfferCard(
@@ -383,11 +387,13 @@ class _InvestmentSimulatorPageState
 class _InvestmentOffer {
   const _InvestmentOffer({
     required this.name,
+    required this.productName,
     required this.rate,
     required this.color,
   });
 
   final String name;
+  final String productName;
   final double rate;
   final Color color;
 }
@@ -452,7 +458,7 @@ class _InvestmentOfferCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      'Cooperativa aliada',
+                      offer.productName,
                       style:
                       theme.textTheme.bodySmall?.copyWith(
                         color: theme

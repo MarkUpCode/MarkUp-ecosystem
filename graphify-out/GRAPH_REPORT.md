@@ -1,17 +1,17 @@
 # Graph Report - MarkUp-ecosystem  (2026-11-16)
 
 ## Corpus Check
-- 582 files · ~140,859 words
+- 582 files · ~140,906 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 55 file(s) not represented in the graph (top: (none) 14, .xml 7, .log 5)
 
 ## Summary
-- 4434 nodes · 8595 edges · 269 communities (163 shown, 106 thin omitted)
+- 4434 nodes · 8591 edges · 267 communities (161 shown, 106 thin omitted)
 - Extraction: 95% EXTRACTED · 5% INFERRED · 0% AMBIGUOUS · INFERRED: 426 edges (avg confidence: 0.88)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `f4f8d612`
+- Built from commit: `105f90ed`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -65,7 +65,7 @@
 - org.springframework.data.jpa.repository.JpaRepository
 - Login.tsx
 - onboarding_repository.dart
-- Map.tsx
+- ref_lucide_react
 - request_credit_page.dart
 - credit_request_card.dart
 - cooperative_partners_view.dart
@@ -108,7 +108,6 @@
 - GuarantorProfile
 - app_shell.dart
 - JwtService
-- ref_react_router_dom
 - UserAdminService.java
 - compilerOptions
 - useCooperatives.ts
@@ -176,7 +175,6 @@
 - LinkClientRequest
 - PreRegisterResponse
 - PublicRegistrationResponse
-- ref_react
 - PreRegisterRequest
 - PreRegisterResponse
 - Role
@@ -262,15 +260,15 @@
   app_movil_dinerop/docs/API_INTEGRATION.md → dinerop-backend/src/main/java/com/markup/dinerop/auth/dto/PublicRegistrationRequest.java
 - `Catálogo y exploración` --references--> `CooperativeRepository`  [INFERRED]
   DINEROP-KNOWLEDGE/USER-FLOWS.md → dinerop-backend/src/main/java/com/markup/dinerop/cooperative/domain/repository/CooperativeRepository.java
-- `Roles y límites` --references--> `SecurityConfig`  [INFERRED]
-  DINEROP-KNOWLEDGE/AUTHENTICATION-FLOW.md → dinerop-backend/src/main/java/com/markup/dinerop/auth/config/SecurityConfig.java
 - `Datos de sesión` --references--> `AuthController`  [INFERRED]
+  app_movil_dinerop/docs/AUTHENTICATION.md → dinerop-backend/src/main/java/com/markup/dinerop/auth/controller/AuthController.java
+- `Registro, activación y recuperación` --references--> `AuthController`  [INFERRED]
   app_movil_dinerop/docs/AUTHENTICATION.md → dinerop-backend/src/main/java/com/markup/dinerop/auth/controller/AuthController.java
 
 ## Import Cycles
 - None detected.
 
-## Communities (269 total, 106 thin omitted)
+## Communities (267 total, 106 thin omitted)
 
 ### Community 0 - "onboarding_page.dart"
 Cohesion: 0.02
@@ -381,8 +379,8 @@ Cohesion: 0.06
 Nodes (30): Autenticación y sesión, Consideraciones observadas, Datos de sesión, Flujo, Referencias, Registro, activación y recuperación, activate, AuthRemoteDataSource (+22 more)
 
 ### Community 28 - "LoginPage.tsx"
-Cohesion: 0.18
-Nodes (9): Button(), LoginBackground(), LoginCard(), LoginCardProps, LoginInput, LoginInputProps, LoginForm, LoginPage() (+1 more)
+Cohesion: 0.11
+Nodes (16): Button(), Card(), Input(), LoginBackground(), LoginCard(), LoginCardProps, LoginInput, LoginInputProps (+8 more)
 
 ### Community 29 - "app_colors.dart"
 Cohesion: 0.06
@@ -401,7 +399,7 @@ Cohesion: 0.08
 Nodes (7): CooperativeRequiredException, InviteUserRequest, AccountDisabledException, CooperativeNotFoundException, OtpAttemptsExceededException, OtpExpiredException, OtpInvalidException
 
 ### Community 33 - "app/App.tsx"
-Cohesion: 0.17
+Cohesion: 0.16
 Nodes (15): App(), useAuth(), useTheme(), MainLayout(), menuItems, LeadsPage(), ProductsPage(), ProfilePage() (+7 more)
 
 ### Community 35 - "AuthContext.tsx"
@@ -445,7 +443,7 @@ Cohesion: 0.10
 Nodes (15): include, linter, rules, Configuración sensible, Convenciones comprobables, Guía de desarrollo, Mapa, Orientación del código (+7 more)
 
 ### Community 45 - "CooperativesPage.tsx"
-Cohesion: 0.11
+Cohesion: 0.10
 Nodes (21): ConfirmationModal(), ConfirmationModalProps, Modal(), ModalProps, PageHeader(), PageHeaderProps, Pagination(), PaginationProps (+13 more)
 
 ### Community 46 - "org.springframework.data.jpa.repository.JpaRepository"
@@ -460,9 +458,9 @@ Nodes (19): Estado global, Estado local, Formularios, Gestión de estado, Persis
 Cohesion: 0.08
 Nodes (18): OnboardingPersonRequest, estadoFormulario, formularioCompleto, fromJson, OnboardingFormStatus, OnboardingStatusResponse, _statusFromString, _client (+10 more)
 
-### Community 49 - "Map.tsx"
-Cohesion: 0.21
-Nodes (10): Hero(), getCitiesByProvince(), getUniqueProvinces(), Location, locations, Map(), MapCenterUpdater(), redIcon (+2 more)
+### Community 49 - "ref_lucide_react"
+Cohesion: 0.10
+Nodes (16): App(), Footer(), Header(), CooperativeFormModalProps, Hero(), getCitiesByProvince(), getUniqueProvinces(), Location (+8 more)
 
 ### Community 50 - "request_credit_page.dart"
 Cohesion: 0.08
@@ -616,10 +614,6 @@ Nodes (18): compilerOptions, allowJs, esModuleInterop, incremental, isolatedModu
 Cohesion: 0.12
 Nodes (13): Enlaces de implementación, Pantallas y navegación, Router, AppShell, build, child, icon, index (+5 more)
 
-### Community 93 - "ref_react_router_dom"
-Cohesion: 0.23
-Nodes (5): App(), Footer(), Header(), Popup(), Terms()
-
 ### Community 94 - "UserAdminService.java"
 Cohesion: 0.22
 Nodes (4): PagedUsersResponse, UserListItemResponse, UserStatsResponse, UserAdminMapper
@@ -629,7 +623,7 @@ Cohesion: 0.11
 Nodes (17): compilerOptions, allowImportingTsExtensions, isolatedModules, jsx, lib, module, moduleDetection, moduleResolution (+9 more)
 
 ### Community 96 - "useCooperatives.ts"
-Cohesion: 0.28
+Cohesion: 0.27
 Nodes (12): createCooperative(), deleteCooperative(), getCooperatives(), updateCooperative(), CooperativesTableProps, useCooperatives(), Cooperative, CooperativeFormData (+4 more)
 
 ### Community 97 - "compilerOptions"
@@ -848,10 +842,6 @@ Nodes (8): eslint@^9.9.1, postcss@^8.4.35, eslint, postcss, name, private, type,
 Cohesion: 0.18
 Nodes (5): _firebaseMessagingBackgroundHandler, initializeApp, initializeDateFormatting, main, null
 
-### Community 164 - "ref_react"
-Cohesion: 0.15
-Nodes (8): Card(), Input(), DashboardData, getDashboard(), DashboardPage(), cn(), CooperativeFormModalProps, SuccessModalProps
-
 ### Community 167 - "Role"
 Cohesion: 0.28
 Nodes (6): RecentUserDto, ChangeRoleRequest, Role, ADMIN, CLIENT, COOPERATIVE
@@ -932,17 +922,17 @@ Nodes (5): scripts, build, dev, lint, start
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `httpClient()` connect `httpClient` to `AuthContext.tsx`, `dinerup-app/docs/ARCHITECTURE.md`, `Lógica de negocio observada`, `DashboardCooperative.tsx`, `CreditDetailsModal.tsx`, `AuthController`, `OnboardingPage.tsx`, `PublicCreditRequestModal.tsx`, `dinerup-app/src/App.tsx`, `Login.tsx`, `DashboardClient.tsx`, `Diseño: Consumo de POST /api/credits/me en NewCreditModal`?**
-  _High betweenness centrality (0.318) - this node is a cross-community bridge._
+- **Why does `Discrepancias que requieren cuidado` connect `AuthController` to `auth/config/SecurityConfig.java`, `lombok.RequiredArgsConstructor`, `httpClient`?**
+  _High betweenness centrality (0.321) - this node is a cross-community bridge._
 - **What connects `_acceptedDeclaration`, `_apellidosController`, `_availableCantons` to the rest of the system?**
   _967 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `onboarding_page.dart` be split into smaller, more focused modules?**
   _Cohesion score 0.018867924528301886 - nodes in this community are weakly interconnected._
-- **Why does `Discrepancias que requieren cuidado` connect `AuthController` to `auth/config/SecurityConfig.java`, `lombok.RequiredArgsConstructor`, `httpClient`?**
-  _High betweenness centrality (0.316) - this node is a cross-community bridge._
+- **Why does `httpClient()` connect `httpClient` to `AuthContext.tsx`, `dinerup-app/docs/ARCHITECTURE.md`, `Lógica de negocio observada`, `DashboardCooperative.tsx`, `CreditDetailsModal.tsx`, `AuthController`, `OnboardingPage.tsx`, `PublicCreditRequestModal.tsx`, `dinerup-app/src/App.tsx`, `Login.tsx`, `DashboardClient.tsx`, `Diseño: Consumo de POST /api/credits/me en NewCreditModal`?**
+  _High betweenness centrality (0.320) - this node is a cross-community bridge._
 - **Should `CreditService` be split into smaller, more focused modules?**
   _Cohesion score 0.049606775559588624 - nodes in this community are weakly interconnected._
 - **Why does `AuthController` connect `AuthController` to `lombok.RequiredArgsConstructor`, `main.dart`, `auth_repository.dart`, `app_movil_dinerop/docs/STATE_MANAGEMENT.md`, `AuthService`, `PasswordResetToken`, `org.springframework.transaction.annotation.Transactional`, `auth/config/SecurityConfig.java`, `secure_token_storage.dart`, `app_shell.dart`?**
-  _High betweenness centrality (0.245) - this node is a cross-community bridge._
+  _High betweenness centrality (0.272) - this node is a cross-community bridge._
 - **Should `lombok.RequiredArgsConstructor` be split into smaller, more focused modules?**
   _Cohesion score 0.0661189358372457 - nodes in this community are weakly interconnected._

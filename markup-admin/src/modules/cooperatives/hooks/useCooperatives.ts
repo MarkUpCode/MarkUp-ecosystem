@@ -78,7 +78,7 @@ export function useCooperatives() {
 
     try {
 
-      await createCooperative(request);
+      const cooperative = await createCooperative(request);
 
       toast.success(
         "Cooperativa creada",
@@ -86,6 +86,7 @@ export function useCooperatives() {
       );
 
       await loadCooperatives();
+      return cooperative;
 
     } catch (error: any) {
 

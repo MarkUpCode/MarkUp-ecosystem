@@ -240,6 +240,9 @@ public class AuthService {
         String normalizedEmail = normalizeEmail(request.getEmail());
 
         Optional<User> existingUser = userRepository.findByEmail(normalizedEmail);
+        if (existingUser.isPresent() && existingUser.get().getRole() != Role.CLIENT) {
+            throw new IllegalArgumentException("Este flujo de registro no está disponible para esta cuenta.");
+        }
         User user = existingUser.orElseGet(() -> createPendingUser(normalizedEmail, Role.CLIENT));
 
         if (existingUser.isPresent() && "ACTIVE".equals(user.getStatus()) && user.getPassword() != null) {
@@ -290,6 +293,12 @@ public class AuthService {
         String normalizedEmail = normalizeEmail(email);
         String normalizedCode = rawCode == null ? "" : rawCode.trim();
 
+        User pendingUser = userRepository.findByEmail(normalizedEmail)
+                .orElseThrow(() -> new OtpInvalidException("El código no es correcto. Verifica e inténtalo nuevamente."));
+        if (pendingUser.getRole() != Role.CLIENT) {
+            throw new OtpInvalidException("El código no es correcto. Verifica e inténtalo nuevamente.");
+        }
+
         EmailVerificationOtp otp = emailVerificationOtpRepository
                 .findTopByEmailAndUsedFalseAndRevokedFalseOrderByCreatedAtDesc(normalizedEmail)
                 .orElseThrow(() -> new OtpInvalidException("El código no es correcto. Verifica e inténtalo nuevamente."));
@@ -321,12 +330,9 @@ public class AuthService {
         otp.setUsed(true);
         emailVerificationOtpRepository.save(otp);
 
-        userRepository.findByEmail(normalizedEmail)
-                .ifPresent(user -> {
-                    user.setStatus("ACTIVE");
-                    user.setActive(true);
-                    userRepository.save(user);
-                });
+        pendingUser.setStatus("ACTIVE");
+        pendingUser.setActive(true);
+        userRepository.save(pendingUser);
     }
 
     @Transactional

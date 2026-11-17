@@ -1,6 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import type { InviteUserRequest } from "../types/user";
+import { getCooperatives } from "@/modules/cooperatives/api/cooperatives.api";
+import type { CooperativeListItem } from "@/modules/cooperatives/types/cooperative";
 
 interface InviteUserFormProps {
 
@@ -19,12 +21,23 @@ export function InviteUserForm({
 }: InviteUserFormProps) {
 
   const [email, setEmail] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [phone, setPhone] = useState("");
 
   const [role, setRole] =
     useState<InviteUserRequest["role"]>("CLIENT");
 
   const [cooperativaId, setCooperativaId] =
     useState("");
+  const [cooperatives, setCooperatives] = useState<CooperativeListItem[]>([]);
+  const [coopError, setCoopError] = useState("");
+
+  useEffect(() => {
+    if (role !== "COOPERATIVE") return;
+    void getCooperatives(0, 1000).then((response) => setCooperatives(response.content))
+      .catch(() => setCoopError("No se pudieron cargar las cooperativas."));
+  }, [role]);
 
   async function handleSubmit(
     e: React.FormEvent
@@ -35,6 +48,9 @@ export function InviteUserForm({
     await onSubmit({
 
       email,
+      firstName,
+      lastName,
+      phone: phone || undefined,
 
       role,
 
@@ -46,6 +62,9 @@ export function InviteUserForm({
     });
 
     setEmail("");
+    setFirstName("");
+    setLastName("");
+    setPhone("");
 
     setRole("CLIENT");
 
@@ -60,7 +79,10 @@ export function InviteUserForm({
       className="space-y-6"
     >
 
-      {/* EMAIL */}
+      <div className="grid gap-4 sm:grid-cols-2">
+        <label className="block text-sm text-slate-300">Nombres<input required value={firstName} onChange={(e) => setFirstName(e.target.value)} className="mt-2 w-full rounded-2xl border border-white/10 bg-slate-950 px-4 py-3 text-white" /></label>
+        <label className="block text-sm text-slate-300">Apellidos<input required value={lastName} onChange={(e) => setLastName(e.target.value)} className="mt-2 w-full rounded-2xl border border-white/10 bg-slate-950 px-4 py-3 text-white" /></label>
+      </div>
 
       <div>
 
@@ -78,6 +100,11 @@ export function InviteUserForm({
           className="w-full rounded-2xl border border-white/10 bg-slate-950 px-4 py-3 text-white outline-none focus:border-cyan-500"
         />
 
+      </div>
+
+      <div>
+        <label className="mb-2 block text-sm text-slate-300">Teléfono (opcional)</label>
+        <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} className="w-full rounded-2xl border border-white/10 bg-slate-950 px-4 py-3 text-white" />
       </div>
 
       {/* ROL */}
@@ -130,18 +157,22 @@ export function InviteUserForm({
 
           <label className="mb-2 block text-sm text-slate-300">
 
-            ID Cooperativa
+            Cooperativa
 
           </label>
 
-          <input
+          <select
             required
             value={cooperativaId}
             onChange={(e)=>
               setCooperativaId(e.target.value)
             }
             className="w-full rounded-2xl border border-white/10 bg-slate-950 px-4 py-3 text-white"
-          />
+          >
+            <option value="">Selecciona una cooperativa</option>
+            {cooperatives.map((cooperative) => <option key={cooperative.id} value={cooperative.id}>{cooperative.nombre} · {cooperative.ciudad}</option>)}
+          </select>
+          {coopError && <p className="mt-2 text-sm text-red-300">{coopError}</p>}
 
         </div>
 

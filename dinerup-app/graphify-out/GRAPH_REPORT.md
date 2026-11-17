@@ -1,17 +1,17 @@
 # Graph Report - dinerup-app  (2026-11-16)
 
 ## Corpus Check
-- 69 files · ~37,033 words
+- 70 files · ~37,450 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 5 file(s) not represented in the graph (top: (none) 2, .example 1, .toml 1)
 
 ## Summary
-- 447 nodes · 939 edges · 19 communities (14 shown, 5 thin omitted)
+- 453 nodes · 958 edges · 18 communities (13 shown, 5 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `e0dc7a77`
+- Built from commit: `105f90ed`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -23,7 +23,6 @@
 - httpClient
 - mockAPI.ts
 - react
-- Login.tsx
 - compilerOptions
 - PublicCreditRequestModal.tsx
 - package.json
@@ -35,10 +34,10 @@
 
 ## God Nodes (most connected - your core abstractions)
 1. `httpClient()` - 34 edges
-2. `react` - 30 edges
-3. `lucide-react` - 23 edges
-4. `DashboardCooperative()` - 23 edges
-5. `getErrorMessage()` - 19 edges
+2. `react` - 31 edges
+3. `DashboardCooperative()` - 23 edges
+4. `lucide-react` - 23 edges
+5. `getErrorMessage()` - 20 edges
 6. `DashboardClient()` - 16 edges
 7. `compilerOptions` - 16 edges
 8. `useAuth()` - 14 edges
@@ -46,61 +45,57 @@
 10. `compilerOptions` - 14 edges
 
 ## Surprising Connections (you probably didn't know these)
-- `App()` --calls--> `ActivateAccount()`  [EXTRACTED]
-  src/App.tsx → src/pages/ActivateAccount.tsx
 - `App()` --calls--> `DashboardClient()`  [EXTRACTED]
-  src/App.tsx → src/pages/DashboardClient.tsx
+  dinerup-app/src/App.tsx → src/pages/DashboardClient.tsx
 - `App()` --calls--> `DashboardCooperative()`  [EXTRACTED]
-  src/App.tsx → src/pages/DashboardCooperative.tsx
-- `App()` --calls--> `ForgotPassword()`  [EXTRACTED]
-  src/App.tsx → src/pages/password/ForgotPassword.tsx
-- `App()` --calls--> `ResetPassword()`  [EXTRACTED]
-  src/App.tsx → src/pages/password/ResetPassword.tsx
+  dinerup-app/src/App.tsx → src/pages/DashboardCooperative.tsx
+- `App()` --calls--> `Login()`  [EXTRACTED]
+  dinerup-app/src/App.tsx → src/pages/Login.tsx
+- `App()` --calls--> `OnboardingPage()`  [EXTRACTED]
+  dinerup-app/src/App.tsx → src/pages/OnboardingPage.tsx
+- `AuthProvider()` --calls--> `loginRequest()`  [EXTRACTED]
+  src/context/AuthContext.tsx → dinerup-app/src/api/auth/auth.api.ts
 
 ## Import Cycles
 - None detected.
 
-## Communities (19 total, 5 thin omitted)
+## Communities (18 total, 5 thin omitted)
 
 ### Community 0 - "DashboardCooperative.tsx"
 Cohesion: 0.06
-Nodes (58): CreateCreditRequestPayload, CreditGuarantorHistoryItem, CreditTimelineEvent, decideCreditRequest(), decideGuaranteeForCreditRequest(), getCooperativeOfferDefaults(), getCreditRequestTimeline(), getGuarantorHistoryForCooperative() (+50 more)
+Nodes (60): CreateCreditRequestPayload, CreditGuarantorHistoryItem, CreditTimelineEvent, decideCreditRequest(), decideGuaranteeForCreditRequest(), getCooperativeOfferDefaults(), getCreditRequestTimeline(), getGuarantorHistoryForCooperative() (+52 more)
 
 ### Community 1 - "OnboardingPage.tsx"
-Cohesion: 0.05
-Nodes (52): lucide-react, ActividadEconomicaData, ClientePerfilUbicacion, DireccionData, FormularioClienteStatus, getMyGuarantorProfiles(), getPreRegistrationData(), GuaranteeOnboardingResponse (+44 more)
+Cohesion: 0.06
+Nodes (52): ActividadEconomicaData, ClientePerfilUbicacion, DireccionData, FormularioClienteStatus, getMyGuarantorProfiles(), getPreRegistrationData(), GuaranteeOnboardingResponse, GuarantorProfileResponse (+44 more)
 
 ### Community 2 - "CreditDetailsModal.tsx"
 Cohesion: 0.14
-Nodes (23): acceptCreditCooperative(), getCreditRequestCooperatives(), getGuarantorHistoryForClient(), CreditCard(), CreditCardProps, statusMap, tipoMap, cooperativeStatus (+15 more)
+Nodes (21): acceptCreditCooperative(), getCreditRequestCooperatives(), getGuarantorHistoryForClient(), CreditCard(), CreditCardProps, statusMap, tipoMap, cooperativeStatus (+13 more)
 
 ### Community 3 - "DashboardClient.tsx"
-Cohesion: 0.09
-Nodes (25): getCooperatives(), createCreditRequest(), getMyCreditRequests(), getFormularioClienteStatus(), CooperativeCard(), CooperativeCardProps, CooperativeLogoMarquee(), cooperatives (+17 more)
+Cohesion: 0.08
+Nodes (26): getCooperatives(), createCreditRequest(), getMyCreditRequests(), getFormularioClienteStatus(), CooperativeCard(), CooperativeCardProps, CooperativeLogoMarquee(), cooperatives (+18 more)
 
 ### Community 4 - "httpClient"
-Cohesion: 0.11
-Nodes (32): activateAccount(), changeRegistrationEmail(), changeRegistrationEmailOnly(), completeRegistration(), forgotPassword(), loginRequest(), LoginResponse, RegistrationOtpVerifyPayload (+24 more)
+Cohesion: 0.10
+Nodes (39): react-router-dom@^7.9.4, react-router-dom, activateAccount(), activateInvitation(), changeRegistrationEmail(), changeRegistrationEmailOnly(), completeRegistration(), forgotPassword() (+31 more)
 
 ### Community 5 - "mockAPI.ts"
 Cohesion: 0.13
 Nodes (21): cooperativesData, Cooperative, CreditRequest, CreditRequestFormData, LoginFormData, RegisterFormData, User, UserType (+13 more)
 
 ### Community 6 - "react"
-Cohesion: 0.12
-Nodes (21): react, AUTH_UNAUTHORIZED_EVENT, emitUnauthorizedEvent(), resetUnauthorizedEventState(), AuthUser, clearStoredAuth(), extractToken(), LEGACY_TOKEN_KEYS (+13 more)
-
-### Community 7 - "Login.tsx"
-Cohesion: 0.16
-Nodes (19): react-router-dom@^7.9.4, react-router-dom, App(), AuthLoadingScreen(), getDashboardPath(), ProtectedRoute(), PublicOnlyRoute(), CooperativesCarousel() (+11 more)
+Cohesion: 0.11
+Nodes (27): react, AUTH_UNAUTHORIZED_EVENT, emitUnauthorizedEvent(), resetUnauthorizedEventState(), AuthUser, clearStoredAuth(), extractToken(), LEGACY_TOKEN_KEYS (+19 more)
 
 ### Community 8 - "compilerOptions"
 Cohesion: 0.11
 Nodes (17): compilerOptions, allowImportingTsExtensions, isolatedModules, jsx, lib, module, moduleDetection, moduleResolution (+9 more)
 
 ### Community 9 - "PublicCreditRequestModal.tsx"
-Cohesion: 0.18
-Nodes (15): creditTypes, FormData, FormErrors, getInitialFormState(), Input(), InputProps, isValidEcuadorId(), onlyLetters() (+7 more)
+Cohesion: 0.10
+Nodes (25): lucide-react, CooperativesCarousel(), creditTypes, FormData, FormErrors, getInitialFormState(), Input(), InputProps (+17 more)
 
 ### Community 10 - "package.json"
 Cohesion: 0.05
@@ -126,17 +121,17 @@ Nodes (4): buildCommand, headers, outputDirectory, rewrites
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `react` connect `react` to `DashboardCooperative.tsx`, `OnboardingPage.tsx`, `CreditDetailsModal.tsx`, `DashboardClient.tsx`, `httpClient`, `Login.tsx`, `PublicCreditRequestModal.tsx`, `package.json`?**
-  _High betweenness centrality (0.193) - this node is a cross-community bridge._
+- **Why does `react` connect `react` to `DashboardCooperative.tsx`, `OnboardingPage.tsx`, `CreditDetailsModal.tsx`, `DashboardClient.tsx`, `httpClient`, `PublicCreditRequestModal.tsx`, `package.json`?**
+  _High betweenness centrality (0.194) - this node is a cross-community bridge._
 - **What connects `PRE_APROBAR`, `RECHAZAR`, `CREADA` to the rest of the system?**
   _7 weakly-connected nodes found - possible missing edges._
 - **Should `DashboardCooperative.tsx` be split into smaller, more focused modules?**
-  _Cohesion score 0.061072261072261075 - nodes in this community are weakly interconnected._
-- **Why does `lucide-react` connect `OnboardingPage.tsx` to `DashboardCooperative.tsx`, `CreditDetailsModal.tsx`, `DashboardClient.tsx`, `httpClient`, `react`, `Login.tsx`, `PublicCreditRequestModal.tsx`, `package.json`?**
-  _High betweenness centrality (0.111) - this node is a cross-community bridge._
+  _Cohesion score 0.06095481670929241 - nodes in this community are weakly interconnected._
+- **Why does `lucide-react` connect `PublicCreditRequestModal.tsx` to `DashboardCooperative.tsx`, `OnboardingPage.tsx`, `CreditDetailsModal.tsx`, `DashboardClient.tsx`, `httpClient`, `package.json`?**
+  _High betweenness centrality (0.108) - this node is a cross-community bridge._
 - **Should `OnboardingPage.tsx` be split into smaller, more focused modules?**
-  _Cohesion score 0.053763440860215055 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.05734767025089606 - nodes in this community are weakly interconnected._
 - **Why does `Cooperative` connect `DashboardClient.tsx` to `mockAPI.ts`?**
-  _High betweenness centrality (0.051) - this node is a cross-community bridge._
+  _High betweenness centrality (0.050) - this node is a cross-community bridge._
 - **Should `CreditDetailsModal.tsx` be split into smaller, more focused modules?**
-  _Cohesion score 0.1396011396011396 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.13768115942028986 - nodes in this community are weakly interconnected._

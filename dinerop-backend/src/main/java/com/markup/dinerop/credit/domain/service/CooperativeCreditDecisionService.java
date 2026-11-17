@@ -76,7 +76,7 @@ public class CooperativeCreditDecisionService {
 
             BigDecimal tasaFinal = tasaAnual != null
                     ? tasaAnual
-                    : BigDecimal.valueOf(cooperativeService.getActiveRate(cooperativaId, cr.getCreditType()));
+                    : BigDecimal.valueOf(cooperativeService.getOfferRate(cooperativaId, cr.getAmount(), plazoFinal, cr.getCreditType()));
 
             var calc = LoanCalculator.calculate(
                     cr.getAmount(),
@@ -160,7 +160,7 @@ public class CooperativeCreditDecisionService {
         return new CooperativeOfferDefaultsDto(
                 cr.getAmount(),
                 safePlazo(cr),
-                BigDecimal.valueOf(cooperativeService.getActiveRate(cooperativaId, cr.getCreditType()))
+                BigDecimal.valueOf(cooperativeService.getOfferRate(cooperativaId, cr.getAmount(), safePlazo(cr), cr.getCreditType()))
         );
     }
 

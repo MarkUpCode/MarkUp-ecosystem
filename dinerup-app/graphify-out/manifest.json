@@ -18,16 +18,16 @@
     "semantic_hash": "33fad9c02cb0ec6d6030369ef6347d57"
   },
   "src/App.tsx": {
-    "mtime": 1789961527.008244,
-    "seen": 1794463041.191589,
-    "ast_hash": "3c71d0009c0ee847b50724abfe5452fd",
-    "semantic_hash": "3c71d0009c0ee847b50724abfe5452fd"
+    "mtime": 1794873603.9345746,
+    "seen": 1794874786.1941557,
+    "ast_hash": "5b10a22c71413300a384313eff179168",
+    "semantic_hash": ""
   },
   "src/api/auth/auth.api.ts": {
-    "mtime": 1790229369.6127257,
-    "seen": 1794463041.1915905,
-    "ast_hash": "1b2c22c12150c3722210704a8857dce9",
-    "semantic_hash": "1b2c22c12150c3722210704a8857dce9"
+    "mtime": 1794873603.933575,
+    "seen": 1794874786.1941607,
+    "ast_hash": "1fd9ba95054410ee5d924fe7a2f4d0d9",
+    "semantic_hash": ""
   },
   "src/api/auth/authEvents.ts": {
     "mtime": 1782016105.1736865,
@@ -543,6 +543,12 @@
     "mtime": 1782016105.187223,
     "seen": 1794858879.5069225,
     "ast_hash": "8ae203d8d8b6ca892f1626af1748571d",
+    "semantic_hash": ""
+  },
+  "src/pages/ActivateInvitation.tsx": {
+    "mtime": 1794873603.933575,
+    "seen": 1794874786.1943085,
+    "ast_hash": "dc059110d9b48d6ee4f9603beb018a98",
     "semantic_hash": ""
   },
   "package-lock.json": {

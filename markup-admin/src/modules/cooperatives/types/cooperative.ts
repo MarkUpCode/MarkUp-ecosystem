@@ -18,7 +18,7 @@ export interface Cooperative {
 
     logoUrl: string;
 
-    calificacion: number;
+    calificacion: number | null;
 
     montoMaximoCredito: number;
 
@@ -76,9 +76,11 @@ export interface CreateCooperativeRequest {
 
     logoUrl: string;
 
-    calificacion: number;
+    calificacion: number | null;
 
     montoMaximoCredito: number;
+
+    tasaAnual?: number;
 
 }
 

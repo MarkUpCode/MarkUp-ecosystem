@@ -75,9 +75,9 @@
     "semantic_hash": ""
   },
   "lib/app/providers.dart": {
-    "mtime": 1794800667.326988,
-    "seen": 1794858958.9389303,
-    "ast_hash": "a7d0a55a194fa8f391d1f767f0f1526e",
+    "mtime": 1794874012.3847733,
+    "seen": 1794874787.7017145,
+    "ast_hash": "fc22108241f64670e642d904fe6e3cf6",
     "semantic_hash": ""
   },
   "lib/app/router/app_router.dart": {
@@ -87,9 +87,9 @@
     "semantic_hash": ""
   },
   "lib/app/shell/app_shell.dart": {
-    "mtime": 1794858886.732626,
-    "seen": 1794858958.9389338,
-    "ast_hash": "b6f424bb05e8894d5c49c96b61f42998",
+    "mtime": 1794859005.5955865,
+    "seen": 1794874787.7017186,
+    "ast_hash": "1011a8d727a860fa9c26500b213ae241",
     "semantic_hash": ""
   },
   "lib/core/config/api_config.dart": {
@@ -267,10 +267,10 @@
     "semantic_hash": "010953096ab5b9f3780caa54df2fab96"
   },
   "lib/features/cooperative/data/cooperative_repository.dart": {
-    "mtime": 1786233095.961361,
-    "seen": 1794462526.8633125,
-    "ast_hash": "0a23a15cc04162d32a9b2f8694f0ee4e",
-    "semantic_hash": "0a23a15cc04162d32a9b2f8694f0ee4e"
+    "mtime": 1794874012.3839326,
+    "seen": 1794874787.7017906,
+    "ast_hash": "98efb378dd59ed799536096cd851fbdf",
+    "semantic_hash": ""
   },
   "lib/features/cooperative/data/models/cooperative_summary.dart": {
     "mtime": 1786233095.961361,
@@ -333,10 +333,10 @@
     "semantic_hash": "cc21eea8772bf1ccb8559e080018a2ed"
   },
   "lib/features/credit/presentation/investment_simulator_page.dart": {
-    "mtime": 1787848640.2350323,
-    "seen": 1794462526.8659832,
-    "ast_hash": "5fc316a8a60075cbbca5511d85fc3c36",
-    "semantic_hash": "5fc316a8a60075cbbca5511d85fc3c36"
+    "mtime": 1794874050.8154557,
+    "seen": 1794874787.7018125,
+    "ast_hash": "b5203f7ee3c931ceefde5879b48a8470",
+    "semantic_hash": ""
   },
   "lib/features/credit/presentation/request_credit_page.dart": {
     "mtime": 1794428707.9728906,
@@ -351,9 +351,9 @@
     "semantic_hash": ""
   },
   "lib/features/dashboard/presentation/dashboard_page.dart": {
-    "mtime": 1794858812.554026,
-    "seen": 1794858958.9390004,
-    "ast_hash": "1e62a28bdbfa68b60be18ff2390919fc",
+    "mtime": 1794859332.7163277,
+    "seen": 1794874787.7018178,
+    "ast_hash": "e8cd1222deed195787b1c1a2a37b3c9f",
     "semantic_hash": ""
   },
   "lib/features/onboarding/data/models/onboarding_request.dart": {
@@ -387,9 +387,9 @@
     "semantic_hash": ""
   },
   "lib/features/onboarding/presentation/onboarding_page.dart": {
-    "mtime": 1794795275.0053766,
-    "seen": 1794858958.9390116,
-    "ast_hash": "91272431cdec5b02e5077bcad52dc410",
+    "mtime": 1794867759.26959,
+    "seen": 1794874787.7018323,
+    "ast_hash": "f3f8681edc147450bbd969fd8ff017ca",
     "semantic_hash": ""
   },
   "lib/features/profile/presentation/profile_page.dart": {
@@ -399,9 +399,9 @@
     "semantic_hash": "22870bdf690341e3c3ddd3b9b3837dc1"
   },
   "lib/features/requests/presentation/requests_page.dart": {
-    "mtime": 1794795544.3874598,
-    "seen": 1794858958.9390142,
-    "ast_hash": "640a5299d52ce12a9307898f59572f70",
+    "mtime": 1794861154.7592287,
+    "seen": 1794874787.7018352,
+    "ast_hash": "4e338ac807e4c9caa7407b9a2ec802fd",
     "semantic_hash": ""
   },
   "lib/features/welcome/data/models/cooperative_partner.dart": {
@@ -525,9 +525,9 @@
     "semantic_hash": ""
   },
   "lib/features/dashboard/presentation/sections/dashboard_exploration_sections.dart": {
-    "mtime": 1794858769.0663698,
-    "seen": 1794858958.9390013,
-    "ast_hash": "fa2d1d4fb3a61a2cfeb7df00eeeec60a",
+    "mtime": 1794864019.7924972,
+    "seen": 1794874787.7018197,
+    "ast_hash": "14c2130c60905a485a44e2f9a2473b59",
     "semantic_hash": ""
   },
   "lib/features/notifications/presentation/notifications_page.dart": {
@@ -537,9 +537,9 @@
     "semantic_hash": ""
   },
   "test/dashboard_responsive_test.dart": {
-    "mtime": 1794858935.3532202,
-    "seen": 1794858958.939043,
-    "ast_hash": "8151a66490a3fd861b934c06941f0e4b",
+    "mtime": 1794860994.105715,
+    "seen": 1794874787.701869,
+    "ast_hash": "989d13ea75ddc380e7d1259b8a0259df",
     "semantic_hash": ""
   },
   ".github/copilot-instructions.md": {

@@ -2514,9 +2514,9 @@
     "semantic_hash": ""
   },
   "markup-admin/src/contexts/auth-context.tsx": {
-    "mtime": 1783069892.7647097,
-    "seen": 1794858910.9783814,
-    "ast_hash": "77d9f2e53c6dc9186828ab9d6f15615a",
+    "mtime": 1794871541.0806112,
+    "seen": 1794871624.6942537,
+    "ast_hash": "dac21c06f750df937e30a6961f3cb356",
     "semantic_hash": ""
   },
   "markup-admin/src/contexts/theme-context.tsx": {
@@ -2550,9 +2550,9 @@
     "semantic_hash": ""
   },
   "markup-admin/src/main.tsx": {
-    "mtime": 1783489176.9845185,
-    "seen": 1794858910.9783945,
-    "ast_hash": "90a984c4b549b14de978caeec75b0511",
+    "mtime": 1794871517.3528368,
+    "seen": 1794871624.6942637,
+    "ast_hash": "56397dfdf31294d02ec3ba9a3257e02e",
     "semantic_hash": ""
   },
   "markup-admin/src/modules/auth/components/LoginBackground.tsx": {
@@ -2574,9 +2574,9 @@
     "semantic_hash": ""
   },
   "markup-admin/src/modules/auth/pages/LoginPage.tsx": {
-    "mtime": 1783581820.0623362,
-    "seen": 1794858910.9784036,
-    "ast_hash": "785b885ffaac2cf1f2d1fd4d6c1a4779",
+    "mtime": 1794871541.0796106,
+    "seen": 1794871624.6942697,
+    "ast_hash": "caa7865c4eeb114e9be77e31fdedee38",
     "semantic_hash": ""
   },
   "markup-admin/src/modules/cooperatives/api/cooperatives.api.ts": {
@@ -2634,9 +2634,9 @@
     "semantic_hash": ""
   },
   "markup-admin/src/modules/dashboard/pages/DashboardPage.tsx": {
-    "mtime": 1793990313.9992144,
-    "seen": 1794858910.9784267,
-    "ast_hash": "be230382c35e636c58d9d4234dc8e13b",
+    "mtime": 1794871541.0826108,
+    "seen": 1794871624.694284,
+    "ast_hash": "182a68537b5b445d0fcab27a78806da6",
     "semantic_hash": ""
   },
   "markup-admin/src/modules/leads/pages/LeadsPage.tsx": {
@@ -2760,9 +2760,9 @@
     "semantic_hash": ""
   },
   "markup-admin/src/services/api.ts": {
-    "mtime": 1783575266.079434,
-    "seen": 1794858910.9784787,
-    "ast_hash": "92b6fd77d1b7dd407bd9eb1e03d1625f",
+    "mtime": 1794871541.0816102,
+    "seen": 1794871624.6943161,
+    "ast_hash": "733da7aa4fb98d8089a969749a065215",
     "semantic_hash": ""
   },
   "markup-admin/src/services/auth.service.ts": {
@@ -2772,9 +2772,9 @@
     "semantic_hash": ""
   },
   "markup-admin/src/services/axios.ts": {
-    "mtime": 1783067930.4871948,
-    "seen": 1794858910.9784832,
-    "ast_hash": "90495c3786c14174f9771559c68c3a95",
+    "mtime": 1794871541.0806112,
+    "seen": 1794871624.6943188,
+    "ast_hash": "39a7837eb7ab86c9d31c3fbb10f44606",
     "semantic_hash": ""
   },
   "markup-admin/src/services/session.service.ts": {

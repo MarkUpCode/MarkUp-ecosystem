@@ -51,6 +51,23 @@ export async function completeRegistration(payload: {
   });
 }
 
+export type InvitationDetails = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  role: string;
+  cooperativeName: string | null;
+  expiresAt: string;
+};
+
+export async function getInvitationDetails(token: string) {
+  return httpClient<InvitationDetails>(`/api/invitations/details?token=${encodeURIComponent(token)}`, { method: "GET", auth: false });
+}
+
+export async function activateInvitation(token: string, password: string) {
+  return httpClient<void>("/api/invitations/activate", { method: "POST", body: { token, password }, auth: false });
+}
+
 export async function startRegistrationOtp(payload: RegistrationStartPayload) {
   return httpClient<{ email: string; message: string; requiresVerification: boolean }>(
     "/api/auth/registration/start",

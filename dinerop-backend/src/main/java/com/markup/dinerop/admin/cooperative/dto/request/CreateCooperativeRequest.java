@@ -31,7 +31,6 @@ public record CreateCooperativeRequest(
         @NotNull
         BigDecimal montoMaximoCredito,
 
-        @NotNull
         @DecimalMin(value = "0.001", message = "La tasa anual debe ser mayor que cero")
         @DecimalMax(value = "100.000", message = "La tasa anual no puede superar el 100%")
         BigDecimal tasaAnual

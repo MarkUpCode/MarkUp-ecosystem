@@ -3,6 +3,8 @@ import { useState } from "react";
 import { UsersTable } from "../components/UsersTable";
 
 import { useUsers } from "../hooks/useUsers";
+import { resendInvitation, revokeInvitation } from "../api/users.api";
+import { useToast } from "@/hooks/useToast";
 import { UsersStats } from "../components/UsersStats";
 import { UsersFilters } from "../components/UsersFilters";
 import { InviteUserModal } from "../components/InviteUserModal";
@@ -14,6 +16,7 @@ import { PageHeader } from "@/components/ui/PageHeader";
 
 
 export function UsersPage() {
+  const toast = useToast();
 
   const [inviteOpen, setInviteOpen] = useState(false);
 
@@ -61,6 +64,17 @@ export function UsersPage() {
 
 
   } = useUsers();
+
+  async function manageInvitation(id: number, action: "resend" | "revoke") {
+    try {
+      if (action === "resend") await resendInvitation(id);
+      else await revokeInvitation(id);
+      toast.success(action === "resend" ? "Invitación reenviada" : "Invitación revocada", "El cambio se guardó correctamente.");
+      await reload();
+    } catch {
+      toast.error("No se pudo actualizar la invitación", "Inténtalo nuevamente.");
+    }
+  }
 
   function handleToggleStatus(user: UserListItem) {
 
@@ -118,6 +132,8 @@ export function UsersPage() {
         <UsersTable
             users={users}
             onToggleStatus={handleToggleStatus}
+            onResendInvitation={(user) => void manageInvitation(user.id, "resend")}
+            onRevokeInvitation={(user) => void manageInvitation(user.id, "revoke")}
             
         />
 

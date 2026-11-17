@@ -11,6 +11,14 @@ public record CreateUserRequest(
         @NotBlank
         String email,
 
+        @NotBlank
+        String firstName,
+
+        @NotBlank
+        String lastName,
+
+        String phone,
+
         @NotNull
         Role role,
 
