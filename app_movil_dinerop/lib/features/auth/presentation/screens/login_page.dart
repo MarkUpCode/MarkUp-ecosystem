@@ -9,6 +9,7 @@ import '../../../../shared/widgets/app_text_field.dart';
 import '../../data/models/app_user.dart';
 import '../../../../core/widgets/cooperative_logo_marquee.dart';
 import '../auth_controller.dart';
+import '../../../investment/providers/investment_providers.dart';
 
 /// ═══════════════════════════════════════════════════════════
 /// LANDING / LOGIN PAGE
@@ -126,7 +127,9 @@ class _LoginNavigationBar extends StatelessWidget {
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
-                        color: theme.colorScheme.primary.withValues(alpha: 0.35),
+                        color: theme.colorScheme.primary.withValues(
+                          alpha: 0.35,
+                        ),
                         blurRadius: 16,
                         offset: const Offset(0, 6),
                       ),
@@ -491,7 +494,14 @@ class _LoginSheetState extends ConsumerState<_LoginSheet> {
         );
       } else {
         Navigator.of(context).pop();
-        context.go('/dashboard');
+        final draft = await ref.read(investmentDraftStoreProvider).read();
+        if (!mounted) return;
+        final next = draft == null
+            ? '/dashboard'
+            : (controller.requiresOnboarding
+                  ? '/onboarding'
+                  : '/simulate-investment');
+        context.go(next);
       }
     } catch (error) {
       if (error is AppException &&

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:printing/printing.dart';
+import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../app/providers.dart';
@@ -16,7 +17,10 @@ import '../../credit/data/models/credit_cooperative_status.dart';
 import '../../credit/data/models/credit_enums.dart';
 import '../../credit/presentation/widgets/credit_request_card.dart';
 import '../../dolarito/providers/dolarito_provider.dart';
+import '../../dolarito/models/dolarito_mood.dart';
 import '../../dolarito/widgets/dolarito_widget.dart';
+import '../../investment/data/models/investment_models.dart';
+import '../../investment/providers/investment_providers.dart';
 
 class RequestsPage extends ConsumerStatefulWidget {
   const RequestsPage({super.key});
@@ -30,6 +34,7 @@ class _RequestsPageState extends ConsumerState<RequestsPage> {
   String _searchQuery = '';
   CreditRequestStatus? _statusFilter;
   String? _typeFilter;
+  int _selectedTab = 0;
 
   @override
   void dispose() {
@@ -82,11 +87,123 @@ class _RequestsPageState extends ConsumerState<RequestsPage> {
     }).toList();
   }
 
+  Widget _requestTabs() => SegmentedButton<int>(
+    segments: const [
+      ButtonSegment(
+        value: 0,
+        icon: Icon(Icons.credit_score_outlined),
+        label: Text('Créditos'),
+      ),
+      ButtonSegment(
+        value: 1,
+        icon: Icon(Icons.savings_outlined),
+        label: Text('Inversiones'),
+      ),
+    ],
+    selected: {_selectedTab},
+    onSelectionChanged: (selection) =>
+        setState(() => _selectedTab = selection.first),
+  );
+
+  Future<void> _showInvestmentDetails(
+    BuildContext context,
+    InvestmentRequest request,
+  ) async {
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      builder: (_) => _InvestmentDetailsSheet(request: request),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final ref = this.ref;
     final requests = ref.watch(requestsProvider);
+    final investments = ref.watch(investmentRequestsProvider);
     final theme = Theme.of(context);
+    if (_selectedTab == 1) {
+      return Scaffold(
+        body: SafeArea(
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
+                child: _requestTabs(),
+              ),
+              Expanded(
+                child: investments.when(
+                  loading: () =>
+                      const Center(child: CircularProgressIndicator()),
+                  error: (error, _) => ListView(
+                    padding: const EdgeInsets.all(20),
+                    children: [
+                      DolaritoWidget(
+                        mood: ref
+                            .read(dolaritoServiceProvider)
+                            .investmentConnectionError()
+                            .mood,
+                        message: ref
+                            .read(dolaritoServiceProvider)
+                            .investmentConnectionError()
+                            .message,
+                        compact: true,
+                        actionLabel: 'Reintentar',
+                        onAction: () =>
+                            ref.invalidate(investmentRequestsProvider),
+                      ),
+                      const SizedBox(height: 14),
+                      AppErrorView(
+                        message: error is AppException
+                            ? error.message
+                            : AppErrorMessages.generic,
+                      ),
+                    ],
+                  ),
+                  data: (items) => RefreshIndicator(
+                    onRefresh: () async =>
+                        ref.invalidate(investmentRequestsProvider),
+                    child: items.isEmpty
+                        ? ListView(
+                            children: [
+                              const SizedBox(height: 60),
+                              AppEmptyState(
+                                title:
+                                    'Todavía no tienes inversiones solicitadas',
+                                message:
+                                    'Compara ofertas y envía una solicitud para consultar aquí las respuestas de la cooperativa.',
+                                actionLabel: 'Comenzar a invertir',
+                                icon: Icons.savings_outlined,
+                                onAction: () =>
+                                    context.push('/simulate-investment'),
+                              ),
+                            ],
+                          )
+                        : ListView.separated(
+                            physics: const AlwaysScrollableScrollPhysics(),
+                            padding: const EdgeInsets.fromLTRB(20, 12, 20, 30),
+                            itemCount: items.length + 1,
+                            separatorBuilder: (_, __) =>
+                                const SizedBox(height: 12),
+                            itemBuilder: (context, index) {
+                              if (index == 0)
+                                return const _InvestmentRequestsHeading();
+                              final request = items[index - 1];
+                              return _InvestmentRequestCard(
+                                request: request,
+                                onTap: () =>
+                                    _showInvestmentDetails(context, request),
+                              );
+                            },
+                          ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
     return Scaffold(
       body: SafeArea(
         child: requests.when(
@@ -97,6 +214,10 @@ class _RequestsPageState extends ConsumerState<RequestsPage> {
               child: items.isEmpty
                   ? ListView(
                       children: [
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
+                          child: _requestTabs(),
+                        ),
                         const SizedBox(height: 88),
                         AppEmptyState(
                           title: 'Todavía no tienes solicitudes',
@@ -118,6 +239,8 @@ class _RequestsPageState extends ConsumerState<RequestsPage> {
                           return Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
+                              _requestTabs(),
+                              const SizedBox(height: 18),
                               Row(
                                 children: [
                                   Expanded(
@@ -262,7 +385,10 @@ class _RequestsPageState extends ConsumerState<RequestsPage> {
             children: [
               DolaritoWidget(
                 mood: ref.read(dolaritoServiceProvider).creditLoadError().mood,
-                message: ref.read(dolaritoServiceProvider).creditLoadError().message,
+                message: ref
+                    .read(dolaritoServiceProvider)
+                    .creditLoadError()
+                    .message,
                 compact: true,
                 actionLabel: 'Reintentar',
                 onAction: () => ref.invalidate(requestsProvider),
@@ -339,10 +465,12 @@ class _RequestDetailsSheet extends ConsumerWidget {
             const SizedBox(height: 18),
             Builder(
               builder: (context) {
-                final reaction = ref.read(dolaritoServiceProvider).creditStatus(
-                  request.estado,
-                  requestId: request.solicitudId,
-                );
+                final reaction = ref
+                    .read(dolaritoServiceProvider)
+                    .creditStatus(
+                      request.estado,
+                      requestId: request.solicitudId,
+                    );
                 return Padding(
                   padding: const EdgeInsets.only(bottom: 16),
                   child: DolaritoWidget(
@@ -449,10 +577,12 @@ class _OfferCardState extends ConsumerState<_OfferCard> {
   void _toggleGuarantorHistory() {
     setState(() {
       _showGuarantorHistory = !_showGuarantorHistory;
-      _guarantorHistory ??= ref.read(creditRepositoryProvider).loadGuarantorHistory(
-        solicitudId: widget.requestId,
-        cooperativaId: widget.offer.cooperativaId,
-      );
+      _guarantorHistory ??= ref
+          .read(creditRepositoryProvider)
+          .loadGuarantorHistory(
+            solicitudId: widget.requestId,
+            cooperativaId: widget.offer.cooperativaId,
+          );
     });
   }
 
@@ -828,29 +958,45 @@ class _OfferCardState extends ConsumerState<_OfferCard> {
                   const SizedBox(height: 12),
                 ],
                 if (needsGuarantor)
-                  _GuarantorNotice(
-                    message: offer.mensajeGarante,
-                  ),
+                  _GuarantorNotice(message: offer.mensajeGarante),
                 if (guaranteeInReview)
                   _GuaranteeReviewNotice(color: color, soft: soft),
                 TextButton.icon(
                   onPressed: _toggleGuarantorHistory,
-                  icon: Icon(_showGuarantorHistory ? Icons.expand_less_rounded : Icons.history_rounded),
-                  label: Text(_showGuarantorHistory ? 'Ocultar historial del garante' : 'Ver historial del garante'),
+                  icon: Icon(
+                    _showGuarantorHistory
+                        ? Icons.expand_less_rounded
+                        : Icons.history_rounded,
+                  ),
+                  label: Text(
+                    _showGuarantorHistory
+                        ? 'Ocultar historial del garante'
+                        : 'Ver historial del garante',
+                  ),
                 ),
                 if (_showGuarantorHistory)
                   FutureBuilder<List<Map<String, dynamic>>>(
                     future: _guarantorHistory,
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const Padding(padding: EdgeInsets.all(12), child: Center(child: CircularProgressIndicator()));
+                        return const Padding(
+                          padding: EdgeInsets.all(12),
+                          child: Center(child: CircularProgressIndicator()),
+                        );
                       }
                       if (snapshot.hasError) {
-                        return const _GuarantorHistoryMessage(message: 'No se pudo cargar el historial. Intenta nuevamente más tarde.');
+                        return const _GuarantorHistoryMessage(
+                          message:
+                              'No se pudo cargar el historial. Intenta nuevamente más tarde.',
+                        );
                       }
-                      final history = snapshot.data ?? const <Map<String, dynamic>>[];
+                      final history =
+                          snapshot.data ?? const <Map<String, dynamic>>[];
                       if (history.isEmpty) {
-                        return const _GuarantorHistoryMessage(message: 'Todavía no hay envíos vinculados a esta solicitud. Los datos anteriores se conservan como legado y no se asocian automáticamente a este crédito.');
+                        return const _GuarantorHistoryMessage(
+                          message:
+                              'Todavía no hay envíos vinculados a esta solicitud. Los datos anteriores se conservan como legado y no se asocian automáticamente a este crédito.',
+                        );
                       }
                       return _GuarantorHistoryView(items: history);
                     },
@@ -868,7 +1014,10 @@ class _OfferCardState extends ConsumerState<_OfferCard> {
                     ),
                     child: const Text(
                       'Garante aprobado. Para completar el trámite deben acudir presencialmente el solicitante y el garante con los documentos indicados.',
-                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
                   ),
                 if (!rejected &&
@@ -1011,7 +1160,10 @@ class _GuarantorHistoryMessage extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     width: double.infinity,
     padding: const EdgeInsets.all(13),
-    decoration: BoxDecoration(color: AppColors.infoSoft, borderRadius: BorderRadius.circular(14)),
+    decoration: BoxDecoration(
+      color: AppColors.infoSoft,
+      borderRadius: BorderRadius.circular(14),
+    ),
     child: Text(message, style: const TextStyle(fontSize: 12, height: 1.45)),
   );
 }
@@ -1023,37 +1175,82 @@ class _GuarantorHistoryView extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Column(
     children: items.map((item) {
-      final snapshot = Map<String, dynamic>.from(item['fotografia'] as Map? ?? const {});
+      final snapshot = Map<String, dynamic>.from(
+        item['fotografia'] as Map? ?? const {},
+      );
       final evaluations = (item['evaluaciones'] as List<dynamic>? ?? const [])
           .whereType<Map>()
           .map((value) => Map<String, dynamic>.from(value));
-      final name = '${snapshot['nombres'] ?? ''} ${snapshot['apellidos'] ?? ''}'.trim();
+      final name = '${snapshot['nombres'] ?? ''} ${snapshot['apellidos'] ?? ''}'
+          .trim();
       final sentAt = item['enviadoEn']?.toString();
       return Container(
         width: double.infinity,
         margin: const EdgeInsets.only(top: 9),
         padding: const EdgeInsets.all(13),
-        decoration: BoxDecoration(color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: .55), borderRadius: BorderRadius.circular(14)),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text('Intento ${item['intento'] ?? '—'} · ${name.isEmpty ? 'Garante' : name}', style: const TextStyle(fontWeight: FontWeight.w800)),
-          Text('Enviado: ${sentAt ?? 'Fecha no disponible'}', style: Theme.of(context).textTheme.bodySmall),
-          ...evaluations.map((evaluation) {
-            final reasons = (evaluation['motivosRechazo'] as List<dynamic>? ?? const []).join(', ');
-            final other = evaluation['motivoRechazoOtro']?.toString();
-            final observation = evaluation['observacion']?.toString();
-            final explanation = [reasons, other, observation].where((value) => value != null && value.trim().isNotEmpty).join(' · ');
-            return Padding(padding: const EdgeInsets.only(top: 8), child: Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10)),
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text((evaluation['decision'] ?? 'Revisión').toString().replaceAll('_', ' '), style: const TextStyle(fontWeight: FontWeight.w700, color: AppColors.primary)),
-                Text('Responsable: ${evaluation['actorRole'] ?? '—'} · ID ${evaluation['actorId'] ?? '—'} · ${evaluation['fecha'] ?? ''}', style: Theme.of(context).textTheme.bodySmall),
-                if (explanation.isNotEmpty) Text(explanation, style: const TextStyle(fontSize: 12, height: 1.4)),
-              ]),
-            ));
-          }),
-        ]),
+        decoration: BoxDecoration(
+          color: Theme.of(
+            context,
+          ).colorScheme.surfaceContainerHighest.withValues(alpha: .55),
+          borderRadius: BorderRadius.circular(14),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Intento ${item['intento'] ?? '—'} · ${name.isEmpty ? 'Garante' : name}',
+              style: const TextStyle(fontWeight: FontWeight.w800),
+            ),
+            Text(
+              'Enviado: ${sentAt ?? 'Fecha no disponible'}',
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
+            ...evaluations.map((evaluation) {
+              final reasons =
+                  (evaluation['motivosRechazo'] as List<dynamic>? ?? const [])
+                      .join(', ');
+              final other = evaluation['motivoRechazoOtro']?.toString();
+              final observation = evaluation['observacion']?.toString();
+              final explanation = [reasons, other, observation]
+                  .where((value) => value != null && value.trim().isNotEmpty)
+                  .join(' · ');
+              return Padding(
+                padding: const EdgeInsets.only(top: 8),
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        (evaluation['decision'] ?? 'Revisión')
+                            .toString()
+                            .replaceAll('_', ' '),
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.primary,
+                        ),
+                      ),
+                      Text(
+                        'Responsable: ${evaluation['actorRole'] ?? '—'} · ID ${evaluation['actorId'] ?? '—'} · ${evaluation['fecha'] ?? ''}',
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                      if (explanation.isNotEmpty)
+                        Text(
+                          explanation,
+                          style: const TextStyle(fontSize: 12, height: 1.4),
+                        ),
+                    ],
+                  ),
+                ),
+              );
+            }),
+          ],
+        ),
       );
     }).toList(),
   );
@@ -1134,7 +1331,9 @@ class _GuarantorNotice extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      hasReasons ? 'Acción requerida' : 'Se requiere un garante',
+                      hasReasons
+                          ? 'Acción requerida'
+                          : 'Se requiere un garante',
                       style: const TextStyle(
                         color: Color(0xFF80500A),
                         fontSize: 11,
@@ -1379,3 +1578,419 @@ class _Metric extends StatelessWidget {
     ),
   );
 }
+
+class _InvestmentRequestsHeading extends StatelessWidget {
+  const _InvestmentRequestsHeading();
+  @override
+  Widget build(BuildContext context) => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text(
+        'Mis solicitudes de inversión',
+        style: Theme.of(
+          context,
+        ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w900),
+      ),
+      const SizedBox(height: 5),
+      const Text(
+        'Revisa las condiciones consultadas y las respuestas de cada cooperativa.',
+      ),
+    ],
+  );
+}
+
+class _InvestmentRequestCard extends StatelessWidget {
+  const _InvestmentRequestCard({required this.request, required this.onTap});
+  final InvestmentRequest request;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final label = _investmentStatusLabel(request.status);
+    return Card(
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(18),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          request.cooperativeName,
+                          style: Theme.of(context).textTheme.bodySmall
+                              ?.copyWith(
+                                color: AppColors.primary,
+                                fontWeight: FontWeight.w700,
+                              ),
+                        ),
+                        const SizedBox(height: 3),
+                        Text(
+                          request.productName,
+                          style: Theme.of(context).textTheme.titleMedium
+                              ?.copyWith(fontWeight: FontWeight.w900),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 6,
+                    ),
+                    decoration: BoxDecoration(
+                      color: label.$2.withValues(alpha: .12),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      label.$1,
+                      style: TextStyle(
+                        color: label.$2,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Text(
+                '\$${request.amount.toStringAsFixed(2)} · ${request.termMonths} meses · ${request.annualRate.toStringAsFixed(2)}% anual',
+                style: const TextStyle(fontWeight: FontWeight.w700),
+              ),
+              if (request.estimatedInterest != null)
+                Text(
+                  'Interés estimado: \$${request.estimatedInterest!.toStringAsFixed(2)}',
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+              const SizedBox(height: 6),
+              Text(
+                'Solicitada ${_formatInvestmentDate(request.createdAt)} · Actualizada ${_formatInvestmentDate(request.updatedAt)}',
+                style: Theme.of(
+                  context,
+                ).textTheme.bodySmall?.copyWith(color: AppColors.textSecondary),
+              ),
+              if (request.acceptance != null)
+                const Padding(
+                  padding: EdgeInsets.only(top: 8),
+                  child: Text(
+                    'La cooperativa respondió. Toca para ver agencia y requisitos.',
+                    style: TextStyle(
+                      color: AppColors.primary,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _InvestmentDetailsSheet extends StatelessWidget {
+  const _InvestmentDetailsSheet({required this.request});
+  final InvestmentRequest request;
+
+  bool _safeMapsUrl(String? value) {
+    if (value == null || value.isEmpty) return false;
+    final uri = Uri.tryParse(value);
+    const hosts = {
+      'maps.google.com',
+      'www.google.com',
+      'google.com',
+      'maps.app.goo.gl',
+      'goo.gl',
+      'www.google.com.ec',
+    };
+    return uri != null &&
+        uri.scheme == 'https' &&
+        hosts.contains(uri.host.toLowerCase()) &&
+        uri.userInfo.isEmpty;
+  }
+
+  Future<void> _openMap(BuildContext context, String? url) async {
+    if (!_safeMapsUrl(url)) return;
+    final opened = await launchUrl(
+      Uri.parse(url!),
+      mode: LaunchMode.externalApplication,
+    );
+    if (!opened && context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'No se pudo abrir el mapa. Usa la dirección de la agencia mostrada.',
+          ),
+        ),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final acceptance = request.acceptance;
+    return DraggableScrollableSheet(
+      initialChildSize: .88,
+      minChildSize: .55,
+      maxChildSize: .96,
+      expand: false,
+      builder: (context, controller) => Material(
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(26)),
+        child: ListView(
+          controller: controller,
+          padding: const EdgeInsets.fromLTRB(20, 12, 20, 30),
+          children: [
+            Center(
+              child: Container(
+                width: 42,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.black26,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+            ),
+            const SizedBox(height: 18),
+            Text(
+              acceptance == null
+                  ? 'Detalle de inversión'
+                  : '¡Tu solicitud fue aceptada!',
+              style: Theme.of(
+                context,
+              ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w900),
+            ),
+            const SizedBox(height: 14),
+            DolaritoWidget(
+              mood: acceptance == null
+                  ? DolaritoMood.thinking
+                  : DolaritoMood.proud,
+              message: acceptance == null
+                  ? 'Tu solicitud sigue el estado que muestra la cooperativa. Revisa aquí el historial.'
+                  : '¡Qué buena noticia! La cooperativa te indicó cómo continuar. La inversión se formaliza directamente con ella.',
+              compact: true,
+            ),
+            const SizedBox(height: 16),
+            _InvestmentDetailLine('Cooperativa', request.cooperativeName),
+            _InvestmentDetailLine('Producto', request.productName),
+            _InvestmentDetailLine(
+              'Monto',
+              '\$${request.amount.toStringAsFixed(2)}',
+            ),
+            _InvestmentDetailLine('Plazo', '${request.termMonths} meses'),
+            _InvestmentDetailLine(
+              'Tasa consultada',
+              '${request.annualRate.toStringAsFixed(2)}% anual',
+            ),
+            if (acceptance?.confirmedAnnualRate != null)
+              _InvestmentDetailLine(
+                'Tasa confirmada por cooperativa',
+                '${acceptance!.confirmedAnnualRate!.toStringAsFixed(2)}% anual',
+              ),
+            if (request.estimatedInterest != null)
+              _InvestmentDetailLine(
+                'Interés estimado',
+                '\$${request.estimatedInterest!.toStringAsFixed(2)}',
+              ),
+            _InvestmentDetailLine(
+              'Solicitada',
+              _formatInvestmentDate(request.createdAt),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Historial de respuestas',
+              style: Theme.of(
+                context,
+              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800),
+            ),
+            const SizedBox(height: 8),
+            ...request.events.reversed.map(
+              (event) => ListTile(
+                contentPadding: EdgeInsets.zero,
+                leading: Icon(
+                  Icons.circle,
+                  size: 12,
+                  color: _investmentStatusLabel(event.status).$2,
+                ),
+                title: Text(_investmentStatusLabel(event.status).$1),
+                subtitle: Text(
+                  [
+                    if (event.note?.isNotEmpty == true) event.note!,
+                    _formatInvestmentDate(event.createdAt),
+                  ].join('\n'),
+                ),
+              ),
+            ),
+            if (acceptance != null) ...[
+              const Divider(height: 28),
+              Container(
+                padding: const EdgeInsets.all(15),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFEAF7F0),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      acceptance.acceptanceMessage,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w700,
+                        height: 1.45,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      acceptance.agencyName,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                    Text(
+                      '${acceptance.agencyAddress}, ${acceptance.agencyCity}',
+                    ),
+                    if (acceptance.openingHours?.isNotEmpty == true)
+                      _InvestmentDetailLine(
+                        'Horario',
+                        acceptance.openingHours!,
+                      ),
+                    if (acceptance.contactDepartment?.isNotEmpty == true)
+                      _InvestmentDetailLine(
+                        'Contacto',
+                        acceptance.contactDepartment!,
+                      ),
+                    if (acceptance.contactPhone?.isNotEmpty == true)
+                      _InvestmentDetailLine(
+                        'Teléfono',
+                        acceptance.contactPhone!,
+                      ),
+                    if (acceptance.responseDeadline != null)
+                      _InvestmentDetailLine(
+                        'Fecha límite',
+                        _formatInvestmentDate(acceptance.responseDeadline!),
+                      ),
+                    if (acceptance.requirements.isNotEmpty) ...[
+                      const SizedBox(height: 14),
+                      const Text(
+                        'Requisitos para presentar',
+                        style: TextStyle(fontWeight: FontWeight.w900),
+                      ),
+                      ...acceptance.requirements.map(
+                        (item) => Padding(
+                          padding: const EdgeInsets.only(top: 8),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Icon(
+                                item.mandatory
+                                    ? Icons.check_circle
+                                    : Icons.info_outline,
+                                size: 18,
+                                color: item.mandatory
+                                    ? AppColors.primary
+                                    : AppColors.textSecondary,
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  '${item.description} · ${item.mandatory ? 'Obligatorio' : 'Opcional'}',
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                    if (acceptance.instructions?.isNotEmpty == true) ...[
+                      const SizedBox(height: 14),
+                      const Text(
+                        'Instrucciones',
+                        style: TextStyle(fontWeight: FontWeight.w900),
+                      ),
+                      Text(acceptance.instructions!),
+                    ],
+                    if (_safeMapsUrl(acceptance.mapsUrl)) ...[
+                      const SizedBox(height: 16),
+                      SizedBox(
+                        width: double.infinity,
+                        child: FilledButton.icon(
+                          onPressed: () =>
+                              _openMap(context, acceptance.mapsUrl),
+                          icon: const Icon(Icons.directions_rounded),
+                          label: const Text('Cómo llegar'),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+              const SizedBox(height: 12),
+              const Text(
+                'La aceptación no significa que el depósito esté constituido. Completa la verificación, entrega de documentos y formalización directamente con la cooperativa.',
+                style: TextStyle(
+                  color: AppColors.textSecondary,
+                  fontSize: 12,
+                  height: 1.45,
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _InvestmentDetailLine extends StatelessWidget {
+  const _InvestmentDetailLine(this.label, this.value);
+  final String label;
+  final String value;
+  @override
+  Widget build(BuildContext context) => Padding(
+    padding: const EdgeInsets.only(bottom: 7),
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(
+          width: 130,
+          child: Text(
+            label,
+            style: const TextStyle(
+              color: AppColors.textSecondary,
+              fontSize: 12,
+            ),
+          ),
+        ),
+        Expanded(
+          child: Text(
+            value,
+            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
+(String, Color) _investmentStatusLabel(String status) => switch (status) {
+  'SUBMITTED' => ('Enviada', const Color(0xFF9B6A14)),
+  'IN_REVIEW' => ('En revisión', const Color(0xFF2E6D9D)),
+  'INFORMATION_REQUIRED' => ('Requiere información', const Color(0xFF9B6A14)),
+  'CONDITIONS_CONFIRMED' => (
+    'Aceptada · formalización pendiente',
+    AppColors.primary,
+  ),
+  'DECLINED' => ('Rechazada', const Color(0xFFAA4B4B)),
+  _ => ('Estado pendiente', AppColors.textSecondary),
+};
+
+String _formatInvestmentDate(DateTime date) =>
+    DateFormat('dd/MM/yyyy HH:mm', 'es_EC').format(date.toLocal());

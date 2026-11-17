@@ -3,8 +3,9 @@ import { X } from "lucide-react";
 import { createInvestmentRequest, getInvestmentAvailability, getInvestmentOffers, getMyInvestmentRequests, type InvestmentAvailability, type InvestmentOffer, type InvestmentRequest } from "../../api/investments.api";
 import { getErrorMessage } from "../../api/errors";
 
-interface Props { open: boolean; onClose: () => void; onSubmit: () => void; }
-export default function NewInvestmentModal({ open, onClose, onSubmit }: Props) {
+export type PublicDraft = { amount: string; term: string; payment: string; productId: number; cooperativeId: number; conditionId: number; annualRate: number; savedAt: number };
+interface Props { open: boolean; onClose: () => void; onSubmit: () => void; onRequestAuthentication?: (draft: PublicDraft) => void; initialDraft?: PublicDraft | null; }
+export default function NewInvestmentModal({ open, onClose, onSubmit, onRequestAuthentication, initialDraft }: Props) {
   const [amount, setAmount] = useState("");
   const [term, setTerm] = useState("");
   const [payment, setPayment] = useState("");
@@ -16,18 +17,35 @@ export default function NewInvestmentModal({ open, onClose, onSubmit }: Props) {
   const [consent, setConsent] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const [draftNotice, setDraftNotice] = useState("");
   const numericAmount = Number(amount);
   const loadRequests = async () => { try { setRequests(await getMyInvestmentRequests()); } catch (e) { setError(getErrorMessage(e, "Inicia sesión para consultar tus solicitudes.")); } };
   useEffect(() => { if (open && showRequests) void loadRequests(); }, [open, showRequests]);
+  useEffect(() => {
+    if (!open || !initialDraft) return;
+    setAmount(initialDraft.amount); setTerm(initialDraft.term); setPayment(initialDraft.payment);
+    setDraftNotice("Recuperamos tu simulación. Consultaremos nuevamente las tasas y disponibilidad actuales.");
+    void (async () => {
+      try {
+        const fresh = await getInvestmentAvailability(Number(initialDraft.amount)); setAvailability(fresh);
+        if (!fresh.termMonths.includes(Number(initialDraft.term))) { setDraftNotice("El plazo guardado ya no está disponible. Elige un plazo vigente."); return; }
+        const current = await getInvestmentOffers(Number(initialDraft.amount), Number(initialDraft.term), initialDraft.payment || undefined);
+        setOffers(current);
+        const match = current.find(o => o.productId === initialDraft.productId && o.cooperativeId === initialDraft.cooperativeId);
+        setDraftNotice(!match ? "La oferta guardada ya no está disponible. Revisa las alternativas actuales." : match.conditionId !== initialDraft.conditionId || match.annualRate !== initialDraft.annualRate ? "La tasa o las condiciones cambiaron. Revisa la oferta actual antes de continuar." : "La oferta sigue vigente. Revisa las condiciones actuales antes de continuar.");
+      } catch { setDraftNotice("No pudimos actualizar la simulación. Consulta nuevamente las ofertas antes de continuar."); }
+    })();
+  }, [open, initialDraft]);
   if (!open) return null;
   const run = async (action: () => Promise<void>) => { setBusy(true); setError(""); try { await action(); } catch (e) { setError(getErrorMessage(e, "No se pudo completar la operación.")); } finally { setBusy(false); } };
   const findTerms = () => run(async () => { const result = await getInvestmentAvailability(numericAmount); setAvailability(result); setTerm(""); setPayment(""); setOffers([]); if (!result.termMonths.length) setError("No hay plazos disponibles para ese monto."); });
   const compare = () => run(async () => { const found = await getInvestmentOffers(numericAmount, Number(term), payment || undefined); setOffers(found); if (!found.length) setError("No encontramos ofertas vigentes con esos criterios."); });
-  const send = () => consentOffer && run(async () => { await createInvestmentRequest({ productId: consentOffer.productId, conditionId: consentOffer.conditionId, amount: numericAmount, termMonths: Number(term), interestPaymentOption: payment || null, personalDataConsent: true }); setConsentOffer(null); setConsent(false); setShowRequests(true); onSubmit(); await loadRequests(); });
+  const send = () => consentOffer && run(async () => { if (onRequestAuthentication) { onRequestAuthentication({ amount, term, payment, productId: consentOffer.productId, cooperativeId: consentOffer.cooperativeId, conditionId: consentOffer.conditionId, annualRate: consentOffer.annualRate, savedAt: Date.now() }); return; } await createInvestmentRequest({ productId: consentOffer.productId, conditionId: consentOffer.conditionId, amount: numericAmount, termMonths: Number(term), interestPaymentOption: payment || null, personalDataConsent: true }); sessionStorage.removeItem("dinerop_pending_investment_v1"); setConsentOffer(null); setConsent(false); setShowRequests(true); onSubmit(); await loadRequests(); });
   return <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-3"><section className="max-h-[92vh] w-full max-w-3xl overflow-y-auto rounded-2xl bg-white shadow-2xl">
     <header className="sticky top-0 z-10 flex items-center justify-between border-b bg-white p-5"><div><h2 className="text-xl font-extrabold text-slate-800">Inversiones</h2><p className="text-sm text-slate-500">Compara condiciones vigentes y consulta tus solicitudes.</p></div><button onClick={onClose} aria-label="Cerrar" className="rounded-lg p-2 hover:bg-slate-100"><X /></button></header>
     <div className="p-5"><div className="mb-5 flex gap-2"><button onClick={() => setShowRequests(false)} className={`rounded-lg px-4 py-2 text-sm font-bold ${!showRequests ? "bg-emerald-700 text-white" : "bg-slate-100"}`}>Comparar ofertas</button><button onClick={() => setShowRequests(true)} className={`rounded-lg px-4 py-2 text-sm font-bold ${showRequests ? "bg-emerald-700 text-white" : "bg-slate-100"}`}>Mis solicitudes</button></div>
       {error && <p role="alert" className="mb-4 rounded-lg bg-rose-50 p-3 text-sm text-rose-700">{error}</p>}
+      {draftNotice && <p role="status" className="mb-4 rounded-lg bg-amber-50 p-3 text-sm text-amber-900">{draftNotice}</p>}
       {showRequests ? <div className="space-y-3">{requests.map(r => <article key={r.id} className="rounded-xl border p-4"><div className="flex justify-between gap-3"><strong>{r.productName} · {r.cooperativeName}</strong><span className="text-sm font-bold text-emerald-700">{r.status.replace(/_/g, " ")}</span></div><p className="mt-2 text-sm">${r.amount.toLocaleString("es-EC", { minimumFractionDigits: 2 })} · {r.termMonths} meses · {r.annualRate.toFixed(2)}% anual</p>{r.statusNote && <p className="mt-2 text-sm text-slate-600">{r.statusNote}</p>}</article>)}{!requests.length && <p className="text-sm text-slate-500">Aún no tienes solicitudes registradas.</p>}</div> : <>
         <div className="grid gap-3 sm:grid-cols-3"><label className="text-sm font-semibold">Monto (USD)<input type="number" min="0.01" step="0.01" value={amount} onChange={e => { setAmount(e.target.value); setAvailability(null); setOffers([]); }} className="mt-1 w-full rounded-lg border p-2.5" /></label><label className="text-sm font-semibold">Plazo<select disabled={!availability} value={term} onChange={e => { setTerm(e.target.value); setPayment(""); setOffers([]); }} className="mt-1 w-full rounded-lg border p-2.5"><option value="">Selecciona</option>{availability?.termMonths.map(x => <option key={x} value={x}>{x} meses</option>)}</select></label><label className="text-sm font-semibold">Pago de intereses<select disabled={!term || !availability?.interestPaymentOptions.length} value={payment} onChange={e => setPayment(e.target.value)} className="mt-1 w-full rounded-lg border p-2.5"><option value="">Sin preferencia</option>{availability?.interestPaymentOptions.map(x => <option key={x} value={x}>{x === "MONTHLY" ? "Mensual" : x === "AT_MATURITY" ? "Al vencimiento" : "Reinvertir"}</option>)}</select></label></div>
         <div className="mt-4 flex flex-wrap gap-2"><button disabled={busy || numericAmount <= 0} onClick={() => void findTerms()} className="rounded-lg border px-4 py-2 font-bold disabled:opacity-50">Consultar plazos</button><button disabled={busy || !term} onClick={() => void compare()} className="rounded-lg bg-emerald-700 px-4 py-2 font-bold text-white disabled:opacity-50">{busy ? "Consultando…" : "Comparar ofertas"}</button></div>

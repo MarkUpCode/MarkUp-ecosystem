@@ -10,6 +10,7 @@ import '../../../../shared/widgets/app_card.dart';
 import '../../../../shared/widgets/app_error_view.dart';
 import '../../../../shared/widgets/app_text_field.dart';
 import '../auth_controller.dart';
+import '../../../investment/providers/investment_providers.dart';
 
 class RegistrationVerificationPage extends ConsumerStatefulWidget {
   const RegistrationVerificationPage({super.key, required this.email});
@@ -81,16 +82,21 @@ class _RegistrationVerificationPageState
     }
 
     try {
-      await ref.read(authControllerProvider).verifyRegistrationCode(
-            email: _email,
-            code: code,
-          );
-      if (mounted) setState(() { _verified = true; _error = null; });
+      await ref
+          .read(authControllerProvider)
+          .verifyRegistrationCode(email: _email, code: code);
+      if (mounted)
+        setState(() {
+          _verified = true;
+          _error = null;
+        });
     } catch (error) {
       if (mounted) {
-        setState(() => _error = error is AppException
-            ? error.message
-            : AppErrorMessages.generic);
+        setState(
+          () => _error = error is AppException
+              ? error.message
+              : AppErrorMessages.generic,
+        );
       }
     }
   }
@@ -101,17 +107,24 @@ class _RegistrationVerificationPageState
     try {
       await ref.read(authControllerProvider).resendRegistrationCode(_email);
       if (mounted) {
-        setState(() { _error = null; _codeController.clear(); });
+        setState(() {
+          _error = null;
+          _codeController.clear();
+        });
         _startResendCountdown();
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Enviamos un nuevo código a tu correo.')),
+          const SnackBar(
+            content: Text('Enviamos un nuevo código a tu correo.'),
+          ),
         );
       }
     } catch (error) {
       if (mounted) {
-        setState(() => _error = error is AppException
-            ? error.message
-            : AppErrorMessages.generic);
+        setState(
+          () => _error = error is AppException
+              ? error.message
+              : AppErrorMessages.generic,
+        );
       }
     }
   }
@@ -124,7 +137,9 @@ class _RegistrationVerificationPageState
     }
 
     try {
-      await ref.read(authControllerProvider).changeRegistrationEmail(
+      await ref
+          .read(authControllerProvider)
+          .changeRegistrationEmail(
             currentEmail: _currentEmail,
             newEmail: newEmail,
           );
@@ -137,14 +152,18 @@ class _RegistrationVerificationPageState
         });
         _startResendCountdown();
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Enviamos un nuevo código al correo actualizado.')),
+          const SnackBar(
+            content: Text('Enviamos un nuevo código al correo actualizado.'),
+          ),
         );
       }
     } catch (error) {
       if (mounted) {
-        setState(() => _error = error is AppException
-            ? error.message
-            : AppErrorMessages.generic);
+        setState(
+          () => _error = error is AppException
+              ? error.message
+              : AppErrorMessages.generic,
+        );
       }
     }
   }
@@ -152,7 +171,9 @@ class _RegistrationVerificationPageState
   Future<void> _setPassword() async {
     final password = _passwordController.text;
     if (password.length < 8) {
-      setState(() => _error = 'La contraseña debe tener al menos 8 caracteres.');
+      setState(
+        () => _error = 'La contraseña debe tener al menos 8 caracteres.',
+      );
       return;
     }
     if (password != _confirmController.text) {
@@ -161,17 +182,24 @@ class _RegistrationVerificationPageState
     }
 
     try {
-      await ref.read(authControllerProvider).setRegistrationPassword(
-            email: _email,
-            password: password,
-          );
+      await ref
+          .read(authControllerProvider)
+          .setRegistrationPassword(email: _email, password: password);
       await ref.read(authControllerProvider).login(_email, password);
-      if (mounted) context.go('/dashboard');
+      final draft = await ref.read(investmentDraftStoreProvider).read();
+      final next = draft == null
+          ? '/dashboard'
+          : (ref.read(authControllerProvider).requiresOnboarding
+                ? '/onboarding'
+                : '/simulate-investment');
+      if (mounted) context.go(next);
     } catch (error) {
       if (mounted) {
-        setState(() => _error = error is AppException
-            ? error.message
-            : AppErrorMessages.generic);
+        setState(
+          () => _error = error is AppException
+              ? error.message
+              : AppErrorMessages.generic,
+        );
       }
     }
   }
@@ -209,9 +237,9 @@ class _RegistrationVerificationPageState
                           onPressed: controller.isBusy
                               ? null
                               : () => setState(() {
-                                    _emailController.text = _currentEmail;
-                                    _editingEmail = false;
-                                  }),
+                                  _emailController.text = _currentEmail;
+                                  _editingEmail = false;
+                                }),
                           child: const Text('Cancelar'),
                         ),
                       ),
@@ -270,7 +298,8 @@ class _RegistrationVerificationPageState
                     suffixIcon: _showPassword
                         ? Icons.visibility_off_outlined
                         : Icons.visibility_outlined,
-                    onSuffixTap: () => setState(() => _showPassword = !_showPassword),
+                    onSuffixTap: () =>
+                        setState(() => _showPassword = !_showPassword),
                   ),
                   const SizedBox(height: 16),
                   AppTextField(

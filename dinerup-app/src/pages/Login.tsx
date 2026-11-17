@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -27,6 +27,7 @@ export default function Login() {
   const [creditRequestType, setCreditRequestType] = useState<"CREDITO" | "INVERSION">("CREDITO");
 
   const navigate = useNavigate();
+  const location = useLocation();
   const { login: authLogin } = useAuth();
 
   const loginForm = useForm<LoginFormData>({
@@ -42,7 +43,8 @@ export default function Login() {
       const rawRole = typeof result?.role === "string" ? result.role.toLowerCase() : "";
       if (!rawRole) { setError("No se pudo determinar el tipo de usuario."); return; }
       if (rawRole !== "client" && rawRole !== "cooperative") { setError("Tipo de cuenta no reconocido."); return; }
-      navigate(rawRole === "client" ? "/dashboard-client" : "/dashboard-cooperative");
+      const returnTo = new URLSearchParams(location.search).get("returnTo");
+      navigate(rawRole === "client" && returnTo === "/investments" ? returnTo : rawRole === "client" ? "/dashboard-client" : "/dashboard-cooperative");
     } catch {
       setError("Credenciales incorrectas o error al iniciar sesión");
     } finally {
@@ -159,7 +161,7 @@ export default function Login() {
 
             <button
               className="left-btn-shimmer"
-              onClick={() => handleOpenCredit("INVERSION")}
+              onClick={() => navigate("/investments")}
               style={{
                 display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
                 background: "linear-gradient(135deg, #f59e0b, #d97706)",

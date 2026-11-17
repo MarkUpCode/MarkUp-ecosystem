@@ -123,6 +123,8 @@ class InvestmentRequest {
     required this.earlyCancellationConditions,
     required this.status,
     required this.statusNote,
+    required this.events,
+    required this.acceptance,
     required this.createdAt,
     required this.updatedAt,
   });
@@ -145,6 +147,8 @@ class InvestmentRequest {
   final String? earlyCancellationConditions;
   final String status;
   final String? statusNote;
+  final List<InvestmentStatusEvent> events;
+  final InvestmentAcceptance? acceptance;
   final DateTime createdAt;
   final DateTime updatedAt;
 
@@ -172,7 +176,105 @@ class InvestmentRequest {
             ?.toString(),
         status: (json['status'] ?? 'UNKNOWN').toString(),
         statusNote: json['statusNote']?.toString(),
+        events: (json['events'] as List? ?? const [])
+            .map(
+              (item) => InvestmentStatusEvent.fromJson(
+                Map<String, dynamic>.from(item as Map),
+              ),
+            )
+            .toList(),
+        acceptance: json['acceptance'] == null
+            ? null
+            : InvestmentAcceptance.fromJson(
+                Map<String, dynamic>.from(json['acceptance'] as Map),
+              ),
         createdAt: DateTime.parse(json['createdAt'].toString()),
         updatedAt: DateTime.parse(json['updatedAt'].toString()),
+      );
+}
+
+class InvestmentStatusEvent {
+  const InvestmentStatusEvent({
+    required this.status,
+    required this.note,
+    required this.createdAt,
+  });
+  final String status;
+  final String? note;
+  final DateTime createdAt;
+  factory InvestmentStatusEvent.fromJson(Map<String, dynamic> json) =>
+      InvestmentStatusEvent(
+        status: (json['status'] ?? 'UNKNOWN').toString(),
+        note: json['note']?.toString(),
+        createdAt: DateTime.parse(json['createdAt'].toString()),
+      );
+}
+
+class InvestmentAcceptance {
+  const InvestmentAcceptance({
+    required this.acceptanceMessage,
+    required this.confirmedAnnualRate,
+    required this.agencyName,
+    required this.agencyAddress,
+    required this.agencyCity,
+    required this.mapsUrl,
+    required this.contactPhone,
+    required this.openingHours,
+    required this.contactDepartment,
+    required this.responseDeadline,
+    required this.instructions,
+    required this.respondedAt,
+    required this.requirements,
+  });
+  final String acceptanceMessage;
+  final double? confirmedAnnualRate;
+  final String agencyName;
+  final String agencyAddress;
+  final String agencyCity;
+  final String? mapsUrl;
+  final String? contactPhone;
+  final String? openingHours;
+  final String? contactDepartment;
+  final DateTime? responseDeadline;
+  final String? instructions;
+  final DateTime respondedAt;
+  final List<InvestmentRequirement> requirements;
+  factory InvestmentAcceptance.fromJson(Map<String, dynamic> json) =>
+      InvestmentAcceptance(
+        acceptanceMessage: (json['acceptanceMessage'] ?? '').toString(),
+        confirmedAnnualRate: (json['confirmedAnnualRate'] as num?)?.toDouble(),
+        agencyName: (json['agencyName'] ?? '').toString(),
+        agencyAddress: (json['agencyAddress'] ?? '').toString(),
+        agencyCity: (json['agencyCity'] ?? '').toString(),
+        mapsUrl: json['mapsUrl']?.toString(),
+        contactPhone: json['contactPhone']?.toString(),
+        openingHours: json['openingHours']?.toString(),
+        contactDepartment: json['contactDepartment']?.toString(),
+        responseDeadline: json['responseDeadline'] == null
+            ? null
+            : DateTime.tryParse(json['responseDeadline'].toString()),
+        instructions: json['instructions']?.toString(),
+        respondedAt: DateTime.parse(json['respondedAt'].toString()),
+        requirements: (json['requirements'] as List? ?? const [])
+            .map(
+              (item) => InvestmentRequirement.fromJson(
+                Map<String, dynamic>.from(item as Map),
+              ),
+            )
+            .toList(),
+      );
+}
+
+class InvestmentRequirement {
+  const InvestmentRequirement({
+    required this.description,
+    required this.mandatory,
+  });
+  final String description;
+  final bool mandatory;
+  factory InvestmentRequirement.fromJson(Map<String, dynamic> json) =>
+      InvestmentRequirement(
+        description: (json['description'] ?? '').toString(),
+        mandatory: json['mandatory'] == true,
       );
 }

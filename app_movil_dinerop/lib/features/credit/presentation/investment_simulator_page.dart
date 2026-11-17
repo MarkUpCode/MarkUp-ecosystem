@@ -9,6 +9,7 @@ import '../../dolarito/providers/dolarito_provider.dart';
 import '../../dolarito/widgets/dolarito_widget.dart';
 import '../../../shared/widgets/app_card.dart';
 import '../../investment/data/models/investment_models.dart';
+import '../../investment/data/investment_draft_store.dart';
 import '../../investment/providers/investment_providers.dart';
 
 const _green = Color(0xFF087A53);
@@ -36,6 +37,7 @@ class _InvestmentSimulatorPageState
   List<int> _availableTermMonths = const [];
   List<String> _availablePaymentOptions = const [];
   List<InvestmentOffer> _offers = const [];
+  String? _draftNotice;
 
   @override
   void initState() {
@@ -48,8 +50,57 @@ class _InvestmentSimulatorPageState
               ref.read(dolaritoServiceProvider).investmentWelcome(),
               force: true,
             );
+        _restoreDraft();
       }
     });
+  }
+
+  Future<void> _restoreDraft() async {
+    final draft = await ref.read(investmentDraftStoreProvider).read();
+    if (!mounted || draft == null) return;
+    if (ref.read(authControllerProvider).isAuthenticated) {
+      ref
+          .read(dolaritoProvider.notifier)
+          .show(
+            ref.read(dolaritoServiceProvider).investmentAccountReady(),
+            force: true,
+          );
+    }
+    _amountController.text = draft.amount.toStringAsFixed(2);
+    _selectedTerm = draft.termMonths;
+    _interestPaymentOption = draft.interestPaymentOption;
+    setState(
+      () => _draftNotice =
+          'Recuperamos tu simulación. Estamos consultando nuevamente las condiciones vigentes.',
+    );
+    await _loadAvailability();
+    if (!mounted) return;
+    if (!_availableTermMonths.contains(draft.termMonths)) {
+      setState(
+        () => _draftNotice =
+            'El plazo anterior ya no está disponible. Elige uno de los plazos actuales.',
+      );
+      return;
+    }
+    await _loadAvailability(termMonths: draft.termMonths);
+    if (!mounted) return;
+    await _compare();
+    if (!mounted) return;
+    final current = _offers
+        .where(
+          (offer) =>
+              offer.productId == draft.productId &&
+              offer.cooperativeId == draft.cooperativeId,
+        )
+        .firstOrNull;
+    setState(
+      () => _draftNotice = current == null
+          ? 'La oferta anterior ya no está disponible con estas condiciones. Revisa las alternativas actuales.'
+          : (current.conditionId != draft.conditionId ||
+                    current.annualRate != draft.annualRate
+                ? 'La tasa o las condiciones cambiaron. Revisa la oferta actual antes de enviar.'
+                : 'La oferta sigue disponible. Revisa las condiciones actuales antes de continuar.'),
+    );
   }
 
   @override
@@ -157,12 +208,33 @@ class _InvestmentSimulatorPageState
   Future<void> _selectOffer(InvestmentOffer offer) async {
     final auth = ref.read(authControllerProvider);
     if (!auth.isAuthenticated) {
+      await ref
+          .read(investmentDraftStoreProvider)
+          .save(
+            PendingInvestmentDraft(
+              amount: _amount,
+              termMonths: _selectedTerm!,
+              interestPaymentOption: _interestPaymentOption,
+              productId: offer.productId,
+              cooperativeId: offer.cooperativeId,
+              conditionId: offer.conditionId,
+              annualRate: offer.annualRate,
+              savedAt: DateTime.now().toUtc(),
+            ),
+          );
+      if (!mounted) return;
+      ref
+          .read(dolaritoProvider.notifier)
+          .show(
+            ref.read(dolaritoServiceProvider).investmentAccountRequired(),
+            force: true,
+          );
       final goToLogin = await showDialog<bool>(
         context: context,
         builder: (context) => AlertDialog(
           title: const Text('Inicia sesión para continuar'),
           content: const Text(
-            'Puedes comparar las tasas sin iniciar sesión. Para enviar una solicitud a una cooperativa necesitas acceder a tu cuenta.',
+            '¡Qué bueno que quieras hacer crecer tu dinero! Primero vamos a crear tu cuenta para que puedas continuar con tu inversión. Guardamos tu simulación y volveremos a consultar las condiciones al regresar.',
           ),
           actions: [
             TextButton(
@@ -171,12 +243,13 @@ class _InvestmentSimulatorPageState
             ),
             FilledButton(
               onPressed: () => Navigator.pop(context, true),
-              child: const Text('Iniciar sesión'),
+              child: const Text('Iniciar sesión o crear cuenta'),
             ),
           ],
         ),
       );
-      if (goToLogin == true && mounted) context.push('/login');
+      if (!mounted) return;
+      if (goToLogin == true) context.push('/login');
       return;
     }
 
@@ -269,6 +342,7 @@ class _InvestmentSimulatorPageState
             consent: true,
             interestPaymentOption: _interestPaymentOption,
           );
+      await ref.read(investmentDraftStoreProvider).clear();
       if (!mounted) return;
       ref
           .read(dolaritoProvider.notifier)
@@ -361,6 +435,10 @@ class _InvestmentSimulatorPageState
               const SizedBox(height: 16),
               if (_error != null) ...[
                 _ErrorBanner(message: _error!),
+                const SizedBox(height: 12),
+              ],
+              if (_draftNotice != null) ...[
+                _ErrorBanner(message: _draftNotice!),
                 const SizedBox(height: 12),
               ],
               if (_showRequests)

@@ -58,4 +58,6 @@ Los clientes móvil y DinerUp usan los nuevos endpoints definidos en `dinerop-ba
 - `POST /api/investments/requests` y `GET /api/investments/requests/me` requieren rol `CLIENT`.
 - `/api/credits/cooperative/me/investment-products*` y `/investment-requests*` requieren `COOPERATIVE`; el backend toma el ID cooperativo de la cuenta autenticada.
 - La selección requiere consentimiento explícito, guarda snapshot de tasa/condiciones y comparte datos de contacto solo con la cooperativa seleccionada. Los plazos implementados son meses porque las condiciones existentes modelan `minimumTermMonths`/`maximumTermMonths`.
+- `/api/credits/cooperative/me/investment-requests/{id}/acceptance` registra la respuesta de aceptación, requisitos y ubicación de agencia, restringida a la cooperativa propietaria y protegida ante doble aceptación concurrente. `CONDITIONS_CONFIRMED` significa aceptación pendiente de formalización en la cooperativa, no depósito constituido.
+- Las experiencias web y móvil conservan un borrador de simulación por hasta 30 minutos durante el acceso/registro y vuelven a consultar ofertas vigentes al regresar; el cliente debe revisar las condiciones actualizadas antes de consentir y enviar.
 - Graphify local actualizado en los tres proyectos. Verifica controladores y servicios Java antes de interpretar los enlaces del grafo como llamadas entre repositorios.

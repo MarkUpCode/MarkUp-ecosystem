@@ -215,6 +215,24 @@ class DolaritoService {
     scopeKey: 'investment',
   );
 
+  DolaritoReaction investmentAccountRequired() => const DolaritoReaction(
+    mood: DolaritoMood.explaining,
+    message:
+        '¡Qué bueno que quieras hacer crecer tu dinero! Primero vamos a crear tu cuenta para que puedas continuar con tu inversión.',
+    event: DolaritoEvent.investmentAccountRequired,
+    priority: DolaritoPriority.actionable,
+    scopeKey: 'investment',
+  );
+
+  DolaritoReaction investmentAccountReady() => const DolaritoReaction(
+    mood: DolaritoMood.proud,
+    message:
+        '¡Excelente! Ya tenemos tu cuenta. Continuemos donde nos quedamos.',
+    event: DolaritoEvent.investmentAccountReady,
+    priority: DolaritoPriority.motivation,
+    scopeKey: 'investment',
+  );
+
   DolaritoReaction investmentThinking() => const DolaritoReaction(
     mood: DolaritoMood.thinking,
     message:

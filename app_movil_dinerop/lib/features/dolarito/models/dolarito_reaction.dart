@@ -32,6 +32,8 @@ enum DolaritoEvent {
   investmentOfferSelected,
   investmentRequestSent,
   investmentRequestStatus,
+  investmentAccountRequired,
+  investmentAccountReady,
 }
 
 enum DolaritoAction { completeProfile, viewRequests, retry }

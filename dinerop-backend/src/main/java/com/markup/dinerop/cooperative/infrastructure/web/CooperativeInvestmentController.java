@@ -10,6 +10,7 @@ import com.markup.dinerop.cooperative.dto.FinancialProductConditionRequest;
 import com.markup.dinerop.cooperative.dto.FinancialProductRequest;
 import com.markup.dinerop.cooperative.dto.FinancialProductResponse;
 import com.markup.dinerop.cooperative.dto.InvestmentRequestResponse;
+import com.markup.dinerop.cooperative.dto.InvestmentAcceptanceRequest;
 import com.markup.dinerop.cooperative.dto.UpdateInvestmentRequestStatus;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
@@ -80,6 +81,15 @@ public class CooperativeInvestmentController {
             @Valid @RequestBody UpdateInvestmentRequestStatus update
     ) {
         return investmentService.updateStatus(requireCooperativeId(user), requestId, update, user.getIdUser());
+    }
+
+    @PutMapping("/investment-requests/{requestId}/acceptance")
+    public InvestmentRequestResponse acceptInvestment(
+            @AuthenticationPrincipal User user,
+            @PathVariable Long requestId,
+            @Valid @RequestBody InvestmentAcceptanceRequest acceptance
+    ) {
+        return investmentService.acceptRequest(requireCooperativeId(user), requestId, acceptance, user.getIdUser());
     }
 
     private Long requireCooperativeId(User user) {

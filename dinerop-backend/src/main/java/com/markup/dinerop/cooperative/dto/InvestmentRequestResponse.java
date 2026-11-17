@@ -41,7 +41,8 @@ public record InvestmentRequestResponse(
         String clientName,
         String clientEmail,
         String clientPhone,
-        List<StatusEvent> events
+        List<StatusEvent> events,
+        InvestmentAcceptanceResponse acceptance
 ) {
     public record StatusEvent(InvestmentRequestStatus status, String note, Instant createdAt) {}
 }

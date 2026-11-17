@@ -58,6 +58,17 @@ public class PushNotificationService {
         sendToUser(userId, title, body, "CREDIT_ACCEPTED", solicitudId);
     }
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void sendInvestmentAccepted(Long userId, Long requestId, String cooperativeName) {
+        try {
+            sendToUser(userId, "Tu solicitud de inversión fue aceptada",
+                    cooperativeName + " respondió a tu solicitud. Revisa los requisitos y la agencia en DINEROP.",
+                    "INVESTMENT_ACCEPTED", "investmentRequestId", requestId);
+        } catch (RuntimeException exception) {
+            log.error("Could not send investment acceptance push to user {}", userId, exception);
+        }
+    }
+
     @Transactional
     public void sendCreditRejected(Long userId, String cooperativeName, List<String> reasons, Long solicitudId) {
         sendToUser(
@@ -116,6 +127,10 @@ public class PushNotificationService {
             String type,
             Long solicitudId
     ) {
+        sendToUser(userId, title, body, type, "solicitudId", solicitudId);
+    }
+
+    private void sendToUser(Long userId, String title, String body, String type, String referenceKey, Long referenceId) {
         if (FirebaseApp.getApps().isEmpty()) {
             log.warn("Push notification skipped: Firebase is not configured");
             return;
@@ -127,7 +142,7 @@ public class PushNotificationService {
                         .setToken(deviceToken.getToken())
                         .setNotification(Notification.builder().setTitle(title).setBody(body).build())
                         .putData("type", type)
-                        .putData("solicitudId", String.valueOf(solicitudId))
+                        .putData(referenceKey, String.valueOf(referenceId))
                         .build();
                 FirebaseMessaging.getInstance().send(message);
             } catch (Exception exception) {

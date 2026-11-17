@@ -5,6 +5,8 @@ import com.markup.dinerop.auth.repository.UserRepository;
 import com.markup.dinerop.cooperative.domain.entity.*;
 import com.markup.dinerop.cooperative.domain.repository.*;
 import com.markup.dinerop.cooperative.dto.*;
+import com.markup.dinerop.cooperative.domain.entity.InvestmentAcceptanceRecord;
+import com.markup.dinerop.notification.service.PushNotificationService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -16,6 +18,7 @@ import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
 import java.time.Instant;
+import java.net.URI;
 import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -36,6 +39,8 @@ public class InvestmentService {
     private final CooperativeRepository cooperativeRepository;
     private final InvestmentRequestRepository requestRepository;
     private final InvestmentRequestStatusEventRepository statusEventRepository;
+    private final InvestmentAcceptanceRepository acceptanceRepository;
+    private final PushNotificationService pushNotificationService;
     private final UserRepository userRepository;
 
     @Transactional(readOnly = true)
@@ -217,6 +222,10 @@ public class InvestmentService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "No se puede devolver una solicitud a su estado inicial.");
         }
+        if (update.status() == InvestmentRequestStatus.CONDITIONS_CONFIRMED) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Usa la respuesta de aceptación para registrar agencia y requisitos.");
+        }
         if ((update.status() == InvestmentRequestStatus.INFORMATION_REQUIRED
                 || update.status() == InvestmentRequestStatus.DECLINED)
                 && (update.note() == null || update.note().isBlank())) {
@@ -228,6 +237,65 @@ public class InvestmentService {
         recordStatus(saved.getId(), update.status(), update.note(), actorId);
         return toResponse(saved,
                 cooperativeRepository.findById(cooperativeId).orElse(null), true);
+    }
+
+    @Transactional
+    public InvestmentRequestResponse acceptRequest(Long cooperativeId, Long requestId,
+            InvestmentAcceptanceRequest payload, Long actorId) {
+        var request = requestRepository.findByIdForUpdate(requestId)
+                .filter(item -> item.getCooperativeId().equals(cooperativeId))
+                .orElseThrow(() -> new EntityNotFoundException("Solicitud de inversión no encontrada."));
+        if (request.getStatus() == InvestmentRequestStatus.CONDITIONS_CONFIRMED
+                || request.getStatus() == InvestmentRequestStatus.DECLINED
+                || acceptanceRepository.findByRequestId(requestId).isPresent()) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "Esta solicitud ya recibió una respuesta final.");
+        }
+        validateMapsUrl(payload.mapsUrl());
+        var response = new InvestmentAcceptanceRecord();
+        response.setRequestId(requestId);
+        response.setCooperativeId(cooperativeId);
+        response.setActorUserId(actorId);
+        response.setAcceptanceMessage(payload.acceptanceMessage().trim());
+        response.setConfirmedAnnualRate(payload.confirmedAnnualRate());
+        response.setAgencyName(payload.agencyName().trim());
+        response.setAgencyAddress(payload.agencyAddress().trim());
+        response.setAgencyCity(payload.agencyCity().trim());
+        response.setMapsUrl(payload.mapsUrl());
+        response.setContactPhone(payload.contactPhone());
+        response.setOpeningHours(payload.openingHours());
+        response.setContactDepartment(payload.contactDepartment());
+        response.setResponseDeadline(payload.responseDeadline());
+        response.setInstructions(payload.instructions());
+        response.setRequirements(payload.requirements().stream()
+                .map(item -> new InvestmentAcceptanceRecord.Requirement(item.description().trim(), item.mandatory()))
+                .toList());
+        acceptanceRepository.save(response);
+        request.setStatus(InvestmentRequestStatus.CONDITIONS_CONFIRMED);
+        var saved = requestRepository.save(request);
+        recordStatus(saved.getId(), InvestmentRequestStatus.CONDITIONS_CONFIRMED,
+                payload.acceptanceMessage().trim(), actorId);
+        pushNotificationService.sendInvestmentAccepted(saved.getClientId(), saved.getId(),
+                cooperativeRepository.findById(cooperativeId).map(
+                        com.markup.dinerop.cooperative.domain.entity.Cooperative::getNombre).orElse("La cooperativa"));
+        return toResponse(saved, cooperativeRepository.findById(cooperativeId).orElse(null), true);
+    }
+
+    private void validateMapsUrl(String rawUrl) {
+        if (rawUrl == null || rawUrl.isBlank()) return;
+        try {
+            URI uri = URI.create(rawUrl.trim());
+            String host = uri.getHost() == null ? "" : uri.getHost().toLowerCase();
+            boolean mapsHost = host.equals("maps.google.com") || host.equals("www.google.com")
+                    || host.equals("google.com") || host.equals("maps.app.goo.gl")
+                    || host.equals("goo.gl") || host.equals("www.google.com.ec");
+            if (!"https".equalsIgnoreCase(uri.getScheme()) || !mapsHost || uri.getUserInfo() != null) {
+                throw new IllegalArgumentException();
+            }
+        } catch (RuntimeException ex) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "El enlace debe ser una URL HTTPS válida de Google Maps.");
+        }
     }
 
     private InvestmentOfferResponse toOffer(FinancialProduct product, FinancialProductCondition condition,
@@ -267,7 +335,17 @@ public class InvestmentService {
                 includeClientData ? request.getClientEmailSnapshot() : null,
                 includeClientData ? request.getClientPhoneSnapshot() : null,
                 events.stream().map(event -> new InvestmentRequestResponse.StatusEvent(
-                        event.getStatus(), event.getNote(), event.getCreatedAt())).toList());
+                        event.getStatus(), event.getNote(), event.getCreatedAt())).toList(),
+                acceptanceRepository.findByRequestId(request.getId()).map(this::toAcceptanceResponse).orElse(null));
+    }
+
+    private com.markup.dinerop.cooperative.dto.InvestmentAcceptanceResponse toAcceptanceResponse(InvestmentAcceptanceRecord response) {
+        return new com.markup.dinerop.cooperative.dto.InvestmentAcceptanceResponse(response.getAcceptanceMessage(), response.getConfirmedAnnualRate(),
+                response.getAgencyName(), response.getAgencyAddress(), response.getAgencyCity(), response.getMapsUrl(),
+                response.getContactPhone(), response.getOpeningHours(), response.getContactDepartment(),
+                response.getResponseDeadline(), response.getInstructions(), response.getRespondedAt(),
+                response.getRequirements().stream().map(item -> new com.markup.dinerop.cooperative.dto.InvestmentAcceptanceResponse.Requirement(
+                        item.getDescription(), item.isMandatory())).toList());
     }
 
     private void recordStatus(Long requestId, InvestmentRequestStatus status, String note, Long actorId) {
@@ -303,3 +381,4 @@ public class InvestmentService {
         return value.compareTo(min) >= 0 && value.compareTo(max) <= 0;
     }
 }
+

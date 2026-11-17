@@ -15,6 +15,7 @@ import '../../../shared/widgets/app_loader.dart';
 import '../../../shared/widgets/app_text_field.dart';
 import '../../../shared/widgets/step_progress.dart';
 import '../../auth/presentation/auth_controller.dart';
+import '../../investment/providers/investment_providers.dart';
 import '../../dolarito/models/dolarito_mood.dart';
 import '../../dolarito/models/dolarito_reaction.dart';
 import '../../dolarito/providers/dolarito_provider.dart';
@@ -832,7 +833,9 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
         if (widget.isGuarantor) {
           context.pop(true);
         } else {
-          context.go('/dashboard');
+          final draft = await ref.read(investmentDraftStoreProvider).read();
+          if (mounted)
+            context.go(draft == null ? '/dashboard' : '/simulate-investment');
         }
       }
     } on AppException catch (error) {
@@ -868,7 +871,9 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
           profileVerified: true,
         );
         if (mounted && !widget.isGuarantor) {
-          context.go('/dashboard');
+          final draft = await ref.read(investmentDraftStoreProvider).read();
+          if (mounted)
+            context.go(draft == null ? '/dashboard' : '/simulate-investment');
         }
         return;
       }
