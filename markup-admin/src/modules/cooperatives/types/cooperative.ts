@@ -36,7 +36,7 @@ export interface CooperativeListItem {
 
     telefono: string;
 
-    calificacion: number;
+    calificacion: number | null;
 
     montoMaximoCredito: number;
 

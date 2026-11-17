@@ -34,10 +34,14 @@ export function CooperativesPage() {
   }
 
   const fields = [["nombre", "Nombre"], ["ciudad", "Ciudad"], ["provincia", "Provincia"], ["direccion", "Dirección"], ["telefono", "Teléfono"], ["paginaWeb", "Página web"], ["logoUrl", "URL del logo"]] as const;
+  const ratedCooperatives = cooperatives.filter((item) => typeof item.calificacion === "number" && Number.isFinite(item.calificacion));
+  const averageRating = ratedCooperatives.length
+    ? ratedCooperatives.reduce((sum, item) => sum + (item.calificacion ?? 0), 0) / ratedCooperatives.length
+    : null;
 
   return <div className="space-y-6">
     <PageHeader title="Cooperativas" subtitle="Administra las entidades, sus usuarios y productos financieros." icon={<Building2 size={30} />} actionLabel="Nueva cooperativa" onAction={() => setCreateOpen(true)} />
-    <CooperativesStats total={cooperatives.length} averageRating={cooperatives.length ? cooperatives.reduce((sum, item) => sum + item.calificacion, 0) / cooperatives.length : 0} highestCredit={cooperatives.length ? Math.max(...cooperatives.map((item) => item.montoMaximoCredito)) : 0} cities={new Set(cooperatives.map((item) => item.ciudad)).size} />
+    <CooperativesStats total={cooperatives.length} averageRating={averageRating} highestCredit={cooperatives.length ? Math.max(...cooperatives.map((item) => item.montoMaximoCredito)) : 0} cities={new Set(cooperatives.map((item) => item.ciudad)).size} />
     <CooperativesFilters search={search} city={city} province={province} onSearchChange={setSearch} onCityChange={setCity} onProvinceChange={setProvince} onReload={reload} />
     {error && !selected && <p className="rounded-xl bg-red-500/10 p-3 text-sm text-red-200">{error}</p>}
     {loading ? <div className="rounded-3xl border border-white/10 bg-slate-900 p-20 text-center">Cargando cooperativas…</div> : <CooperativesTable cooperatives={cooperatives} onEdit={(item) => void openEdit(item)} onView={(item) => navigate(`/productos?cooperativeId=${item.id}`)} onDelete={(item) => { if (window.confirm(`¿Eliminar la cooperativa ${item.nombre}?`)) void remove(item.id); }} />}

@@ -9,7 +9,7 @@ interface CooperativesStatsProps {
 
   total: number;
 
-  averageRating: number;
+  averageRating: number | null;
 
   highestCredit: number;
 
@@ -101,7 +101,7 @@ export function CooperativesStats({
 
         title="Calificación"
 
-        value={averageRating.toFixed(1)}
+        value={averageRating === null ? "—" : averageRating.toFixed(1)}
 
         icon={<Star size={28}/>}
 

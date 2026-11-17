@@ -142,7 +142,9 @@ export function CooperativesTable({
 
                                     <Star className="h-4 w-4 fill-current"/>
 
-                                    {cooperative.calificacion.toFixed(1)}
+                                    {typeof cooperative.calificacion === "number" && Number.isFinite(cooperative.calificacion)
+                                        ? cooperative.calificacion.toFixed(1)
+                                        : "Sin calificación"}
 
                                 </div>
 
