@@ -152,6 +152,11 @@ public class FinancialProductService {
         product.setType(request.type()); product.setName(request.name().trim());
         product.setDescription(request.description()); product.setMinimumAmount(request.minimumAmount());
         product.setMaximumAmount(request.maximumAmount()); product.setActive(request.active() == null || request.active());
+        if (request.calculationMethod() != null) product.setCalculationMethod(request.calculationMethod());
+        if (request.interestPaymentOptions() != null) product.setInterestPaymentOptions(new LinkedHashSet<>(request.interestPaymentOptions()));
+        if (request.renewalConditions() != null) product.setRenewalConditions(request.renewalConditions());
+        if (request.earlyCancellationConditions() != null) product.setEarlyCancellationConditions(request.earlyCancellationConditions());
+        if (request.targetAudience() != null) product.setTargetAudience(request.targetAudience());
     }
     private FinancialProductCondition saveCondition(Long productId, FinancialProductConditionRequest request) {
         FinancialProductCondition c = new FinancialProductCondition(); c.setProductId(productId);
@@ -173,7 +178,7 @@ public class FinancialProductService {
                 .filter(c -> !activeOnly || !c.getValidFrom().isAfter(now))
                 .filter(c -> !activeOnly || c.getValidUntil() == null || c.getValidUntil().isAfter(now))
                 .map(this::toCondition).toList();
-        return new FinancialProductResponse(p.getId(), p.getCooperativeId(), p.getType(), p.getName(), p.getDescription(), p.getMinimumAmount(), p.getMaximumAmount(), p.isActive(), conditions);
+        return new FinancialProductResponse(p.getId(), p.getCooperativeId(), p.getType(), p.getName(), p.getDescription(), p.getMinimumAmount(), p.getMaximumAmount(), p.isActive(), conditions, p.getInterestPaymentOptions(), p.getCalculationMethod(), p.getRenewalConditions(), p.getEarlyCancellationConditions(), p.getTargetAudience());
     }
     private FinancialProductResponse.Condition toCondition(FinancialProductCondition c) {
         return new FinancialProductResponse.Condition(c.getId(), c.getMinimumAmount(), c.getMaximumAmount(), c.getMinimumTermMonths(), c.getMaximumTermMonths(), c.getAnnualRate(), c.getValidFrom(), c.getValidUntil());

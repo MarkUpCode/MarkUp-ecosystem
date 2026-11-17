@@ -84,9 +84,9 @@
     "semantic_hash": ""
   },
   "app_movil_dinerop/lib/app/shell/app_shell.dart": {
-    "mtime": 1794859005.5955865,
-    "seen": 1794859818.5217376,
-    "ast_hash": "1011a8d727a860fa9c26500b213ae241",
+    "mtime": 1794893971.0879457,
+    "seen": 1794894132.2931163,
+    "ast_hash": "d655fa21dcc6b787cd0e01ed3b36a383",
     "semantic_hash": ""
   },
   "app_movil_dinerop/lib/core/config/api_config.dart": {
@@ -120,9 +120,9 @@
     "semantic_hash": ""
   },
   "app_movil_dinerop/lib/core/notifications/push_notification_service.dart": {
-    "mtime": 1790234749.0519052,
-    "seen": 1794858910.9773905,
-    "ast_hash": "1c7e152b8852a8ef40a067975af09ecf",
+    "mtime": 1794893957.781261,
+    "seen": 1794894132.2931347,
+    "ast_hash": "75127831131034d81d38884b120d030a",
     "semantic_hash": ""
   },
   "app_movil_dinerop/lib/core/storage/secure_token_storage.dart": {
@@ -204,9 +204,9 @@
     "semantic_hash": ""
   },
   "app_movil_dinerop/lib/features/auth/presentation/auth_controller.dart": {
-    "mtime": 1794419406.1295009,
-    "seen": 1794858910.9774115,
-    "ast_hash": "6e4e1851365dee4490eaa1a9abd141ba",
+    "mtime": 1794893357.1080961,
+    "seen": 1794894132.2931743,
+    "ast_hash": "d8dd5621ce39969146eca466a1d24360",
     "semantic_hash": ""
   },
   "app_movil_dinerop/lib/features/auth/presentation/screens/activation_page.dart": {
@@ -342,9 +342,9 @@
     "semantic_hash": ""
   },
   "app_movil_dinerop/lib/features/credit/presentation/request_credit_page.dart": {
-    "mtime": 1794428707.9728906,
-    "seen": 1794858910.9774451,
-    "ast_hash": "bb78755d37fa795fa2d115ba017c1c9f",
+    "mtime": 1794893693.2773845,
+    "seen": 1794894132.293236,
+    "ast_hash": "0cb3701f7e3d7804a0f83c1de13621ad",
     "semantic_hash": ""
   },
   "app_movil_dinerop/lib/features/credit/presentation/widgets/credit_request_card.dart": {
@@ -354,9 +354,9 @@
     "semantic_hash": ""
   },
   "app_movil_dinerop/lib/features/dashboard/presentation/dashboard_page.dart": {
-    "mtime": 1794859332.7163277,
-    "seen": 1794859818.5218756,
-    "ast_hash": "e8cd1222deed195787b1c1a2a37b3c9f",
+    "mtime": 1794893581.9015307,
+    "seen": 1794894132.2932408,
+    "ast_hash": "162863d89f73bd42a4dda483633b7c2c",
     "semantic_hash": ""
   },
   "app_movil_dinerop/lib/features/dashboard/presentation/sections/dashboard_exploration_sections.dart": {
@@ -366,9 +366,9 @@
     "semantic_hash": ""
   },
   "app_movil_dinerop/lib/features/notifications/presentation/notifications_page.dart": {
-    "mtime": 1794800634.215647,
-    "seen": 1794858910.9774506,
-    "ast_hash": "82d397dcff080ab541df3573d0443ad2",
+    "mtime": 1794893506.8992257,
+    "seen": 1794894132.2932677,
+    "ast_hash": "a129e7347daa8f445e57a87edbbfcac3",
     "semantic_hash": ""
   },
   "app_movil_dinerop/lib/features/onboarding/data/models/onboarding_request.dart": {
@@ -402,21 +402,21 @@
     "semantic_hash": ""
   },
   "app_movil_dinerop/lib/features/onboarding/presentation/onboarding_page.dart": {
-    "mtime": 1794867759.26959,
-    "seen": 1794870132.6997406,
-    "ast_hash": "f3f8681edc147450bbd969fd8ff017ca",
+    "mtime": 1794893581.903531,
+    "seen": 1794894132.2932851,
+    "ast_hash": "064cd79b0b74ea4862cb2ef0405fff91",
     "semantic_hash": ""
   },
   "app_movil_dinerop/lib/features/profile/presentation/profile_page.dart": {
-    "mtime": 1789359261.687846,
-    "seen": 1794858910.9774601,
-    "ast_hash": "22870bdf690341e3c3ddd3b9b3837dc1",
+    "mtime": 1794893581.905036,
+    "seen": 1794894132.2932875,
+    "ast_hash": "7a7864995f26719154c1dc80fda93122",
     "semantic_hash": ""
   },
   "app_movil_dinerop/lib/features/requests/presentation/requests_page.dart": {
-    "mtime": 1794861154.7592287,
-    "seen": 1794862462.218098,
-    "ast_hash": "4e338ac807e4c9caa7407b9a2ec802fd",
+    "mtime": 1794893922.141671,
+    "seen": 1794894132.29329,
+    "ast_hash": "7b2139a28741d4c8f65c9704ef30dbae",
     "semantic_hash": ""
   },
   "app_movil_dinerop/lib/features/welcome/data/models/cooperative_partner.dart": {
@@ -522,15 +522,15 @@
     "semantic_hash": ""
   },
   "app_movil_dinerop/pubspec.yaml": {
-    "mtime": 1794766438.7623868,
-    "seen": 1794858910.977554,
-    "ast_hash": "353b7c75f0286800a87cde5998d1c487",
+    "mtime": 1794893357.106096,
+    "seen": 1794894132.2933443,
+    "ast_hash": "43bd0baa92af5b3e7b0c8a1a62e2fdd2",
     "semantic_hash": ""
   },
   "app_movil_dinerop/test/dashboard_responsive_test.dart": {
-    "mtime": 1794860994.105715,
-    "seen": 1794862462.2181585,
-    "ast_hash": "989d13ea75ddc380e7d1259b8a0259df",
+    "mtime": 1794893818.4620874,
+    "seen": 1794894132.293347,
+    "ast_hash": "cc9037e7a53aabff14de7a9b19099b0c",
     "semantic_hash": ""
   },
   "app_movil_dinerop/test/widget_test.dart": {
@@ -1434,9 +1434,9 @@
     "semantic_hash": ""
   },
   "dinerop-backend/src/main/java/com/markup/dinerop/credit/infrastructure/web/CreditController.java": {
-    "mtime": 1794794622.766987,
-    "seen": 1794858910.9779263,
-    "ast_hash": "fbd527b1df3e1b7c1597e43532e9b7ac",
+    "mtime": 1794893219.933102,
+    "seen": 1794894132.293819,
+    "ast_hash": "bbc07d5851863eb9a5e2bb93dc37048e",
     "semantic_hash": ""
   },
   "dinerop-backend/src/main/java/com/markup/dinerop/credit/infrastructure/web/InternalCreditController.java": {
@@ -3240,9 +3240,9 @@
     "semantic_hash": ""
   },
   "app_movil_dinerop/docs/API_INTEGRATION.md": {
-    "mtime": 1794463052.7302516,
-    "seen": 1794858910.9786513,
-    "ast_hash": "b6ca11235dec9b863bedc409030def72",
+    "mtime": 1794893499.664862,
+    "seen": 1794894132.294684,
+    "ast_hash": "bd1496fe81b4d65d6a57e7dd0783db4c",
     "semantic_hash": ""
   },
   "app_movil_dinerop/docs/ARCHITECTURE.md": {
@@ -4029,6 +4029,138 @@
     "mtime": 1794874209.422641,
     "seen": 1794874992.5253968,
     "ast_hash": "dc85245e9fb834985c006db024101c51",
+    "semantic_hash": ""
+  },
+  "app_movil_dinerop/lib/features/dolarito/config/dolarito_messages.dart": {
+    "mtime": 1794893506.1160288,
+    "seen": 1794894132.2932475,
+    "ast_hash": "75e276da1a271459c338571f2840d149",
+    "semantic_hash": ""
+  },
+  "app_movil_dinerop/lib/features/dolarito/models/dolarito_mood.dart": {
+    "mtime": 1794893581.9005294,
+    "seen": 1794894132.29325,
+    "ast_hash": "870db0cc4730f0ba69cec877bc569360",
+    "semantic_hash": ""
+  },
+  "app_movil_dinerop/lib/features/dolarito/models/dolarito_reaction.dart": {
+    "mtime": 1794893506.1821895,
+    "seen": 1794894132.2932525,
+    "ast_hash": "5209195111d9fe9f4a572c0d9d9dc5f9",
+    "semantic_hash": ""
+  },
+  "app_movil_dinerop/lib/features/dolarito/models/dolarito_state.dart": {
+    "mtime": 1794893124.4834292,
+    "seen": 1794894132.2932544,
+    "ast_hash": "3dd640b096a27e0f76b647f89d4b041a",
+    "semantic_hash": ""
+  },
+  "app_movil_dinerop/lib/features/dolarito/providers/dolarito_provider.dart": {
+    "mtime": 1794893978.9166377,
+    "seen": 1794894132.2932568,
+    "ast_hash": "9f156e30d4e963375c7ccd66fd768c78",
+    "semantic_hash": ""
+  },
+  "app_movil_dinerop/lib/features/dolarito/services/dolarito_service.dart": {
+    "mtime": 1794893506.334612,
+    "seen": 1794894132.2932594,
+    "ast_hash": "4d8f9924a6c065459abdebffaccfe93c",
+    "semantic_hash": ""
+  },
+  "app_movil_dinerop/lib/features/dolarito/widgets/dolarito_message.dart": {
+    "mtime": 1794893506.3701937,
+    "seen": 1794894132.2932622,
+    "ast_hash": "720d2dec860a33454b589a6446268119",
+    "semantic_hash": ""
+  },
+  "app_movil_dinerop/lib/features/dolarito/widgets/dolarito_widget.dart": {
+    "mtime": 1794893581.899529,
+    "seen": 1794894132.2932649,
+    "ast_hash": "ea61865b3128c812004441f317a6e1d1",
+    "semantic_hash": ""
+  },
+  "app_movil_dinerop/test/dolarito_assets_test.dart": {
+    "mtime": 1794893611.8523493,
+    "seen": 1794894132.2933493,
+    "ast_hash": "9e3187e8c9c961da98cf43041d706d8d",
+    "semantic_hash": ""
+  },
+  "app_movil_dinerop/test/dolarito_service_test.dart": {
+    "mtime": 1794893611.8503492,
+    "seen": 1794894132.2933526,
+    "ast_hash": "d1db522b6c61da00a57c37ae7d3b4f93",
+    "semantic_hash": ""
+  },
+  "dinerop-backend/src/main/resources/db/migration/V2__cooperative_products_and_invitation_fields.sql": {
+    "mtime": 1794873137.746488,
+    "seen": 1794894132.2940457,
+    "ast_hash": "3e1dd1a89ded02cb6970bfc7428289f0",
+    "semantic_hash": ""
+  },
+  "dinerop-backend/src/test/java/com/markup/dinerop/credit/infrastructure/web/CreditControllerOnboardingGateTest.java": {
+    "mtime": 1794893247.3809052,
+    "seen": 1794894132.294111,
+    "ast_hash": "a7c43ee8504f33755f957e7b05266065",
+    "semantic_hash": ""
+  },
+  "app_movil_dinerop/assets/images/dolarito/dolarito_excited.png": {
+    "mtime": 1794891519.4961169,
+    "seen": 1794894132.2948444,
+    "ast_hash": "0dbc603ce0046a060aa7ed898f7e46a5",
+    "semantic_hash": ""
+  },
+  "app_movil_dinerop/assets/images/dolarito/dolarito_explaining.png": {
+    "mtime": 1794891971.533677,
+    "seen": 1794894132.294847,
+    "ast_hash": "6cc75481be5e556d1c9d820c222a2869",
+    "semantic_hash": ""
+  },
+  "app_movil_dinerop/assets/images/dolarito/dolarito_happy.png": {
+    "mtime": 1794891474.2735813,
+    "seen": 1794894132.2948499,
+    "ast_hash": "1d021c3210a596275f3f51c098d9b222",
+    "semantic_hash": ""
+  },
+  "app_movil_dinerop/assets/images/dolarito/dolarito_motivated.png": {
+    "mtime": 1794891549.3510761,
+    "seen": 1794894132.294852,
+    "ast_hash": "61702fb0f83232ea11b9fdb53e983665",
+    "semantic_hash": ""
+  },
+  "app_movil_dinerop/assets/images/dolarito/dolarito_nervous.png": {
+    "mtime": 1794891753.021722,
+    "seen": 1794894132.2948546,
+    "ast_hash": "6d5e36d7ea275d041d6463969bba2d94",
+    "semantic_hash": ""
+  },
+  "app_movil_dinerop/assets/images/dolarito/dolarito_proud.png": {
+    "mtime": 1794891531.2220635,
+    "seen": 1794894132.2948568,
+    "ast_hash": "188455256fa8d55f9110bb27127c7510",
+    "semantic_hash": ""
+  },
+  "app_movil_dinerop/assets/images/dolarito/dolarito_sad.png": {
+    "mtime": 1794891803.5029428,
+    "seen": 1794894132.2948592,
+    "ast_hash": "a7f85ae86829ac8b8412eab22a06d59f",
+    "semantic_hash": ""
+  },
+  "app_movil_dinerop/assets/images/dolarito/dolarito_thinking.png": {
+    "mtime": 1794891606.5761175,
+    "seen": 1794894132.294862,
+    "ast_hash": "10642d23ba4e31b88a5478681e4720d8",
+    "semantic_hash": ""
+  },
+  "app_movil_dinerop/assets/images/dolarito/dolarito_waiting.png": {
+    "mtime": 1794891662.664566,
+    "seen": 1794894132.2948644,
+    "ast_hash": "06b7416dc17a988d5f4961f086ea21db",
+    "semantic_hash": ""
+  },
+  "app_movil_dinerop/assets/images/dolarito/dolarito_worried.png": {
+    "mtime": 1794891837.541781,
+    "seen": 1794894132.2948663,
+    "ast_hash": "9a910620d8d48e3601b2af9fd94181f2",
     "semantic_hash": ""
   },
   "dinerup-app/package-lock.json": {

@@ -206,6 +206,123 @@ class DolaritoService {
     scopeKey: 'credit-form',
   );
 
+  DolaritoReaction investmentWelcome() => const DolaritoReaction(
+    mood: DolaritoMood.excited,
+    message:
+        '¡Vamos a descubrir cuánto podría crecer tu dinero! Comparamos las tasas vigentes sin compartir tus datos personales.',
+    event: DolaritoEvent.investmentWelcome,
+    priority: DolaritoPriority.motivation,
+    scopeKey: 'investment',
+  );
+
+  DolaritoReaction investmentThinking() => const DolaritoReaction(
+    mood: DolaritoMood.thinking,
+    message:
+        'Cuéntame cuánto quieres invertir y por cuánto tiempo. Buscaré únicamente opciones vigentes que coincidan.',
+    event: DolaritoEvent.investmentThinking,
+    priority: DolaritoPriority.motivation,
+    scopeKey: 'investment',
+  );
+
+  DolaritoReaction investmentOffersFound(int count) => DolaritoReaction(
+    mood: DolaritoMood.excited,
+    message: count == 1
+        ? 'Encontré una alternativa compatible. Revisa la tasa y sus condiciones antes de decidir.'
+        : 'Encontré $count alternativas compatibles. Compara la tasa, la estimación y las condiciones antes de decidir.',
+    event: DolaritoEvent.investmentOffersFound,
+    priority: DolaritoPriority.informative,
+    scopeKey: 'investment',
+  );
+
+  DolaritoReaction investmentNoOffers() => const DolaritoReaction(
+    mood: DolaritoMood.thinking,
+    message:
+        'No encontré ofertas vigentes para ese monto y plazo. Probemos otro monto o plazo.',
+    event: DolaritoEvent.investmentNoOffers,
+    priority: DolaritoPriority.informative,
+    scopeKey: 'investment',
+  );
+
+  DolaritoReaction investmentOfferSelected() => const DolaritoReaction(
+    mood: DolaritoMood.proud,
+    message:
+        'Revisa el resumen. Solo compartiré tus datos con la cooperativa que elijas y cuando nos des permiso.',
+    event: DolaritoEvent.investmentOfferSelected,
+    priority: DolaritoPriority.actionable,
+    scopeKey: 'investment',
+  );
+
+  DolaritoReaction investmentRequestSent() => const DolaritoReaction(
+    mood: DolaritoMood.waiting,
+    message:
+        'Tu solicitud fue enviada. La cooperativa debe confirmar las condiciones; aún no es una inversión formalizada.',
+    event: DolaritoEvent.investmentRequestSent,
+    priority: DolaritoPriority.informative,
+    scopeKey: 'investment',
+  );
+
+  DolaritoReaction investmentConnectionError() => const DolaritoReaction(
+    mood: DolaritoMood.worried,
+    message:
+        'No pude consultar el servicio de inversiones. Inténtalo de nuevo cuando recuperes la conexión.',
+    event: DolaritoEvent.connectionError,
+    priority: DolaritoPriority.alert,
+    dismissible: true,
+    scopeKey: 'investment',
+  );
+
+  DolaritoReaction investmentRequestStatus(String status) {
+    switch (status.toUpperCase()) {
+      case 'SUBMITTED':
+        return investmentRequestSent();
+      case 'IN_REVIEW':
+        return const DolaritoReaction(
+          mood: DolaritoMood.thinking,
+          message:
+              'La cooperativa está revisando tu solicitud. Te avisaremos cuando responda.',
+          event: DolaritoEvent.investmentRequestStatus,
+          priority: DolaritoPriority.informative,
+          scopeKey: 'investment',
+        );
+      case 'INFORMATION_REQUIRED':
+        return const DolaritoReaction(
+          mood: DolaritoMood.worried,
+          message:
+              'La cooperativa necesita información adicional. Revisa el mensaje de tu solicitud para ver qué debes hacer.',
+          event: DolaritoEvent.investmentRequestStatus,
+          priority: DolaritoPriority.actionable,
+          scopeKey: 'investment',
+        );
+      case 'CONDITIONS_CONFIRMED':
+        return const DolaritoReaction(
+          mood: DolaritoMood.excited,
+          message:
+              'La cooperativa confirmó las condiciones. Contacta directamente con ella para formalizar; DINEROP no recibe ni custodia tu dinero.',
+          event: DolaritoEvent.investmentRequestStatus,
+          priority: DolaritoPriority.celebration,
+          scopeKey: 'investment',
+        );
+      case 'DECLINED':
+        return const DolaritoReaction(
+          mood: DolaritoMood.sad,
+          message:
+              'La cooperativa no pudo continuar con esta solicitud. Revisa su mensaje y compara otras opciones vigentes.',
+          event: DolaritoEvent.investmentRequestStatus,
+          priority: DolaritoPriority.actionable,
+          scopeKey: 'investment',
+        );
+      default:
+        return const DolaritoReaction(
+          mood: DolaritoMood.thinking,
+          message:
+              'Consulta los detalles para confirmar el estado de esta solicitud.',
+          event: DolaritoEvent.investmentRequestStatus,
+          priority: DolaritoPriority.informative,
+          scopeKey: 'investment',
+        );
+    }
+  }
+
   DolaritoReaction notification(PushNotificationEvent event) {
     final scope = event.solicitudId == null
         ? 'notification'

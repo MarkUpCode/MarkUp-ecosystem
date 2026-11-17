@@ -1,232 +1,39 @@
-import { useState } from "react";
-import { X, DollarSign, MapPin, ChevronDown } from "lucide-react";
-import { ecuadorProvinces } from "../../data/ecuadorProvinces";
+import { useEffect, useState } from "react";
+import { X } from "lucide-react";
+import { createInvestmentRequest, getInvestmentAvailability, getInvestmentOffers, getMyInvestmentRequests, type InvestmentAvailability, type InvestmentOffer, type InvestmentRequest } from "../../api/investments.api";
+import { getErrorMessage } from "../../api/errors";
 
-interface NewInvestmentModalProps {
-  open: boolean;
-  onClose: () => void;
-  onSubmit: (data: { amount: number }) => void;
-}
-
-export default function NewInvestmentModal({
-  open,
-  onClose,
-  onSubmit,
-}: NewInvestmentModalProps) {
-  const [amount, setAmount] = useState<string>("");
-  const [province, setProvince] = useState<string>("");
-  const [city, setCity] = useState<string>("");
-  const [parroquia, setParroquia] = useState<string>("");
-  const [errors, setErrors] = useState<{ amount?: string }>({});
-
-  const selectedProvinciaData = ecuadorProvinces.Ecuador.find(
-    (p) => p.provincia === province
-  );
-  const selectedCantonData = selectedProvinciaData?.cantones.find(
-    (c) => c.nombre === city
-  );
-
-  const handleProvinceChange = (val: string) => {
-    setProvince(val);
-    setCity("");
-    setParroquia("");
-  };
-
-  const handleCityChange = (val: string) => {
-    setCity(val);
-    setParroquia("");
-  };
-
-  const handleSubmit = () => {
-    const newErrors: { amount?: string } = {};
-
-    if (!amount || parseFloat(amount) <= 0) {
-      newErrors.amount = "Ingresa un monto válido";
-    }
-
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-      return;
-    }
-
-    onSubmit({
-      amount: parseFloat(amount),
-    });
-
-    // Reset form
-    setAmount("");
-    setProvince("");
-    setCity("");
-    setParroquia("");
-    setErrors({});
-    onClose();
-  };
-
+interface Props { open: boolean; onClose: () => void; onSubmit: () => void; }
+export default function NewInvestmentModal({ open, onClose, onSubmit }: Props) {
+  const [amount, setAmount] = useState("");
+  const [term, setTerm] = useState("");
+  const [payment, setPayment] = useState("");
+  const [availability, setAvailability] = useState<InvestmentAvailability | null>(null);
+  const [offers, setOffers] = useState<InvestmentOffer[]>([]);
+  const [requests, setRequests] = useState<InvestmentRequest[]>([]);
+  const [showRequests, setShowRequests] = useState(false);
+  const [consentOffer, setConsentOffer] = useState<InvestmentOffer | null>(null);
+  const [consent, setConsent] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  const numericAmount = Number(amount);
+  const loadRequests = async () => { try { setRequests(await getMyInvestmentRequests()); } catch (e) { setError(getErrorMessage(e, "Inicia sesión para consultar tus solicitudes.")); } };
+  useEffect(() => { if (open && showRequests) void loadRequests(); }, [open, showRequests]);
   if (!open) return null;
-
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full">
-        {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200">
-          <h2 className="text-2xl font-bold text-gray-800">
-            Nueva Inversión
-          </h2>
-          <button
-            onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-          >
-            <X className="w-6 h-6 text-gray-600" />
-          </button>
-        </div>
-
-        {/* Content */}
-        <div className="p-6 space-y-5">
-          {/* Monto a Invertir */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              <div className="flex items-center gap-2">
-                <DollarSign className="w-4 h-4 text-gray-600" />
-                Monto a invertir
-              </div>
-            </label>
-            <input
-              type="number"
-              value={amount}
-              onChange={(e) => {
-                setAmount(e.target.value);
-                if (errors.amount) {
-                  setErrors({ ...errors, amount: undefined });
-                }
-              }}
-              placeholder="Ej: 10000"
-              min="0"
-              step="100"
-              className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition ${
-                errors.amount
-                  ? "border-red-500 focus:ring-red-500"
-                  : "border-gray-300"
-              }`}
-            />
-            {errors.amount && (
-              <p className="text-red-600 text-sm mt-1">{errors.amount}</p>
-            )}
-            {amount && (
-              <p className="text-xs text-gray-500 mt-2">
-                Monto: ${parseFloat(amount).toLocaleString("es-EC", {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                })}
-              </p>
-            )}
-          </div>
-
-          {/* Ubicación — solo visual, no afecta el submit */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              <div className="flex items-center gap-2">
-                <MapPin className="w-4 h-4 text-gray-600" />
-                Ubicación
-              </div>
-            </label>
-            <div className="space-y-3">
-
-              {/* Provincia */}
-              <div className="relative">
-                <select
-                  value={province}
-                  onChange={(e) => handleProvinceChange(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition appearance-none bg-white"
-                >
-                  <option value="">Selecciona una provincia</option>
-                  {ecuadorProvinces.Ecuador.map((p) => (
-                    <option key={p.provincia} value={p.provincia}>
-                      {p.provincia}
-                    </option>
-                  ))}
-                </select>
-                <ChevronDown className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-              </div>
-
-              {/* Cantón */}
-              <div className="relative">
-                <select
-                  value={city}
-                  onChange={(e) => handleCityChange(e.target.value)}
-                  disabled={!province}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition appearance-none bg-white disabled:bg-gray-50 disabled:text-gray-400 disabled:cursor-not-allowed"
-                >
-                  <option value="">
-                    {province ? "Selecciona un cantón" : "Primero elige una provincia"}
-                  </option>
-                  {selectedProvinciaData?.cantones.map((c) => (
-                    <option key={c.nombre} value={c.nombre}>
-                      {c.nombre}
-                    </option>
-                  ))}
-                </select>
-                <ChevronDown className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-              </div>
-
-              {/* Parroquia */}
-              <div className="relative">
-                <select
-                  value={parroquia}
-                  onChange={(e) => setParroquia(e.target.value)}
-                  disabled={!city}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition appearance-none bg-white disabled:bg-gray-50 disabled:text-gray-400 disabled:cursor-not-allowed"
-                >
-                  <option value="">
-                    {city ? "Selecciona una parroquia" : "Primero elige un cantón"}
-                  </option>
-                  {selectedCantonData?.parroquias.map((p) => (
-                    <option key={p} value={p}>
-                      {p}
-                    </option>
-                  ))}
-                </select>
-                <ChevronDown className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-              </div>
-
-            </div>
-          </div>
-
-          {/* Info */}
-          <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-4">
-            <p className="text-xs text-emerald-800">
-              <strong>Beneficios:</strong> Obtén ganancias seguras con tasas
-              competitivas en el mercado. Tu inversión estará protegida y podrás
-              seguir su desempeño en tiempo real.
-            </p>
-          </div>
-
-          {/* Warning */}
-          <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
-            <p className="text-xs text-amber-800">
-              <strong>Importante:</strong> Una vez confirmes esta inversión, no
-              podrás cancelarla inmediatamente. Por favor verifica que el monto
-              sea el correcto.
-            </p>
-          </div>
-        </div>
-
-        {/* Footer */}
-        <div className="border-t border-gray-200 p-6 bg-gray-50 flex gap-3">
-          <button
-            onClick={onClose}
-            className="flex-1 px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg font-medium transition-colors"
-          >
-            Cancelar
-          </button>
-          <button
-            onClick={handleSubmit}
-            disabled={!amount}
-            className="flex-1 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            Hacer Inversión
-          </button>
-        </div>
-      </div>
+  const run = async (action: () => Promise<void>) => { setBusy(true); setError(""); try { await action(); } catch (e) { setError(getErrorMessage(e, "No se pudo completar la operación.")); } finally { setBusy(false); } };
+  const findTerms = () => run(async () => { const result = await getInvestmentAvailability(numericAmount); setAvailability(result); setTerm(""); setPayment(""); setOffers([]); if (!result.termMonths.length) setError("No hay plazos disponibles para ese monto."); });
+  const compare = () => run(async () => { const found = await getInvestmentOffers(numericAmount, Number(term), payment || undefined); setOffers(found); if (!found.length) setError("No encontramos ofertas vigentes con esos criterios."); });
+  const send = () => consentOffer && run(async () => { await createInvestmentRequest({ productId: consentOffer.productId, conditionId: consentOffer.conditionId, amount: numericAmount, termMonths: Number(term), interestPaymentOption: payment || null, personalDataConsent: true }); setConsentOffer(null); setConsent(false); setShowRequests(true); onSubmit(); await loadRequests(); });
+  return <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-3"><section className="max-h-[92vh] w-full max-w-3xl overflow-y-auto rounded-2xl bg-white shadow-2xl">
+    <header className="sticky top-0 z-10 flex items-center justify-between border-b bg-white p-5"><div><h2 className="text-xl font-extrabold text-slate-800">Inversiones</h2><p className="text-sm text-slate-500">Compara condiciones vigentes y consulta tus solicitudes.</p></div><button onClick={onClose} aria-label="Cerrar" className="rounded-lg p-2 hover:bg-slate-100"><X /></button></header>
+    <div className="p-5"><div className="mb-5 flex gap-2"><button onClick={() => setShowRequests(false)} className={`rounded-lg px-4 py-2 text-sm font-bold ${!showRequests ? "bg-emerald-700 text-white" : "bg-slate-100"}`}>Comparar ofertas</button><button onClick={() => setShowRequests(true)} className={`rounded-lg px-4 py-2 text-sm font-bold ${showRequests ? "bg-emerald-700 text-white" : "bg-slate-100"}`}>Mis solicitudes</button></div>
+      {error && <p role="alert" className="mb-4 rounded-lg bg-rose-50 p-3 text-sm text-rose-700">{error}</p>}
+      {showRequests ? <div className="space-y-3">{requests.map(r => <article key={r.id} className="rounded-xl border p-4"><div className="flex justify-between gap-3"><strong>{r.productName} · {r.cooperativeName}</strong><span className="text-sm font-bold text-emerald-700">{r.status.replace(/_/g, " ")}</span></div><p className="mt-2 text-sm">${r.amount.toLocaleString("es-EC", { minimumFractionDigits: 2 })} · {r.termMonths} meses · {r.annualRate.toFixed(2)}% anual</p>{r.statusNote && <p className="mt-2 text-sm text-slate-600">{r.statusNote}</p>}</article>)}{!requests.length && <p className="text-sm text-slate-500">Aún no tienes solicitudes registradas.</p>}</div> : <>
+        <div className="grid gap-3 sm:grid-cols-3"><label className="text-sm font-semibold">Monto (USD)<input type="number" min="0.01" step="0.01" value={amount} onChange={e => { setAmount(e.target.value); setAvailability(null); setOffers([]); }} className="mt-1 w-full rounded-lg border p-2.5" /></label><label className="text-sm font-semibold">Plazo<select disabled={!availability} value={term} onChange={e => { setTerm(e.target.value); setPayment(""); setOffers([]); }} className="mt-1 w-full rounded-lg border p-2.5"><option value="">Selecciona</option>{availability?.termMonths.map(x => <option key={x} value={x}>{x} meses</option>)}</select></label><label className="text-sm font-semibold">Pago de intereses<select disabled={!term || !availability?.interestPaymentOptions.length} value={payment} onChange={e => setPayment(e.target.value)} className="mt-1 w-full rounded-lg border p-2.5"><option value="">Sin preferencia</option>{availability?.interestPaymentOptions.map(x => <option key={x} value={x}>{x === "MONTHLY" ? "Mensual" : x === "AT_MATURITY" ? "Al vencimiento" : "Reinvertir"}</option>)}</select></label></div>
+        <div className="mt-4 flex flex-wrap gap-2"><button disabled={busy || numericAmount <= 0} onClick={() => void findTerms()} className="rounded-lg border px-4 py-2 font-bold disabled:opacity-50">Consultar plazos</button><button disabled={busy || !term} onClick={() => void compare()} className="rounded-lg bg-emerald-700 px-4 py-2 font-bold text-white disabled:opacity-50">{busy ? "Consultando…" : "Comparar ofertas"}</button></div>
+        <div className="mt-5 space-y-3">{offers.map(o => <article key={o.conditionId} className="rounded-xl border border-slate-200 p-4"><div className="flex flex-wrap justify-between gap-2"><div><p className="text-xs text-slate-500">{o.cooperativeName}</p><h3 className="font-extrabold">{o.productName}</h3></div><strong className="text-emerald-700">{o.annualRate.toFixed(2)}% anual</strong></div><p className="mt-2 text-sm text-slate-600">{o.estimatedInterest == null ? "Ganancia a confirmar por la cooperativa" : `Interés estimado: $${o.estimatedInterest.toLocaleString("es-EC", { minimumFractionDigits: 2 })} · Total: $${o.estimatedTotal?.toLocaleString("es-EC", { minimumFractionDigits: 2 })}`}</p>{o.description && <p className="mt-1 text-sm text-slate-600">{o.description}</p>}<p className="mt-1 text-xs text-slate-500">Vigente desde {new Date(o.validFrom).toLocaleDateString("es-EC")}{o.validUntil ? ` hasta ${new Date(o.validUntil).toLocaleDateString("es-EC")}` : ""}</p><button onClick={() => { setConsentOffer(o); setConsent(false); }} className="mt-3 rounded-lg bg-emerald-700 px-4 py-2 text-sm font-bold text-white">Solicitar contacto</button></article>)}</div>
+      </>}
     </div>
-  );
+    {consentOffer && <div className="fixed inset-0 z-[60] grid place-items-center bg-black/60 p-4"><section className="w-full max-w-lg rounded-2xl bg-white p-6"><h3 className="text-lg font-extrabold">Confirmar solicitud</h3><p className="mt-2 text-sm text-slate-600">Se enviará una solicitud de contacto a {consentOffer.cooperativeName}. La cooperativa debe confirmar la disponibilidad y formalizar la operación. DINEROP no recibe ni custodia fondos.</p><div className="mt-4 rounded-xl bg-slate-50 p-4 text-sm"><p><strong>Producto:</strong> {consentOffer.productName}</p><p><strong>Monto y plazo:</strong> ${numericAmount.toLocaleString("es-EC", { minimumFractionDigits: 2 })} · {term} meses</p><p><strong>Tasa anual:</strong> {consentOffer.annualRate.toFixed(2)}%</p>{consentOffer.estimatedInterest == null ? <p>Ganancia estimada: la cooperativa debe confirmarla.</p> : <p><strong>Interés estimado:</strong> ${consentOffer.estimatedInterest.toLocaleString("es-EC", { minimumFractionDigits: 2 })} · <strong>Total:</strong> ${consentOffer.estimatedTotal?.toLocaleString("es-EC", { minimumFractionDigits: 2 })}</p>}{payment && <p><strong>Pago de intereses:</strong> {payment}</p>}{consentOffer.description && <p className="mt-2 text-slate-600">{consentOffer.description}</p>}</div><label className="mt-4 flex gap-2 text-sm"><input type="checkbox" checked={consent} onChange={e => setConsent(e.target.checked)} />Autorizo compartir mis datos de contacto únicamente con esta cooperativa para atender mi solicitud.</label><div className="mt-5 flex justify-end gap-2"><button onClick={() => setConsentOffer(null)} className="rounded-lg border px-4 py-2">Volver</button><button disabled={!consent || busy} onClick={() => void send()} className="rounded-lg bg-emerald-700 px-4 py-2 font-bold text-white disabled:opacity-50">Enviar</button></div></section></div>}
+  </section></div>;
 }

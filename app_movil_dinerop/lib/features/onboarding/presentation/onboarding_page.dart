@@ -1972,11 +1972,14 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage>
                   SizedBox(height: compactLayout ? 8 : 20),
                   StepProgress(currentStep: _step + 1, totalSteps: _totalSteps),
                   SizedBox(height: compactLayout ? 8 : 16),
-                  if (!keyboardVisible && !widget.isGuarantor)
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 12),
+                  Visibility(
+                    visible: !keyboardVisible && !widget.isGuarantor,
+                    maintainState: true,
+                    child: const Padding(
+                      padding: EdgeInsets.only(bottom: 12),
                       child: DolaritoStateWidget(compact: true),
                     ),
+                  ),
                   if (_error != null) ...[
                     AppErrorView(message: _error!),
                     const SizedBox(height: 12),

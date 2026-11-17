@@ -25,6 +25,13 @@ enum DolaritoEvent {
   informationPending,
   connectionError,
   pushUpdate,
+  investmentWelcome,
+  investmentThinking,
+  investmentOffersFound,
+  investmentNoOffers,
+  investmentOfferSelected,
+  investmentRequestSent,
+  investmentRequestStatus,
 }
 
 enum DolaritoAction { completeProfile, viewRequests, retry }

@@ -138,10 +138,10 @@
     "semantic_hash": "8eb273753db21aa92d9fcbe7a0c6636a"
   },
   "src/components/investment/NewInvestmentModal.tsx": {
-    "mtime": 1782016105.1802018,
-    "seen": 1794463041.1916134,
-    "ast_hash": "d5023cf9ad2f9fd39eb78fe144297b83",
-    "semantic_hash": "d5023cf9ad2f9fd39eb78fe144297b83"
+    "mtime": 1794934153.6911142,
+    "seen": 1794934252.7865756,
+    "ast_hash": "e42011d3ec31901fbcab28e4a91cbe81",
+    "semantic_hash": ""
   },
   "src/components/layout/Footer.tsx": {
     "mtime": 1794429850.652164,
@@ -234,15 +234,15 @@
     "semantic_hash": "eaa3590579178602ab64e88602e82994"
   },
   "src/pages/DashboardClient.tsx": {
-    "mtime": 1794430192.981786,
-    "seen": 1794463041.1916313,
-    "ast_hash": "8a90a55aac051026aa3867779c64cb24",
-    "semantic_hash": "8a90a55aac051026aa3867779c64cb24"
+    "mtime": 1794934147.4226694,
+    "seen": 1794934252.7866497,
+    "ast_hash": "416d444eb7efeb41880cd800242e9c7d",
+    "semantic_hash": ""
   },
   "src/pages/DashboardCooperative.tsx": {
-    "mtime": 1794795710.880255,
-    "seen": 1794858879.5068493,
-    "ast_hash": "eb3314b5597e7cc6649a973a7fb22e58",
+    "mtime": 1794934147.4246733,
+    "seen": 1794934252.7866533,
+    "ast_hash": "530a259f49ee3fcfd245059b045c76f1",
     "semantic_hash": ""
   },
   "src/pages/Login.tsx": {
@@ -549,6 +549,18 @@
     "mtime": 1794873603.933575,
     "seen": 1794874786.1943085,
     "ast_hash": "dc059110d9b48d6ee4f9603beb018a98",
+    "semantic_hash": ""
+  },
+  "src/api/investments.api.ts": {
+    "mtime": 1794933457.634545,
+    "seen": 1794933847.26192,
+    "ast_hash": "87dc3b7c5bf673c70a5aae248a5e01ab",
+    "semantic_hash": ""
+  },
+  "src/components/investment/CooperativeInvestmentsPanel.tsx": {
+    "mtime": 1794934198.2774277,
+    "seen": 1794934252.7865703,
+    "ast_hash": "454146383027364eda6b6b8576e87216",
     "semantic_hash": ""
   },
   "package-lock.json": {

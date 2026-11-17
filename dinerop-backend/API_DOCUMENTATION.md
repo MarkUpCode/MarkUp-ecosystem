@@ -803,3 +803,11 @@ Retorna la información de onboarding de una solicitud (vista cooperativa).
 | Onboarding Cliente      | 4     |
 | Onboarding Cooperativa  | 2     |
 | **Total**               | **32**|
+
+## Inversiones (módulo independiente)
+
+- Público, sin datos de usuario: `GET /api/investments/availability?amount={USD}[&termMonths={meses}]` y `GET /api/investments/offers?amount={USD}&termMonths={meses}[&interestPaymentOption={MONTHLY|AT_MATURITY|REINVEST}]`.
+- Cliente autenticado con rol `CLIENT`: `POST /api/investments/requests` (incluye `personalDataConsent: true`), `GET /api/investments/requests/me`.
+- Cooperativa autenticada con rol `COOPERATIVE`, bajo su `cooperativaId` del JWT: `GET/POST /api/credits/cooperative/me/investment-products`, `PUT /investment-products/{id}`, `POST /investment-products/{id}/conditions`, `GET /investment-requests`, `PUT /investment-requests/{id}/status`.
+- La comparación solo devuelve productos activos, rangos y tasas vigentes. Tasas sin método explícito de cálculo no muestran ganancia. Los estados terminales son `CONDITIONS_CONFIRMED` (no equivale a contrato) y `DECLINED`. Las solicitudes guardan snapshot de condiciones y solo entregan datos de contacto a la cooperativa seleccionada tras consentimiento.
+- Plazos disponibles en la versión actual se expresan en meses; operaciones con días aún no están representadas por el esquema de condiciones existente.

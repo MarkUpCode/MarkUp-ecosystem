@@ -1,0 +1,305 @@
+package com.markup.dinerop.cooperative.domain.service;
+
+import com.markup.dinerop.auth.entity.User;
+import com.markup.dinerop.auth.repository.UserRepository;
+import com.markup.dinerop.cooperative.domain.entity.*;
+import com.markup.dinerop.cooperative.domain.repository.*;
+import com.markup.dinerop.cooperative.dto.*;
+import jakarta.persistence.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
+
+import java.math.BigDecimal;
+import java.math.MathContext;
+import java.math.RoundingMode;
+import java.time.Instant;
+import java.util.Comparator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
+
+@Service
+@RequiredArgsConstructor
+public class InvestmentService {
+    private static final List<InvestmentRequestStatus> ACTIVE_DUPLICATE_STATUSES = List.of(
+            InvestmentRequestStatus.SUBMITTED,
+            InvestmentRequestStatus.IN_REVIEW,
+            InvestmentRequestStatus.INFORMATION_REQUIRED
+    );
+
+    private final FinancialProductRepository productRepository;
+    private final FinancialProductConditionRepository conditionRepository;
+    private final CooperativeRepository cooperativeRepository;
+    private final InvestmentRequestRepository requestRepository;
+    private final InvestmentRequestStatusEventRepository statusEventRepository;
+    private final UserRepository userRepository;
+
+    @Transactional(readOnly = true)
+    public List<InvestmentOfferResponse> compareOffers(
+            BigDecimal amount,
+            Integer termMonths,
+            InterestPaymentOption paymentOption
+    ) {
+        if (amount == null || amount.signum() <= 0 || termMonths == null || termMonths <= 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ingresa un monto y plazo válidos.");
+        }
+        Instant now = Instant.now();
+        return productRepository.findAll().stream()
+                .filter(FinancialProduct::isActive)
+                .filter(product -> product.getType() == FinancialProductType.INVESTMENT)
+                .filter(product -> within(amount, product.getMinimumAmount(), product.getMaximumAmount()))
+                .flatMap(product -> conditionRepository.findByProductIdOrderByValidFromDescIdDesc(product.getId())
+                        .stream()
+                        .filter(condition -> !condition.getValidFrom().isAfter(now))
+                        .filter(condition -> condition.getValidUntil() == null || condition.getValidUntil().isAfter(now))
+                        .filter(condition -> within(amount, condition.getMinimumAmount(), condition.getMaximumAmount()))
+                        .filter(condition -> termMonths >= condition.getMinimumTermMonths()
+                                && termMonths <= condition.getMaximumTermMonths())
+                        .filter(condition -> paymentOption == null || product.getInterestPaymentOptions().contains(paymentOption))
+                        .map(condition -> toOffer(product, condition, amount, termMonths, paymentOption)))
+                .sorted(Comparator
+                        .comparing(InvestmentOfferResponse::estimatedInterest,
+                                Comparator.nullsLast(Comparator.reverseOrder()))
+                        .thenComparing(InvestmentOfferResponse::annualRate, Comparator.reverseOrder()))
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public InvestmentAvailabilityResponse getAvailability(BigDecimal amount, Integer termMonths) {
+        if (amount == null || amount.signum() <= 0 || (termMonths != null && (termMonths < 1 || termMonths > 600))) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ingresa un monto y plazo válidos.");
+        }
+        Instant now = Instant.now();
+        var terms = new TreeSet<Integer>();
+        var options = new LinkedHashSet<InterestPaymentOption>();
+        for (var product : productRepository.findAll()) {
+            if (!product.isActive() || product.getType() != FinancialProductType.INVESTMENT
+                    || !within(amount, product.getMinimumAmount(), product.getMaximumAmount())) continue;
+            for (var condition : conditionRepository.findByProductIdOrderByValidFromDescIdDesc(product.getId())) {
+                if (condition.getValidFrom().isAfter(now)
+                        || (condition.getValidUntil() != null && !condition.getValidUntil().isAfter(now))
+                        || !within(amount, condition.getMinimumAmount(), condition.getMaximumAmount())) continue;
+                if (termMonths == null) {
+                    for (int month = condition.getMinimumTermMonths(); month <= condition.getMaximumTermMonths(); month++) {
+                        terms.add(month);
+                    }
+                } else if (termMonths >= condition.getMinimumTermMonths()
+                        && termMonths <= condition.getMaximumTermMonths()) {
+                    options.addAll(product.getInterestPaymentOptions());
+                }
+            }
+        }
+        return new InvestmentAvailabilityResponse(List.copyOf(terms), Set.copyOf(options));
+    }
+
+    @Transactional
+    public InvestmentRequestResponse createRequest(Long clientId, CreateInvestmentRequest request) {
+        if (!Boolean.TRUE.equals(request.personalDataConsent())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Debes autorizar el envío de tus datos únicamente a la cooperativa seleccionada.");
+        }
+        var user = userRepository.findById(clientId)
+                .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado."));
+        var product = productRepository.findById(request.productId())
+                .filter(FinancialProduct::isActive)
+                .filter(item -> item.getType() == FinancialProductType.INVESTMENT)
+                .orElseThrow(() -> new EntityNotFoundException("La oferta ya no está disponible."));
+        var condition = conditionRepository.findById(request.conditionId())
+                .filter(item -> item.getProductId().equals(product.getId()))
+                .orElseThrow(() -> new EntityNotFoundException("La tasa seleccionada ya no está disponible."));
+
+        Instant now = Instant.now();
+        if (condition.getValidFrom().isAfter(now)
+                || (condition.getValidUntil() != null && !condition.getValidUntil().isAfter(now))) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "La vigencia de esta tasa cambió. Compara las ofertas nuevamente.");
+        }
+        if (!within(request.amount(), product.getMinimumAmount(), product.getMaximumAmount())
+                || !within(request.amount(), condition.getMinimumAmount(), condition.getMaximumAmount())
+                || request.termMonths() < condition.getMinimumTermMonths()
+                || request.termMonths() > condition.getMaximumTermMonths()) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "La oferta ya no coincide con el monto o plazo. Compara nuevamente.");
+        }
+        if (!product.getInterestPaymentOptions().isEmpty()
+                && request.interestPaymentOption() != null
+                && !product.getInterestPaymentOptions().contains(request.interestPaymentOption())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "Selecciona una forma de pago de intereses disponible para esta oferta.");
+        }
+        if (product.getInterestPaymentOptions().isEmpty() && request.interestPaymentOption() != null) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "Esta oferta no tiene una forma de pago configurada. Compara nuevamente.");
+        }
+        if (requestRepository.existsByClientIdAndProductIdAndConditionIdAndAmountAndTermMonthsAndStatusIn(
+                clientId, product.getId(), condition.getId(), request.amount(), request.termMonths(),
+                ACTIVE_DUPLICATE_STATUSES)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "Ya tienes una solicitud activa para esta misma oferta.");
+        }
+
+        var cooperative = cooperativeRepository.findById(product.getCooperativeId())
+                .orElseThrow(() -> new EntityNotFoundException("Cooperativa no encontrada."));
+        var estimate = calculateInterest(request.amount(), condition.getAnnualRate(),
+                request.termMonths(), product.getCalculationMethod(), request.interestPaymentOption());
+        String clientName = ((user.getFirstName() == null ? "" : user.getFirstName().trim()) + " "
+                + (user.getLastName() == null ? "" : user.getLastName().trim())).trim();
+        if (clientName.isBlank()) clientName = user.getEmail();
+
+        var investmentRequest = new InvestmentRequest();
+        investmentRequest.setClientId(clientId);
+        investmentRequest.setCooperativeId(product.getCooperativeId());
+        investmentRequest.setProductId(product.getId());
+        investmentRequest.setConditionId(condition.getId());
+        investmentRequest.setProductNameSnapshot(product.getName());
+        investmentRequest.setProductDescriptionSnapshot(product.getDescription());
+        investmentRequest.setRenewalConditionsSnapshot(product.getRenewalConditions());
+        investmentRequest.setEarlyCancellationSnapshot(product.getEarlyCancellationConditions());
+        investmentRequest.setTargetAudienceSnapshot(product.getTargetAudience());
+        investmentRequest.setClientNameSnapshot(clientName);
+        investmentRequest.setClientEmailSnapshot(user.getEmail());
+        investmentRequest.setClientPhoneSnapshot(user.getPhone());
+        investmentRequest.setAmount(request.amount().setScale(2, RoundingMode.HALF_UP));
+        investmentRequest.setTermMonths(request.termMonths());
+        investmentRequest.setInterestPaymentOption(request.interestPaymentOption());
+        investmentRequest.setAnnualRateSnapshot(condition.getAnnualRate());
+        investmentRequest.setConditionMinimumAmountSnapshot(condition.getMinimumAmount());
+        investmentRequest.setConditionMaximumAmountSnapshot(condition.getMaximumAmount());
+        investmentRequest.setConditionMinimumTermSnapshot(condition.getMinimumTermMonths());
+        investmentRequest.setConditionMaximumTermSnapshot(condition.getMaximumTermMonths());
+        investmentRequest.setRateValidFromSnapshot(condition.getValidFrom());
+        investmentRequest.setRateValidUntilSnapshot(condition.getValidUntil());
+        investmentRequest.setCalculationMethodSnapshot(product.getCalculationMethod());
+        investmentRequest.setEstimatedInterest(estimate);
+        investmentRequest.setEstimatedTotal(estimate == null ? null : request.amount().add(estimate).setScale(2, RoundingMode.HALF_UP));
+        investmentRequest.setPersonalDataConsent(true);
+        investmentRequest.setConsentedAt(now);
+        investmentRequest.setStatus(InvestmentRequestStatus.SUBMITTED);
+        var saved = requestRepository.save(investmentRequest);
+        recordStatus(saved.getId(), InvestmentRequestStatus.SUBMITTED,
+                "La solicitud fue enviada a " + cooperative.getNombre() + ".", clientId);
+        return toResponse(saved, cooperative, true);
+    }
+
+    @Transactional(readOnly = true)
+    public List<InvestmentRequestResponse> getClientRequests(Long clientId) {
+        return requestRepository.findByClientIdOrderByCreatedAtDesc(clientId).stream()
+                .map(request -> toResponse(request,
+                        cooperativeRepository.findById(request.getCooperativeId()).orElse(null), true))
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<InvestmentRequestResponse> getCooperativeRequests(Long cooperativeId) {
+        return requestRepository.findByCooperativeIdOrderByCreatedAtDesc(cooperativeId).stream()
+                .map(request -> toResponse(request,
+                        cooperativeRepository.findById(request.getCooperativeId()).orElse(null), true))
+                .toList();
+    }
+
+    @Transactional
+    public InvestmentRequestResponse updateStatus(
+            Long cooperativeId, Long requestId, UpdateInvestmentRequestStatus update, Long actorId
+    ) {
+        var request = requestRepository.findById(requestId)
+                .filter(item -> item.getCooperativeId().equals(cooperativeId))
+                .orElseThrow(() -> new EntityNotFoundException("Solicitud de inversión no encontrada."));
+        if (request.getStatus() == InvestmentRequestStatus.CONDITIONS_CONFIRMED
+                || request.getStatus() == InvestmentRequestStatus.DECLINED) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "Esta solicitud ya tiene una respuesta final de la cooperativa.");
+        }
+        if (update.status() == InvestmentRequestStatus.SUBMITTED) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "No se puede devolver una solicitud a su estado inicial.");
+        }
+        if ((update.status() == InvestmentRequestStatus.INFORMATION_REQUIRED
+                || update.status() == InvestmentRequestStatus.DECLINED)
+                && (update.note() == null || update.note().isBlank())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Explica al cliente qué información o motivo debe conocer.");
+        }
+        request.setStatus(update.status());
+        var saved = requestRepository.save(request);
+        recordStatus(saved.getId(), update.status(), update.note(), actorId);
+        return toResponse(saved,
+                cooperativeRepository.findById(cooperativeId).orElse(null), true);
+    }
+
+    private InvestmentOfferResponse toOffer(FinancialProduct product, FinancialProductCondition condition,
+            BigDecimal amount, Integer months, InterestPaymentOption paymentOption) {
+        var cooperative = cooperativeRepository.findById(product.getCooperativeId()).orElse(null);
+        var estimatedInterest = calculateInterest(amount, condition.getAnnualRate(), months,
+                product.getCalculationMethod(), paymentOption);
+        return new InvestmentOfferResponse(
+                product.getCooperativeId(), cooperative == null ? "Cooperativa" : cooperative.getNombre(),
+                cooperative == null ? null : cooperative.getLogoUrl(), product.getId(), condition.getId(),
+                product.getName(), product.getDescription(), product.getMinimumAmount(), product.getMaximumAmount(),
+                condition.getMinimumAmount(), condition.getMaximumAmount(), condition.getMinimumTermMonths(),
+                condition.getMaximumTermMonths(), condition.getAnnualRate(), condition.getValidFrom(),
+                condition.getValidUntil(), product.getInterestPaymentOptions(), product.getCalculationMethod(),
+                product.getRenewalConditions(), product.getEarlyCancellationConditions(), product.getTargetAudience(),
+                estimatedInterest, estimatedInterest == null ? null : amount.add(estimatedInterest).setScale(2, RoundingMode.HALF_UP));
+    }
+
+    private InvestmentRequestResponse toResponse(InvestmentRequest request,
+            com.markup.dinerop.cooperative.domain.entity.Cooperative cooperative, boolean includeClientData) {
+        var events = statusEventRepository.findByRequestIdOrderByCreatedAtAscIdAsc(request.getId());
+        var lastEvent = events.isEmpty() ? null : events.get(events.size() - 1);
+        return new InvestmentRequestResponse(
+                request.getId(), request.getCooperativeId(),
+                cooperative == null ? "Cooperativa" : cooperative.getNombre(),
+                cooperative == null ? null : cooperative.getLogoUrl(), request.getProductId(), request.getConditionId(),
+                request.getProductNameSnapshot(), request.getProductDescriptionSnapshot(), request.getAmount(),
+                request.getTermMonths(), request.getInterestPaymentOption(), request.getAnnualRateSnapshot(),
+                request.getConditionMinimumAmountSnapshot(), request.getConditionMaximumAmountSnapshot(),
+                request.getConditionMinimumTermSnapshot(), request.getConditionMaximumTermSnapshot(),
+                request.getRateValidFromSnapshot(), request.getRateValidUntilSnapshot(),
+                request.getCalculationMethodSnapshot(), request.getEstimatedInterest(), request.getEstimatedTotal(),
+                request.getRenewalConditionsSnapshot(), request.getEarlyCancellationSnapshot(),
+                request.getTargetAudienceSnapshot(), request.getStatus(), lastEvent == null ? null : lastEvent.getNote(),
+                request.getConsentedAt(), request.getCreatedAt(), request.getUpdatedAt(),
+                includeClientData ? request.getClientNameSnapshot() : null,
+                includeClientData ? request.getClientEmailSnapshot() : null,
+                includeClientData ? request.getClientPhoneSnapshot() : null,
+                events.stream().map(event -> new InvestmentRequestResponse.StatusEvent(
+                        event.getStatus(), event.getNote(), event.getCreatedAt())).toList());
+    }
+
+    private void recordStatus(Long requestId, InvestmentRequestStatus status, String note, Long actorId) {
+        var event = new InvestmentRequestStatusEvent();
+        event.setRequestId(requestId);
+        event.setStatus(status);
+        event.setNote(note);
+        event.setChangedBy(actorId);
+        statusEventRepository.save(event);
+    }
+
+    private BigDecimal calculateInterest(BigDecimal amount, BigDecimal annualRatePercent,
+            int months, InvestmentCalculationMethod method, InterestPaymentOption paymentOption) {
+        if (method == null || method == InvestmentCalculationMethod.UNSPECIFIED) return null;
+        BigDecimal monthlyRate = annualRatePercent
+                .divide(BigDecimal.valueOf(1200), 12, RoundingMode.HALF_UP);
+        BigDecimal interest;
+        if (method == InvestmentCalculationMethod.SIMPLE_INTEREST
+                || paymentOption == InterestPaymentOption.MONTHLY) {
+            interest = amount.multiply(annualRatePercent)
+                    .multiply(BigDecimal.valueOf(months))
+                    .divide(BigDecimal.valueOf(1200), 2, RoundingMode.HALF_UP);
+        } else {
+            BigDecimal growth = BigDecimal.ONE.add(monthlyRate)
+                    .pow(months, MathContext.DECIMAL128);
+            interest = amount.multiply(growth.subtract(BigDecimal.ONE))
+                    .setScale(2, RoundingMode.HALF_UP);
+        }
+        return interest.max(BigDecimal.ZERO);
+    }
+
+    private boolean within(BigDecimal value, BigDecimal min, BigDecimal max) {
+        return value.compareTo(min) >= 0 && value.compareTo(max) <= 0;
+    }
+}

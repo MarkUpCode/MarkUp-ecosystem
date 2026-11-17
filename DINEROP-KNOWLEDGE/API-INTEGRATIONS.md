@@ -49,3 +49,13 @@ Controladores incluyen endpoints internos `/internal/credits/**`, `/internal/coo
 - `POST /api/cooperatives` aparece como regla pública en el `httpClient` web, pero el controlador existe y el endpoint se declara público por patrón `/api/cooperatives/**`; ninguno de los dos clientes crea cooperativas en uso visible.
 
 Referencias primarias: `dinerop-backend/src/main/java/com/markup/dinerop/*Controller.java`, `auth/config/SecurityConfig.java`, `app_movil_dinerop/lib/features/*/data/`, `app_movil_dinerop/lib/core/notifications/push_notification_service.dart`, `dinerup-app/src/api/`.
+
+## Módulo de inversiones (noviembre de 2026)
+
+Los clientes móvil y DinerUp usan los nuevos endpoints definidos en `dinerop-backend/cooperative/infrastructure/web/InvestmentController` y `CooperativeInvestmentController`:
+
+- `GET /api/investments/availability` y `GET /api/investments/offers` son públicos y no reciben PII.
+- `POST /api/investments/requests` y `GET /api/investments/requests/me` requieren rol `CLIENT`.
+- `/api/credits/cooperative/me/investment-products*` y `/investment-requests*` requieren `COOPERATIVE`; el backend toma el ID cooperativo de la cuenta autenticada.
+- La selección requiere consentimiento explícito, guarda snapshot de tasa/condiciones y comparte datos de contacto solo con la cooperativa seleccionada. Los plazos implementados son meses porque las condiciones existentes modelan `minimumTermMonths`/`maximumTermMonths`.
+- Graphify local actualizado en los tres proyectos. Verifica controladores y servicios Java antes de interpretar los enlaces del grafo como llamadas entre repositorios.

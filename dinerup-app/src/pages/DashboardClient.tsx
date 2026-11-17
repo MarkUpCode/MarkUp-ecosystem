@@ -15,7 +15,6 @@ import {
   ClipboardList,
   Landmark,
   UserRound,
-  ChevronLeft,
   ShieldCheck,
 } from "lucide-react";
 import { useAuth } from "../context/useAuth";
@@ -60,7 +59,6 @@ export default function DashboardClient() {
   const [showCreditModal, setShowCreditModal] = useState(false);
   const [showInvestmentModal, setShowInvestmentModal] = useState(false);
   const [creditSuccess, setCreditSuccess] = useState(false);
-  const [investmentSuccess, setInvestmentSuccess] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -133,7 +131,6 @@ export default function DashboardClient() {
   };
 
   const handleRequestInvestment = () => {
-    if (needsOnboarding) return;
     setShowInvestmentModal(true);
   };
 
@@ -164,22 +161,7 @@ export default function DashboardClient() {
     }
   };
 
-  const handleInvestmentSubmit = async (data: { amount: number }) => {
-    try {
-      await createCreditRequest({
-        monto: data.amount,
-        type: "INVERSION",
-        creditType: null,
-      });
-      setInvestmentSuccess(true);
-      setTimeout(() => setInvestmentSuccess(false), 5000);
-      void loadData();
-    } catch (error) {
-      setPageError(
-        getErrorMessage(error, "No se pudo registrar la inversión."),
-      );
-    }
-  };
+  const handleInvestmentSubmit = () => setPageError("");
 
   return (
     <div className="portal-shell flex h-screen flex-col overflow-hidden bg-[#f5f8fc]">
@@ -330,9 +312,7 @@ export default function DashboardClient() {
                   todas las cooperativas
                 </h2>
                 <p className="mb-4 text-sm text-slate-600 sm:mb-6 sm:text-base">
-                  Para solicitar creditos o realizar inversiones necesitamos
-                  conocer tus datos. Es un proceso rapido que solo haras una
-                  vez.
+                  Completa tu perfil para facilitar la evaluación de solicitudes de crédito. Puedes comparar inversiones sin llenar este formulario.
                 </p>
                 <button
                   disabled={checkingOnboarding}
@@ -461,13 +441,8 @@ export default function DashboardClient() {
               Invierte de forma segura con buenas tasas
             </p>
             <button
-              disabled={needsOnboarding}
               onClick={handleRequestInvestment}
-              className={`w-full py-2.5 sm:py-3 rounded-xl font-medium flex items-center justify-center gap-2 ${
-                needsOnboarding
-                  ? "bg-gray-200 text-gray-500 cursor-not-allowed"
-                  : "bg-emerald-600 text-white hover:bg-emerald-700 shadow-md"
-              }`}
+              className="w-full py-2.5 sm:py-3 rounded-xl font-medium flex items-center justify-center gap-2 bg-emerald-600 text-white hover:bg-emerald-700 shadow-md"
             >
               <Plus className="w-5 h-5" />
               Nueva Inversion
@@ -574,13 +549,6 @@ export default function DashboardClient() {
         <div className="fixed bottom-6 right-6 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-2 z-40">
           <CheckCircle className="w-5 h-5" />
           Tu solicitud de credito fue enviada exitosamente
-        </div>
-      )}
-
-      {investmentSuccess && (
-        <div className="fixed bottom-6 right-6 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-2 z-40">
-          <CheckCircle className="w-5 h-5" />
-          Tu inversion fue registrada exitosamente
         </div>
       )}
 

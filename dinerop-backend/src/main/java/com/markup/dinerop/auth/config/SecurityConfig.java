@@ -61,6 +61,8 @@ public class SecurityConfig {
                         .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(PUBLIC_ENDPOINTS).permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/investments/offers").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/investments/availability").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/credits/public-request").permitAll()
                         .anyRequest().authenticated()
                 )

@@ -87,9 +87,9 @@
     "semantic_hash": ""
   },
   "lib/app/shell/app_shell.dart": {
-    "mtime": 1794859005.5955865,
-    "seen": 1794874787.7017186,
-    "ast_hash": "1011a8d727a860fa9c26500b213ae241",
+    "mtime": 1794893971.0879457,
+    "seen": 1794933852.230088,
+    "ast_hash": "d655fa21dcc6b787cd0e01ed3b36a383",
     "semantic_hash": ""
   },
   "lib/core/config/api_config.dart": {
@@ -123,10 +123,10 @@
     "semantic_hash": "f8181adf9ddd76fa08ea9774e7b217bb"
   },
   "lib/core/notifications/push_notification_service.dart": {
-    "mtime": 1790234749.0519052,
-    "seen": 1794462526.8575187,
-    "ast_hash": "1c7e152b8852a8ef40a067975af09ecf",
-    "semantic_hash": "1c7e152b8852a8ef40a067975af09ecf"
+    "mtime": 1794893957.781261,
+    "seen": 1794933852.2301004,
+    "ast_hash": "75127831131034d81d38884b120d030a",
+    "semantic_hash": ""
   },
   "lib/core/storage/secure_token_storage.dart": {
     "mtime": 1786491354.763639,
@@ -207,10 +207,10 @@
     "semantic_hash": "c47b9475014ba11cca80ddea40500f42"
   },
   "lib/features/auth/presentation/auth_controller.dart": {
-    "mtime": 1794419406.1295009,
-    "seen": 1794462526.860851,
-    "ast_hash": "6e4e1851365dee4490eaa1a9abd141ba",
-    "semantic_hash": "6e4e1851365dee4490eaa1a9abd141ba"
+    "mtime": 1794893357.1080961,
+    "seen": 1794933852.2301238,
+    "ast_hash": "d8dd5621ce39969146eca466a1d24360",
+    "semantic_hash": ""
   },
   "lib/features/auth/presentation/screens/activation_page.dart": {
     "mtime": 1786233095.990422,
@@ -267,9 +267,9 @@
     "semantic_hash": "010953096ab5b9f3780caa54df2fab96"
   },
   "lib/features/cooperative/data/cooperative_repository.dart": {
-    "mtime": 1794874012.3839326,
-    "seen": 1794874787.7017906,
-    "ast_hash": "98efb378dd59ed799536096cd851fbdf",
+    "mtime": 1794932879.7882428,
+    "seen": 1794933852.2301404,
+    "ast_hash": "cd3b86e3aa5c47b14c94b78bac7f4a6e",
     "semantic_hash": ""
   },
   "lib/features/cooperative/data/models/cooperative_summary.dart": {
@@ -333,16 +333,16 @@
     "semantic_hash": "cc21eea8772bf1ccb8559e080018a2ed"
   },
   "lib/features/credit/presentation/investment_simulator_page.dart": {
-    "mtime": 1794874050.8154557,
-    "seen": 1794874787.7018125,
-    "ast_hash": "b5203f7ee3c931ceefde5879b48a8470",
+    "mtime": 1794934100.8922808,
+    "seen": 1794934112.7970293,
+    "ast_hash": "807683990c2520cb65a9322b9d4f3d42",
     "semantic_hash": ""
   },
   "lib/features/credit/presentation/request_credit_page.dart": {
-    "mtime": 1794428707.9728906,
-    "seen": 1794462526.8662148,
-    "ast_hash": "bb78755d37fa795fa2d115ba017c1c9f",
-    "semantic_hash": "bb78755d37fa795fa2d115ba017c1c9f"
+    "mtime": 1794893693.2773845,
+    "seen": 1794933852.2301617,
+    "ast_hash": "0cb3701f7e3d7804a0f83c1de13621ad",
+    "semantic_hash": ""
   },
   "lib/features/credit/presentation/widgets/credit_request_card.dart": {
     "mtime": 1794718936.3062408,
@@ -351,9 +351,9 @@
     "semantic_hash": ""
   },
   "lib/features/dashboard/presentation/dashboard_page.dart": {
-    "mtime": 1794859332.7163277,
-    "seen": 1794874787.7018178,
-    "ast_hash": "e8cd1222deed195787b1c1a2a37b3c9f",
+    "mtime": 1794893581.9015307,
+    "seen": 1794933852.230165,
+    "ast_hash": "162863d89f73bd42a4dda483633b7c2c",
     "semantic_hash": ""
   },
   "lib/features/onboarding/data/models/onboarding_request.dart": {
@@ -387,21 +387,21 @@
     "semantic_hash": ""
   },
   "lib/features/onboarding/presentation/onboarding_page.dart": {
-    "mtime": 1794867759.26959,
-    "seen": 1794874787.7018323,
-    "ast_hash": "f3f8681edc147450bbd969fd8ff017ca",
+    "mtime": 1794896122.2089648,
+    "seen": 1794933852.2301962,
+    "ast_hash": "d98ea143f1d60bb197c777bf39f00975",
     "semantic_hash": ""
   },
   "lib/features/profile/presentation/profile_page.dart": {
-    "mtime": 1789359261.687846,
-    "seen": 1794462526.868338,
-    "ast_hash": "22870bdf690341e3c3ddd3b9b3837dc1",
-    "semantic_hash": "22870bdf690341e3c3ddd3b9b3837dc1"
+    "mtime": 1794893581.905036,
+    "seen": 1794933852.230198,
+    "ast_hash": "7a7864995f26719154c1dc80fda93122",
+    "semantic_hash": ""
   },
   "lib/features/requests/presentation/requests_page.dart": {
-    "mtime": 1794861154.7592287,
-    "seen": 1794874787.7018352,
-    "ast_hash": "4e338ac807e4c9caa7407b9a2ec802fd",
+    "mtime": 1794893922.141671,
+    "seen": 1794933852.2301996,
+    "ast_hash": "7b2139a28741d4c8f65c9704ef30dbae",
     "semantic_hash": ""
   },
   "lib/features/welcome/data/models/cooperative_partner.dart": {
@@ -507,9 +507,9 @@
     "semantic_hash": "e211252f82e1b690b17143e45d974035"
   },
   "pubspec.yaml": {
-    "mtime": 1794766438.7623868,
-    "seen": 1794858958.9390419,
-    "ast_hash": "353b7c75f0286800a87cde5998d1c487",
+    "mtime": 1794893357.106096,
+    "seen": 1794933852.2302291,
+    "ast_hash": "43bd0baa92af5b3e7b0c8a1a62e2fdd2",
     "semantic_hash": ""
   },
   "test/widget_test.dart": {
@@ -525,21 +525,21 @@
     "semantic_hash": ""
   },
   "lib/features/dashboard/presentation/sections/dashboard_exploration_sections.dart": {
-    "mtime": 1794864019.7924972,
-    "seen": 1794874787.7018197,
-    "ast_hash": "14c2130c60905a485a44e2f9a2473b59",
+    "mtime": 1794933994.0770907,
+    "seen": 1794934026.3523898,
+    "ast_hash": "1ffd1fe80532f48f6b8b9746cddc0656",
     "semantic_hash": ""
   },
   "lib/features/notifications/presentation/notifications_page.dart": {
-    "mtime": 1794800634.215647,
-    "seen": 1794858958.9390025,
-    "ast_hash": "82d397dcff080ab541df3573d0443ad2",
+    "mtime": 1794893506.8992257,
+    "seen": 1794933852.2301857,
+    "ast_hash": "a129e7347daa8f445e57a87edbbfcac3",
     "semantic_hash": ""
   },
   "test/dashboard_responsive_test.dart": {
-    "mtime": 1794860994.105715,
-    "seen": 1794874787.701869,
-    "ast_hash": "989d13ea75ddc380e7d1259b8a0259df",
+    "mtime": 1794893818.4620874,
+    "seen": 1794933852.2302306,
+    "ast_hash": "cc9037e7a53aabff14de7a9b19099b0c",
     "semantic_hash": ""
   },
   ".github/copilot-instructions.md": {
@@ -555,9 +555,9 @@
     "semantic_hash": ""
   },
   "docs/API_INTEGRATION.md": {
-    "mtime": 1794463052.7302516,
-    "seen": 1794858958.9390485,
-    "ast_hash": "b6ca11235dec9b863bedc409030def72",
+    "mtime": 1794933758.9756742,
+    "seen": 1794933852.230241,
+    "ast_hash": "157f6522b54eb944b9fef5aca50f28a5",
     "semantic_hash": ""
   },
   "docs/ARCHITECTURE.md": {
@@ -816,6 +816,144 @@
     "mtime": 1761233083.7817187,
     "seen": 1794858958.9391074,
     "ast_hash": "978c1bee49d7ad5fc1a4d81099b13e18",
+    "semantic_hash": ""
+  },
+  "lib/features/dolarito/config/dolarito_messages.dart": {
+    "mtime": 1794893506.1160288,
+    "seen": 1794933852.2301683,
+    "ast_hash": "75e276da1a271459c338571f2840d149",
+    "semantic_hash": ""
+  },
+  "lib/features/dolarito/models/dolarito_mood.dart": {
+    "mtime": 1794893581.9005294,
+    "seen": 1794933852.2301707,
+    "ast_hash": "870db0cc4730f0ba69cec877bc569360",
+    "semantic_hash": ""
+  },
+  "lib/features/dolarito/models/dolarito_reaction.dart": {
+    "mtime": 1794932962.4625514,
+    "seen": 1794933852.2301724,
+    "ast_hash": "26b7fad892728fe5ea6ac2deaf4ab900",
+    "semantic_hash": ""
+  },
+  "lib/features/dolarito/models/dolarito_state.dart": {
+    "mtime": 1794893124.4834292,
+    "seen": 1794933852.2301736,
+    "ast_hash": "3dd640b096a27e0f76b647f89d4b041a",
+    "semantic_hash": ""
+  },
+  "lib/features/dolarito/providers/dolarito_provider.dart": {
+    "mtime": 1794893978.9166377,
+    "seen": 1794933852.2301753,
+    "ast_hash": "9f156e30d4e963375c7ccd66fd768c78",
+    "semantic_hash": ""
+  },
+  "lib/features/dolarito/services/dolarito_service.dart": {
+    "mtime": 1794934041.1184452,
+    "seen": 1794934059.883386,
+    "ast_hash": "fd512ba1aeba027870fb04f5600499f7",
+    "semantic_hash": ""
+  },
+  "lib/features/dolarito/widgets/dolarito_message.dart": {
+    "mtime": 1794893506.3701937,
+    "seen": 1794933852.230178,
+    "ast_hash": "720d2dec860a33454b589a6446268119",
+    "semantic_hash": ""
+  },
+  "lib/features/dolarito/widgets/dolarito_widget.dart": {
+    "mtime": 1794893581.899529,
+    "seen": 1794933852.2301795,
+    "ast_hash": "ea61865b3128c812004441f317a6e1d1",
+    "semantic_hash": ""
+  },
+  "lib/features/investment/data/investment_repository.dart": {
+    "mtime": 1794934040.640124,
+    "seen": 1794934059.8833911,
+    "ast_hash": "bfec6e029b2110a1015f059deba9c2db",
+    "semantic_hash": ""
+  },
+  "lib/features/investment/data/models/investment_models.dart": {
+    "mtime": 1794934040.6821263,
+    "seen": 1794934059.8833928,
+    "ast_hash": "885e7ef816c2eeac22135308043cccc1",
+    "semantic_hash": ""
+  },
+  "lib/features/investment/providers/investment_providers.dart": {
+    "mtime": 1794932933.6174355,
+    "seen": 1794933852.230184,
+    "ast_hash": "b6a1f2f6e5434ec8daef1d466c0aafc7",
+    "semantic_hash": ""
+  },
+  "test/dolarito_assets_test.dart": {
+    "mtime": 1794893611.8523493,
+    "seen": 1794933852.230232,
+    "ast_hash": "9e3187e8c9c961da98cf43041d706d8d",
+    "semantic_hash": ""
+  },
+  "test/dolarito_service_test.dart": {
+    "mtime": 1794893611.8503492,
+    "seen": 1794933852.230234,
+    "ast_hash": "d1db522b6c61da00a57c37ae7d3b4f93",
+    "semantic_hash": ""
+  },
+  "assets/images/dolarito/dolarito_excited.png": {
+    "mtime": 1794891519.4961169,
+    "seen": 1794933852.2302725,
+    "ast_hash": "0dbc603ce0046a060aa7ed898f7e46a5",
+    "semantic_hash": ""
+  },
+  "assets/images/dolarito/dolarito_explaining.png": {
+    "mtime": 1794891971.533677,
+    "seen": 1794933852.230274,
+    "ast_hash": "6cc75481be5e556d1c9d820c222a2869",
+    "semantic_hash": ""
+  },
+  "assets/images/dolarito/dolarito_happy.png": {
+    "mtime": 1794891474.2735813,
+    "seen": 1794933852.2302756,
+    "ast_hash": "1d021c3210a596275f3f51c098d9b222",
+    "semantic_hash": ""
+  },
+  "assets/images/dolarito/dolarito_motivated.png": {
+    "mtime": 1794891549.3510761,
+    "seen": 1794933852.2302768,
+    "ast_hash": "61702fb0f83232ea11b9fdb53e983665",
+    "semantic_hash": ""
+  },
+  "assets/images/dolarito/dolarito_nervous.png": {
+    "mtime": 1794891753.021722,
+    "seen": 1794933852.2302785,
+    "ast_hash": "6d5e36d7ea275d041d6463969bba2d94",
+    "semantic_hash": ""
+  },
+  "assets/images/dolarito/dolarito_proud.png": {
+    "mtime": 1794891531.2220635,
+    "seen": 1794933852.2302797,
+    "ast_hash": "188455256fa8d55f9110bb27127c7510",
+    "semantic_hash": ""
+  },
+  "assets/images/dolarito/dolarito_sad.png": {
+    "mtime": 1794891803.5029428,
+    "seen": 1794933852.2302806,
+    "ast_hash": "a7f85ae86829ac8b8412eab22a06d59f",
+    "semantic_hash": ""
+  },
+  "assets/images/dolarito/dolarito_thinking.png": {
+    "mtime": 1794891606.5761175,
+    "seen": 1794933852.2302823,
+    "ast_hash": "10642d23ba4e31b88a5478681e4720d8",
+    "semantic_hash": ""
+  },
+  "assets/images/dolarito/dolarito_waiting.png": {
+    "mtime": 1794891662.664566,
+    "seen": 1794933852.2302835,
+    "ast_hash": "06b7416dc17a988d5f4961f086ea21db",
+    "semantic_hash": ""
+  },
+  "assets/images/dolarito/dolarito_worried.png": {
+    "mtime": 1794891837.541781,
+    "seen": 1794933852.2302847,
+    "ast_hash": "9a910620d8d48e3601b2af9fd94181f2",
     "semantic_hash": ""
   }
 }

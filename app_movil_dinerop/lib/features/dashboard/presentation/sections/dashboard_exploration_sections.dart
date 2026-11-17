@@ -511,7 +511,7 @@ class QuickActionsGrid extends StatelessWidget {
               label: 'Realizar inversión',
               color: const Color(0xFF7656C8),
               tint: const Color(0xFFF0ECFA),
-              comingSoon: true,
+              onTap: () => context.push('/simulate-investment'),
             ),
             _ActionTile(
               icon: Icons.fact_check_outlined,
@@ -555,7 +555,6 @@ class _ActionTile extends StatelessWidget {
     required this.color,
     required this.tint,
     this.onTap,
-    this.comingSoon = false,
   });
 
   final IconData icon;
@@ -563,7 +562,6 @@ class _ActionTile extends StatelessWidget {
   final Color color;
   final Color tint;
   final VoidCallback? onTap;
-  final bool comingSoon;
 
   @override
   Widget build(BuildContext context) => Material(
@@ -571,17 +569,7 @@ class _ActionTile extends StatelessWidget {
     color: tint,
     borderRadius: BorderRadius.circular(17),
     child: InkWell(
-      onTap:
-          onTap ??
-          (comingSoon
-              ? () => ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text(
-                      'Las inversiones estarán disponibles próximamente.',
-                    ),
-                  ),
-                )
-              : null),
+      onTap: onTap,
       borderRadius: BorderRadius.circular(17),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 9),
@@ -606,19 +594,6 @@ class _ActionTile extends StatelessWidget {
                 fontWeight: FontWeight.w800,
               ),
             ),
-            if (comingSoon) ...[
-              const SizedBox(height: 3),
-              Text(
-                'PRÓXIMAMENTE',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: color,
-                  fontSize: 7,
-                  letterSpacing: .35,
-                  fontWeight: FontWeight.w900,
-                ),
-              ),
-            ],
           ],
         ),
       ),

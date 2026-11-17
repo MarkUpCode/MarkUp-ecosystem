@@ -58,3 +58,7 @@ Las rutas listadas sí existen en controladores fuente. Hay diferencias entre ba
 ## Referencias
 
 App: [`api_client.dart`](../lib/core/network/api_client.dart), [`api_config.dart`](../lib/core/config/api_config.dart), [`auth_remote_data_source.dart`](../lib/features/auth/data/auth_remote_data_source.dart), [`onboarding_repository.dart`](../lib/features/onboarding/data/onboarding_repository.dart), [`credit_repository.dart`](../lib/features/credit/data/credit_repository.dart), [`cooperative_repository.dart`](../lib/features/cooperative/data/cooperative_repository.dart), [`push_notification_service.dart`](../lib/core/notifications/push_notification_service.dart). Backend: `../dinerop-backend/src/main/java/com/markup/dinerop/{auth/controller/AuthController.java,credit/infrastructure/web/CreditController.java,onboarding/controller/OnboardingClienteController.java,cooperative/infrastructure/web/CooperativeController.java,notification/controller/PushNotificationController.java}`.
+
+## Inversiones
+
+La comparación web y móvil consume `GET /api/investments/availability` y `GET /api/investments/offers` sin autenticación ni datos personales. Enviar una solicitud usa `POST /api/investments/requests` autenticado e incluye consentimiento explícito; el cliente consulta su historial en `/api/investments/requests/me`. La bandeja de cooperativa usa `/api/credits/cooperative/me/investment-*` y deriva el ámbito desde el usuario autenticado. Véase también `API_DOCUMENTATION.md`.

@@ -5,6 +5,8 @@ import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "financial_products", indexes = @Index(name = "idx_financial_product_coop", columnList = "cooperative_id,type"))
@@ -25,6 +27,25 @@ public class FinancialProduct {
 
     @Column(length = 2000)
     private String description;
+
+    @Column(name = "renewal_conditions", length = 2000)
+    private String renewalConditions;
+
+    @Column(name = "early_cancellation_conditions", length = 2000)
+    private String earlyCancellationConditions;
+
+    @Column(name = "target_audience", length = 500)
+    private String targetAudience;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "calculation_method", nullable = false, length = 30)
+    private InvestmentCalculationMethod calculationMethod = InvestmentCalculationMethod.UNSPECIFIED;
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "financial_product_interest_options", joinColumns = @JoinColumn(name = "product_id"))
+    @Enumerated(EnumType.STRING)
+    @Column(name = "payment_option", nullable = false, length = 20)
+    private Set<InterestPaymentOption> interestPaymentOptions = new LinkedHashSet<>();
 
     @Column(name = "minimum_amount", nullable = false, precision = 20, scale = 2)
     private BigDecimal minimumAmount;
