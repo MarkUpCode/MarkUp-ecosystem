@@ -72,9 +72,9 @@
     "semantic_hash": ""
   },
   "app_movil_dinerop/lib/app/providers.dart": {
-    "mtime": 1794800667.326988,
-    "seen": 1794858910.9773786,
-    "ast_hash": "a7d0a55a194fa8f391d1f767f0f1526e",
+    "mtime": 1794874012.3847733,
+    "seen": 1794874992.3594859,
+    "ast_hash": "fc22108241f64670e642d904fe6e3cf6",
     "semantic_hash": ""
   },
   "app_movil_dinerop/lib/app/router/app_router.dart": {
@@ -264,9 +264,9 @@
     "semantic_hash": ""
   },
   "app_movil_dinerop/lib/features/cooperative/data/cooperative_repository.dart": {
-    "mtime": 1786233095.961361,
-    "seen": 1794858910.977427,
-    "ast_hash": "0a23a15cc04162d32a9b2f8694f0ee4e",
+    "mtime": 1794874012.3839326,
+    "seen": 1794874992.3723543,
+    "ast_hash": "98efb378dd59ed799536096cd851fbdf",
     "semantic_hash": ""
   },
   "app_movil_dinerop/lib/features/cooperative/data/models/cooperative_summary.dart": {
@@ -336,9 +336,9 @@
     "semantic_hash": ""
   },
   "app_movil_dinerop/lib/features/credit/presentation/investment_simulator_page.dart": {
-    "mtime": 1787848640.2350323,
-    "seen": 1794858910.977444,
-    "ast_hash": "5fc316a8a60075cbbca5511d85fc3c36",
+    "mtime": 1794874050.8154557,
+    "seen": 1794874992.376897,
+    "ast_hash": "b5203f7ee3c931ceefde5879b48a8470",
     "semantic_hash": ""
   },
   "app_movil_dinerop/lib/features/credit/presentation/request_credit_page.dart": {
@@ -582,9 +582,9 @@
     "semantic_hash": ""
   },
   "dinerop-backend/src/main/java/com/markup/dinerop/admin/cooperative/dto/request/CreateCooperativeRequest.java": {
-    "mtime": 1789361535.868712,
-    "seen": 1794858910.97758,
-    "ast_hash": "5940efd965dd29edd9f729e787ca6e59",
+    "mtime": 1794873666.0730908,
+    "seen": 1794874992.3951058,
+    "ast_hash": "b638a3da1bac70f02dbce498e2f31f50",
     "semantic_hash": ""
   },
   "dinerop-backend/src/main/java/com/markup/dinerop/admin/cooperative/dto/request/UpdateCooperativeRequest.java": {
@@ -624,9 +624,9 @@
     "semantic_hash": ""
   },
   "dinerop-backend/src/main/java/com/markup/dinerop/admin/cooperative/service/CooperativeAdminService.java": {
-    "mtime": 1789361695.8115017,
-    "seen": 1794858910.9775982,
-    "ast_hash": "7a78ceae379b48696bc7b404537f88da",
+    "mtime": 1794873321.3804035,
+    "seen": 1794874992.3993006,
+    "ast_hash": "510d264a4d69df757188d5d74f0ee432",
     "semantic_hash": ""
   },
   "dinerop-backend/src/main/java/com/markup/dinerop/admin/cooperative/specification/CooperativeSpecification.java": {
@@ -696,9 +696,9 @@
     "semantic_hash": ""
   },
   "dinerop-backend/src/main/java/com/markup/dinerop/admin/users/controller/UserAdminController.java": {
-    "mtime": 1783478677.0660663,
-    "seen": 1794858910.977629,
-    "ast_hash": "a7ac4b8942add38f363aed1094285363",
+    "mtime": 1794873210.8440974,
+    "seen": 1794874992.4045038,
+    "ast_hash": "f4ecc807e77cf2c8dbf1306694d02884",
     "semantic_hash": ""
   },
   "dinerop-backend/src/main/java/com/markup/dinerop/admin/users/dto/request/ChangeRoleRequest.java": {
@@ -714,9 +714,9 @@
     "semantic_hash": ""
   },
   "dinerop-backend/src/main/java/com/markup/dinerop/admin/users/dto/request/CreateUserRequest.java": {
-    "mtime": 1783314442.971906,
-    "seen": 1794858910.977637,
-    "ast_hash": "da103f7e42c56318cadc27daede65089",
+    "mtime": 1794873023.7671492,
+    "seen": 1794874992.4052548,
+    "ast_hash": "1936e35c29c237a46586645f54ee20b2",
     "semantic_hash": ""
   },
   "dinerop-backend/src/main/java/com/markup/dinerop/admin/users/dto/request/UpdateUserRequest.java": {
@@ -780,9 +780,9 @@
     "semantic_hash": ""
   },
   "dinerop-backend/src/main/java/com/markup/dinerop/admin/users/service/UserAdminService.java": {
-    "mtime": 1783494383.3697338,
-    "seen": 1794858910.9776642,
-    "ast_hash": "687eef2b1c4f0fd0e71026390098847a",
+    "mtime": 1794874165.251618,
+    "seen": 1794874992.4097257,
+    "ast_hash": "6d3b6ee030fd3147375df6f451dd476f",
     "semantic_hash": ""
   },
   "dinerop-backend/src/main/java/com/markup/dinerop/auth/config/AdminBootstrapRunner.java": {
@@ -804,9 +804,9 @@
     "semantic_hash": ""
   },
   "dinerop-backend/src/main/java/com/markup/dinerop/auth/config/SecurityConfig.java": {
-    "mtime": 1794714265.5120776,
-    "seen": 1794858910.9776752,
-    "ast_hash": "2d134b40676c32c8f5b65b283690b27a",
+    "mtime": 1794873210.846608,
+    "seen": 1794874992.412054,
+    "ast_hash": "3a72babb977f8de9dd92f318beebcb43",
     "semantic_hash": ""
   },
   "dinerop-backend/src/main/java/com/markup/dinerop/auth/config/WebClientConfig.java": {
@@ -948,9 +948,9 @@
     "semantic_hash": ""
   },
   "dinerop-backend/src/main/java/com/markup/dinerop/auth/entity/User.java": {
-    "mtime": 1782016087.205029,
-    "seen": 1794858910.977733,
-    "ast_hash": "92e05f192ef710a9160770d3f45c03ee",
+    "mtime": 1794873023.7661448,
+    "seen": 1794874992.4221501,
+    "ast_hash": "6e86567726d9dbb15cba52bdc251d971",
     "semantic_hash": ""
   },
   "dinerop-backend/src/main/java/com/markup/dinerop/auth/entity/UserPreRegistration.java": {
@@ -978,9 +978,9 @@
     "semantic_hash": ""
   },
   "dinerop-backend/src/main/java/com/markup/dinerop/auth/exception/GlobalExceptionHandler.java": {
-    "mtime": 1789960971.5148,
-    "seen": 1794858910.977746,
-    "ast_hash": "6e1d403ee4524f37503ad84b4f687885",
+    "mtime": 1794874527.9670944,
+    "seen": 1794874992.4237716,
+    "ast_hash": "572e02be92898866f7bc68383c6a8bb0",
     "semantic_hash": ""
   },
   "dinerop-backend/src/main/java/com/markup/dinerop/auth/exception/OtpAttemptsExceededException.java": {
@@ -1038,15 +1038,15 @@
     "semantic_hash": ""
   },
   "dinerop-backend/src/main/java/com/markup/dinerop/auth/repository/UserRepository.java": {
-    "mtime": 1783494279.0425923,
-    "seen": 1794858910.9777753,
-    "ast_hash": "4a90f603bcfa753d1c617c368da31986",
+    "mtime": 1794873715.1449761,
+    "seen": 1794874992.4280856,
+    "ast_hash": "2e63b83258eba300af0bc64c6b603344",
     "semantic_hash": ""
   },
   "dinerop-backend/src/main/java/com/markup/dinerop/auth/service/AuthService.java": {
-    "mtime": 1794422085.912356,
-    "seen": 1794858910.9777775,
-    "ast_hash": "de5e6292a9ea2c315b8f330947a6933a",
+    "mtime": 1794873715.1469953,
+    "seen": 1794874992.42809,
+    "ast_hash": "7872e7c74e56f6e2b5fca69217ff556f",
     "semantic_hash": ""
   },
   "dinerop-backend/src/main/java/com/markup/dinerop/auth/service/CustomUserDetailsService.java": {
@@ -1092,15 +1092,15 @@
     "semantic_hash": ""
   },
   "dinerop-backend/src/main/java/com/markup/dinerop/cooperative/domain/repository/CooperativeRepository.java": {
-    "mtime": 1783520397.4356122,
-    "seen": 1794858910.9777923,
-    "ast_hash": "cada5c8ab1e85f1a5112e142acc7e762",
+    "mtime": 1794874710.7232165,
+    "seen": 1794874992.4305296,
+    "ast_hash": "66a13672d4c6ca280bcc2073f4119343",
     "semantic_hash": ""
   },
   "dinerop-backend/src/main/java/com/markup/dinerop/cooperative/domain/service/CooperativeService.java": {
-    "mtime": 1789361594.7370818,
-    "seen": 1794858910.9777944,
-    "ast_hash": "3f529128ab4616963fa982bcf503d77a",
+    "mtime": 1794874278.24157,
+    "seen": 1794874992.4305406,
+    "ast_hash": "7470aa98ddcd4e52d731c0f50cac73cb",
     "semantic_hash": ""
   },
   "dinerop-backend/src/main/java/com/markup/dinerop/cooperative/dto/CooperativeDto.java": {
@@ -1236,9 +1236,9 @@
     "semantic_hash": ""
   },
   "dinerop-backend/src/main/java/com/markup/dinerop/credit/domain/service/CooperativeCreditDecisionService.java": {
-    "mtime": 1794725694.3126898,
-    "seen": 1794858910.9778445,
-    "ast_hash": "c4748177a00546c63d609dbf9a71a30a",
+    "mtime": 1794874278.24257,
+    "seen": 1794874992.4383109,
+    "ast_hash": "1d1d81f559c72ea43fa7a2ccd3fd8495",
     "semantic_hash": ""
   },
   "dinerop-backend/src/main/java/com/markup/dinerop/credit/domain/service/CooperativeCreditQueryService.java": {
@@ -1260,9 +1260,9 @@
     "semantic_hash": ""
   },
   "dinerop-backend/src/main/java/com/markup/dinerop/credit/domain/service/CreditService.java": {
-    "mtime": 1794794772.3202045,
-    "seen": 1794858910.9778538,
-    "ast_hash": "cac2dcfdc12702f98926184a4ab3878d",
+    "mtime": 1794874278.2435703,
+    "seen": 1794874992.4392698,
+    "ast_hash": "5e68c6ccb3505464afe9e0aa0c404d42",
     "semantic_hash": ""
   },
   "dinerop-backend/src/main/java/com/markup/dinerop/credit/domain/service/calculation/LoanCalculationResult.java": {
@@ -1524,9 +1524,9 @@
     "semantic_hash": ""
   },
   "dinerop-backend/src/main/java/com/markup/dinerop/notification/service/NotificationService.java": {
-    "mtime": 1794794405.924024,
-    "seen": 1794858910.9779656,
-    "ast_hash": "63d8aa67b7fd2bc816ed2b982d3dfd4a",
+    "mtime": 1794873210.846608,
+    "seen": 1794874992.4545803,
+    "ast_hash": "003d1d24045dae5fc9c3ae0d018781fe",
     "semantic_hash": ""
   },
   "dinerop-backend/src/main/java/com/markup/dinerop/notification/service/PushNotificationService.java": {
@@ -2010,15 +2010,15 @@
     "semantic_hash": ""
   },
   "dinerup-app/src/App.tsx": {
-    "mtime": 1789961527.008244,
-    "seen": 1794858910.978164,
-    "ast_hash": "3c71d0009c0ee847b50724abfe5452fd",
+    "mtime": 1794873603.9345746,
+    "seen": 1794874992.485711,
+    "ast_hash": "5b10a22c71413300a384313eff179168",
     "semantic_hash": ""
   },
   "dinerup-app/src/api/auth/auth.api.ts": {
-    "mtime": 1790229369.6127257,
-    "seen": 1794858910.9781663,
-    "ast_hash": "1b2c22c12150c3722210704a8857dce9",
+    "mtime": 1794873603.933575,
+    "seen": 1794874992.485715,
+    "ast_hash": "1fd9ba95054410ee5d924fe7a2f4d0d9",
     "semantic_hash": ""
   },
   "dinerup-app/src/api/auth/authEvents.ts": {
@@ -2610,21 +2610,21 @@
     "semantic_hash": ""
   },
   "markup-admin/src/modules/cooperatives/hooks/useCooperatives.ts": {
-    "mtime": 1783524102.2280147,
-    "seen": 1794858910.9784176,
-    "ast_hash": "69c282f51090c3486619255953d58d43",
+    "mtime": 1794873500.4511085,
+    "seen": 1794874992.5243728,
+    "ast_hash": "8c9f50c0f2806ef5482dd3c21f3fbe87",
     "semantic_hash": ""
   },
   "markup-admin/src/modules/cooperatives/pages/CooperativesPage.tsx": {
-    "mtime": 1783525287.4427724,
-    "seen": 1794858910.97842,
-    "ast_hash": "3dca0328f86676f1f80e1dbba9ff6162",
+    "mtime": 1794873964.1803842,
+    "seen": 1794874992.5243778,
+    "ast_hash": "b115ad230d709138fc83d1d2a4d62bd3",
     "semantic_hash": ""
   },
   "markup-admin/src/modules/cooperatives/types/cooperative.ts": {
-    "mtime": 1783526178.3864887,
-    "seen": 1794858910.9784222,
-    "ast_hash": "119c84650d62aa952088ba7889282eff",
+    "mtime": 1794873500.4495986,
+    "seen": 1794874992.5243816,
+    "ast_hash": "c3ab9230997c049f5090250c1528e8c3",
     "semantic_hash": ""
   },
   "markup-admin/src/modules/dashboard/api/dashboard.api.ts": {
@@ -2646,9 +2646,9 @@
     "semantic_hash": ""
   },
   "markup-admin/src/modules/products/pages/ProductsPage.tsx": {
-    "mtime": 1783067930.505741,
-    "seen": 1794858910.9784307,
-    "ast_hash": "476f26ed3a2e4ff7cb0bab56577c4592",
+    "mtime": 1794874506.907858,
+    "seen": 1794874992.5254006,
+    "ast_hash": "e664c3335ebdb0f372868d2210bc422e",
     "semantic_hash": ""
   },
   "markup-admin/src/modules/profile/pages/ProfilePage.tsx": {
@@ -2682,15 +2682,15 @@
     "semantic_hash": ""
   },
   "markup-admin/src/modules/users/api/users.api.ts": {
-    "mtime": 1783480668.4128842,
-    "seen": 1794858910.9784477,
-    "ast_hash": "919e22ca6ff16282b99696e76ad8dfea",
+    "mtime": 1794873282.917968,
+    "seen": 1794874992.527043,
+    "ast_hash": "2121f28057b66839615bc98e744f3bfb",
     "semantic_hash": ""
   },
   "markup-admin/src/modules/users/components/InviteUserForm.tsx": {
-    "mtime": 1783487632.8335557,
-    "seen": 1794858910.9784498,
-    "ast_hash": "7a8760ca4a86c13d53ba4115720b644f",
+    "mtime": 1794874384.0056176,
+    "seen": 1794874992.527048,
+    "ast_hash": "da6f44acbc08328c33baa891a91385fd",
     "semantic_hash": ""
   },
   "markup-admin/src/modules/users/components/InviteUserModal.tsx": {
@@ -2724,9 +2724,9 @@
     "semantic_hash": ""
   },
   "markup-admin/src/modules/users/components/UsersTable.tsx": {
-    "mtime": 1783491167.1424496,
-    "seen": 1794858910.9784646,
-    "ast_hash": "5d78ab72579190ed22a08c3be815cc76",
+    "mtime": 1794873299.3056912,
+    "seen": 1794874992.528712,
+    "ast_hash": "b1c4c42f46294ab137663816c0df846e",
     "semantic_hash": ""
   },
   "markup-admin/src/modules/users/hooks/useUsers.ts": {
@@ -2736,15 +2736,15 @@
     "semantic_hash": ""
   },
   "markup-admin/src/modules/users/pages/UsersPage.tsx": {
-    "mtime": 1783524979.4608593,
-    "seen": 1794858910.9784694,
-    "ast_hash": "54c9f754720f67435b8eee530755c6e6",
+    "mtime": 1794873299.3056912,
+    "seen": 1794874992.529032,
+    "ast_hash": "d05fc23876b8d669794bd814c95f9268",
     "semantic_hash": ""
   },
   "markup-admin/src/modules/users/types/user.ts": {
-    "mtime": 1783494659.8168223,
-    "seen": 1794858910.978472,
-    "ast_hash": "58880c147b29f1bc4e08ea16b45c9def",
+    "mtime": 1794873282.916961,
+    "seen": 1794874992.5290356,
+    "ast_hash": "73edcee9c1d298455eb912e07bd5ca0b",
     "semantic_hash": ""
   },
   "markup-admin/src/routes/ProtectedRoute.tsx": {
@@ -3897,6 +3897,138 @@
     "mtime": 1794871235.153122,
     "seen": 1794871354.5236738,
     "ast_hash": "ec2dc0dc7bef63488889f34de2f5584d",
+    "semantic_hash": ""
+  },
+  "dinerop-backend/src/main/java/com/markup/dinerop/admin/cooperative/controller/FinancialProductAdminController.java": {
+    "mtime": 1794874209.422641,
+    "seen": 1794874992.3950987,
+    "ast_hash": "8e16056839ec496f2ec44c92fd11e098",
+    "semantic_hash": ""
+  },
+  "dinerop-backend/src/main/java/com/markup/dinerop/auth/controller/InvitationController.java": {
+    "mtime": 1794873210.8440974,
+    "seen": 1794874992.4138122,
+    "ast_hash": "ef574be39c69121f9c724cff5899c6d4",
+    "semantic_hash": ""
+  },
+  "dinerop-backend/src/main/java/com/markup/dinerop/auth/dto/InvitationActivationRequest.java": {
+    "mtime": 1794873187.8064609,
+    "seen": 1794874992.414991,
+    "ast_hash": "3f5b6f87fd94516bca2635799c242efa",
+    "semantic_hash": ""
+  },
+  "dinerop-backend/src/main/java/com/markup/dinerop/auth/dto/InvitationDetailsResponse.java": {
+    "mtime": 1794873187.8064609,
+    "seen": 1794874992.4149947,
+    "ast_hash": "531637fb1fa6d0fffbca62525cc0f808",
+    "semantic_hash": ""
+  },
+  "dinerop-backend/src/main/java/com/markup/dinerop/auth/entity/CooperativeInvitation.java": {
+    "mtime": 1794873187.805456,
+    "seen": 1794874992.4209027,
+    "ast_hash": "f1e42232e88a807584d7d031323c11e4",
+    "semantic_hash": ""
+  },
+  "dinerop-backend/src/main/java/com/markup/dinerop/auth/repository/CooperativeInvitationRepository.java": {
+    "mtime": 1794873187.805456,
+    "seen": 1794874992.426563,
+    "ast_hash": "682eadd8589ff7e35d1c0e73bf40da61",
+    "semantic_hash": ""
+  },
+  "dinerop-backend/src/main/java/com/markup/dinerop/auth/service/InvitationService.java": {
+    "mtime": 1794874165.251618,
+    "seen": 1794874992.428553,
+    "ast_hash": "f0dd75923cfcdc11bad5faa987afc53b",
+    "semantic_hash": ""
+  },
+  "dinerop-backend/src/main/java/com/markup/dinerop/cooperative/domain/entity/FinancialProduct.java": {
+    "mtime": 1794873049.3482637,
+    "seen": 1794874992.4298398,
+    "ast_hash": "2e1f35d2eedb28429537d523db152a0c",
+    "semantic_hash": ""
+  },
+  "dinerop-backend/src/main/java/com/markup/dinerop/cooperative/domain/entity/FinancialProductCondition.java": {
+    "mtime": 1794873049.3492634,
+    "seen": 1794874992.4298437,
+    "ast_hash": "6faa5cc5c7f96fef4d8f6ff1ca3f0b55",
+    "semantic_hash": ""
+  },
+  "dinerop-backend/src/main/java/com/markup/dinerop/cooperative/domain/entity/FinancialProductType.java": {
+    "mtime": 1794873049.3472579,
+    "seen": 1794874992.4298465,
+    "ast_hash": "e5d7034f78870c75943d442ed2f37208",
+    "semantic_hash": ""
+  },
+  "dinerop-backend/src/main/java/com/markup/dinerop/cooperative/domain/repository/FinancialProductConditionRepository.java": {
+    "mtime": 1794873049.3502634,
+    "seen": 1794874992.4305332,
+    "ast_hash": "7c80f9254b3e3b563dc5260381f0851e",
+    "semantic_hash": ""
+  },
+  "dinerop-backend/src/main/java/com/markup/dinerop/cooperative/domain/repository/FinancialProductRepository.java": {
+    "mtime": 1794873049.3492634,
+    "seen": 1794874992.4305367,
+    "ast_hash": "b34225025144f03c3645a01ed3aa3b79",
+    "semantic_hash": ""
+  },
+  "dinerop-backend/src/main/java/com/markup/dinerop/cooperative/domain/service/FinancialProductService.java": {
+    "mtime": 1794874710.7232165,
+    "seen": 1794874992.430544,
+    "ast_hash": "ba5d0882051682bfb86b712c5e238d98",
+    "semantic_hash": ""
+  },
+  "dinerop-backend/src/main/java/com/markup/dinerop/cooperative/dto/FinancialProductConditionRequest.java": {
+    "mtime": 1794873102.3345964,
+    "seen": 1794874992.431551,
+    "ast_hash": "959ade40546b0356cbb6ffbb3c459b4c",
+    "semantic_hash": ""
+  },
+  "dinerop-backend/src/main/java/com/markup/dinerop/cooperative/dto/FinancialProductRequest.java": {
+    "mtime": 1794873102.3335874,
+    "seen": 1794874992.4315543,
+    "ast_hash": "73ff8a10ebe776887759ab21a0d12b6e",
+    "semantic_hash": ""
+  },
+  "dinerop-backend/src/main/java/com/markup/dinerop/cooperative/dto/FinancialProductResponse.java": {
+    "mtime": 1794873102.3345964,
+    "seen": 1794874992.431558,
+    "ast_hash": "e5572b3be5e0361937ac38528f4806e6",
+    "semantic_hash": ""
+  },
+  "dinerop-backend/src/main/java/com/markup/dinerop/cooperative/infrastructure/web/FinancialProductController.java": {
+    "mtime": 1794873137.745481,
+    "seen": 1794874992.4325085,
+    "ast_hash": "1eb5619c683895c8dd8c09021c95a0e5",
+    "semantic_hash": ""
+  },
+  "dinerop-backend/src/test/java/com/markup/dinerop/auth/service/InvitationServiceTest.java": {
+    "mtime": 1794874629.4535327,
+    "seen": 1794874992.483105,
+    "ast_hash": "f4eaa36ddf8fa074799160130ba0b1c4",
+    "semantic_hash": ""
+  },
+  "dinerop-backend/src/test/java/com/markup/dinerop/cooperative/domain/service/FinancialProductServiceTest.java": {
+    "mtime": 1794874720.6373017,
+    "seen": 1794874992.4831095,
+    "ast_hash": "9940a6e93759b930e67348ce8eff21f1",
+    "semantic_hash": ""
+  },
+  "dinerup-app/src/pages/ActivateInvitation.tsx": {
+    "mtime": 1794873603.933575,
+    "seen": 1794874992.4983964,
+    "ast_hash": "dc059110d9b48d6ee4f9603beb018a98",
+    "semantic_hash": ""
+  },
+  "markup-admin/src/modules/cooperatives/components/CooperativeWizard.tsx": {
+    "mtime": 1794874498.307557,
+    "seen": 1794874992.5230792,
+    "ast_hash": "ed96cc369224d7d9c3926322194fd5f0",
+    "semantic_hash": ""
+  },
+  "markup-admin/src/modules/products/api/products.api.ts": {
+    "mtime": 1794874209.422641,
+    "seen": 1794874992.5253968,
+    "ast_hash": "dc85245e9fb834985c006db024101c51",
     "semantic_hash": ""
   },
   "dinerup-app/package-lock.json": {
