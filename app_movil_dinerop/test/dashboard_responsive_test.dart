@@ -315,8 +315,21 @@ void main() async {
 
     await tester.pumpWidget(const MaterialApp(home: _SpotlightTestHarness()));
     await tester.pumpAndSettle();
-    expect(find.text('¡Vamos por nuevas oportunidades!'), findsOneWidget);
+    expect(find.text('¡No dejes tus solicitudes en pausa!'), findsNWidgets(2));
     expect(find.byTooltip('Cerrar'), findsOneWidget);
+    final normalCardSize = tester.getSize(
+      find.byKey(const ValueKey('profile-card-normal')),
+    );
+    final spotlightCardSize = tester.getSize(
+      find.byKey(const ValueKey('profile-card-spotlight')),
+    );
+    expect(spotlightCardSize, normalCardSize);
+    expect(
+      find.text(
+        'Completa tu perfil para que las cooperativas revisen tus solicitudes y te compartan novedades en DINEROP.',
+      ),
+      findsNWidgets(2),
+    );
     expect(
       tester.getSize(find.byKey(const ValueKey('onboarding-spotlight-scrim'))),
       const Size(320, 850),
@@ -326,8 +339,7 @@ void main() async {
 
     await tester.tap(find.byTooltip('Cerrar'));
     await tester.pumpAndSettle();
-    expect(find.text('Tu perfil abre oportunidades'), findsOneWidget);
-    expect(find.text('¡Vamos por nuevas oportunidades!'), findsNothing);
+    expect(find.text('¡No dejes tus solicitudes en pausa!'), findsOneWidget);
     expect(tester.takeException(), isNull);
 
     await tester.pump(const Duration(seconds: 7));
@@ -335,7 +347,7 @@ void main() async {
     final shake = tester.widget<Transform>(
       find
           .ancestor(
-            of: find.text('Tu perfil abre oportunidades'),
+            of: find.text('¡No dejes tus solicitudes en pausa!').last,
             matching: find.byType(Transform),
           )
           .first,

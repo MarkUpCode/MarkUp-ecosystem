@@ -26,6 +26,7 @@ class _OnboardingWelcomeExperienceState
     extends State<OnboardingWelcomeExperience> {
   final _portalController = OverlayPortalController();
   late final LayerLink _layerLink = LayerLink();
+  final _targetKey = GlobalKey();
 
   @override
   void initState() {
@@ -54,18 +55,25 @@ class _OnboardingWelcomeExperienceState
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) => OverlayPortal(
-        controller: _portalController,
-        overlayChildBuilder: (context) => _SpotlightOverlay(
+    return OverlayPortal(
+      controller: _portalController,
+      overlayChildBuilder: (context) {
+        final target = _targetKey.currentContext?.findRenderObject();
+        final width = target is RenderBox && target.hasSize
+            ? target.size.width
+            : MediaQuery.sizeOf(context).width - 36;
+        return _SpotlightOverlay(
           layerLink: _layerLink,
-          width: constraints.maxWidth,
+          width: width,
           isFirstWelcome: widget.isFirstWelcome,
           onDismiss: widget.onDismiss,
           onCompleteProfile: widget.onCompleteProfile,
-        ),
-        child: CompositedTransformTarget(
-          link: _layerLink,
+        );
+      },
+      child: CompositedTransformTarget(
+        link: _layerLink,
+        child: KeyedSubtree(
+          key: _targetKey,
           child: AnimatedOpacity(
             opacity: widget.showSpotlight ? 0 : 1,
             duration: const Duration(milliseconds: 220),
@@ -124,7 +132,6 @@ class _ProfileCompletionCardState extends State<_ProfileCompletionCard>
 
   @override
   Widget build(BuildContext context) {
-    final characterSize = widget.spotlight ? 88.0 : 62.0;
     return AnimatedBuilder(
       animation: _shakeController,
       builder: (context, child) {
@@ -136,25 +143,29 @@ class _ProfileCompletionCardState extends State<_ProfileCompletionCard>
         );
       },
       child: Container(
-        padding: EdgeInsets.all(widget.spotlight ? 19 : 14),
+        key: ValueKey(
+          widget.spotlight ? 'profile-card-spotlight' : 'profile-card-normal',
+        ),
+        padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
           gradient: const LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [Color(0xFFFFB347), Color(0xFFF28A20)],
           ),
-          borderRadius: BorderRadius.circular(widget.spotlight ? 25 : 20),
+          borderRadius: BorderRadius.circular(20),
           border: Border.all(color: const Color(0xFFFFD08A), width: 1),
           boxShadow: [
             BoxShadow(
               color: const Color(0xFFF28A20).withValues(alpha: .25),
-              blurRadius: widget.spotlight ? 32 : 14,
-              spreadRadius: widget.spotlight ? 4 : 0,
+              blurRadius: widget.spotlight ? 26 : 14,
+              spreadRadius: widget.spotlight ? 2 : 0,
               offset: const Offset(0, 7),
             ),
           ],
         ),
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Row(
@@ -162,8 +173,8 @@ class _ProfileCompletionCardState extends State<_ProfileCompletionCard>
               children: [
                 Image.asset(
                   'assets/images/dolarito/dolarito_motivated.png',
-                  width: characterSize,
-                  height: characterSize,
+                  width: 62,
+                  height: 62,
                   fit: BoxFit.contain,
                 ),
                 const SizedBox(width: 10),
@@ -172,24 +183,20 @@ class _ProfileCompletionCardState extends State<_ProfileCompletionCard>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        widget.spotlight
-                            ? '¡Vamos por nuevas oportunidades!'
-                            : 'Tu perfil abre oportunidades',
+                        '¡No dejes tus solicitudes en pausa!',
                         style: TextStyle(
                           color: const Color(0xFF512B0B),
-                          fontSize: widget.spotlight ? 19 : 15,
+                          fontSize: 15,
                           height: 1.15,
                           fontWeight: FontWeight.w900,
                         ),
                       ),
                       const SizedBox(height: 5),
                       Text(
-                        widget.spotlight
-                            ? 'Ayuda a las cooperativas a conocer tu situación. Completa tus datos correctos y actualizados para facilitar la evaluación de tus solicitudes.'
-                            : 'Completa tu perfil y acércate a nuevas oportunidades financieras.',
+                        'Completa tu perfil para que las cooperativas revisen tus solicitudes y te compartan novedades en DINEROP.',
                         style: TextStyle(
                           color: const Color(0xFF61380F),
-                          fontSize: widget.spotlight ? 14 : 11,
+                          fontSize: 11,
                           height: 1.35,
                           fontWeight: FontWeight.w600,
                         ),
@@ -199,9 +206,9 @@ class _ProfileCompletionCardState extends State<_ProfileCompletionCard>
                 ),
               ],
             ),
-            SizedBox(height: widget.spotlight ? 14 : 10),
+            const SizedBox(height: 10),
             SizedBox(
-              height: widget.spotlight ? 48 : 39,
+              height: 39,
               child: FilledButton.icon(
                 onPressed: widget.onComplete,
                 icon: const Icon(Icons.arrow_forward_rounded, size: 18),
@@ -212,8 +219,8 @@ class _ProfileCompletionCardState extends State<_ProfileCompletionCard>
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(13),
                   ),
-                  textStyle: TextStyle(
-                    fontSize: widget.spotlight ? 15 : 12,
+                  textStyle: const TextStyle(
+                    fontSize: 12,
                     fontWeight: FontWeight.w800,
                   ),
                 ),
@@ -279,13 +286,16 @@ class _SpotlightOverlayState extends State<_SpotlightOverlay>
           showWhenUnlinked: false,
           targetAnchor: Alignment.topLeft,
           followerAnchor: Alignment.topLeft,
-          child: Material(
-            type: MaterialType.transparency,
-            child: SizedBox(
-              width: widget.width,
-              child: _ProfileCompletionCard(
-                spotlight: true,
-                onComplete: widget.onCompleteProfile,
+          child: Align(
+            alignment: Alignment.topLeft,
+            child: Material(
+              type: MaterialType.transparency,
+              child: SizedBox(
+                width: widget.width,
+                child: _ProfileCompletionCard(
+                  spotlight: true,
+                  onComplete: widget.onCompleteProfile,
+                ),
               ),
             ),
           ),
@@ -314,8 +324,8 @@ class _SpotlightOverlayState extends State<_SpotlightOverlay>
               padding: const EdgeInsets.fromLTRB(24, 16, 24, 28),
               child: Text(
                 widget.isFirstWelcome
-                    ? 'Tus datos básicos ya crearon tu cuenta. Este paso ayuda a las cooperativas a evaluar tus solicitudes.'
-                    : 'Tu perfil sigue pendiente. Complétalo cuando quieras para continuar con tus solicitudes.',
+                    ? 'Completa tu información para que las cooperativas puedan revisar tus solicitudes y compartirte novedades en DINEROP.'
+                    : 'Tu perfil sigue pendiente. Complétalo para que las cooperativas puedan revisar tus solicitudes y mantenerte al tanto.',
                 textAlign: TextAlign.center,
                 style: const TextStyle(
                   color: Colors.white,

@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -37,6 +38,8 @@ class ActiveCreditCarousel extends StatefulWidget {
 class _ActiveCreditCarouselState extends State<ActiveCreditCarousel> {
   late final PageController _controller;
   int _page = 0;
+  double _cardHeight = 340;
+  final Map<int, double> _measuredCardHeights = {};
 
   List<ClientCreditRequestSummary> get _activeRequests {
     final active = widget.requests.toList()
@@ -60,6 +63,18 @@ class _ActiveCreditCarouselState extends State<ActiveCreditCarousel> {
     super.dispose();
   }
 
+  void _recordCardHeight(int requestId, Size size) {
+    if (!mounted || size.height <= 0) return;
+    _measuredCardHeights[requestId] = size.height;
+    final active = _activeRequests;
+    if (active.isEmpty) return;
+    final current = active[_page.clamp(0, active.length - 1)];
+    if (current.solicitudId == requestId &&
+        (_cardHeight - size.height).abs() > .5) {
+      setState(() => _cardHeight = size.height);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final active = _activeRequests;
@@ -70,17 +85,37 @@ class _ActiveCreditCarouselState extends State<ActiveCreditCarousel> {
           _CreditEmptyState(onRequestCredit: widget.onRequestCredit)
         else ...[
           SizedBox(
-            height: 278,
+            height: _cardHeight,
             child: PageView.builder(
               controller: _controller,
               itemCount: active.length,
-              onPageChanged: (page) => setState(() => _page = page),
+              onPageChanged: (page) {
+                setState(() {
+                  _page = page;
+                  final height = _measuredCardHeights[active[page].solicitudId];
+                  if (height != null) _cardHeight = height;
+                });
+              },
               itemBuilder: (context, index) => Padding(
                 padding: const EdgeInsets.only(right: 9),
-                child: _CreditSummaryCard(
-                  request: active[index],
-                  profileComplete: widget.profileComplete,
-                  onViewDetails: () => widget.onViewDetails(active[index]),
+                child: LayoutBuilder(
+                  builder: (context, constraints) => OverflowBox(
+                    alignment: Alignment.topCenter,
+                    minWidth: constraints.maxWidth,
+                    maxWidth: constraints.maxWidth,
+                    minHeight: 0,
+                    maxHeight: double.infinity,
+                    child: _MeasuredSize(
+                      onChange: (size) =>
+                          _recordCardHeight(active[index].solicitudId, size),
+                      child: _CreditSummaryCard(
+                        request: active[index],
+                        profileComplete: widget.profileComplete,
+                        onViewDetails: () =>
+                            widget.onViewDetails(active[index]),
+                      ),
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -311,6 +346,21 @@ class _InvestmentRequestCarouselState
     extends State<_InvestmentRequestCarousel> {
   late final PageController _controller = PageController(viewportFraction: .94);
   int _page = 0;
+  double _cardHeight = 220;
+  final Map<int, double> _measuredCardHeights = {};
+
+  void _recordCardHeight(int requestId, Size size) {
+    if (!mounted || size.height <= 0) return;
+    _measuredCardHeights[requestId] = size.height;
+    final items = widget.requests;
+    if (items.isEmpty) return;
+    final current = [...items]
+      ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+    if (current[_page.clamp(0, current.length - 1)].id == requestId &&
+        (_cardHeight - size.height).abs() > .5) {
+      setState(() => _cardHeight = size.height);
+    }
+  }
 
   @override
   void dispose() {
@@ -324,17 +374,38 @@ class _InvestmentRequestCarouselState
       ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
     return Column(
       children: [
-        SizedBox(
-          height: 265,
-          child: PageView.builder(
-            controller: _controller,
-            itemCount: items.length,
-            onPageChanged: (page) => setState(() => _page = page),
-            itemBuilder: (context, index) => Padding(
-              padding: const EdgeInsets.only(right: 9),
-              child: _InvestmentSummaryCard(
-                request: items[index],
-                onViewDetails: () => widget.onViewDetails(items[index]),
+        AnimatedSize(
+          duration: const Duration(milliseconds: 180),
+          curve: Curves.easeOutCubic,
+          child: SizedBox(
+            height: _cardHeight,
+            child: PageView.builder(
+              controller: _controller,
+              itemCount: items.length,
+              onPageChanged: (page) => setState(() {
+                _page = page;
+                final height = _measuredCardHeights[items[page].id];
+                if (height != null) _cardHeight = height;
+              }),
+              itemBuilder: (context, index) => Padding(
+                padding: const EdgeInsets.only(right: 9),
+                child: LayoutBuilder(
+                  builder: (context, constraints) => OverflowBox(
+                    alignment: Alignment.topCenter,
+                    minWidth: constraints.maxWidth,
+                    maxWidth: constraints.maxWidth,
+                    minHeight: 0,
+                    maxHeight: double.infinity,
+                    child: _MeasuredSize(
+                      onChange: (size) =>
+                          _recordCardHeight(items[index].id, size),
+                      child: _InvestmentSummaryCard(
+                        request: items[index],
+                        onViewDetails: () => widget.onViewDetails(items[index]),
+                      ),
+                    ),
+                  ),
+                ),
               ),
             ),
           ),
@@ -398,6 +469,7 @@ class _InvestmentSummaryCard extends StatelessWidget {
     final status = _investmentStatus(request.status);
     return _ApplicationCard(
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
@@ -435,11 +507,17 @@ class _InvestmentSummaryCard extends StatelessWidget {
           ),
           const SizedBox(height: 9),
           _DolaritoRequestNote(reaction: reaction),
-          const Spacer(),
           Align(
             alignment: Alignment.centerRight,
             child: TextButton(
               onPressed: onViewDetails,
+              style: TextButton.styleFrom(
+                foregroundColor: const Color(0xFF087E8B),
+                padding: const EdgeInsets.symmetric(horizontal: 4),
+                minimumSize: const Size(0, 28),
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                visualDensity: VisualDensity.compact,
+              ),
               child: const Text('Ver detalles  →'),
             ),
           ),
@@ -499,12 +577,10 @@ class _DolaritoRequestNote extends StatelessWidget {
         Expanded(
           child: Text(
             reaction.message,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
             style: const TextStyle(
               color: _navy,
-              fontSize: 10,
-              height: 1.25,
+              fontSize: 12,
+              height: 1.3,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -512,6 +588,42 @@ class _DolaritoRequestNote extends StatelessWidget {
       ],
     ),
   );
+}
+
+class _MeasuredSize extends SingleChildRenderObjectWidget {
+  const _MeasuredSize({required this.onChange, required super.child});
+
+  final ValueChanged<Size> onChange;
+
+  @override
+  RenderObject createRenderObject(BuildContext context) =>
+      _RenderMeasuredSize(onChange);
+
+  @override
+  void updateRenderObject(
+    BuildContext context,
+    covariant _RenderMeasuredSize renderObject,
+  ) {
+    renderObject.onChange = onChange;
+  }
+}
+
+class _RenderMeasuredSize extends RenderProxyBox {
+  _RenderMeasuredSize(this.onChange);
+
+  ValueChanged<Size> onChange;
+  Size? _reportedSize;
+
+  @override
+  void performLayout() {
+    super.performLayout();
+    if (_reportedSize == size) return;
+    _reportedSize = size;
+    final measured = size;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (attached) onChange(measured);
+    });
+  }
 }
 
 (String, Color) _investmentStatus(String status) => switch (status
@@ -572,6 +684,7 @@ class _CreditSummaryCard extends StatelessWidget {
       child: Stack(
         children: [
           Column(
+            mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
