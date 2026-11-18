@@ -194,23 +194,11 @@ class _DashboardApplicationsSectionState
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SegmentedButton<int>(
-          showSelectedIcon: false,
-          segments: const [
-            ButtonSegment(
-              value: 0,
-              icon: Icon(Icons.credit_score_outlined),
-              label: Text('Créditos'),
-            ),
-            ButtonSegment(
-              value: 1,
-              icon: Icon(Icons.savings_outlined),
-              label: Text('Inversiones'),
-            ),
-          ],
-          selected: {_selected},
-          onSelectionChanged: (selection) =>
-              setState(() => _selected = selection.first),
+        Center(
+          child: _DashboardApplicationSelector(
+            selected: _selected,
+            onSelected: (value) => setState(() => _selected = value),
+          ),
         ),
         const SizedBox(height: 13),
         _SectionHeading(
@@ -253,6 +241,131 @@ class _DashboardApplicationsSectionState
       ],
     );
   }
+}
+
+class _DashboardApplicationSelector extends StatelessWidget {
+  const _DashboardApplicationSelector({
+    required this.selected,
+    required this.onSelected,
+  });
+
+  final int selected;
+  final ValueChanged<int> onSelected;
+
+  @override
+  Widget build(BuildContext context) => ConstrainedBox(
+    constraints: const BoxConstraints(maxWidth: 340),
+    child: Container(
+      height: 48,
+      padding: const EdgeInsets.all(4),
+      decoration: BoxDecoration(
+        color: const Color(0xFFEDF3F4),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFE3EBEC)),
+      ),
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          AnimatedAlign(
+            alignment: selected == 0
+                ? Alignment.centerLeft
+                : Alignment.centerRight,
+            duration: const Duration(milliseconds: 280),
+            curve: Curves.easeInOutCubic,
+            child: FractionallySizedBox(
+              widthFactor: .5,
+              heightFactor: 1,
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 220),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Color(0x14142B4A),
+                      blurRadius: 8,
+                      offset: Offset(0, 2),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _ApplicationSelectorOption(
+                label: 'Mis créditos',
+                icon: Icons.credit_score_outlined,
+                selected: selected == 0,
+                onTap: () => onSelected(0),
+              ),
+              _ApplicationSelectorOption(
+                label: 'Mis inversiones',
+                icon: Icons.savings_outlined,
+                selected: selected == 1,
+                onTap: () => onSelected(1),
+              ),
+            ],
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
+class _ApplicationSelectorOption extends StatelessWidget {
+  const _ApplicationSelectorOption({
+    required this.label,
+    required this.icon,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final String label;
+  final IconData icon;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) => Expanded(
+    child: Semantics(
+      button: true,
+      selected: selected,
+      label: label,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          key: ValueKey('application-selector-$label'),
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(12),
+          child: AnimatedDefaultTextStyle(
+            duration: const Duration(milliseconds: 180),
+            curve: Curves.easeOut,
+            style: TextStyle(
+              color: selected ? _navy : _muted,
+              fontSize: 12,
+              fontWeight: selected ? FontWeight.w800 : FontWeight.w600,
+            ),
+            child: IconTheme(
+              data: IconThemeData(
+                color: selected ? const Color(0xFF128E80) : _muted,
+                size: 17,
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(icon),
+                  const SizedBox(width: 6),
+                  Flexible(child: Text(label, maxLines: 1)),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    ),
+  );
 }
 
 class _ApplicationLoadingState extends StatelessWidget {

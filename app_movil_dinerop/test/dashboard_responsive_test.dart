@@ -246,13 +246,24 @@ void main() async {
       ),
     );
     await tester.pumpAndSettle();
-    expect(find.text('Mis créditos'), findsOneWidget);
+    expect(find.text('Mis créditos'), findsNWidgets(2));
     await tester.tap(find.text('Ver detalles  →').first);
     expect(openedCreditId, 101);
 
-    await tester.tap(find.text('Inversiones'));
+    final investmentsOption = find.byKey(
+      const ValueKey('application-selector-Mis inversiones'),
+    );
+    final investmentsOptionRect = tester.getRect(investmentsOption);
+    final investmentsTextRect = tester.getRect(
+      find.text('Mis inversiones').first,
+    );
+    expect(
+      (investmentsTextRect.center.dy - investmentsOptionRect.center.dy).abs(),
+      lessThan(2),
+    );
+    await tester.tapAt(investmentsOptionRect.topLeft + const Offset(2, 2));
     await tester.pumpAndSettle();
-    expect(find.text('Mis inversiones'), findsOneWidget);
+    expect(find.text('Mis inversiones'), findsNWidgets(2));
     expect(find.text('Cooperativa Sol'), findsWidgets);
     expect(find.text('En revisión'), findsOneWidget);
     expect(
@@ -294,7 +305,7 @@ void main() async {
       ),
     );
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Inversiones'));
+    await tester.tap(find.text('Mis inversiones').first);
     await tester.pumpAndSettle();
     expect(
       find.text('Todavía no tienes inversiones solicitadas.'),

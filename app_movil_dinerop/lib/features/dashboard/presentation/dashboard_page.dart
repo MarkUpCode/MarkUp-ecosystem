@@ -12,6 +12,13 @@ import 'sections/dashboard_exploration_sections.dart';
 
 const _navy = Color(0xFF142B4A);
 const _muted = Color(0xFF718096);
+const _dashboardWelcomeMessages = [
+  '¡Qué gusto tenerte de vuelta!',
+  '¡Volviste! Dolarito ya te guardó sitio.',
+  'Tus metas financieras preguntaban por ti.',
+  '¡Qué bueno verte! Vamos paso a paso.',
+  'Dolarito dice: hoy pinta bien para avanzar.',
+];
 
 class DashboardPage extends ConsumerWidget {
   const DashboardPage({super.key});
@@ -26,6 +33,9 @@ class DashboardPage extends ConsumerWidget {
     final welcomeDismissed = ref.watch(onboardingWelcomeDismissedProvider);
     final firstWelcome = ref.watch(onboardingWelcomeIsFirstProvider);
     final profileComplete = onboarding.valueOrNull?.formularioCompleto == true;
+    final profileProgress = onboarding.valueOrNull == null
+        ? null
+        : (profileComplete ? 1.0 : 0.7);
 
     return Stack(
       children: [
@@ -60,11 +70,16 @@ class DashboardPage extends ConsumerWidget {
                             name: data.firstName?.trim().isNotEmpty == true
                                 ? data.firstName!.trim()
                                 : 'cliente',
+                            profileProgress: profileProgress,
                           ),
-                          loading: () =>
-                              const _DashboardGreeting(name: 'cliente'),
-                          error: (_, _) =>
-                              const _DashboardGreeting(name: 'cliente'),
+                          loading: () => _DashboardGreeting(
+                            name: 'cliente',
+                            profileProgress: profileProgress,
+                          ),
+                          error: (_, _) => _DashboardGreeting(
+                            name: 'cliente',
+                            profileProgress: profileProgress,
+                          ),
                         ),
                         const SizedBox(height: 7),
                         if (onboarding.valueOrNull?.formularioCompleto ==
@@ -141,54 +156,113 @@ class DashboardPage extends ConsumerWidget {
 }
 
 class _DashboardGreeting extends StatelessWidget {
-  const _DashboardGreeting({required this.name});
+  const _DashboardGreeting({required this.name, required this.profileProgress});
 
   final String name;
+  final double? profileProgress;
 
   @override
   Widget build(BuildContext context) {
-    final firstLetter = name.trim().isEmpty
-        ? 'D'
-        : name.trim()[0].toUpperCase();
+    final welcomeMessage =
+        _dashboardWelcomeMessages[DateTime.now().day %
+            _dashboardWelcomeMessages.length];
     return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Container(
-          width: 39,
-          height: 39,
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            color: const Color(0xFFE5F8F5),
-            borderRadius: BorderRadius.circular(14),
-          ),
-          child: Text(
-            firstLetter,
-            style: const TextStyle(
-              color: Color(0xFF128E80),
-              fontWeight: FontWeight.w900,
-              fontSize: 17,
-            ),
-          ),
+        Image.asset(
+          'assets/images/dolarito/dolarito_greeting.png',
+          width: 48,
+          height: 48,
+          fit: BoxFit.contain,
         ),
-        const SizedBox(width: 11),
+        const SizedBox(width: 9),
         Expanded(
           child: Column(
+            mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                '¡Hola, $name! 👋',
+                '¡Hola, $name!',
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
                   color: _navy,
-                  fontSize: 18,
+                  fontSize: 17,
                   letterSpacing: -.3,
                   fontWeight: FontWeight.w900,
                 ),
               ),
               const SizedBox(height: 2),
-              const Text(
-                'Nos alegra tenerte de vuelta.',
-                style: TextStyle(color: _muted, fontSize: 11),
+              Row(
+                children: [
+                  const Icon(
+                    Icons.auto_awesome_rounded,
+                    size: 11,
+                    color: Color(0xFF16A995),
+                  ),
+                  const SizedBox(width: 4),
+                  Expanded(
+                    child: Text(
+                      welcomeMessage,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: _muted,
+                        fontSize: 10,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 4),
+              Row(
+                children: [
+                  const Text(
+                    'Perfil',
+                    style: TextStyle(
+                      color: _muted,
+                      fontSize: 10,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(width: 7),
+                  Expanded(
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(99),
+                      child: LinearProgressIndicator(
+                        value: profileProgress,
+                        minHeight: 5,
+                        backgroundColor: const Color(0xFFE5ECEF),
+                        valueColor: AlwaysStoppedAnimation(
+                          profileProgress == 1
+                              ? const Color(0xFF16845B)
+                              : const Color(0xFF16A995),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 7),
+                  if (profileProgress == 1)
+                    const Icon(
+                      Icons.check_circle_rounded,
+                      size: 14,
+                      color: Color(0xFF16845B),
+                    ),
+                  if (profileProgress == 1) const SizedBox(width: 3),
+                  Text(
+                    profileProgress == null
+                        ? '…'
+                        : '${(profileProgress! * 100).round()}%',
+                    style: TextStyle(
+                      color: profileProgress == 1
+                          ? const Color(0xFF16845B)
+                          : _navy,
+                      fontSize: 10,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
