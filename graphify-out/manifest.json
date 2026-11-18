@@ -78,9 +78,9 @@
     "semantic_hash": ""
   },
   "app_movil_dinerop/lib/app/router/app_router.dart": {
-    "mtime": 1795021173.5384212,
-    "seen": 1795029009.8486402,
-    "ast_hash": "7eedaf49cb6d2e55f2a131b175668589",
+    "mtime": 1795029124.4820092,
+    "seen": 1795030301.602823,
+    "ast_hash": "2472144cdf5faa12f555764e3c691268",
     "semantic_hash": ""
   },
   "app_movil_dinerop/lib/app/shell/app_shell.dart": {
@@ -168,15 +168,15 @@
     "semantic_hash": ""
   },
   "app_movil_dinerop/lib/features/auth/data/auth_remote_data_source.dart": {
-    "mtime": 1795011830.9582415,
-    "seen": 1795015085.4544551,
-    "ast_hash": "0062ebaf055fb68b7cefff8fbab0d595",
+    "mtime": 1795029124.4804978,
+    "seen": 1795030301.6078057,
+    "ast_hash": "b58d6e6be0321095935ec6139d492988",
     "semantic_hash": ""
   },
   "app_movil_dinerop/lib/features/auth/data/auth_repository.dart": {
-    "mtime": 1795011830.9592419,
-    "seen": 1795015085.4544604,
-    "ast_hash": "5a87861ee8242f9e082dcc93511b27f0",
+    "mtime": 1795029124.4810026,
+    "seen": 1795030301.6078098,
+    "ast_hash": "5acd95280e4a395893998579028af48c",
     "semantic_hash": ""
   },
   "app_movil_dinerop/lib/features/auth/data/models/app_user.dart": {
@@ -204,9 +204,9 @@
     "semantic_hash": ""
   },
   "app_movil_dinerop/lib/features/auth/presentation/auth_controller.dart": {
-    "mtime": 1795011830.9602406,
-    "seen": 1795015085.4556625,
-    "ast_hash": "d8dd5621ce39969146eca466a1d24360",
+    "mtime": 1795029124.4820092,
+    "seen": 1795030301.609123,
+    "ast_hash": "8c14d40b775ccfdfa9e8adbf61439ebd",
     "semantic_hash": ""
   },
   "app_movil_dinerop/lib/features/auth/presentation/screens/activation_page.dart": {
@@ -222,9 +222,9 @@
     "semantic_hash": ""
   },
   "app_movil_dinerop/lib/features/auth/presentation/screens/forgot_password_page.dart": {
-    "mtime": 1786233096.007959,
-    "seen": 1794858910.9774165,
-    "ast_hash": "11fcb39c4f5f8d80625fd5e726fa784c",
+    "mtime": 1795029690.190625,
+    "seen": 1795030301.6124897,
+    "ast_hash": "547c1348e13689e43e283d341f2c244a",
     "semantic_hash": ""
   },
   "app_movil_dinerop/lib/features/auth/presentation/screens/login_page.dart": {
@@ -252,9 +252,9 @@
     "semantic_hash": ""
   },
   "app_movil_dinerop/lib/features/auth/presentation/screens/reset_password_page.dart": {
-    "mtime": 1786233096.007959,
-    "seen": 1794858910.977423,
-    "ast_hash": "94ad7b20534af8a3007608caa9edeec0",
+    "mtime": 1795029690.191625,
+    "seen": 1795030301.6141422,
+    "ast_hash": "c843512711b35dc8bff3b1a990f46979",
     "semantic_hash": ""
   },
   "app_movil_dinerop/lib/features/auth/presentation/screens/splash_page.dart": {
@@ -816,9 +816,9 @@
     "semantic_hash": ""
   },
   "dinerop-backend/src/main/java/com/markup/dinerop/auth/controller/AuthController.java": {
-    "mtime": 1792658996.724538,
-    "seen": 1794858910.9776802,
-    "ast_hash": "797a83e8e78521007b1dcadb1e8aafcb",
+    "mtime": 1795029111.1585002,
+    "seen": 1795030301.6575797,
+    "ast_hash": "d7097e860d6a54c7b0653e1b45fa5fa3",
     "semantic_hash": ""
   },
   "dinerop-backend/src/main/java/com/markup/dinerop/auth/controller/InternalAuthController.java": {
@@ -936,9 +936,9 @@
     "semantic_hash": ""
   },
   "dinerop-backend/src/main/java/com/markup/dinerop/auth/entity/PasswordResetToken.java": {
-    "mtime": 1782016087.2040296,
-    "seen": 1794858910.9777284,
-    "ast_hash": "b136be7017023a1a27779e1b925b4634",
+    "mtime": 1795029040.5532453,
+    "seen": 1795030301.6659846,
+    "ast_hash": "be51b4721206897e5416b951194cc52a",
     "semantic_hash": ""
   },
   "dinerop-backend/src/main/java/com/markup/dinerop/auth/entity/Role.java": {
@@ -1026,9 +1026,9 @@
     "semantic_hash": ""
   },
   "dinerop-backend/src/main/java/com/markup/dinerop/auth/repository/PasswordResetTokenRepository.java": {
-    "mtime": 1782016087.2060292,
-    "seen": 1794858910.9777715,
-    "ast_hash": "ea1036135c13f4e02e57d4e37acc2f85",
+    "mtime": 1795029669.0997005,
+    "seen": 1795030301.6713533,
+    "ast_hash": "812ddaabdb68c9882e31b00c83373286",
     "semantic_hash": ""
   },
   "dinerop-backend/src/main/java/com/markup/dinerop/auth/repository/UserPreRegistrationRepository.java": {
@@ -1044,9 +1044,9 @@
     "semantic_hash": ""
   },
   "dinerop-backend/src/main/java/com/markup/dinerop/auth/service/AuthService.java": {
-    "mtime": 1795014943.2001371,
-    "seen": 1795015085.5156097,
-    "ast_hash": "a4face7a9c2b92115f1eed35dd5e1ecb",
+    "mtime": 1795029985.796167,
+    "seen": 1795030301.6724236,
+    "ast_hash": "ab4180495f369041467a51be651026c5",
     "semantic_hash": ""
   },
   "dinerop-backend/src/main/java/com/markup/dinerop/auth/service/CustomUserDetailsService.java": {
@@ -1524,9 +1524,9 @@
     "semantic_hash": ""
   },
   "dinerop-backend/src/main/java/com/markup/dinerop/notification/service/NotificationService.java": {
-    "mtime": 1794873210.846608,
-    "seen": 1794874992.4545803,
-    "ast_hash": "003d1d24045dae5fc9c3ae0d018781fe",
+    "mtime": 1795029090.4138286,
+    "seen": 1795030301.7158804,
+    "ast_hash": "7e2f17c2e19b088139d73f504fcc0d9d",
     "semantic_hash": ""
   },
   "dinerop-backend/src/main/java/com/markup/dinerop/notification/service/PushNotificationService.java": {
@@ -2016,9 +2016,9 @@
     "semantic_hash": ""
   },
   "dinerup-app/src/api/auth/auth.api.ts": {
-    "mtime": 1794873603.933575,
-    "seen": 1794874992.485715,
-    "ast_hash": "1fd9ba95054410ee5d924fe7a2f4d0d9",
+    "mtime": 1795029430.7985878,
+    "seen": 1795030301.7531962,
+    "ast_hash": "90be5225a37d797e6b53592f6c2d795c",
     "semantic_hash": ""
   },
   "dinerup-app/src/api/auth/authEvents.ts": {
@@ -2274,15 +2274,15 @@
     "semantic_hash": ""
   },
   "dinerup-app/src/pages/password/ForgotPassword.tsx": {
-    "mtime": 1782016105.1902225,
-    "seen": 1794858910.9782848,
-    "ast_hash": "7584f8b6603f0c3d1da5d27bfd119f21",
+    "mtime": 1795029509.7585707,
+    "seen": 1795030301.7732697,
+    "ast_hash": "594848e506bbdf0c3d39096878822e91",
     "semantic_hash": ""
   },
   "dinerup-app/src/pages/password/ResetPassword.tsx": {
-    "mtime": 1782016105.1902225,
-    "seen": 1794858910.9782867,
-    "ast_hash": "ffebfe713e50def0d8bcb680ea954400",
+    "mtime": 1795029482.005358,
+    "seen": 1795030301.7732904,
+    "ast_hash": "680fba35933e7983d47a0b48432bcd24",
     "semantic_hash": ""
   },
   "dinerup-app/src/pages/steps/Step1Identity.tsx": {
@@ -3186,9 +3186,9 @@
     "semantic_hash": ""
   },
   "DINEROP-KNOWLEDGE/AUTHENTICATION-FLOW.md": {
-    "mtime": 1794504074.5454595,
-    "seen": 1794858910.9786305,
-    "ast_hash": "c7dcaa7829b09ab2579e6f4e2e707d56",
+    "mtime": 1795029279.2076633,
+    "seen": 1795030301.823082,
+    "ast_hash": "4129fa7e933c74176c9ecfe74d728af5",
     "semantic_hash": ""
   },
   "DINEROP-KNOWLEDGE/CROSS-REPOSITORY-DEPENDENCIES.md": {
@@ -3240,9 +3240,9 @@
     "semantic_hash": ""
   },
   "app_movil_dinerop/docs/API_INTEGRATION.md": {
-    "mtime": 1795014817.8845499,
-    "seen": 1795015085.656311,
-    "ast_hash": "b5dadf005d32a16135b0a951064a76b1",
+    "mtime": 1795029279.2051537,
+    "seen": 1795030301.8273942,
+    "ast_hash": "cd4637d7dd9d9dd814a9c8f803be1b6d",
     "semantic_hash": ""
   },
   "app_movil_dinerop/docs/ARCHITECTURE.md": {
@@ -3252,9 +3252,9 @@
     "semantic_hash": ""
   },
   "app_movil_dinerop/docs/AUTHENTICATION.md": {
-    "mtime": 1794463104.3163025,
-    "seen": 1794858910.978656,
-    "ast_hash": "783cf668194da8b5929fd54207645a2c",
+    "mtime": 1795029279.2061565,
+    "seen": 1795030301.8276854,
+    "ast_hash": "05e17a4d95cad90d32f775ccdb83cc94",
     "semantic_hash": ""
   },
   "app_movil_dinerop/docs/BUSINESS_LOGIC.md": {
@@ -3312,15 +3312,15 @@
     "semantic_hash": ""
   },
   "dinerop-backend/API_DOCUMENTATION.md": {
-    "mtime": 1794949932.580645,
-    "seen": 1794950457.9788244,
-    "ast_hash": "405b0e350527160d52f2521d30dc4827",
+    "mtime": 1795029537.3069777,
+    "seen": 1795030301.830841,
+    "ast_hash": "780608086f17634eeddbcc778a337c91",
     "semantic_hash": ""
   },
   "dinerop-backend/docs/API_ENDPOINTS.md": {
-    "mtime": 1795014956.1082745,
-    "seen": 1795015085.659891,
-    "ast_hash": "51a03da66c5396328b27115e479f28fb",
+    "mtime": 1795029537.3059776,
+    "seen": 1795030301.8308535,
+    "ast_hash": "c7e6b777dc85b87f55e9223e580a59f5",
     "semantic_hash": ""
   },
   "dinerop-backend/docs/ARCHITECTURE.md": {
@@ -3330,9 +3330,9 @@
     "semantic_hash": ""
   },
   "dinerop-backend/docs/AUTHENTICATION.md": {
-    "mtime": 1794462213.442961,
-    "seen": 1794858910.9786873,
-    "ast_hash": "c6ba5b70575e0c393545003c13ff73f0",
+    "mtime": 1795029537.307976,
+    "seen": 1795030301.8316112,
+    "ast_hash": "c4df87fdd8f9e1e178ce124ec6294085",
     "semantic_hash": ""
   },
   "dinerop-backend/docs/BUSINESS_LOGIC.md": {
@@ -3396,9 +3396,9 @@
     "semantic_hash": ""
   },
   "dinerup-app/docs/AUTHENTICATION.md": {
-    "mtime": 1794463577.293196,
-    "seen": 1794858910.9787126,
-    "ast_hash": "85eb0a8be8ad54c414a9f135146406f0",
+    "mtime": 1795029537.307976,
+    "seen": 1795030301.835167,
+    "ast_hash": "3bcbf1cbd2aee79b0f065d447433fb65",
     "semantic_hash": ""
   },
   "dinerup-app/docs/BUSINESS_LOGIC.md": {
@@ -4413,6 +4413,24 @@
     "mtime": 1795025365.6257813,
     "seen": 1795029009.8496354,
     "ast_hash": "2c7dd3da576cdef2a0a1c57fc9767b25",
+    "semantic_hash": ""
+  },
+  "dinerop-backend/src/main/java/com/markup/dinerop/auth/dto/PasswordResetOtpVerificationRequest.java": {
+    "mtime": 1795029040.5557551,
+    "seen": 1795030301.6631877,
+    "ast_hash": "ba25b3030c336f643f077c1979bdd3d6",
+    "semantic_hash": ""
+  },
+  "dinerop-backend/src/main/java/com/markup/dinerop/auth/dto/PasswordResetOtpVerificationResponse.java": {
+    "mtime": 1795029040.5567663,
+    "seen": 1795030301.6631918,
+    "ast_hash": "7a7aa7ed5a2b6aea3f1fd23925af891d",
+    "semantic_hash": ""
+  },
+  "dinerop-backend/src/test/java/com/markup/dinerop/auth/service/AuthServicePasswordResetOtpTest.java": {
+    "mtime": 1795030106.087031,
+    "seen": 1795030301.747791,
+    "ast_hash": "21d382fd78cb5a4c74af950582406a8e",
     "semantic_hash": ""
   },
   "dinerup-app/package-lock.json": {
