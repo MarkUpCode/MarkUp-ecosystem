@@ -68,4 +68,9 @@ class AuthRepository {
     required String token,
     required String newPassword,
   }) => _remote.resetPassword(token: token, newPassword: newPassword);
+
+  Future<String> verifyPasswordResetCode({
+    required String email,
+    required String code,
+  }) => _remote.verifyPasswordResetCode(email: email, code: code);
 }

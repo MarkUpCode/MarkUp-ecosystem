@@ -20,6 +20,7 @@ Base URL es solo host/base; las rutas abajo incluyen `/api/...`. No se asume que
 | POST | `/api/auth/registration/change-email` | No | `changeRegistrationEmail` | `AuthController.registration/change-email` |
 | POST | `/api/auth/registration/set-password` | No | `setRegistrationPassword` | `AuthController.registration/set-password` |
 | POST | `/api/auth/password/forgot` | No | `forgotPassword` | `AuthController.password/forgot` |
+| POST | `/api/auth/password/verify-code` | No | `verifyPasswordResetCode` | `AuthController.password/verify-code`; devuelve una credencial temporal tras validar el OTP de recuperación |
 | POST | `/api/auth/password/reset` | No | `resetPassword` | `AuthController.password/reset` |
 | GET | `/api/onboarding/cliente/formulario-status` | Sí | `loadStatus` | `OnboardingClienteController.formulario-status` |
 | GET | `/api/onboarding/cliente/pre-registration` | Sí | `loadPreRegistrationData` | `OnboardingClienteController.pre-registration` |

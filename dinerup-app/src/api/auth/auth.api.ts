@@ -132,10 +132,21 @@ export async function setRegistrationPassword(payload: RegistrationPasswordPaylo
 }
 
 export async function forgotPassword(email: string) {
-  return httpClient("/api/auth/password/forgot", {
+  return httpClient<string>("/api/auth/password/forgot", {
     method: "POST",
     auth: false,
     body: { email },
+  });
+}
+
+export async function verifyPasswordResetCode(payload: {
+  email: string;
+  code: string;
+}) {
+  return httpClient<{ resetToken: string }>("/api/auth/password/verify-code", {
+    method: "POST",
+    auth: false,
+    body: payload,
   });
 }
 

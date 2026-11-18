@@ -113,15 +113,31 @@ Inicia el flujo de recuperación de contraseña.
 }
 ```
 
-**Response `200`:** `"Si el correo existe, se enviaron instrucciones"`
+**Response `200`:** `"Si el correo existe, recibirás un código para restablecer tu contraseña."`
 
 > ℹ️ Siempre retorna el mismo mensaje por seguridad.
 
 ---
 
+### POST `/api/auth/password/verify-code`
+
+Valida el OTP de recuperación, independiente del OTP de registro. El código expira en 10 minutos, permite hasta 5 intentos y se puede reenviar luego de 45 segundos. Una validación exitosa consume el código y devuelve una credencial temporal para establecer la nueva contraseña.
+
+**Request body:**
+```json
+{
+  "email": "user@example.com",
+  "code": "123456"
+}
+```
+
+**Response `200`:** `{"resetToken":"credencial-temporal-de-un-solo-uso"}`
+
+---
+
 ### POST `/api/auth/password/reset`
 
-Restablece la contraseña usando el token recibido por email.
+Restablece la contraseña usando la credencial temporal devuelta por la verificación OTP.
 
 **Request body:**
 ```json

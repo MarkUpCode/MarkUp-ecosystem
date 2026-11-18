@@ -129,4 +129,18 @@ class AuthRemoteDataSource {
       parser: (data) => data.toString(),
     );
   }
+
+  Future<String> verifyPasswordResetCode({
+    required String email,
+    required String code,
+  }) {
+    return _client.request<String>(
+      '/api/auth/password/verify-code',
+      method: 'POST',
+      authenticated: false,
+      body: {'email': email, 'code': code},
+      parser: (data) =>
+          Map<String, dynamic>.from(data as Map)['resetToken'].toString(),
+    );
+  }
 }

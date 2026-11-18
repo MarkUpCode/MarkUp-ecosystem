@@ -72,15 +72,15 @@
     "semantic_hash": ""
   },
   "app_movil_dinerop/lib/app/providers.dart": {
-    "mtime": 1794949604.1647325,
-    "seen": 1794950457.5862129,
-    "ast_hash": "0bff1eb5f0f60ba0af80555fd6c10af9",
+    "mtime": 1795016901.2387643,
+    "seen": 1795029009.8486376,
+    "ast_hash": "729e580b219e1b72cab7d653b1512e2e",
     "semantic_hash": ""
   },
   "app_movil_dinerop/lib/app/router/app_router.dart": {
-    "mtime": 1795011830.961241,
-    "seen": 1795015085.4489496,
-    "ast_hash": "cbed3d71e34e16e080198db56db365e5",
+    "mtime": 1795021173.5384212,
+    "seen": 1795029009.8486402,
+    "ast_hash": "7eedaf49cb6d2e55f2a131b175668589",
     "semantic_hash": ""
   },
   "app_movil_dinerop/lib/app/shell/app_shell.dart": {
@@ -228,9 +228,9 @@
     "semantic_hash": ""
   },
   "app_movil_dinerop/lib/features/auth/presentation/screens/login_page.dart": {
-    "mtime": 1795011117.206205,
-    "seen": 1795015085.4567878,
-    "ast_hash": "e07512a314e90bf6e8512a7c497a74ac",
+    "mtime": 1795016901.2397654,
+    "seen": 1795029009.8486807,
+    "ast_hash": "ef91ae260245bc0cab776d509a775ea0",
     "semantic_hash": ""
   },
   "app_movil_dinerop/lib/features/auth/presentation/screens/pending_activation_page.dart": {
@@ -246,9 +246,9 @@
     "semantic_hash": ""
   },
   "app_movil_dinerop/lib/features/auth/presentation/screens/registration_verification_page.dart": {
-    "mtime": 1795012204.8282626,
-    "seen": 1795015085.4575253,
-    "ast_hash": "4fa69b6c9658add4200ba8d46a651a18",
+    "mtime": 1795017121.926194,
+    "seen": 1795029009.848685,
+    "ast_hash": "7e351eaecc8a514e55e8bf92a943922d",
     "semantic_hash": ""
   },
   "app_movil_dinerop/lib/features/auth/presentation/screens/reset_password_page.dart": {
@@ -354,15 +354,15 @@
     "semantic_hash": ""
   },
   "app_movil_dinerop/lib/features/dashboard/presentation/dashboard_page.dart": {
-    "mtime": 1794893581.9015307,
-    "seen": 1794894132.2932408,
-    "ast_hash": "162863d89f73bd42a4dda483633b7c2c",
+    "mtime": 1795028072.4231122,
+    "seen": 1795029009.848716,
+    "ast_hash": "9d61e1f0ce6caebac2e38521f1dd40ce",
     "semantic_hash": ""
   },
   "app_movil_dinerop/lib/features/dashboard/presentation/sections/dashboard_exploration_sections.dart": {
-    "mtime": 1794933994.0770907,
-    "seen": 1794934624.8631284,
-    "ast_hash": "1ffd1fe80532f48f6b8b9746cddc0656",
+    "mtime": 1795027681.4684825,
+    "seen": 1795029009.8487172,
+    "ast_hash": "4b28bc3bbee97d676f2fc55ac25e5424",
     "semantic_hash": ""
   },
   "app_movil_dinerop/lib/features/notifications/presentation/notifications_page.dart": {
@@ -414,9 +414,9 @@
     "semantic_hash": ""
   },
   "app_movil_dinerop/lib/features/requests/presentation/requests_page.dart": {
-    "mtime": 1794936947.8405373,
-    "seen": 1794942644.9963129,
-    "ast_hash": "8b09934730cbf9a2782a1a8542cd5942",
+    "mtime": 1795021191.0289009,
+    "seen": 1795029009.8487542,
+    "ast_hash": "5fd3248a5cb571c6bffb906c03dafd0a",
     "semantic_hash": ""
   },
   "app_movil_dinerop/lib/features/welcome/data/models/cooperative_partner.dart": {
@@ -510,9 +510,9 @@
     "semantic_hash": ""
   },
   "app_movil_dinerop/lib/shared/widgets/app_text_field.dart": {
-    "mtime": 1793993942.0686824,
-    "seen": 1794858910.9775362,
-    "ast_hash": "48b509e4a99392d1ec9095affdf41b01",
+    "mtime": 1795016828.163521,
+    "seen": 1795029009.8487775,
+    "ast_hash": "ece8976ba8e6089b2e6f0446c79a0c7d",
     "semantic_hash": ""
   },
   "app_movil_dinerop/lib/shared/widgets/step_progress.dart": {
@@ -528,9 +528,9 @@
     "semantic_hash": ""
   },
   "app_movil_dinerop/test/dashboard_responsive_test.dart": {
-    "mtime": 1794893818.4620874,
-    "seen": 1794894132.293347,
-    "ast_hash": "cc9037e7a53aabff14de7a9b19099b0c",
+    "mtime": 1795027728.6686819,
+    "seen": 1795029009.8487816,
+    "ast_hash": "078559ecfdf84ab3e642f946c5cd8ea3",
     "semantic_hash": ""
   },
   "app_movil_dinerop/test/widget_test.dart": {
@@ -3234,9 +3234,9 @@
     "semantic_hash": ""
   },
   "app_movil_dinerop/README.md": {
-    "mtime": 1786199722.4597123,
-    "seen": 1794858910.9786487,
-    "ast_hash": "20691c1dbd1d072ffe85bd9c98744bd3",
+    "mtime": 1795021946.7321124,
+    "seen": 1795029009.8495402,
+    "ast_hash": "a181f412a34f9b9365cd507ee362ba9a",
     "semantic_hash": ""
   },
   "app_movil_dinerop/docs/API_INTEGRATION.md": {
@@ -4395,6 +4395,24 @@
     "mtime": 1795014529.090124,
     "seen": 1795015085.5313852,
     "ast_hash": "acacd142c131e891724e17a077abfcb9",
+    "semantic_hash": ""
+  },
+  "app_movil_dinerop/lib/features/onboarding/presentation/onboarding_welcome_experience.dart": {
+    "mtime": 1795023825.977352,
+    "seen": 1795029009.8487506,
+    "ast_hash": "875424dabcc5b39a74ec43190bc179e8",
+    "semantic_hash": ""
+  },
+  "dinerop-backend/src/main/resources/db/migration/V6__investment_registration_parish.sql": {
+    "mtime": 1795014529.0931263,
+    "seen": 1795029009.849216,
+    "ast_hash": "3cde083c6f9e35d4ab21a2751411da3e",
+    "semantic_hash": ""
+  },
+  "app_movil_dinerop/assets/images/dolarito/dolarito_greeting.png": {
+    "mtime": 1795025365.6257813,
+    "seen": 1795029009.8496354,
+    "ast_hash": "2c7dd3da576cdef2a0a1c57fc9767b25",
     "semantic_hash": ""
   },
   "dinerup-app/package-lock.json": {

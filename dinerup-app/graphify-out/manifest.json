@@ -24,9 +24,9 @@
     "semantic_hash": ""
   },
   "src/api/auth/auth.api.ts": {
-    "mtime": 1794873603.933575,
-    "seen": 1794874786.1941607,
-    "ast_hash": "1fd9ba95054410ee5d924fe7a2f4d0d9",
+    "mtime": 1795029430.7985878,
+    "seen": 1795029744.2966833,
+    "ast_hash": "90be5225a37d797e6b53592f6c2d795c",
     "semantic_hash": ""
   },
   "src/api/auth/authEvents.ts": {
@@ -258,16 +258,16 @@
     "semantic_hash": "1e812f1e734c66c73c4e1bb9aba9e671"
   },
   "src/pages/password/ForgotPassword.tsx": {
-    "mtime": 1782016105.1902225,
-    "seen": 1794463041.1916366,
-    "ast_hash": "7584f8b6603f0c3d1da5d27bfd119f21",
-    "semantic_hash": "7584f8b6603f0c3d1da5d27bfd119f21"
+    "mtime": 1795029509.7585707,
+    "seen": 1795029744.2968307,
+    "ast_hash": "594848e506bbdf0c3d39096878822e91",
+    "semantic_hash": ""
   },
   "src/pages/password/ResetPassword.tsx": {
-    "mtime": 1782016105.1902225,
-    "seen": 1794463041.1916554,
-    "ast_hash": "ffebfe713e50def0d8bcb680ea954400",
-    "semantic_hash": "ffebfe713e50def0d8bcb680ea954400"
+    "mtime": 1795029482.005358,
+    "seen": 1795029744.2968338,
+    "ast_hash": "680fba35933e7983d47a0b48432bcd24",
+    "semantic_hash": ""
   },
   "src/pages/steps/Step1Identity.tsx": {
     "mtime": 1789961527.012244,
@@ -432,9 +432,9 @@
     "semantic_hash": ""
   },
   "docs/AUTHENTICATION.md": {
-    "mtime": 1794463577.293196,
-    "seen": 1794858879.5068974,
-    "ast_hash": "85eb0a8be8ad54c414a9f135146406f0",
+    "mtime": 1795029537.307976,
+    "seen": 1795029744.2968857,
+    "ast_hash": "3bcbf1cbd2aee79b0f065d447433fb65",
     "semantic_hash": ""
   },
   "docs/BUSINESS_LOGIC.md": {

@@ -24,7 +24,7 @@ sequenceDiagram
 
 ## Registro y recuperación
 
-`AuthController` expone registro, activación, OTP, definición de contraseña y recuperación. El `AuthService` coordina `UserRepository`, pre-registro, OTP y tokens. El flujo exacto y caducidad dependen del servicio y configuración vigente; no se especifican aquí valores temporales sin verificación completa.
+`AuthController` expone registro, activación, OTP, definición de contraseña y recuperación. La recuperación usa retos independientes guardados en `password_reset_tokens`: `/password/forgot` siempre devuelve la misma respuesta, `/password/verify-code` verifica el código y entrega una credencial temporal de un solo uso, y `/password/reset` actualiza la contraseña con esa credencial. El código vence en 10 minutos, permite 5 intentos y el reenvío se limita a uno cada 45 segundos.
 
 ## Autorización
 

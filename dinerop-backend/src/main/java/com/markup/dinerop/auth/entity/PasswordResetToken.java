@@ -2,6 +2,7 @@ package com.markup.dinerop.auth.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -31,7 +32,17 @@ public class PasswordResetToken {
     @Column(nullable = false)
     private boolean used;
 
-    @Column(name = "created_at")
+    @Column(nullable = false)
+    private int attempts;
+
+    @Column(nullable = false)
+    private boolean verified;
+
+    @Column(name = "verified_at")
+    private LocalDateTime verifiedAt;
+
+    @CreationTimestamp
+    @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 }
 

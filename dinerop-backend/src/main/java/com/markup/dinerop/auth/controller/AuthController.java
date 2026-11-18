@@ -120,7 +120,14 @@ public class AuthController {
         authService.forgotPassword(request);
 
         // Siempre mismo mensaje (seguridad)
-        return ResponseEntity.ok("Si el correo existe, se enviaron instrucciones");
+        return ResponseEntity.ok("Si el correo existe, recibirás un código para restablecer tu contraseña.");
+    }
+
+    @PostMapping("/password/verify-code")
+    public ResponseEntity<PasswordResetOtpVerificationResponse> verifyPasswordResetCode(
+            @Valid @RequestBody PasswordResetOtpVerificationRequest request
+    ) {
+        return ResponseEntity.ok(authService.verifyPasswordResetOtp(request));
     }
 
     // =========================================================

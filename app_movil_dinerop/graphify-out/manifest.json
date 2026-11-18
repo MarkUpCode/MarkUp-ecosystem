@@ -81,9 +81,9 @@
     "semantic_hash": ""
   },
   "lib/app/router/app_router.dart": {
-    "mtime": 1795021173.5384212,
-    "seen": 1795021728.7171323,
-    "ast_hash": "7eedaf49cb6d2e55f2a131b175668589",
+    "mtime": 1795029124.4820092,
+    "seen": 1795029745.1029644,
+    "ast_hash": "2472144cdf5faa12f555764e3c691268",
     "semantic_hash": ""
   },
   "lib/app/shell/app_shell.dart": {
@@ -171,15 +171,15 @@
     "semantic_hash": "ce6ad4cce5049f688e77a1d05ef2d807"
   },
   "lib/features/auth/data/auth_remote_data_source.dart": {
-    "mtime": 1795011830.9582415,
-    "seen": 1795012232.9076412,
-    "ast_hash": "0062ebaf055fb68b7cefff8fbab0d595",
+    "mtime": 1795029124.4804978,
+    "seen": 1795029745.1029902,
+    "ast_hash": "b58d6e6be0321095935ec6139d492988",
     "semantic_hash": ""
   },
   "lib/features/auth/data/auth_repository.dart": {
-    "mtime": 1795011830.9592419,
-    "seen": 1795012232.9076424,
-    "ast_hash": "5a87861ee8242f9e082dcc93511b27f0",
+    "mtime": 1795029124.4810026,
+    "seen": 1795029745.1029916,
+    "ast_hash": "5acd95280e4a395893998579028af48c",
     "semantic_hash": ""
   },
   "lib/features/auth/data/models/app_user.dart": {
@@ -207,9 +207,9 @@
     "semantic_hash": "c47b9475014ba11cca80ddea40500f42"
   },
   "lib/features/auth/presentation/auth_controller.dart": {
-    "mtime": 1795011830.9602406,
-    "seen": 1795012232.9076493,
-    "ast_hash": "d8dd5621ce39969146eca466a1d24360",
+    "mtime": 1795029124.4820092,
+    "seen": 1795029745.1029987,
+    "ast_hash": "8c14d40b775ccfdfa9e8adbf61439ebd",
     "semantic_hash": ""
   },
   "lib/features/auth/presentation/screens/activation_page.dart": {
@@ -225,10 +225,10 @@
     "semantic_hash": ""
   },
   "lib/features/auth/presentation/screens/forgot_password_page.dart": {
-    "mtime": 1786233096.007959,
-    "seen": 1794462526.8615983,
-    "ast_hash": "11fcb39c4f5f8d80625fd5e726fa784c",
-    "semantic_hash": "11fcb39c4f5f8d80625fd5e726fa784c"
+    "mtime": 1795029690.190625,
+    "seen": 1795029745.1030035,
+    "ast_hash": "547c1348e13689e43e283d341f2c244a",
+    "semantic_hash": ""
   },
   "lib/features/auth/presentation/screens/login_page.dart": {
     "mtime": 1795016901.2397654,
@@ -255,10 +255,10 @@
     "semantic_hash": ""
   },
   "lib/features/auth/presentation/screens/reset_password_page.dart": {
-    "mtime": 1786233096.007959,
-    "seen": 1794462526.862814,
-    "ast_hash": "94ad7b20534af8a3007608caa9edeec0",
-    "semantic_hash": "94ad7b20534af8a3007608caa9edeec0"
+    "mtime": 1795029690.191625,
+    "seen": 1795029745.1030133,
+    "ast_hash": "c843512711b35dc8bff3b1a990f46979",
+    "semantic_hash": ""
   },
   "lib/features/auth/presentation/screens/splash_page.dart": {
     "mtime": 1789498410.8316653,
@@ -351,9 +351,9 @@
     "semantic_hash": ""
   },
   "lib/features/dashboard/presentation/dashboard_page.dart": {
-    "mtime": 1795021252.0106552,
-    "seen": 1795021728.7172072,
-    "ast_hash": "ada9a976318962ab2cce8e25c4b2e714",
+    "mtime": 1795028072.4231122,
+    "seen": 1795029745.1030445,
+    "ast_hash": "9d61e1f0ce6caebac2e38521f1dd40ce",
     "semantic_hash": ""
   },
   "lib/features/onboarding/data/models/onboarding_request.dart": {
@@ -525,9 +525,9 @@
     "semantic_hash": ""
   },
   "lib/features/dashboard/presentation/sections/dashboard_exploration_sections.dart": {
-    "mtime": 1795021924.6724613,
-    "seen": 1795021953.6366246,
-    "ast_hash": "f32b0da2ce0446c2b584bb19ee22b68b",
+    "mtime": 1795027681.4684825,
+    "seen": 1795029745.1030462,
+    "ast_hash": "4b28bc3bbee97d676f2fc55ac25e5424",
     "semantic_hash": ""
   },
   "lib/features/notifications/presentation/notifications_page.dart": {
@@ -537,9 +537,9 @@
     "semantic_hash": ""
   },
   "test/dashboard_responsive_test.dart": {
-    "mtime": 1795021862.242661,
-    "seen": 1795021953.6366923,
-    "ast_hash": "d457221498502f9d37830890cfc29497",
+    "mtime": 1795027728.6686819,
+    "seen": 1795029745.1031117,
+    "ast_hash": "078559ecfdf84ab3e642f946c5cd8ea3",
     "semantic_hash": ""
   },
   ".github/copilot-instructions.md": {
@@ -555,9 +555,9 @@
     "semantic_hash": ""
   },
   "docs/API_INTEGRATION.md": {
-    "mtime": 1795014817.8845499,
-    "seen": 1795014842.1535912,
-    "ast_hash": "b5dadf005d32a16135b0a951064a76b1",
+    "mtime": 1795029279.2051537,
+    "seen": 1795029745.103121,
+    "ast_hash": "cd4637d7dd9d9dd814a9c8f803be1b6d",
     "semantic_hash": ""
   },
   "docs/ARCHITECTURE.md": {
@@ -567,9 +567,9 @@
     "semantic_hash": ""
   },
   "docs/AUTHENTICATION.md": {
-    "mtime": 1794463104.3163025,
-    "seen": 1794858958.9390507,
-    "ast_hash": "783cf668194da8b5929fd54207645a2c",
+    "mtime": 1795029279.2061565,
+    "seen": 1795029745.1031241,
+    "ast_hash": "05e17a4d95cad90d32f775ccdb83cc94",
     "semantic_hash": ""
   },
   "docs/BUSINESS_LOGIC.md": {
@@ -981,9 +981,15 @@
     "semantic_hash": ""
   },
   "lib/features/onboarding/presentation/onboarding_welcome_experience.dart": {
-    "mtime": 1795021679.5221872,
-    "seen": 1795021728.7172406,
-    "ast_hash": "44e8a446e79de45c0bbdabdf4510d5b0",
+    "mtime": 1795023825.977352,
+    "seen": 1795029745.1030803,
+    "ast_hash": "875424dabcc5b39a74ec43190bc179e8",
+    "semantic_hash": ""
+  },
+  "assets/images/dolarito/dolarito_greeting.png": {
+    "mtime": 1795025365.6257813,
+    "seen": 1795029745.1031547,
+    "ast_hash": "2c7dd3da576cdef2a0a1c57fc9767b25",
     "semantic_hash": ""
   }
 }

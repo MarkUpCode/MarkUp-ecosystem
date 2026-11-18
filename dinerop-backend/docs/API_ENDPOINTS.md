@@ -15,8 +15,9 @@ Rutas combinadas desde `@RequestMapping` y mapping de método en cada controlado
 | POST | `/registration/resend-code` | reenviar OTP |
 | POST | `/registration/change-email` | cambiar email en registro |
 | POST | `/registration/set-password` | definir contraseña |
-| POST | `/password/forgot` | iniciar recuperación |
-| POST | `/password/reset` | restablecer contraseña |
+| POST | `/password/forgot` | solicitar OTP de recuperación, respuesta uniforme |
+| POST | `/password/verify-code` | validar OTP y obtener credencial temporal de un solo uso |
+| POST | `/password/reset` | cambiar contraseña usando credencial temporal |
 
 `InternalAuthController`: POST `/api/internal/auth/pre-register`.
 

@@ -1,0 +1,19 @@
+package com.markup.dinerop.auth.dto;
+
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import lombok.*;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class PasswordResetOtpVerificationRequest {
+    @NotBlank @Email
+    private String email;
+
+    @NotBlank @Pattern(regexp = "\\d{6}")
+    private String code;
+}

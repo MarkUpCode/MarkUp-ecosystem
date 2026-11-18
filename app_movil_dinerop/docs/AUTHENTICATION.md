@@ -30,7 +30,7 @@ En bootstrap el controlador intenta leer la sesión guardada; valida estado de o
 
 ## Registro, activación y recuperación
 
-Las páginas de registro, verificación, activación, creación de contraseña y recuperación usan métodos del mismo `AuthController`; las peticiones son públicas (`authenticated: false`). El alta pública de cliente usa `/api/credits/public-request`. Activación y reset reciben tokens en query params de la ruta, pero los tokens se transmiten al endpoint como query/body y no se persisten como sesión. El login exitoso registra FCM de forma no bloqueante.
+Las páginas de registro, verificación y activación usan métodos del mismo `AuthController`; las peticiones son públicas (`authenticated: false`). El alta pública de cliente usa `/api/credits/public-request`. La recuperación solicita un OTP con `/api/auth/password/forgot`, lo valida con `/api/auth/password/verify-code` y usa la credencial temporal devuelta una sola vez en `/api/auth/password/reset`. El OTP tiene vigencia de 10 minutos, máximo 5 intentos y espera de 45 segundos para reenviar; es independiente del OTP de registro. El correo siempre obtiene la misma respuesta al solicitar el código, exista o no la cuenta. El login exitoso registra FCM de forma no bloqueante.
 
 ## Consideraciones observadas
 

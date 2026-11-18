@@ -8,18 +8,15 @@
   "6": "react",
   "7": "react",
   "8": "compilerOptions",
-  "9": "package.json",
-  "10": "dependencies",
+  "9": "PublicCreditRequestModal.tsx",
+  "10": "react",
   "11": "compilerOptions",
-  "13": "eslint.config.js",
-  "14": "devDependencies",
-  "16": "scripts",
+  "13": "package.json",
   "17": "onboarding.ts",
   "18": "vercel.json",
   "19": "vite-env.d.ts",
   "20": "tsconfig.json",
   "21": "Footer.tsx",
   "22": "tailwind.config.js",
-  "23": "postcss.config.js",
-  "24": "vite"
+  "23": "postcss.config.js"
 }

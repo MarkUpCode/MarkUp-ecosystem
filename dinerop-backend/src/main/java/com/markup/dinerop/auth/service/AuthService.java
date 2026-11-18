@@ -68,6 +68,8 @@ public class AuthService {
     private static final int OTP_TTL_SECONDS = 600;
     private static final int OTP_MAX_ATTEMPTS = 5;
     private static final int OTP_RESEND_SECONDS = 45;
+    private static final String PASSWORD_RESET_CODE_INVALID =
+            "El código no es correcto, expiró o ya no es válido. Solicita uno nuevo.";
 
 
     // =========================================================
@@ -598,36 +600,85 @@ public class AuthService {
             return;
         }
 
-        // 3. Invalidar tokens anteriores
+        var latest = passwordResetTokenRepository
+                .findTopByUser_IdUserOrderByCreatedAtDesc(user.getIdUser())
+                .orElse(null);
+        if (latest != null && latest.getCreatedAt() != null
+                && latest.getCreatedAt().plusSeconds(OTP_RESEND_SECONDS).isAfter(java.time.LocalDateTime.now())) {
+            return;
+        }
+
+        // Invalidate any prior OTP or unconsumed reset grant before issuing a new code.
         passwordResetTokenRepository
                 .findAllByUser_IdUserAndUsedFalse(user.getIdUser())
-                .forEach(token -> {
-                    token.setUsed(true);
-                    passwordResetTokenRepository.save(token);
-                });
+                .forEach(token -> token.setUsed(true));
+        passwordResetTokenRepository.flush();
 
-        // 4. Generar nuevo token
-        String tokenValue = UUID.randomUUID().toString();
-
-        var expiresAt = Instant.now()
-                .plus(15, ChronoUnit.MINUTES)
-                .atZone(java.time.ZoneId.systemDefault())
-                .toLocalDateTime();
+        String code = generateCode();
+        var expiresAt = java.time.LocalDateTime.now().plusSeconds(OTP_TTL_SECONDS);
 
         PasswordResetToken resetToken = PasswordResetToken.builder()
-                .token(tokenValue)
+                .token(passwordEncoder.encode(code))
                 .user(user)
                 .expiresAt(expiresAt)
                 .used(false)
+                .verified(false)
+                .attempts(0)
                 .build();
 
         passwordResetTokenRepository.save(resetToken);
 
-        //envio de correo
-        notificationService.sendResetPasswordEmail(user.getEmail(), tokenValue);
+        notificationService.sendResetPasswordOtpEmail(user.getEmail(), code);
 
+        log.info("Password reset code issued");
+    }
 
-        log.info("Password reset token generated for {}", email);
+    @Transactional(dontRollbackOn = {OtpInvalidException.class, OtpExpiredException.class,
+            OtpAttemptsExceededException.class})
+    public PasswordResetOtpVerificationResponse verifyPasswordResetOtp(
+            PasswordResetOtpVerificationRequest request
+    ) {
+        String email = normalizeEmail(request.getEmail());
+        User user = userRepository.findByEmail(email)
+                .filter(candidate -> "ACTIVE".equals(candidate.getStatus()))
+                .orElseThrow(() -> new OtpInvalidException(
+                        PASSWORD_RESET_CODE_INVALID));
+        PasswordResetToken challenge = passwordResetTokenRepository
+                .findTopByUser_IdUserAndUsedFalseOrderByCreatedAtDesc(user.getIdUser())
+                .orElseThrow(() -> new OtpInvalidException(
+                        PASSWORD_RESET_CODE_INVALID));
+
+        if (challenge.isVerified()) {
+            throw new OtpInvalidException(PASSWORD_RESET_CODE_INVALID);
+        }
+        if (challenge.getExpiresAt().isBefore(java.time.LocalDateTime.now())) {
+            challenge.setUsed(true);
+            passwordResetTokenRepository.save(challenge);
+            throw new OtpInvalidException(PASSWORD_RESET_CODE_INVALID);
+        }
+        if (challenge.getAttempts() >= OTP_MAX_ATTEMPTS) {
+            challenge.setUsed(true);
+            passwordResetTokenRepository.save(challenge);
+            throw new OtpInvalidException(PASSWORD_RESET_CODE_INVALID);
+        }
+        if (!passwordEncoder.matches(request.getCode().trim(), challenge.getToken())) {
+            challenge.setAttempts(challenge.getAttempts() + 1);
+            if (challenge.getAttempts() >= OTP_MAX_ATTEMPTS) {
+                challenge.setUsed(true);
+                passwordResetTokenRepository.save(challenge);
+                throw new OtpInvalidException(PASSWORD_RESET_CODE_INVALID);
+            }
+            passwordResetTokenRepository.save(challenge);
+            throw new OtpInvalidException(PASSWORD_RESET_CODE_INVALID);
+        }
+
+        // Replacing the code hash with a one-time grant consumes the OTP.
+        String resetGrant = UUID.randomUUID().toString();
+        challenge.setToken(hashOtp(resetGrant));
+        challenge.setVerified(true);
+        challenge.setVerifiedAt(java.time.LocalDateTime.now());
+        passwordResetTokenRepository.save(challenge);
+        return new PasswordResetOtpVerificationResponse(resetGrant);
     }
 
 
@@ -639,10 +690,10 @@ public class AuthService {
     public void resetPassword(ResetPasswordRequest request) {
 
         PasswordResetToken token = passwordResetTokenRepository
-                .findByToken(request.getToken())
+                .findByToken(hashOtp(request.getToken()))
                 .orElseThrow(() -> new RuntimeException("INVALID_OR_USED_TOKEN"));
 
-        if (token.isUsed()) {
+        if (token.isUsed() || !token.isVerified() || token.getVerifiedAt() == null) {
             throw new RuntimeException("TOKEN_ALREADY_USED");
         }
 
@@ -660,6 +711,10 @@ public class AuthService {
         user.setActive(true);
 
         token.setUsed(true);
+        var activeChallenges = passwordResetTokenRepository
+                .findAllByUser_IdUserAndUsedFalse(user.getIdUser());
+        activeChallenges.forEach(activeChallenge -> activeChallenge.setUsed(true));
+        passwordResetTokenRepository.saveAll(activeChallenges);
 
         userRepository.save(user);
         passwordResetTokenRepository.save(token);

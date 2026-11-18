@@ -26,7 +26,7 @@ El contrato de login está en `AuthController`, `AuthService`, DTOs de auth. Pas
 
 ## Registro y recuperación
 
-Ambos clientes implementan rutas de registro OTP (`registration/start`, `verify-code`, `resend-code`, `change-email`, `set-password`), activación/registro legado y recuperación (`password/forgot`, `password/reset`). Móvil además inicia una solicitud de crédito pública desde su pantalla de registro; esto es una operación de negocio separada y no se debe describir como `POST /api/auth/register`.
+Ambos clientes implementan rutas de registro OTP (`registration/start`, `verify-code`, `resend-code`, `change-email`, `set-password`), activación/registro legado y recuperación. La recuperación usa OTP propio: `password/forgot` entrega respuesta uniforme, `password/verify-code` valida el código y devuelve una credencial temporal de un solo uso, y `password/reset` cambia la contraseña. Su código es independiente del OTP de registro. Móvil además inicia una solicitud de crédito pública desde su pantalla de registro; esto es una operación de negocio separada y no se debe describir como `POST /api/auth/register`.
 
 ## Roles y límites
 

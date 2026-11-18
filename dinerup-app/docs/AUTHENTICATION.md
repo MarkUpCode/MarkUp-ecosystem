@@ -26,7 +26,7 @@ Los guards son de interfaz y basados en rol (`ProtectedRoute`); la autorización
 - Inicio de sesión.
 - Registro en pasos con inicio/verificación/reenvío OTP, cambio de email y asignación de contraseña, orquestado por `CompleteRegistrationModal`.
 - Activación de cuenta con token de URL.
-- Solicitud de recuperación y restablecimiento mediante token.
+- Recuperación mediante OTP: solicitud uniforme, validación de código, credencial temporal de un uso y establecimiento de contraseña. Código de 10 minutos, hasta 5 intentos y reenvío cada 45 segundos.
 
 No se observan cookies de sesión ni un proveedor OAuth en estas implementaciones. La persistencia de token en localStorage es evidencia del mecanismo actual, no recomendación de seguridad.
 

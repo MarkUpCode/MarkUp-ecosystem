@@ -353,6 +353,27 @@ class AuthController extends ChangeNotifier {
     }
   }
 
+  Future<String> verifyPasswordResetCode({
+    required String email,
+    required String code,
+  }) async {
+    _setBusy(true);
+    _errorMessage = null;
+    try {
+      return await _authRepository.verifyPasswordResetCode(
+        email: email,
+        code: code,
+      );
+    } catch (error) {
+      _errorMessage = error is AppException
+          ? error.message
+          : AppErrorMessages.generic;
+      rethrow;
+    } finally {
+      _setBusy(false);
+    }
+  }
+
   Future<void> logout({bool silent = false}) async {
     if (!silent) {
       _setBusy(true);

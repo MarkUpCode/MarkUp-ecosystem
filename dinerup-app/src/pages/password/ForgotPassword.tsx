@@ -1,31 +1,26 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { forgotPassword } from "../../api/auth/auth.api";
 import { getErrorMessage } from "../../api/errors";
 
 export default function ForgotPassword() {
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
-  const [msg, setMsg] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const submit = async () => {
     setError(null);
-    setMsg(null);
-
-    if (!email) {
-      setError("Ingresa tu correo.");
+    const normalizedEmail = email.trim().toLowerCase();
+    if (!/^\S+@\S+\.\S+$/.test(normalizedEmail)) {
+      setError("Ingresa un correo electrónico válido.");
       return;
     }
 
     try {
       setLoading(true);
-      const res = await forgotPassword(email);
-      setMsg(
-        typeof res === "string"
-          ? res
-          : "Si el correo existe, se enviaron instrucciones",
-      );
+      await forgotPassword(normalizedEmail);
+      navigate(`/reset-password?email=${encodeURIComponent(normalizedEmail)}`);
     } catch (e) {
       setError(getErrorMessage(e, "No se pudo procesar la solicitud."));
     } finally {
@@ -38,7 +33,7 @@ export default function ForgotPassword() {
       <div className="w-full max-w-md rounded-2xl bg-white shadow-xl p-6 border border-neutral-100">
         <h1 className="text-2xl font-bold mb-2">Recuperar contrasena</h1>
         <p className="text-sm text-neutral-600 mb-4">
-          Te enviaremos un enlace para restablecer tu contrasena.
+          Si el correo está registrado, te enviaremos un código para restablecer tu contraseña.
         </p>
 
         <label className="block text-sm font-semibold text-neutral-700 mb-1">
@@ -52,12 +47,6 @@ export default function ForgotPassword() {
           placeholder="tu@email.com"
         />
 
-        {msg && (
-          <div className="mt-4 p-3 bg-green-50 border-l-4 border-green-500 rounded-r-lg">
-            <p className="text-green-800 text-sm font-medium">{msg}</p>
-          </div>
-        )}
-
         {error && (
           <div className="mt-4 p-3 bg-red-50 border-l-4 border-red-500 rounded-r-lg">
             <p className="text-red-700 text-sm font-medium">{error}</p>
@@ -69,7 +58,7 @@ export default function ForgotPassword() {
           disabled={loading}
           className="mt-4 w-full bg-gradient-to-r from-brand-secondary to-brand-dark text-white py-3 rounded-xl font-semibold hover:opacity-90 transition-all shadow-lg disabled:opacity-60"
         >
-          {loading ? "Enviando..." : "Enviar enlace"}
+          {loading ? "Enviando..." : "Enviar código"}
         </button>
 
         <div className="mt-4 text-center">

@@ -160,8 +160,12 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/reset-password',
-        builder: (context, state) =>
-            ResetPasswordPage(token: state.uri.queryParameters['token']),
+        builder: (context, state) {
+          final email = state.uri.queryParameters['email'];
+          return email == null || email.isEmpty
+              ? const ForgotPasswordPage()
+              : ResetPasswordPage(email: email);
+        },
       ),
       GoRoute(
         path: '/pending-activation',
