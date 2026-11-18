@@ -38,6 +38,10 @@ final dashboardOnboardingStatusProvider = FutureProvider.autoDispose((ref) {
   return ref.watch(onboardingRepositoryProvider).loadStatus();
 });
 
+/// Session-only dismissal. Completion is always determined by the backend status.
+final onboardingWelcomeDismissedProvider = StateProvider<bool>((ref) => false);
+final onboardingWelcomeIsFirstProvider = StateProvider<bool>((ref) => false);
+
 /// Personal data captured at registration. The login response intentionally
 /// contains only authentication data, so client-facing screens use this
 /// authenticated endpoint for the person's name and contact details.

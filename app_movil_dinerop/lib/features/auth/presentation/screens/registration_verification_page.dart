@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -36,6 +37,9 @@ class _RegistrationVerificationPageState
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmController = TextEditingController();
+  final _codeFocusNode = FocusNode();
+  final _passwordFocusNode = FocusNode();
+  final _confirmFocusNode = FocusNode();
 
   bool _verified = false;
   bool _showPassword = false;
@@ -110,6 +114,9 @@ class _RegistrationVerificationPageState
     _emailController.dispose();
     _passwordController.dispose();
     _confirmController.dispose();
+    _codeFocusNode.dispose();
+    _passwordFocusNode.dispose();
+    _confirmFocusNode.dispose();
     super.dispose();
   }
 
@@ -125,6 +132,9 @@ class _RegistrationVerificationPageState
           .read(authControllerProvider)
           .verifyRegistrationCode(email: _email, code: code);
       if (mounted) {
+        _codeFocusNode.unfocus();
+        await SystemChannels.textInput.invokeMethod<void>('TextInput.hide');
+        if (!mounted) return;
         setState(() {
           _verified = true;
           _error = null;
@@ -242,19 +252,11 @@ class _RegistrationVerificationPageState
         if (mounted) context.go('/dashboard');
         return;
       }
-      final draft = await ref.read(investmentDraftStoreProvider).read();
-      final creditDraft = await ref
-          .read(creditSimulationDraftStoreProvider)
-          .read();
-      final needsOnboarding = ref
-          .read(authControllerProvider)
-          .requiresOnboarding;
-      final next = draft != null
-          ? (needsOnboarding ? '/onboarding' : '/simulate-investment')
-          : creditDraft != null
-          ? (needsOnboarding ? '/onboarding' : '/simulate-credit')
-          : '/dashboard';
-      if (mounted) context.go(next);
+      if (mounted) {
+        ref.read(onboardingWelcomeDismissedProvider.notifier).state = false;
+        ref.read(onboardingWelcomeIsFirstProvider.notifier).state = true;
+        context.go('/dashboard');
+      }
     } catch (error) {
       if (mounted) {
         setState(
@@ -341,9 +343,12 @@ class _RegistrationVerificationPageState
                 const SizedBox(height: 20),
                 if (!_verified) ...[
                   AppTextField(
+                    key: const ValueKey('registration-otp-field'),
                     controller: _codeController,
                     label: 'Código de 6 dígitos',
                     keyboardType: TextInputType.number,
+                    textInputAction: TextInputAction.done,
+                    focusNode: _codeFocusNode,
                     prefixIcon: Icons.mark_email_read_outlined,
                   ),
                   const SizedBox(height: 16),
@@ -366,8 +371,12 @@ class _RegistrationVerificationPageState
                   ),
                 ] else ...[
                   AppTextField(
+                    key: const ValueKey('registration-password-field'),
                     controller: _passwordController,
                     label: 'Contraseña',
+                    keyboardType: TextInputType.visiblePassword,
+                    textInputAction: TextInputAction.next,
+                    focusNode: _passwordFocusNode,
                     obscureText: !_showPassword,
                     prefixIcon: Icons.lock_outline,
                     suffixIcon: _showPassword
@@ -378,8 +387,12 @@ class _RegistrationVerificationPageState
                   ),
                   const SizedBox(height: 16),
                   AppTextField(
+                    key: const ValueKey('registration-confirm-password-field'),
                     controller: _confirmController,
                     label: 'Confirmar contraseña',
+                    keyboardType: TextInputType.visiblePassword,
+                    textInputAction: TextInputAction.done,
+                    focusNode: _confirmFocusNode,
                     obscureText: true,
                     prefixIcon: Icons.lock_reset_outlined,
                   ),

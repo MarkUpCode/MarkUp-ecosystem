@@ -218,7 +218,15 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           ),
           GoRoute(
             path: '/requests',
-            builder: (context, state) => const RequestsPage(),
+            builder: (context, state) {
+              final extra = state.extra is Map
+                  ? state.extra! as Map
+                  : const <String, dynamic>{};
+              return RequestsPage(
+                initialCreditId: (extra['creditId'] as num?)?.toInt(),
+                initialInvestmentId: (extra['investmentId'] as num?)?.toInt(),
+              );
+            },
           ),
           GoRoute(
             path: '/cooperatives',

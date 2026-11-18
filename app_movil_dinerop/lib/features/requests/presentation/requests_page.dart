@@ -23,7 +23,14 @@ import '../../investment/data/models/investment_models.dart';
 import '../../investment/providers/investment_providers.dart';
 
 class RequestsPage extends ConsumerStatefulWidget {
-  const RequestsPage({super.key});
+  const RequestsPage({
+    super.key,
+    this.initialCreditId,
+    this.initialInvestmentId,
+  });
+
+  final int? initialCreditId;
+  final int? initialInvestmentId;
 
   @override
   ConsumerState<RequestsPage> createState() => _RequestsPageState();
@@ -34,7 +41,8 @@ class _RequestsPageState extends ConsumerState<RequestsPage> {
   String _searchQuery = '';
   CreditRequestStatus? _statusFilter;
   String? _typeFilter;
-  int _selectedTab = 0;
+  late int _selectedTab = widget.initialInvestmentId == null ? 0 : 1;
+  bool _initialDetailsOpened = false;
 
   @override
   void dispose() {
@@ -116,6 +124,37 @@ class _RequestsPageState extends ConsumerState<RequestsPage> {
     );
   }
 
+  void _openInitialCreditDetailsIfRequested(
+    BuildContext context,
+    WidgetRef ref,
+    List<ClientCreditRequestSummary> requests,
+  ) {
+    final id = widget.initialCreditId;
+    if (_initialDetailsOpened || id == null) return;
+    final matches = requests.where((item) => item.solicitudId == id);
+    if (matches.isEmpty) return;
+    final request = matches.first;
+    _initialDetailsOpened = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _showDetails(context, ref, request);
+    });
+  }
+
+  void _openInitialInvestmentDetailsIfRequested(
+    BuildContext context,
+    List<InvestmentRequest> requests,
+  ) {
+    final id = widget.initialInvestmentId;
+    if (_initialDetailsOpened || id == null) return;
+    final matches = requests.where((item) => item.id == id);
+    if (matches.isEmpty) return;
+    final request = matches.first;
+    _initialDetailsOpened = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _showInvestmentDetails(context, request);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final ref = this.ref;
@@ -160,43 +199,51 @@ class _RequestsPageState extends ConsumerState<RequestsPage> {
                       ),
                     ],
                   ),
-                  data: (items) => RefreshIndicator(
-                    onRefresh: () async =>
-                        ref.invalidate(investmentRequestsProvider),
-                    child: items.isEmpty
-                        ? ListView(
-                            children: [
-                              const SizedBox(height: 60),
-                              AppEmptyState(
-                                title:
-                                    'Todavía no tienes inversiones solicitadas',
-                                message:
-                                    'Compara ofertas y envía una solicitud para consultar aquí las respuestas de la cooperativa.',
-                                actionLabel: 'Comenzar a invertir',
-                                icon: Icons.savings_outlined,
-                                onAction: () =>
-                                    context.push('/simulate-investment'),
+                  data: (items) {
+                    _openInitialInvestmentDetailsIfRequested(context, items);
+                    return RefreshIndicator(
+                      onRefresh: () async =>
+                          ref.invalidate(investmentRequestsProvider),
+                      child: items.isEmpty
+                          ? ListView(
+                              children: [
+                                const SizedBox(height: 60),
+                                AppEmptyState(
+                                  title:
+                                      'Todavía no tienes inversiones solicitadas',
+                                  message:
+                                      'Compara ofertas y envía una solicitud para consultar aquí las respuestas de la cooperativa.',
+                                  actionLabel: 'Comenzar a invertir',
+                                  icon: Icons.savings_outlined,
+                                  onAction: () =>
+                                      context.push('/simulate-investment'),
+                                ),
+                              ],
+                            )
+                          : ListView.separated(
+                              physics: const AlwaysScrollableScrollPhysics(),
+                              padding: const EdgeInsets.fromLTRB(
+                                20,
+                                12,
+                                20,
+                                30,
                               ),
-                            ],
-                          )
-                        : ListView.separated(
-                            physics: const AlwaysScrollableScrollPhysics(),
-                            padding: const EdgeInsets.fromLTRB(20, 12, 20, 30),
-                            itemCount: items.length + 1,
-                            separatorBuilder: (_, __) =>
-                                const SizedBox(height: 12),
-                            itemBuilder: (context, index) {
-                              if (index == 0)
-                                return const _InvestmentRequestsHeading();
-                              final request = items[index - 1];
-                              return _InvestmentRequestCard(
-                                request: request,
-                                onTap: () =>
-                                    _showInvestmentDetails(context, request),
-                              );
-                            },
-                          ),
-                  ),
+                              itemCount: items.length + 1,
+                              separatorBuilder: (_, __) =>
+                                  const SizedBox(height: 12),
+                              itemBuilder: (context, index) {
+                                if (index == 0)
+                                  return const _InvestmentRequestsHeading();
+                                final request = items[index - 1];
+                                return _InvestmentRequestCard(
+                                  request: request,
+                                  onTap: () =>
+                                      _showInvestmentDetails(context, request),
+                                );
+                              },
+                            ),
+                    );
+                  },
                 ),
               ),
             ],
@@ -208,6 +255,7 @@ class _RequestsPageState extends ConsumerState<RequestsPage> {
       body: SafeArea(
         child: requests.when(
           data: (items) {
+            _openInitialCreditDetailsIfRequested(context, ref, items);
             final filteredItems = _filteredRequests(items);
             return RefreshIndicator(
               onRefresh: () async => ref.invalidate(requestsProvider),

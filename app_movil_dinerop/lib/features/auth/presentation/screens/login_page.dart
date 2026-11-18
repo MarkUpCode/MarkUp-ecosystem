@@ -486,6 +486,8 @@ class _LoginSheetState extends ConsumerState<_LoginSheet> {
         _emailController.text.trim(),
         _passwordController.text,
       );
+      ref.read(onboardingWelcomeDismissedProvider.notifier).state = false;
+      ref.read(onboardingWelcomeIsFirstProvider.notifier).state = false;
 
       if (!mounted) return;
 
@@ -504,11 +506,11 @@ class _LoginSheetState extends ConsumerState<_LoginSheet> {
         if (!mounted) return;
         final next = draft != null
             ? (controller.requiresOnboarding
-                  ? '/onboarding'
+                  ? '/dashboard'
                   : '/simulate-investment')
             : creditDraft != null
             ? (controller.requiresOnboarding
-                  ? '/onboarding'
+                  ? '/dashboard'
                   : '/simulate-credit')
             : '/dashboard';
         context.go(next);

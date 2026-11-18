@@ -1,8 +1,13 @@
 import 'package:app_movil_dinerop/features/credit/data/models/client_credit_request.dart';
 import 'package:app_movil_dinerop/features/credit/data/models/credit_enums.dart';
 import 'package:app_movil_dinerop/features/dashboard/presentation/sections/dashboard_exploration_sections.dart';
+import 'package:app_movil_dinerop/app/providers.dart';
 import 'package:app_movil_dinerop/app/shell/app_shell.dart';
 import 'package:app_movil_dinerop/features/dolarito/providers/dolarito_provider.dart';
+import 'package:app_movil_dinerop/features/investment/data/models/investment_models.dart';
+import 'package:app_movil_dinerop/features/investment/providers/investment_providers.dart';
+import 'package:app_movil_dinerop/features/onboarding/presentation/onboarding_welcome_experience.dart';
+import 'package:app_movil_dinerop/features/requests/presentation/requests_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -31,6 +36,31 @@ void main() async {
       cantidadSolicitudesEnviadas: 1,
     ),
   ];
+  InvestmentRequest investment({int id = 501, String status = 'IN_REVIEW'}) =>
+      InvestmentRequest(
+        id: id,
+        cooperativeId: 8,
+        cooperativeName: 'Cooperativa Sol',
+        cooperativeLogoUrl: null,
+        productName: 'Depósito a plazo',
+        productDescription: null,
+        amount: 1500,
+        termMonths: 12,
+        interestPaymentOption: null,
+        annualRate: 7.5,
+        rateValidUntil: null,
+        calculationMethod: 'FIXED',
+        estimatedInterest: 112.5,
+        estimatedTotal: 1612.5,
+        renewalConditions: null,
+        earlyCancellationConditions: null,
+        status: status,
+        statusNote: null,
+        events: const [],
+        acceptance: null,
+        createdAt: DateTime(2026, 11, 10),
+        updatedAt: DateTime(2026, 11, 12),
+      );
 
   for (final width in widths) {
     testWidgets('authenticated header and bottom navigation fit at $width px', (
@@ -86,8 +116,6 @@ void main() async {
             body: ListView(
               padding: const EdgeInsets.all(18),
               children: [
-                const ProfileStatusRow(complete: false),
-                const SizedBox(height: 14),
                 ActiveCreditCarousel(
                   requests: requests,
                   profileComplete: true,
@@ -167,10 +195,174 @@ void main() async {
     );
     await tester.pumpAndSettle();
     expect(find.text('1 de 2'), findsOneWidget);
+    expect(
+      find.text('Estamos esperando una respuesta de la cooperativa.'),
+      findsOneWidget,
+    );
 
     await tester.drag(find.byType(PageView), const Offset(-280, 0));
     await tester.pumpAndSettle();
     expect(find.text('2 de 2'), findsOneWidget);
+    expect(
+      find.text(
+        'La cooperativa necesita información de un garante. Te acompaño para revisar qué debes completar.',
+      ),
+      findsOneWidget,
+    );
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('dashboard selector shows real investments and opens selection', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(320, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    int? openedCreditId;
+    int? openedInvestmentId;
+    var exploredInvestments = false;
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: DashboardApplicationsSection(
+            creditRequests: AsyncData<List<ClientCreditRequestSummary>>(
+              requests,
+            ),
+            investmentRequests: AsyncData<List<InvestmentRequest>>([
+              investment(),
+              investment(id: 502, status: 'INFORMATION_REQUIRED'),
+            ]),
+            profileComplete: true,
+            onRequestCredit: () {},
+            onCreditDetails: (request) => openedCreditId = request.solicitudId,
+            onInvestmentDetails: (request) => openedInvestmentId = request.id,
+            onRequestInvestment: () => exploredInvestments = true,
+            onRetryCredits: () {},
+            onRetryInvestments: () {},
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('Mis créditos'), findsOneWidget);
+    await tester.tap(find.text('Ver detalles  →').first);
+    expect(openedCreditId, 101);
+
+    await tester.tap(find.text('Inversiones'));
+    await tester.pumpAndSettle();
+    expect(find.text('Mis inversiones'), findsOneWidget);
+    expect(find.text('Cooperativa Sol'), findsWidgets);
+    expect(find.text('En revisión'), findsOneWidget);
+    expect(
+      find.text(
+        'La cooperativa está revisando tu solicitud. Te avisaremos cuando responda.',
+      ),
+      findsOneWidget,
+    );
+
+    await tester.drag(find.byType(PageView), const Offset(-280, 0));
+    await tester.pumpAndSettle();
+    expect(find.text('Requiere información'), findsOneWidget);
+    expect(
+      find.text(
+        'La cooperativa necesita información adicional. Revisa el mensaje de tu solicitud para ver qué debes hacer.',
+      ),
+      findsOneWidget,
+    );
+    await tester.tap(find.text('Ver detalles  →').last);
+    expect(openedInvestmentId, 502);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: DashboardApplicationsSection(
+            creditRequests: AsyncData<List<ClientCreditRequestSummary>>(
+              requests,
+            ),
+            investmentRequests: const AsyncData<List<InvestmentRequest>>([]),
+            profileComplete: true,
+            onRequestCredit: () {},
+            onRequestInvestment: () => exploredInvestments = true,
+            onCreditDetails: (_) {},
+            onInvestmentDetails: (_) {},
+            onRetryCredits: () {},
+            onRetryInvestments: () {},
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Inversiones'));
+    await tester.pumpAndSettle();
+    expect(
+      find.text('Todavía no tienes inversiones solicitadas.'),
+      findsOneWidget,
+    );
+    await tester.tap(find.text('Explorar inversiones'));
+    expect(exploredInvestments, isTrue);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('onboarding spotlight closes back to the orange reminder', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(320, 850);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const MaterialApp(home: _SpotlightTestHarness()));
+    await tester.pumpAndSettle();
+    expect(find.text('¡Vamos por nuevas oportunidades!'), findsOneWidget);
+    expect(find.byTooltip('Cerrar'), findsOneWidget);
+    expect(
+      tester.getSize(find.byKey(const ValueKey('onboarding-spotlight-scrim'))),
+      const Size(320, 850),
+    );
+    expect(find.text('Dashboard stays visible'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+
+    await tester.tap(find.byTooltip('Cerrar'));
+    await tester.pumpAndSettle();
+    expect(find.text('Tu perfil abre oportunidades'), findsOneWidget);
+    expect(find.text('¡Vamos por nuevas oportunidades!'), findsNothing);
+    expect(tester.takeException(), isNull);
+
+    await tester.pump(const Duration(seconds: 7));
+    await tester.pump(const Duration(milliseconds: 180));
+    final shake = tester.widget<Transform>(
+      find
+          .ancestor(
+            of: find.text('Tu perfil abre oportunidades'),
+            matching: find.byType(Transform),
+          )
+          .first,
+    );
+    expect(shake.transform.storage[12], isNot(closeTo(0, .1)));
+    await tester.pump(const Duration(milliseconds: 500));
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('investment detail route opens the requested investment id', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          requestsProvider.overrideWith((ref) async => requests),
+          investmentRequestsProvider.overrideWith(
+            (ref) async => [investment(id: 502)],
+          ),
+          dolaritoProvider.overrideWith((ref) => DolaritoNotifier()),
+        ],
+        child: const MaterialApp(home: RequestsPage(initialInvestmentId: 502)),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('Detalle de inversión'), findsOneWidget);
+    expect(find.text('Cooperativa Sol'), findsWidgets);
     expect(tester.takeException(), isNull);
   });
 
@@ -282,7 +474,7 @@ void main() async {
         );
         expect(
           find.text(
-            '¡Felicidades! Tu crédito fue aceptado. Revisa los requisitos para retirarlo.',
+            '¡Buenas noticias! Tu solicitud fue aceptada. Revisa los requisitos y los siguientes pasos.',
           ),
           findsOneWidget,
         );
@@ -350,5 +542,34 @@ void main() async {
       );
       expect(find.text('Dashboard route'), findsOneWidget);
     },
+  );
+}
+
+class _SpotlightTestHarness extends StatefulWidget {
+  const _SpotlightTestHarness();
+
+  @override
+  State<_SpotlightTestHarness> createState() => _SpotlightTestHarnessState();
+}
+
+class _SpotlightTestHarnessState extends State<_SpotlightTestHarness> {
+  bool _showSpotlight = true;
+
+  @override
+  Widget build(BuildContext context) => Scaffold(
+    body: Padding(
+      padding: const EdgeInsets.all(18),
+      child: Column(
+        children: [
+          const Text('Dashboard stays visible'),
+          OnboardingWelcomeExperience(
+            isFirstWelcome: true,
+            showSpotlight: _showSpotlight,
+            onDismiss: () => setState(() => _showSpotlight = false),
+            onCompleteProfile: () {},
+          ),
+        ],
+      ),
+    ),
   );
 }

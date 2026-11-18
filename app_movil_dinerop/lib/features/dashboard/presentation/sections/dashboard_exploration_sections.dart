@@ -1,85 +1,20 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/utils/formatters.dart';
 import '../../../credit/data/models/client_credit_request.dart';
 import '../../../credit/data/models/credit_enums.dart';
+import '../../../dolarito/models/dolarito_reaction.dart';
+import '../../../dolarito/services/dolarito_service.dart';
+import '../../../investment/data/models/investment_models.dart';
 
 const _navy = Color(0xFF142B4A);
 const _teal = Color(0xFF16B8A6);
 const _muted = Color(0xFF718096);
 const _line = Color(0xFFE8EDF3);
-
-class ProfileStatusRow extends StatelessWidget {
-  const ProfileStatusRow({super.key, required this.complete, this.onComplete});
-
-  final bool complete;
-  final VoidCallback? onComplete;
-
-  @override
-  Widget build(BuildContext context) {
-    if (complete) {
-      return Row(
-        children: [
-          const Icon(Icons.check_circle_rounded, color: _teal, size: 17),
-          const SizedBox(width: 6),
-          const Expanded(
-            child: Text(
-              'Perfil completo',
-              style: TextStyle(
-                color: _navy,
-                fontSize: 12,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
-            decoration: BoxDecoration(
-              color: const Color(0xFFE7F8F5),
-              borderRadius: BorderRadius.circular(99),
-            ),
-            child: const Text(
-              '100%',
-              style: TextStyle(
-                color: _teal,
-                fontSize: 11,
-                fontWeight: FontWeight.w900,
-              ),
-            ),
-          ),
-        ],
-      );
-    }
-
-    return Row(
-      children: [
-        const Icon(Icons.pending_outlined, color: Color(0xFFD68B28), size: 17),
-        const SizedBox(width: 6),
-        const Expanded(
-          child: Text(
-            'Completa tu información de perfil',
-            style: TextStyle(color: _muted, fontSize: 12),
-          ),
-        ),
-        TextButton(
-          onPressed: onComplete,
-          style: TextButton.styleFrom(
-            foregroundColor: _navy,
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-            minimumSize: const Size(0, 32),
-          ),
-          child: const Text(
-            'Completar',
-            style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800),
-          ),
-        ),
-      ],
-    );
-  }
-}
 
 class ActiveCreditCarousel extends StatefulWidget {
   const ActiveCreditCarousel({
@@ -131,16 +66,11 @@ class _ActiveCreditCarouselState extends State<ActiveCreditCarousel> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const _SectionHeading(
-          title: 'Mi último crédito',
-          subtitle: 'Conoce cómo avanza tu solicitud',
-        ),
-        const SizedBox(height: 12),
         if (active.isEmpty)
           _CreditEmptyState(onRequestCredit: widget.onRequestCredit)
         else ...[
           SizedBox(
-            height: 236,
+            height: 278,
             child: PageView.builder(
               controller: _controller,
               itemCount: active.length,
@@ -189,6 +119,434 @@ class _ActiveCreditCarouselState extends State<ActiveCreditCarousel> {
   }
 }
 
+class DashboardApplicationsSection extends StatefulWidget {
+  const DashboardApplicationsSection({
+    super.key,
+    required this.creditRequests,
+    required this.investmentRequests,
+    required this.profileComplete,
+    required this.onRequestCredit,
+    required this.onRequestInvestment,
+    required this.onCreditDetails,
+    required this.onInvestmentDetails,
+    required this.onRetryCredits,
+    required this.onRetryInvestments,
+  });
+
+  final AsyncValue<List<ClientCreditRequestSummary>> creditRequests;
+  final AsyncValue<List<InvestmentRequest>> investmentRequests;
+  final bool profileComplete;
+  final VoidCallback onRequestCredit;
+  final VoidCallback onRequestInvestment;
+  final ValueChanged<ClientCreditRequestSummary> onCreditDetails;
+  final ValueChanged<InvestmentRequest> onInvestmentDetails;
+  final VoidCallback onRetryCredits;
+  final VoidCallback onRetryInvestments;
+
+  @override
+  State<DashboardApplicationsSection> createState() =>
+      _DashboardApplicationsSectionState();
+}
+
+class _DashboardApplicationsSectionState
+    extends State<DashboardApplicationsSection> {
+  int _selected = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    final investmentsSelected = _selected == 1;
+    final title = investmentsSelected ? 'Mis inversiones' : 'Mis créditos';
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SegmentedButton<int>(
+          showSelectedIcon: false,
+          segments: const [
+            ButtonSegment(
+              value: 0,
+              icon: Icon(Icons.credit_score_outlined),
+              label: Text('Créditos'),
+            ),
+            ButtonSegment(
+              value: 1,
+              icon: Icon(Icons.savings_outlined),
+              label: Text('Inversiones'),
+            ),
+          ],
+          selected: {_selected},
+          onSelectionChanged: (selection) =>
+              setState(() => _selected = selection.first),
+        ),
+        const SizedBox(height: 13),
+        _SectionHeading(
+          title: title,
+          subtitle: investmentsSelected
+              ? 'Sigue el estado de tus inversiones'
+              : 'Conoce cómo avanzan tus solicitudes',
+        ),
+        const SizedBox(height: 11),
+        if (investmentsSelected)
+          widget.investmentRequests.when(
+            data: (items) => items.isEmpty
+                ? _ApplicationEmptyState(
+                    message: 'Todavía no tienes inversiones solicitadas.',
+                    actionLabel: 'Explorar inversiones',
+                    onAction: widget.onRequestInvestment,
+                  )
+                : _InvestmentRequestCarousel(
+                    requests: items,
+                    onViewDetails: widget.onInvestmentDetails,
+                  ),
+            loading: () => const _ApplicationLoadingState(),
+            error: (_, _) =>
+                _ApplicationErrorState(onRetry: widget.onRetryInvestments),
+          )
+        else
+          widget.creditRequests.when(
+            data: (items) => items.isEmpty
+                ? _CreditEmptyState(onRequestCredit: widget.onRequestCredit)
+                : ActiveCreditCarousel(
+                    requests: items,
+                    profileComplete: widget.profileComplete,
+                    onRequestCredit: widget.onRequestCredit,
+                    onViewDetails: widget.onCreditDetails,
+                  ),
+            loading: () => const _ApplicationLoadingState(),
+            error: (_, _) =>
+                _ApplicationErrorState(onRetry: widget.onRetryCredits),
+          ),
+      ],
+    );
+  }
+}
+
+class _ApplicationLoadingState extends StatelessWidget {
+  const _ApplicationLoadingState();
+
+  @override
+  Widget build(BuildContext context) => const SizedBox(
+    height: 150,
+    child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+  );
+}
+
+class _ApplicationErrorState extends StatelessWidget {
+  const _ApplicationErrorState({required this.onRetry});
+
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) => Container(
+    height: 110,
+    padding: const EdgeInsets.all(16),
+    decoration: BoxDecoration(
+      color: Colors.white,
+      border: Border.all(color: _line),
+      borderRadius: BorderRadius.circular(18),
+    ),
+    child: Row(
+      children: [
+        const Expanded(
+          child: Text(
+            'No pudimos cargar estas solicitudes.',
+            style: TextStyle(color: _muted, fontSize: 12),
+          ),
+        ),
+        TextButton(onPressed: onRetry, child: const Text('Reintentar')),
+      ],
+    ),
+  );
+}
+
+class _ApplicationEmptyState extends StatelessWidget {
+  const _ApplicationEmptyState({
+    required this.message,
+    required this.actionLabel,
+    required this.onAction,
+  });
+
+  final String message;
+  final String actionLabel;
+  final VoidCallback onAction;
+
+  @override
+  Widget build(BuildContext context) => Container(
+    width: double.infinity,
+    padding: const EdgeInsets.all(17),
+    decoration: BoxDecoration(
+      color: Colors.white,
+      border: Border.all(color: _line),
+      borderRadius: BorderRadius.circular(18),
+    ),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(message, style: const TextStyle(color: _muted, fontSize: 12)),
+        const SizedBox(height: 7),
+        TextButton.icon(
+          onPressed: onAction,
+          icon: const Icon(Icons.arrow_forward_rounded, size: 16),
+          label: Text(actionLabel),
+        ),
+      ],
+    ),
+  );
+}
+
+class _InvestmentRequestCarousel extends StatefulWidget {
+  const _InvestmentRequestCarousel({
+    required this.requests,
+    required this.onViewDetails,
+  });
+
+  final List<InvestmentRequest> requests;
+  final ValueChanged<InvestmentRequest> onViewDetails;
+
+  @override
+  State<_InvestmentRequestCarousel> createState() =>
+      _InvestmentRequestCarouselState();
+}
+
+class _InvestmentRequestCarouselState
+    extends State<_InvestmentRequestCarousel> {
+  late final PageController _controller = PageController(viewportFraction: .94);
+  int _page = 0;
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final items = [...widget.requests]
+      ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+    return Column(
+      children: [
+        SizedBox(
+          height: 265,
+          child: PageView.builder(
+            controller: _controller,
+            itemCount: items.length,
+            onPageChanged: (page) => setState(() => _page = page),
+            itemBuilder: (context, index) => Padding(
+              padding: const EdgeInsets.only(right: 9),
+              child: _InvestmentSummaryCard(
+                request: items[index],
+                onViewDetails: () => widget.onViewDetails(items[index]),
+              ),
+            ),
+          ),
+        ),
+        if (items.length > 1) ...[
+          const SizedBox(height: 8),
+          _CarouselPageIndicator(page: _page, count: items.length),
+        ],
+      ],
+    );
+  }
+}
+
+class _CarouselPageIndicator extends StatelessWidget {
+  const _CarouselPageIndicator({required this.page, required this.count});
+  final int page;
+  final int count;
+
+  @override
+  Widget build(BuildContext context) => Row(
+    mainAxisAlignment: MainAxisAlignment.center,
+    children: [
+      for (var index = 0; index < count; index++)
+        AnimatedContainer(
+          duration: const Duration(milliseconds: 180),
+          margin: const EdgeInsets.symmetric(horizontal: 3),
+          width: index == page ? 17 : 6,
+          height: 6,
+          decoration: BoxDecoration(
+            color: index == page ? _teal : const Color(0xFFC8D2DE),
+            borderRadius: BorderRadius.circular(99),
+          ),
+        ),
+      const SizedBox(width: 7),
+      Text(
+        '${page + 1} de $count',
+        style: const TextStyle(
+          color: _muted,
+          fontSize: 10,
+          fontWeight: FontWeight.w700,
+        ),
+      ),
+    ],
+  );
+}
+
+class _InvestmentSummaryCard extends StatelessWidget {
+  const _InvestmentSummaryCard({
+    required this.request,
+    required this.onViewDetails,
+  });
+
+  final InvestmentRequest request;
+  final VoidCallback onViewDetails;
+
+  @override
+  Widget build(BuildContext context) {
+    final reaction = const DolaritoService().investmentRequestStatus(
+      request.status,
+    );
+    final status = _investmentStatus(request.status);
+    return _ApplicationCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  request.cooperativeName,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: _navy,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ),
+              _StatusPill(label: status.$1, color: status.$2),
+            ],
+          ),
+          const SizedBox(height: 2),
+          Text(
+            '${request.productName} · Inversión #${request.id}',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(color: _muted, fontSize: 10),
+          ),
+          const SizedBox(height: 5),
+          Text(
+            formatCurrency(request.amount),
+            style: const TextStyle(
+              color: _navy,
+              fontSize: 20,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+          const SizedBox(height: 9),
+          _DolaritoRequestNote(reaction: reaction),
+          const Spacer(),
+          Align(
+            alignment: Alignment.centerRight,
+            child: TextButton(
+              onPressed: onViewDetails,
+              child: const Text('Ver detalles  →'),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ApplicationCard extends StatelessWidget {
+  const _ApplicationCard({required this.child});
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) => Container(
+    padding: const EdgeInsets.fromLTRB(13, 12, 13, 5),
+    decoration: BoxDecoration(
+      gradient: const LinearGradient(
+        colors: [Colors.white, Color(0xFFF5FAFC)],
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+      ),
+      border: Border.all(color: const Color(0xFFE4EBF1)),
+      borderRadius: BorderRadius.circular(21),
+      boxShadow: const [
+        BoxShadow(
+          color: Color(0x0D142B4A),
+          blurRadius: 12,
+          offset: Offset(0, 4),
+        ),
+      ],
+    ),
+    child: child,
+  );
+}
+
+class _DolaritoRequestNote extends StatelessWidget {
+  const _DolaritoRequestNote({required this.reaction});
+  final DolaritoReaction reaction;
+
+  @override
+  Widget build(BuildContext context) => Container(
+    padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 7),
+    decoration: BoxDecoration(
+      color: const Color(0xFFEFF9F4),
+      borderRadius: BorderRadius.circular(13),
+    ),
+    child: Row(
+      children: [
+        Image.asset(
+          'assets/images/dolarito/${reaction.mood.assetName}',
+          width: 38,
+          height: 38,
+          fit: BoxFit.contain,
+        ),
+        const SizedBox(width: 7),
+        Expanded(
+          child: Text(
+            reaction.message,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+              color: _navy,
+              fontSize: 10,
+              height: 1.25,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
+(String, Color) _investmentStatus(String status) => switch (status
+    .toUpperCase()) {
+  'SUBMITTED' => ('Enviada', const Color(0xFF9A5B00)),
+  'IN_REVIEW' => ('En revisión', const Color(0xFF087E8B)),
+  'INFORMATION_REQUIRED' => ('Requiere información', const Color(0xFF9A5B00)),
+  'CONDITIONS_CONFIRMED' => (
+    'Condiciones confirmadas',
+    const Color(0xFF16845B),
+  ),
+  'DECLINED' => ('No aceptada', const Color(0xFFB42318)),
+  _ => ('Pendiente', const Color(0xFF667085)),
+};
+
+class _StatusPill extends StatelessWidget {
+  const _StatusPill({required this.label, required this.color});
+  final String label;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) => Container(
+    padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+    decoration: BoxDecoration(
+      color: color.withValues(alpha: .12),
+      borderRadius: BorderRadius.circular(99),
+    ),
+    child: Text(
+      label,
+      maxLines: 1,
+      style: TextStyle(color: color, fontSize: 9, fontWeight: FontWeight.w900),
+    ),
+  );
+}
+
 class _CreditSummaryCard extends StatelessWidget {
   const _CreditSummaryCard({
     required this.request,
@@ -202,28 +560,15 @@ class _CreditSummaryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final reaction = const DolaritoService().creditStatus(
+      request.estado,
+      requestId: request.solicitudId,
+    );
     final status = _CreditStatus.from(request.estado);
     final step = _progressStep(request.estado, profileComplete);
     final rejected = request.estado == CreditRequestStatus.rechazada;
 
-    return Container(
-      padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Colors.white, Color(0xFFF5FAFC)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        border: Border.all(color: const Color(0xFFE4EBF1)),
-        borderRadius: BorderRadius.circular(21),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x0D142B4A),
-            blurRadius: 12,
-            offset: Offset(0, 4),
-          ),
-        ],
-      ),
+    return _ApplicationCard(
       child: Stack(
         children: [
           Column(
@@ -273,24 +618,22 @@ class _CreditSummaryCard extends StatelessWidget {
               ),
               const SizedBox(height: 0),
               Text(
-                'Solicitado el ${formatDate(request.fechaSolicitud)}',
+                '${request.tipo.toLowerCase() == 'microcredito' ? 'Microcrédito' : 'Crédito'} · ${request.cantidadSolicitudesEnviadas} cooperativas notificadas',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: const TextStyle(color: _muted, fontSize: 10),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                'Solicitado el ${formatDate(request.fechaSolicitud)}',
+                style: const TextStyle(color: _muted, fontSize: 9),
               ),
               const SizedBox(height: 3),
               _CreditStepper(step: step, rejected: rejected),
               const SizedBox(height: 2),
-              Text(
-                status.message,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  color: _navy,
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                  height: 1.35,
-                ),
-              ),
-              const SizedBox(height: 4),
+              const SizedBox(height: 5),
+              _DolaritoRequestNote(reaction: reaction),
+              const SizedBox(height: 3),
               Align(
                 alignment: Alignment.centerRight,
                 child: TextButton(

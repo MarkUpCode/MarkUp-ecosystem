@@ -10,6 +10,7 @@ class AppTextField extends StatefulWidget {
     this.hint,
     this.keyboardType,
     this.textInputAction,
+    this.focusNode,
     this.obscureText = false,
     this.prefixIcon,
     this.suffixIcon,
@@ -29,6 +30,7 @@ class AppTextField extends StatefulWidget {
   final String? hint;
   final TextInputType? keyboardType;
   final TextInputAction? textInputAction;
+  final FocusNode? focusNode;
   final bool obscureText;
   final IconData? prefixIcon;
   final IconData? suffixIcon;
@@ -86,6 +88,7 @@ class _AppTextFieldState extends State<AppTextField>
         validator: widget.validator,
         keyboardType: widget.keyboardType,
         textInputAction: widget.textInputAction,
+        focusNode: widget.focusNode,
         obscureText: widget.obscureText,
         maxLines: widget.maxLines,
         enabled: widget.enabled,
