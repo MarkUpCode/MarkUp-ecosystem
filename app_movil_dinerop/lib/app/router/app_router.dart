@@ -7,6 +7,7 @@ import '../../features/auth/presentation/screens/activation_page.dart';
 import '../../features/auth/presentation/screens/complete_registration_page.dart';
 import '../../features/auth/presentation/screens/forgot_password_page.dart';
 import '../../features/auth/presentation/screens/login_page.dart';
+import '../../features/auth/presentation/screens/investment_registration_page.dart';
 import '../../features/auth/presentation/screens/pending_activation_page.dart';
 import '../../features/auth/presentation/screens/register_page.dart';
 import '../../features/auth/presentation/screens/registration_verification_page.dart';
@@ -65,6 +66,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         '/welcome',
         '/login',
         '/register',
+        '/register-investment',
         '/activate',
         '/complete-registration',
         '/verify-registration',
@@ -129,6 +131,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/register',
         builder: (context, state) => const RegisterPage(),
+      ),
+      GoRoute(
+        path: '/register-investment',
+        builder: (context, state) => const InvestmentRegistrationPage(),
       ),
       GoRoute(
         path: '/activate',

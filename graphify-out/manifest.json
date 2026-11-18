@@ -2598,15 +2598,15 @@
     "semantic_hash": ""
   },
   "markup-admin/src/modules/cooperatives/components/CooperativesStats.tsx": {
-    "mtime": 1783522913.3546598,
-    "seen": 1794858910.9784133,
-    "ast_hash": "23f969b71f1ff0eb45bd940dd8cf60bf",
+    "mtime": 1794950908.4990242,
+    "seen": 1794951029.2391868,
+    "ast_hash": "7db6dff4f66c4dc487f4dea8ff180668",
     "semantic_hash": ""
   },
   "markup-admin/src/modules/cooperatives/components/CooperativesTable.tsx": {
-    "mtime": 1783523313.7237084,
-    "seen": 1794858910.9784153,
-    "ast_hash": "8676330921a9c7177ebab13eec64afdd",
+    "mtime": 1794950908.4964972,
+    "seen": 1794951029.2391913,
+    "ast_hash": "bc45b3b125100f5b625a3f79646aba93",
     "semantic_hash": ""
   },
   "markup-admin/src/modules/cooperatives/hooks/useCooperatives.ts": {
@@ -2616,15 +2616,15 @@
     "semantic_hash": ""
   },
   "markup-admin/src/modules/cooperatives/pages/CooperativesPage.tsx": {
-    "mtime": 1794873964.1803842,
-    "seen": 1794874992.5243778,
-    "ast_hash": "b115ad230d709138fc83d1d2a4d62bd3",
+    "mtime": 1794950914.6517758,
+    "seen": 1794951029.239199,
+    "ast_hash": "6cef1de53d3970e8d82a65b5d8a97fac",
     "semantic_hash": ""
   },
   "markup-admin/src/modules/cooperatives/types/cooperative.ts": {
-    "mtime": 1794873500.4495986,
-    "seen": 1794874992.5243816,
-    "ast_hash": "c3ab9230997c049f5090250c1528e8c3",
+    "mtime": 1794950908.4929845,
+    "seen": 1794951029.2392042,
+    "ast_hash": "f38642b92af74cd78bbe931105c71612",
     "semantic_hash": ""
   },
   "markup-admin/src/modules/dashboard/api/dashboard.api.ts": {
@@ -4377,6 +4377,12 @@
     "mtime": 1794949287.2155762,
     "seen": 1794950457.8586917,
     "ast_hash": "83d2dec2ec9888fa019966d3f801f4bb",
+    "semantic_hash": ""
+  },
+  "dinerop-backend/src/main/resources/db/migration/V5__credit_product_categories.sql": {
+    "mtime": 1794948696.1584854,
+    "seen": 1794951029.2387576,
+    "ast_hash": "784ae79488e0b22b77428905b0d594d6",
     "semantic_hash": ""
   },
   "dinerup-app/package-lock.json": {

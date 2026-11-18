@@ -1,7 +1,7 @@
 # Graph Report - MarkUp-ecosystem  (2026-11-17)
 
 ## Corpus Check
-- 653 files · ~165,423 words
+- 653 files · ~165,460 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 55 file(s) not represented in the graph (top: (none) 14, .xml 7, .log 5)
 
@@ -11,7 +11,7 @@
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `3ead6d46`
+- Built from commit: `a434622c`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -274,14 +274,14 @@
 ## Surprising Connections (you probably didn't know these)
 - `Módulo de inversiones (noviembre de 2026)` --references--> `CooperativeInvestmentController`  [INFERRED]
   DINEROP-KNOWLEDGE/API-INTEGRATIONS.md → dinerop-backend/src/main/java/com/markup/dinerop/cooperative/infrastructure/web/CooperativeInvestmentController.java
-- `Crédito público y catálogo de productos (noviembre de 2026)` --references--> `FinancialProductType`  [INFERRED]
-  DINEROP-KNOWLEDGE/API-INTEGRATIONS.md → dinerop-backend/src/main/java/com/markup/dinerop/cooperative/domain/entity/FinancialProductType.java
 - `Catálogo y exploración` --references--> `CooperativeRepository`  [INFERRED]
   DINEROP-KNOWLEDGE/USER-FLOWS.md → dinerop-backend/src/main/java/com/markup/dinerop/cooperative/domain/repository/CooperativeRepository.java
 - `Datos de sesión` --references--> `AuthController`  [INFERRED]
   app_movil_dinerop/docs/AUTHENTICATION.md → dinerop-backend/src/main/java/com/markup/dinerop/auth/controller/AuthController.java
 - `Registro, activación y recuperación` --references--> `AuthController`  [INFERRED]
   app_movil_dinerop/docs/AUTHENTICATION.md → dinerop-backend/src/main/java/com/markup/dinerop/auth/controller/AuthController.java
+- `Router` --references--> `AuthController`  [INFERRED]
+  app_movil_dinerop/docs/NAVIGATION.md → dinerop-backend/src/main/java/com/markup/dinerop/auth/controller/AuthController.java
 
 ## Import Cycles
 - None detected.
@@ -993,7 +993,7 @@ Cohesion: 0.40
 Nodes (5): scripts, build, dev, lint, start
 
 ## Knowledge Gaps
-- **1244 isolated node(s):** `timer`, `cooperativeRepositoryProvider`, `cooperativesProvider`, `investmentProductsProvider`, `_refreshWhileObserved` (+1239 more)
+- **1244 isolated node(s):** `_acceptedDeclaration`, `_apellidosController`, `_availableCantons`, `_availableParishes`, `_barrioController` (+1239 more)
   These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 2572 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
 - **136 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
@@ -1001,16 +1001,16 @@ Nodes (5): scripts, build, dev, lint, start
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `httpClient()` connect `httpClient` to `dinerup-app/src/App.tsx`, `AuthContext.tsx`, `Guía de desarrollo`, `Lógica de negocio observada`, `httpClient.ts`, `CreditDetailsModal.tsx`, `DashboardCooperative.tsx`, `PublicCreditRequestModal.tsx`, `OnboardingPage.tsx`, `auth.api.ts`, `OnboardingClienteController`, `DashboardClient.tsx`, `Resumen del proyecto`, `Diseño: Consumo de POST /api/credits/me en NewCreditModal`?**
-  _High betweenness centrality (0.326) - this node is a cross-community bridge._
-- **What connects `timer`, `cooperativeRepositoryProvider`, `cooperativesProvider` to the rest of the system?**
+  _High betweenness centrality (0.271) - this node is a cross-community bridge._
+- **What connects `_acceptedDeclaration`, `_apellidosController`, `_availableCantons` to the rest of the system?**
   _1244 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `onboarding_page.dart` be split into smaller, more focused modules?**
   _Cohesion score 0.019230769230769232 - nodes in this community are weakly interconnected._
 - **Why does `Discrepancias que requieren cuidado` connect `OnboardingClienteController` to `AuthController`, `auth/config/SecurityConfig.java`, `httpClient`?**
-  _High betweenness centrality (0.324) - this node is a cross-community bridge._
+  _High betweenness centrality (0.268) - this node is a cross-community bridge._
 - **Should `annotation` be split into smaller, more focused modules?**
   _Cohesion score 0.09032258064516129 - nodes in this community are weakly interconnected._
 - **Why does `AuthController` connect `AuthController` to `annotation`, `lombok.RequiredArgsConstructor`, `main.dart`, `app_shell.dart`, `OnboardingClienteController`, `AuthService`, `InternalCreditController`, `auth/config/SecurityConfig.java`, `secure_token_storage.dart`, `auth_repository.dart`?**
-  _High betweenness centrality (0.182) - this node is a cross-community bridge._
+  _High betweenness centrality (0.156) - this node is a cross-community bridge._
 - **Should `org.junit.jupiter.api.Test` be split into smaller, more focused modules?**
   _Cohesion score 0.058823529411764705 - nodes in this community are weakly interconnected._

@@ -12,6 +12,8 @@ import '../../../../shared/widgets/app_text_field.dart';
 import '../auth_controller.dart';
 import '../../../investment/providers/investment_providers.dart';
 import '../../../../app/providers.dart';
+import '../../../dolarito/providers/dolarito_provider.dart';
+import '../../../dolarito/widgets/dolarito_widget.dart';
 
 class RegistrationVerificationPage extends ConsumerStatefulWidget {
   const RegistrationVerificationPage({super.key, required this.email});
@@ -37,6 +39,7 @@ class _RegistrationVerificationPageState
   Timer? _resendTimer;
   late String _currentEmail;
   String? _error;
+  bool _investmentRegistration = false;
 
   String get _email => _emailController.text.trim();
 
@@ -46,6 +49,19 @@ class _RegistrationVerificationPageState
     _currentEmail = widget.email?.trim() ?? '';
     _emailController.text = _currentEmail;
     _startResendCountdown();
+    _loadInvestmentRegistration();
+  }
+
+  Future<void> _loadInvestmentRegistration() async {
+    final draft = await ref.read(investmentDraftStoreProvider).read();
+    if (!mounted || draft == null) return;
+    setState(() => _investmentRegistration = true);
+    ref
+        .read(dolaritoProvider.notifier)
+        .show(
+          ref.read(dolaritoServiceProvider).investmentRegistration(),
+          force: true,
+        );
   }
 
   void _startResendCountdown() {
@@ -86,11 +102,12 @@ class _RegistrationVerificationPageState
       await ref
           .read(authControllerProvider)
           .verifyRegistrationCode(email: _email, code: code);
-      if (mounted)
+      if (mounted) {
         setState(() {
           _verified = true;
           _error = null;
         });
+      }
     } catch (error) {
       if (mounted) {
         setState(
@@ -224,6 +241,19 @@ class _RegistrationVerificationPageState
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                if (_investmentRegistration) ...[
+                  Builder(
+                    builder: (context) {
+                      final dolarito = ref.watch(dolaritoProvider);
+                      return DolaritoWidget(
+                        mood: dolarito.mood,
+                        message: dolarito.message,
+                        compact: true,
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 14),
+                ],
                 Text(
                   _verified ? 'Define tu contraseña' : 'Verifica tu correo',
                   style: Theme.of(context).textTheme.titleLarge,

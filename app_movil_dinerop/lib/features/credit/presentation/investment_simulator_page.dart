@@ -229,7 +229,7 @@ class _InvestmentSimulatorPageState
             ref.read(dolaritoServiceProvider).investmentAccountRequired(),
             force: true,
           );
-      final goToLogin = await showDialog<bool>(
+      final nextStep = await showDialog<String>(
         context: context,
         builder: (context) => AlertDialog(
           title: const Text('Inicia sesión para continuar'),
@@ -238,18 +238,27 @@ class _InvestmentSimulatorPageState
           ),
           actions: [
             TextButton(
-              onPressed: () => Navigator.pop(context, false),
+              onPressed: () => Navigator.pop(context),
               child: const Text('Seguir comparando'),
             ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context, 'register');
+              },
+              child: const Text('Crear cuenta'),
+            ),
             FilledButton(
-              onPressed: () => Navigator.pop(context, true),
-              child: const Text('Iniciar sesión o crear cuenta'),
+              onPressed: () {
+                Navigator.pop(context, 'login');
+              },
+              child: const Text('Ya tengo cuenta'),
             ),
           ],
         ),
       );
       if (!mounted) return;
-      if (goToLogin == true) context.push('/login');
+      if (nextStep == 'register') context.push('/register-investment');
+      if (nextStep == 'login') context.push('/login');
       return;
     }
 

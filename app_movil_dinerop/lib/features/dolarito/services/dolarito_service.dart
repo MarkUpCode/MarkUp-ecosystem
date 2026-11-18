@@ -233,6 +233,15 @@ class DolaritoService {
     scopeKey: 'investment',
   );
 
+  DolaritoReaction investmentRegistration() => const DolaritoReaction(
+    mood: DolaritoMood.motivated,
+    message:
+        'Vamos paso a paso: crea tu cuenta para guardar esta inversión y continuar con la oferta que elegiste.',
+    event: DolaritoEvent.investmentRegistration,
+    priority: DolaritoPriority.motivation,
+    scopeKey: 'investment-registration',
+  );
+
   DolaritoReaction creditSimulationThinking() => const DolaritoReaction(
     mood: DolaritoMood.thinking,
     message:

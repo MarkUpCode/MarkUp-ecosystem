@@ -23,8 +23,8 @@ import '../../../../app/providers.dart';
 ///
 /// Los dos servicios principales tienen el mismo peso visual.
 /// La solicitud de crédito ya es funcional.
-/// La inversión está presente visualmente, pero todavía no
-/// ejecuta ninguna acción.
+/// La inversión abre el simulador para elegir una oferta vigente
+/// antes de iniciar sesión o crear una cuenta.
 ///
 /// Cada servicio cuenta además con su propio simulador.
 class LoginPage extends ConsumerWidget {
@@ -65,6 +65,7 @@ class LoginPage extends ConsumerWidget {
               const SizedBox(height: 16),
 
               _InvestmentServiceCard(
+                onPressed: () => context.push('/simulate-investment'),
                 onSimulationPressed: () => context.push('/simulate-investment'),
               ),
 
@@ -209,17 +210,18 @@ class _CreditServiceCard extends StatelessWidget {
 // ═══════════════════════════════════════════════════════════
 
 class _InvestmentServiceCard extends StatelessWidget {
-  const _InvestmentServiceCard({required this.onSimulationPressed});
+  const _InvestmentServiceCard({
+    required this.onPressed,
+    required this.onSimulationPressed,
+  });
 
+  final VoidCallback onPressed;
   final VoidCallback onSimulationPressed;
 
   @override
   Widget build(BuildContext context) {
     return _ServiceCard(
-      // La inversión mantiene el mismo protagonismo visual
-      // que el crédito, pero su acción principal todavía
-      // no ejecuta ninguna funcionalidad.
-      onPressed: null,
+      onPressed: onPressed,
       onSimulationPressed: onSimulationPressed,
       gradient: const LinearGradient(
         begin: Alignment.topLeft,

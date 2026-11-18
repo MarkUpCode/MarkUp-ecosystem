@@ -18,39 +18,68 @@ class AuthRepository {
     required AppUser user,
     required bool onboardingComplete,
   }) {
-    return _storage.saveSession(token: token, user: user, onboardingComplete: onboardingComplete);
+    return _storage.saveSession(
+      token: token,
+      user: user,
+      onboardingComplete: onboardingComplete,
+    );
   }
 
   Future<void> clearSession() => _storage.clear();
 
-  Future<LoginResponse> login(String email, String password) => _remote.login(email, password);
+  Future<LoginResponse> login(String email, String password) =>
+      _remote.login(email, password);
 
-  Future<PublicRegistrationResponse> register(PublicRegistrationRequest request) => _remote.register(request);
+  Future<PublicRegistrationResponse> register(
+    PublicRegistrationRequest request,
+  ) => _remote.register(request);
 
   Future<String> activate(String token) => _remote.activate(token);
 
-  Future<String> completeRegistration({required String email, required String password}) =>
-      _remote.completeRegistration(email: email, password: password);
+  Future<String> completeRegistration({
+    required String email,
+    required String password,
+  }) => _remote.completeRegistration(email: email, password: password);
 
-    Future<String> verifyRegistrationCode({required String email, required String code}) =>
-      _remote.verifyRegistrationCode(email: email, code: code);
+  Future<String> verifyRegistrationCode({
+    required String email,
+    required String code,
+  }) => _remote.verifyRegistrationCode(email: email, code: code);
 
-    Future<String> resendRegistrationCode(String email) =>
+  Future<String> startRegistration({
+    required String email,
+    required String firstName,
+    required String lastName,
+    required String identification,
+    String? phone,
+  }) => _remote.startRegistration(
+    email: email,
+    firstName: firstName,
+    lastName: lastName,
+    identification: identification,
+    phone: phone,
+  );
+
+  Future<String> resendRegistrationCode(String email) =>
       _remote.resendRegistrationCode(email);
 
-    Future<String> changeRegistrationEmail({
-      required String currentEmail,
-      required String newEmail,
-    }) => _remote.changeRegistrationEmail(
-          currentEmail: currentEmail,
-          newEmail: newEmail,
-        );
+  Future<String> changeRegistrationEmail({
+    required String currentEmail,
+    required String newEmail,
+  }) => _remote.changeRegistrationEmail(
+    currentEmail: currentEmail,
+    newEmail: newEmail,
+  );
 
-    Future<String> setRegistrationPassword({required String email, required String password}) =>
-      _remote.setRegistrationPassword(email: email, password: password);
+  Future<String> setRegistrationPassword({
+    required String email,
+    required String password,
+  }) => _remote.setRegistrationPassword(email: email, password: password);
 
   Future<String> forgotPassword(String email) => _remote.forgotPassword(email);
 
-  Future<String> resetPassword({required String token, required String newPassword}) =>
-      _remote.resetPassword(token: token, newPassword: newPassword);
+  Future<String> resetPassword({
+    required String token,
+    required String newPassword,
+  }) => _remote.resetPassword(token: token, newPassword: newPassword);
 }

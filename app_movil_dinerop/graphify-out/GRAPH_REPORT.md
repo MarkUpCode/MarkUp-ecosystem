@@ -1,17 +1,17 @@
 # Graph Report - app_movil_dinerop  (2026-11-17)
 
 ## Corpus Check
-- 106 files · ~53,457 words
+- 107 files · ~54,284 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 28 file(s) not represented in the graph (top: .xml 7, (none) 4, .plist 4)
 
 ## Summary
-- 1814 nodes · 2475 edges · 109 communities (91 shown, 18 thin omitted)
+- 1842 nodes · 2532 edges · 104 communities (87 shown, 17 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `332b3abb`
+- Built from commit: `a434622c`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -42,7 +42,7 @@
 - app_exception.dart
 - credit_request_payload.dart
 - dolarito_state.dart
-- theme_provider.dart
+- investment_registration_page.dart
 - VoidCallback?
 - app_user.dart
 - credit_repository.dart
@@ -63,7 +63,7 @@
 - formatters.dart
 - push_notification_service.dart
 - forgot_password_page.dart
-- authControllerProvider
+- Route /login
 - onboarding_repository.dart
 - package:flutter/material.dart
 - providers.dart
@@ -79,7 +79,7 @@
 - onboarding_submission_response.dart
 - dashboard_exploration_sections.dart
 - cooperative_repository.dart
-- welcome_trust_view.dart
+- app_theme.dart
 - StatelessWidget
 - analysis_options.yaml
 - auth_remote_data_source.dart
@@ -103,42 +103,37 @@
 - dart:async
 - credit_simulation_draft_store.dart
 - app_header.dart
-- public_credit_offer.dart
-- dolaritoServiceProvider
-- pre_registration_data.dart
+- authControllerProvider
 - credit_enums.dart
-- VoidCallback
-- onboarding_status_response.dart
-- cooperatives_page.dart
 
 ## God Nodes (most connected - your core abstractions)
 1. `StatelessWidget` - 78 edges
-2. `authControllerProvider` - 41 edges
-3. `dolaritoServiceProvider` - 23 edges
+2. `authControllerProvider` - 43 edges
+3. `dolaritoServiceProvider` - 28 edges
 4. `dependencies` - 15 edges
 5. `build` - 13 edges
-6. `DashboardPage` - 11 edges
-7. `investmentDraftStoreProvider` - 10 edges
-8. `build` - 9 edges
-9. `_OnboardingPageState` - 8 edges
-10. `ProfilePage` - 8 edges
+6. `investmentDraftStoreProvider` - 11 edges
+7. `DashboardPage` - 11 edges
+8. `dolaritoProvider` - 11 edges
+9. `build` - 9 edges
+10. `_OnboardingPageState` - 8 edges
 
 ## Surprising Connections (you probably didn't know these)
-- `_LoginNavigationBar` --inherits--> `StatelessWidget`  [EXTRACTED]
-  lib/features/auth/presentation/screens/login_page.dart → lib/shared/widgets/app_authenticated_header.dart
-- `_CreditServiceCard` --inherits--> `StatelessWidget`  [EXTRACTED]
-  lib/features/auth/presentation/screens/login_page.dart → lib/shared/widgets/app_authenticated_header.dart
-- `_InvestmentServiceCard` --inherits--> `StatelessWidget`  [EXTRACTED]
-  lib/features/auth/presentation/screens/login_page.dart → lib/shared/widgets/app_authenticated_header.dart
-- `_ServiceCard` --inherits--> `StatelessWidget`  [EXTRACTED]
-  lib/features/auth/presentation/screens/login_page.dart → lib/shared/widgets/app_authenticated_header.dart
-- `_LoginErrorBanner` --inherits--> `StatelessWidget`  [EXTRACTED]
-  lib/features/auth/presentation/screens/login_page.dart → lib/shared/widgets/app_authenticated_header.dart
+- `didChangeAppLifecycleState` --references--> `authControllerProvider`  [EXTRACTED]
+  lib/app/app.dart → lib/features/auth/presentation/auth_controller.dart
+- `build` --references--> `authControllerProvider`  [EXTRACTED]
+  lib/features/auth/presentation/screens/complete_registration_page.dart → lib/features/auth/presentation/auth_controller.dart
+- `build` --references--> `authControllerProvider`  [EXTRACTED]
+  lib/features/auth/presentation/screens/forgot_password_page.dart → lib/features/auth/presentation/auth_controller.dart
+- `_submit` --references--> `authControllerProvider`  [EXTRACTED]
+  lib/features/auth/presentation/screens/forgot_password_page.dart → lib/features/auth/presentation/auth_controller.dart
+- `build` --references--> `authControllerProvider`  [EXTRACTED]
+  lib/features/auth/presentation/screens/reset_password_page.dart → lib/features/auth/presentation/auth_controller.dart
 
 ## Import Cycles
 - None detected.
 
-## Communities (109 total, 18 thin omitted)
+## Communities (104 total, 17 thin omitted)
 
 ### Community 0 - "onboarding_page.dart"
 Cohesion: 0.02
@@ -146,15 +141,15 @@ Nodes (97): _acceptedDeclaration, _apellidosController, _availableCantons, _avai
 
 ### Community 1 - "registration_verification_page.dart"
 Cohesion: 0.09
-Nodes (18): _changeEmail, _codeController, _confirmController, createState, _currentEmail, dispose, _editingEmail, email (+10 more)
+Nodes (19): _changeEmail, _codeController, _confirmController, createState, _currentEmail, dispose, _editingEmail, email (+11 more)
 
 ### Community 2 - "welcome_identity_view.dart"
-Cohesion: 0.09
-Nodes (20): _banksFade, _banksSlide, build, createState, dispose, _fadeAnimation, _footerFade, icon (+12 more)
+Cohesion: 0.05
+Nodes (43): _banksFade, _banksSlide, build, createState, dispose, _fadeAnimation, _footerFade, icon (+35 more)
 
 ### Community 3 - "auth_controller.dart"
 Cohesion: 0.05
-Nodes (35): activate, authRemoteDataSourceProvider, _authRepository, authRepositoryProvider, _bootstrap, _bootstrapErrorMessage, changeRegistrationEmail, _clearSessionAfterBootstrapFailure (+27 more)
+Nodes (36): activate, authRemoteDataSourceProvider, _authRepository, authRepositoryProvider, _bootstrap, _bootstrapErrorMessage, changeRegistrationEmail, _clearSessionAfterBootstrapFailure (+28 more)
 
 ### Community 4 - "cooperative_partners_view.dart"
 Cohesion: 0.04
@@ -178,19 +173,19 @@ Nodes (32): _acceptedTerms, _amount, _amountValidator, _buildStep, createState, 
 
 ### Community 9 - "welcome_page.dart"
 Cohesion: 0.06
-Nodes (27): _autoPlayTimer, build, _cancelAutoPlay, _controller, createState, _currentPage, didUpdateWidget, dispose (+19 more)
+Nodes (29): _autoPlayTimer, build, _cancelAutoPlay, _controller, createState, _currentPage, didUpdateWidget, dispose (+21 more)
 
 ### Community 10 - "dependencies"
 Cohesion: 0.06
 Nodes (35): dependencies, cupertino_icons, dio, firebase_core, firebase_messaging, flutter, flutter_local_notifications, flutter_localizations (+27 more)
 
 ### Community 11 - "credit_simulator_page.dart"
-Cohesion: 0.10
-Nodes (19): creditSimulationDraftStoreProvider, _amountController, build, _continueWithOffer, createState, _creditCategory, _CreditOfferCard, CreditSimulatorPage (+11 more)
+Cohesion: 0.06
+Nodes (31): creditSimulationDraftStoreProvider, amount, annualRate, conditions, cooperativeId, cooperativeName, creditCategory, description (+23 more)
 
 ### Community 12 - "auth_repository.dart"
-Cohesion: 0.12
-Nodes (12): activate, AuthRepository, clearSession, completeRegistration, forgotPassword, login, readSession, register (+4 more)
+Cohesion: 0.10
+Nodes (17): activate, AuthRepository, changeRegistrationEmail, clearSession, completeRegistration, forgotPassword, login, readSession (+9 more)
 
 ### Community 13 - "requests_page.dart"
 Cohesion: 0.05
@@ -218,7 +213,7 @@ Nodes (19): clear, onboardingComplete, _onboardingKey, _operationTimeout, readSe
 
 ### Community 19 - "app_router.dart"
 Cohesion: 0.05
-Nodes (11): build, createState, didChangeAppLifecycleState, DineropApp, _DineropAppState, dispose, initState, appRouterProvider (+3 more)
+Nodes (10): build, createState, didChangeAppLifecycleState, _DineropAppState, dispose, initState, appRouterProvider, authController (+2 more)
 
 ### Community 20 - "credit_cooperative_status.dart"
 Cohesion: 0.08
@@ -244,13 +239,13 @@ Nodes (8): amount, city, CreditRequestPayload, creditType, plazoMeses, province,
 Cohesion: 0.05
 Nodes (33): ThemeNotifier, assetName, DolaritoMood, explaining, action, actionLabel, dismissible, DolaritoAction (+25 more)
 
-### Community 27 - "theme_provider.dart"
-Cohesion: 0.29
-Nodes (4): SecureTokenStorage, _loadTheme, setThemeMode, _storage
+### Community 27 - "investment_registration_page.dart"
+Cohesion: 0.15
+Nodes (12): createState, dispose, _email, _error, _firstName, _formKey, _identification, InvestmentRegistrationPage (+4 more)
 
 ### Community 28 - "VoidCallback?"
-Cohesion: 0.22
-Nodes (7): actionLabel, AppEmptyState, build, icon, message, onAction, title
+Cohesion: 0.13
+Nodes (11): actionLabel, AppEmptyState, build, icon, message, onAction, title, AppErrorView (+3 more)
 
 ### Community 29 - "app_user.dart"
 Cohesion: 0.13
@@ -258,15 +253,15 @@ Nodes (13): AppUserRole, AppUserStatus, email, fromJson, id, isActive, isClient,
 
 ### Community 30 - "credit_repository.dart"
 Cohesion: 0.11
-Nodes (9): acceptCooperative, _client, createCreditRequest, downloadReferralPdf, loadCatalog, loadGuarantorHistory, loadMyRequests, loadPreApprovedCooperatives (+1 more)
+Nodes (10): acceptCooperative, _client, createCreditRequest, downloadReferralPdf, loadCatalog, loadGuarantorHistory, loadMyRequests, loadPreApprovedCooperatives (+2 more)
 
 ### Community 31 - "String?"
 Cohesion: 0.15
-Nodes (10): fromJson, message, requestId, status, cooperativasNotificadas, CreditRequestResponse, estado, fromJson (+2 more)
+Nodes (10): fromJson, message, PublicRegistrationResponse, requestId, status, cooperativasNotificadas, estado, fromJson (+2 more)
 
 ### Community 32 - "State"
-Cohesion: 0.16
-Nodes (16): CooperativeLogoMarquee, _CooperativeLogoMarqueeState, ActiveCreditCarousel, _ActiveCreditCarouselState, _CelebrationConfetti, _CelebrationConfettiState, _StoryProgressBar, _StoryProgressBarState (+8 more)
+Cohesion: 0.22
+Nodes (12): CooperativeLogoMarquee, _CooperativeLogoMarqueeState, ActiveCreditCarousel, _ActiveCreditCarouselState, _CelebrationConfetti, _CelebrationConfettiState, _StoryProgressBar, _StoryProgressBarState (+4 more)
 
 ### Community 33 - ".application"
 Cohesion: 0.15
@@ -294,55 +289,55 @@ Nodes (12): amount, city, creditType, email, firstName, identification, lastName
 
 ### Community 39 - "activation_page.dart"
 Cohesion: 0.20
-Nodes (7): _activate, createState, _done, _error, initState, _message, token
+Nodes (8): ActivationPage, _ActivationPageState, createState, _done, _error, initState, _message, token
 
 ### Community 40 - "investment_draft_store.dart"
 Cohesion: 0.11
 Nodes (17): amount, annualRate, clear, conditionId, cooperativeId, fromJson, interestPaymentOption, _key (+9 more)
 
 ### Community 41 - "app_shell.dart"
-Cohesion: 0.18
-Nodes (8): child, icon, index, label, _NavigationItem, onTap, selectedIcon, selectedIndex
+Cohesion: 0.15
+Nodes (9): build, child, icon, index, label, _NavigationItem, onTap, selectedIcon (+1 more)
 
 ### Community 42 - "complete_registration_page.dart"
-Cohesion: 0.17
-Nodes (11): build, _confirmController, createState, dispose, email, _emailController, _error, _formKey (+3 more)
+Cohesion: 0.15
+Nodes (12): build, CompleteRegistrationPage, _CompleteRegistrationPageState, _confirmController, createState, dispose, email, _emailController (+4 more)
 
 ### Community 43 - "reset_password_page.dart"
-Cohesion: 0.12
-Nodes (14): email, message, PendingActivationPage, build, createState, dispose, _error, _formKey (+6 more)
+Cohesion: 0.15
+Nodes (13): build, createState, dispose, _error, _formKey, initState, _message, _passwordController (+5 more)
 
 ### Community 44 - "package:go_router/go_router.dart"
-Cohesion: 0.10
-Nodes (7): initializeDateFormatting, main, requests, widths, main, main, service
+Cohesion: 0.06
+Nodes (12): _firebaseMessagingBackgroundHandler, initializeApp, initializeDateFormatting, main, null, initializeDateFormatting, main, requests (+4 more)
 
 ### Community 45 - "formatters.dart"
 Cohesion: 0.18
 Nodes (7): _currencyFormatter, _dateFormatter, _dateTimeFormatter, format, formatCurrency, formatDate, formatDateTime
 
 ### Community 46 - "push_notification_service.dart"
-Cohesion: 0.04
-Nodes (31): body, _client, consumePendingOpenedEvent, dispose, _events, _foregroundSubscription, fromData, _handleLocalNotificationResponse (+23 more)
+Cohesion: 0.06
+Nodes (26): body, _client, consumePendingOpenedEvent, dispose, _events, _foregroundSubscription, fromData, _handleLocalNotificationResponse (+18 more)
 
 ### Community 47 - "forgot_password_page.dart"
-Cohesion: 0.18
-Nodes (8): build, createState, dispose, _emailController, _error, _formKey, _message, _submit
-
-### Community 48 - "authControllerProvider"
 Cohesion: 0.13
-Nodes (18): authControllerProvider, build, _submit, _LoginSheet, _LoginSheetState, _submit, build, build (+10 more)
+Nodes (11): build, createState, dispose, _emailController, _error, _formKey, _message, _submit (+3 more)
+
+### Community 48 - "Route /login"
+Cohesion: 0.29
+Nodes (5): build, _submit, build, build, _showSuccessDialog
 
 ### Community 49 - "onboarding_repository.dart"
-Cohesion: 0.12
-Nodes (12): OnboardingPersonRequest, _client, fromJson, GuarantorProfile, id, loadMyGuarantorProfiles, loadPreRegistrationData, loadStatus (+4 more)
+Cohesion: 0.06
+Nodes (27): OnboardingPersonRequest, estadoFormulario, formularioCompleto, fromJson, OnboardingFormStatus, OnboardingStatusResponse, _statusFromString, city (+19 more)
 
 ### Community 50 - "package:flutter/material.dart"
-Cohesion: 0.15
-Nodes (8): AppTheme, dark, light, build, CreditBureauPage, AppLoader, build, label
+Cohesion: 0.17
+Nodes (7): build, CooperativesPage, build, CreditBureauPage, AppLoader, build, label
 
 ### Community 51 - "providers.dart"
-Cohesion: 0.13
-Nodes (10): cooperativeRepositoryProvider, cooperativesProvider, creditRepositoryProvider, investmentProductsProvider, _refreshWhileObserved, timer, watch, CooperativeRepository (+2 more)
+Cohesion: 0.15
+Nodes (8): cooperativeRepositoryProvider, cooperativesProvider, investmentProductsProvider, _refreshWhileObserved, timer, watch, CooperativeRepository, CreditRepository
 
 ### Community 52 - "client_credit_request.dart"
 Cohesion: 0.20
@@ -361,12 +356,12 @@ Cohesion: 0.22
 Nodes (8): AppButton, AppButtonVariant, build, icon, isLoading, label, onPressed, variant
 
 ### Community 56 - "ConsumerState"
-Cohesion: 0.12
-Nodes (19): ActivationPage, _ActivationPageState, CompleteRegistrationPage, _CompleteRegistrationPageState, ForgotPasswordPage, _ForgotPasswordPageState, RegisterPage, _RegisterPageState (+11 more)
+Cohesion: 0.18
+Nodes (11): DineropApp, ForgotPasswordPage, _ForgotPasswordPageState, _LoginSheet, _LoginSheetState, RegisterPage, _RegisterPageState, RegistrationVerificationPage (+3 more)
 
 ### Community 57 - "di.dart"
-Cohesion: 0.20
-Nodes (5): apiClientProvider, baseUrl, flutterSecureStorageProvider, secureTokenStorageProvider, storage
+Cohesion: 0.12
+Nodes (9): apiClientProvider, baseUrl, flutterSecureStorageProvider, secureTokenStorageProvider, storage, SecureTokenStorage, _loadTheme, setThemeMode (+1 more)
 
 ### Community 58 - "app_spacing.dart"
 Cohesion: 0.22
@@ -378,7 +373,7 @@ Nodes (6): AppAuthenticatedHeader, build, onNotifications, preferredSize, _showH
 
 ### Community 60 - "dolarito_service.dart"
 Cohesion: 0.07
-Nodes (26): beforeCreditRequest, creditApplicationMotivation, creditLoadError, creditSimulationNoOffers, creditSimulationOffers, creditSimulationThinking, creditStatus, dashboard (+18 more)
+Nodes (27): beforeCreditRequest, creditApplicationMotivation, creditLoadError, creditSimulationNoOffers, creditSimulationOffers, creditSimulationThinking, creditStatus, dashboard (+19 more)
 
 ### Community 61 - "onboarding_submission_response.dart"
 Cohesion: 0.25
@@ -386,15 +381,15 @@ Nodes (6): destinoCredito, estado, fechaCreacion, fromJson, id, OnboardingSubmis
 
 ### Community 62 - "dashboard_exploration_sections.dart"
 Cohesion: 0.04
-Nodes (47): _ActionTile, build, color, _colors, complete, _controller, createState, _CreditStatus (+39 more)
+Nodes (47): _ActionTile, build, color, _colors, complete, _controller, createState, _CreditEmptyState (+39 more)
 
 ### Community 63 - "cooperative_repository.dart"
 Cohesion: 0.08
 Nodes (24): annualRate, calculationMethod, _client, conditionId, cooperativeId, cooperativeLogoUrl, cooperativeName, description (+16 more)
 
-### Community 64 - "welcome_trust_view.dart"
-Cohesion: 0.10
-Nodes (19): build, _cardsController, createState, description, dispose, _headerController, _headerFade, _headerSlide (+11 more)
+### Community 64 - "app_theme.dart"
+Cohesion: 0.40
+Nodes (3): AppTheme, dark, light
 
 ### Community 65 - "StatelessWidget"
 Cohesion: 0.07
@@ -413,8 +408,8 @@ Cohesion: 0.12
 Nodes (12): actionLabel, compact, dismissible, DolaritoWidget, imageSize, message, mood, onAction (+4 more)
 
 ### Community 75 - "_navigate"
-Cohesion: 0.25
-Nodes (3): build, _navigate, _submit
+Cohesion: 0.29
+Nodes (3): _navigate, _submit, _actionCallback
 
 ### Community 76 - "investment_models.dart"
 Cohesion: 0.03
@@ -422,7 +417,7 @@ Nodes (57): acceptance, acceptanceMessage, agencyAddress, agencyCity, agencyName
 
 ### Community 77 - "build"
 Cohesion: 0.25
-Nodes (11): clientProfileProvider, dashboardCreditRequestsProvider, dashboardOnboardingStatusProvider, build, _loadLocationData, _RequestCreditPageState, build, DashboardPage (+3 more)
+Nodes (11): clientProfileProvider, dashboardCreditRequestsProvider, dashboardOnboardingStatusProvider, build, _loadLocationData, RequestCreditPage, _RequestCreditPageState, build (+3 more)
 
 ### Community 78 - "notifications_page.dart"
 Cohesion: 0.25
@@ -433,8 +428,8 @@ Cohesion: 0.13
 Nodes (13): _ContactCard, data, email, icon, _InfoRow, label, onboardingComplete, onTap (+5 more)
 
 ### Community 80 - "build"
-Cohesion: 0.18
-Nodes (8): requestsProvider, build, build, InvestmentRequestsList, investmentRequestsProvider, build, RequestsPage, _RequestsPageState
+Cohesion: 0.15
+Nodes (10): creditRepositoryProvider, requestsProvider, build, build, InvestmentRequestsList, investmentRequestsProvider, build, RequestsPage (+2 more)
 
 ### Community 81 - "dolarito_messages.dart"
 Cohesion: 0.14
@@ -465,8 +460,8 @@ Cohesion: 0.25
 Nodes (5): AppBadge, build, color, label, textColor
 
 ### Community 90 - "ConsumerWidget"
-Cohesion: 0.25
-Nodes (8): AppShell, LoginPage, SplashPage, dolaritoProvider, build, DolaritoStateWidget, NotificationsPage, _RequestDetailsSheet
+Cohesion: 0.20
+Nodes (10): AppShell, build, LoginPage, build, SplashPage, dolaritoProvider, build, DolaritoStateWidget (+2 more)
 
 ### Community 92 - "dart:async"
 Cohesion: 0.20
@@ -480,49 +475,33 @@ Nodes (14): amount, clear, creditCategory, CreditSimulationDraft, CreditSimulati
 Cohesion: 0.29
 Nodes (5): AppHeader, build, subtitle, title, trailing
 
-### Community 100 - "public_credit_offer.dart"
-Cohesion: 0.15
-Nodes (12): amount, annualRate, conditions, cooperativeId, cooperativeName, creditCategory, description, fromJson (+4 more)
-
-### Community 101 - "dolaritoServiceProvider"
-Cohesion: 0.20
-Nodes (11): onboardingRepositoryProvider, _compare, _compare, initState, dolaritoServiceProvider, _goNext, _goPrevious, _loadInitialData (+3 more)
-
-### Community 102 - "pre_registration_data.dart"
-Cohesion: 0.20
-Nodes (9): city, email, firstName, fromJson, identification, lastName, phone, PreRegistrationData (+1 more)
+### Community 101 - "authControllerProvider"
+Cohesion: 0.09
+Nodes (28): authControllerProvider, onboardingRepositoryProvider, _activate, initState, initState, _submit, _submit, _submit (+20 more)
 
 ### Community 103 - "credit_enums.dart"
 Cohesion: 0.22
 Nodes (8): CreditDecision, creditDecisionToApiValue, CreditRequestStatus, creditRequestStatusFromJson, CreditRequestType, creditRequestTypeFromJson, CreditType, creditTypeFromJson
 
-### Community 104 - "VoidCallback"
-Cohesion: 0.29
-Nodes (4): AppErrorView, build, message, onRetry
-
-### Community 105 - "onboarding_status_response.dart"
-Cohesion: 0.29
-Nodes (6): estadoFormulario, formularioCompleto, fromJson, OnboardingFormStatus, OnboardingStatusResponse, _statusFromString
-
 ## Knowledge Gaps
-- **1168 isolated node(s):** `timer`, `cooperativeRepositoryProvider`, `cooperativesProvider`, `investmentProductsProvider`, `_refreshWhileObserved` (+1163 more)
-  These have ≤1 connection - possible missing edges. (Counts symbols only; 1360 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
-- **18 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **1187 isolated node(s):** `email`, `_codeController`, `_emailController`, `_passwordController`, `_confirmController` (+1182 more)
+  These have ≤1 connection - possible missing edges. (Counts symbols only; 1381 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
+- **17 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `ApiClient` connect `investment_repository.dart` to `auth_remote_data_source.dart`, `push_notification_service.dart`, `onboarding_repository.dart`, `api_client.dart`, `di.dart`, `credit_repository.dart`, `cooperative_repository.dart`?**
-  _High betweenness centrality (0.034) - this node is a cross-community bridge._
-- **What connects `timer`, `cooperativeRepositoryProvider`, `cooperativesProvider` to the rest of the system?**
-  _1168 weakly-connected nodes found - possible missing edges._
+- **Why does `StatelessWidget` connect `StatelessWidget` to `welcome_identity_view.dart`, `cooperative_partners_view.dart`, `login_page.dart`, `register_page.dart`, `credit_simulator_page.dart`, `dashboard_page.dart`, `credit_request_card.dart`, `VoidCallback?`, `splash_page.dart`, `app_shell.dart`, `forgot_password_page.dart`, `package:flutter/material.dart`, `app_button.dart`, `app_authenticated_header.dart`, `dashboard_exploration_sections.dart`, `dolarito_widget.dart`, `notifications_page.dart`, `profile_page.dart`, `step_progress.dart`, `app_card.dart`, `dolarito_message.dart`, `Color`, `ConsumerWidget`, `app_header.dart`?**
+  _High betweenness centrality (0.036) - this node is a cross-community bridge._
+- **What connects `email`, `_codeController`, `_emailController` to the rest of the system?**
+  _1187 weakly-connected nodes found - possible missing edges._
 - **Should `onboarding_page.dart` be split into smaller, more focused modules?**
   _Cohesion score 0.019230769230769232 - nodes in this community are weakly interconnected._
-- **Why does `StatelessWidget` connect `StatelessWidget` to `welcome_identity_view.dart`, `cooperative_partners_view.dart`, `login_page.dart`, `register_page.dart`, `credit_simulator_page.dart`, `dashboard_page.dart`, `credit_request_card.dart`, `VoidCallback?`, `splash_page.dart`, `app_shell.dart`, `reset_password_page.dart`, `package:flutter/material.dart`, `app_button.dart`, `app_authenticated_header.dart`, `dashboard_exploration_sections.dart`, `welcome_trust_view.dart`, `dolarito_widget.dart`, `notifications_page.dart`, `profile_page.dart`, `step_progress.dart`, `app_card.dart`, `dolarito_message.dart`, `Color`, `ConsumerWidget`, `app_header.dart`, `VoidCallback`, `cooperatives_page.dart`?**
-  _High betweenness centrality (0.016) - this node is a cross-community bridge._
+- **Why does `ApiClient` connect `investment_repository.dart` to `auth_remote_data_source.dart`, `push_notification_service.dart`, `onboarding_repository.dart`, `api_client.dart`, `di.dart`, `credit_repository.dart`, `cooperative_repository.dart`?**
+  _High betweenness centrality (0.032) - this node is a cross-community bridge._
 - **Should `registration_verification_page.dart` be split into smaller, more focused modules?**
   _Cohesion score 0.09090909090909091 - nodes in this community are weakly interconnected._
-- **Why does `SecureTokenStorage` connect `theme_provider.dart` to `di.dart`, `secure_token_storage.dart`, `auth_repository.dart`?**
-  _High betweenness centrality (0.014) - this node is a cross-community bridge._
+- **Why does `AppUser` connect `login_response.dart` to `secure_token_storage.dart`, `auth_controller.dart`, `app_user.dart`?**
+  _High betweenness centrality (0.017) - this node is a cross-community bridge._
 - **Should `welcome_identity_view.dart` be split into smaller, more focused modules?**
-  _Cohesion score 0.09090909090909091 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.04521276595744681 - nodes in this community are weakly interconnected._

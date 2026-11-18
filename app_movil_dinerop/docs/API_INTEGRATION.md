@@ -15,6 +15,7 @@ Base URL es solo host/base; las rutas abajo incluyen `/api/...`. No se asume que
 | GET | `/api/auth/activate?token=…` | No | `activate` | `AuthController.activate` |
 | POST | `/api/auth/complete-registration` | No | `completeRegistration` | `AuthController.complete-registration` |
 | POST | `/api/auth/registration/verify-code` | No | `verifyRegistrationCode` | `AuthController.registration/verify-code` |
+| POST | `/api/auth/registration/start` | No | Registro de cuenta para inversión | `AuthController.registration/start`; crea la cuenta pendiente y el OTP sin crear una solicitud de crédito |
 | POST | `/api/auth/registration/resend-code` | No | `resendRegistrationCode` | `AuthController.registration/resend-code` |
 | POST | `/api/auth/registration/change-email` | No | `changeRegistrationEmail` | `AuthController.registration/change-email` |
 | POST | `/api/auth/registration/set-password` | No | `setRegistrationPassword` | `AuthController.registration/set-password` |
@@ -64,3 +65,5 @@ App: [`api_client.dart`](../lib/core/network/api_client.dart), [`api_config.dart
 La comparación web y móvil consume `GET /api/investments/availability` y `GET /api/investments/offers` sin autenticación ni datos personales. Enviar una solicitud usa `POST /api/investments/requests` autenticado e incluye consentimiento explícito; el cliente consulta su historial en `/api/investments/requests/me`. La bandeja de cooperativa usa `/api/credits/cooperative/me/investment-*` y deriva el ámbito desde el usuario autenticado. La aceptación detallada se registra mediante `PUT /investment-requests/{id}/acceptance`; el estado `CONDITIONS_CONFIRMED` indica aceptación pendiente de formalización. Véase también `API_DOCUMENTATION.md`.
 
 El simulador de crédito consulta `GET /api/credits/public-offers?creditCategory={CONSUMO|MICROCREDITO}&amount={USD}&termMonths={meses}` sin autenticación ni PII. Muestra productos/tasas actuales que cumplen monto y plazo; no calcula cuotas porque el contrato no proporciona cargos financieros completos. Si el usuario continúa sin sesión, la app guarda el monto, plazo y tipo por 30 minutos en almacenamiento seguro, lo recupera después del acceso/onboarding y vuelve a consultar las ofertas.
+
+El simulador de inversión conserva de forma segura la simulación y la oferta elegida por 30 minutos. Para crear una cuenta usa `POST /api/auth/registration/start`, seguido de verificación OTP y creación de contraseña; después de iniciar sesión y completar onboarding, vuelve al simulador y consulta condiciones vigentes. Este flujo no llama a `/api/credits/public-request`.
