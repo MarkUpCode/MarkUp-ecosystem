@@ -40,6 +40,9 @@ public class UserPreRegistration {
     @Column(name = "city", length = 100)
     private String city;
 
+    @Column(name = "parish", length = 100)
+    private String parish;
+
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;

@@ -150,6 +150,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: '/verify-registration',
         builder: (context, state) => RegistrationVerificationPage(
           email: state.uri.queryParameters['email'],
+          isInvestmentRegistration:
+              state.uri.queryParameters['flow'] == 'investment',
         ),
       ),
       GoRoute(

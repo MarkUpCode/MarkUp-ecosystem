@@ -69,29 +69,6 @@ class AuthRemoteDataSource {
     );
   }
 
-  Future<String> startRegistration({
-    required String email,
-    required String firstName,
-    required String lastName,
-    required String identification,
-    String? phone,
-  }) {
-    return _client.request<String>(
-      '/api/auth/registration/start',
-      method: 'POST',
-      authenticated: false,
-      body: {
-        'email': email,
-        'firstName': firstName,
-        'lastName': lastName,
-        'identification': identification,
-        if (phone?.trim().isNotEmpty == true) 'phone': phone!.trim(),
-      },
-      parser: (data) =>
-          data is Map ? (data['message'] ?? '').toString() : data.toString(),
-    );
-  }
-
   Future<String> resendRegistrationCode(String email) {
     return _client.request<String>(
       '/api/auth/registration/resend-code',

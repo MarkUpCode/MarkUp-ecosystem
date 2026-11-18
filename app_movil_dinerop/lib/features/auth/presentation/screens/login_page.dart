@@ -65,7 +65,7 @@ class LoginPage extends ConsumerWidget {
               const SizedBox(height: 16),
 
               _InvestmentServiceCard(
-                onPressed: () => context.push('/simulate-investment'),
+                onPressed: () => context.push('/register-investment'),
                 onSimulationPressed: () => context.push('/simulate-investment'),
               ),
 

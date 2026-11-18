@@ -29,4 +29,6 @@ public class PublicRegistrationRequest {
     private String province;
 
     private String city;
+
+    private String parish;
 }

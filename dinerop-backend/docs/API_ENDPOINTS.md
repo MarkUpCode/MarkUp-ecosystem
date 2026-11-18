@@ -39,6 +39,16 @@ Rutas combinadas desde `@RequestMapping` y mapping de método en cada controlado
 
 `InternalCreditController` (`/internal/credits`): POST `/link-client`, POST `/completed`, PUT `/solicitudes/{solicitudId}/estado`.
 
+## Inversiones — `InvestmentController` (`/api/investments`)
+
+| Método | Ruta | Uso / autorización explícita |
+|---|---|---|
+| GET | `/availability` | consultar plazos y formas de pago; pública |
+| GET | `/offers` | comparar ofertas; pública |
+| POST | `/public-requests` | solicitud de inversión y registro OTP en un único flujo; pública |
+| POST | `/requests` | crear solicitud autenticado como CLIENT |
+| GET | `/requests/me` | consultar solicitudes del CLIENT autenticado |
+
 ## Onboarding
 
 - `OnboardingClienteController` (`/api/onboarding/cliente`): POST `/solicitante`, POST `/garante/completar`, GET `/{solicitudId}`, GET `/formulario-status`, GET `/pre-registration`.
@@ -65,4 +75,4 @@ Todos estos controladores declaran `@PreAuthorize("hasRole('ADMIN')")`.
 
 ## Verificación de permisos
 
-`SecurityConfig` permite `/api/auth/**`, `/api/cooperatives/**`, `/api/visits/**`, `/api/test/**`, Swagger, actuator, OPTIONS y POST `/api/credits/public-request`; el resto requiere autenticación. Controladores agregan roles en algunos métodos/clases. Hay que revisar ambas capas para saber el permiso efectivo. No se documentan cuerpos completos aquí; ver DTOs del controlador y `API_DOCUMENTATION.md`, validando este último con el código.
+`SecurityConfig` permite `/api/auth/**`, `/api/cooperatives/**`, `/api/visits/**`, `/api/test/**`, Swagger, actuator, OPTIONS, POST `/api/credits/public-request`, POST `/api/investments/public-requests` y GET de ofertas/disponibilidad de inversión; el resto requiere autenticación. Controladores agregan roles en algunos métodos/clases. Hay que revisar ambas capas para saber el permiso efectivo. No se documentan cuerpos completos aquí; ver DTOs del controlador y `API_DOCUMENTATION.md`, validando este último con el código.

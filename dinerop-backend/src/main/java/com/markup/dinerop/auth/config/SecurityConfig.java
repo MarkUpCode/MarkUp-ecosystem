@@ -63,6 +63,7 @@ public class SecurityConfig {
                         .requestMatchers(PUBLIC_ENDPOINTS).permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/investments/offers").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/investments/availability").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/investments/public-requests").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/credits/public-offers").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/credits/public-request").permitAll()
                         .anyRequest().authenticated()

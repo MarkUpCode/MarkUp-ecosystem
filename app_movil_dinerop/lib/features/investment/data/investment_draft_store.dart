@@ -6,29 +6,29 @@ class PendingInvestmentDraft {
     required this.amount,
     required this.termMonths,
     required this.interestPaymentOption,
-    required this.productId,
-    required this.cooperativeId,
-    required this.conditionId,
-    required this.annualRate,
+    this.productId,
+    this.cooperativeId,
+    this.conditionId,
+    this.annualRate,
     required this.savedAt,
   });
   final double amount;
   final int termMonths;
   final String? interestPaymentOption;
-  final int productId;
-  final int cooperativeId;
-  final int conditionId;
-  final double annualRate;
+  final int? productId;
+  final int? cooperativeId;
+  final int? conditionId;
+  final double? annualRate;
   final DateTime savedAt;
 
   Map<String, dynamic> toJson() => {
     'amount': amount,
     'termMonths': termMonths,
     'interestPaymentOption': interestPaymentOption,
-    'productId': productId,
-    'cooperativeId': cooperativeId,
-    'conditionId': conditionId,
-    'annualRate': annualRate,
+    if (productId != null) 'productId': productId,
+    if (cooperativeId != null) 'cooperativeId': cooperativeId,
+    if (conditionId != null) 'conditionId': conditionId,
+    if (annualRate != null) 'annualRate': annualRate,
     'savedAt': savedAt.toUtc().toIso8601String(),
   };
   factory PendingInvestmentDraft.fromJson(Map<String, dynamic> json) =>
@@ -36,10 +36,10 @@ class PendingInvestmentDraft {
         amount: (json['amount'] as num).toDouble(),
         termMonths: (json['termMonths'] as num).toInt(),
         interestPaymentOption: json['interestPaymentOption']?.toString(),
-        productId: (json['productId'] as num).toInt(),
-        cooperativeId: (json['cooperativeId'] as num).toInt(),
-        conditionId: (json['conditionId'] as num).toInt(),
-        annualRate: (json['annualRate'] as num).toDouble(),
+        productId: (json['productId'] as num?)?.toInt(),
+        cooperativeId: (json['cooperativeId'] as num?)?.toInt(),
+        conditionId: (json['conditionId'] as num?)?.toInt(),
+        annualRate: (json['annualRate'] as num?)?.toDouble(),
         savedAt: DateTime.parse(json['savedAt'].toString()),
       );
 }

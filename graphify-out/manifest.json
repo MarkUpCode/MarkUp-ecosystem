@@ -78,9 +78,9 @@
     "semantic_hash": ""
   },
   "app_movil_dinerop/lib/app/router/app_router.dart": {
-    "mtime": 1794949804.1932545,
-    "seen": 1794950457.5862212,
-    "ast_hash": "9bfdb8a5690991a53d92b4d7a5f964b6",
+    "mtime": 1794976446.6735005,
+    "seen": 1794978000.3327978,
+    "ast_hash": "01e791da2093e9ad27e2e70e07b80051",
     "semantic_hash": ""
   },
   "app_movil_dinerop/lib/app/shell/app_shell.dart": {
@@ -168,15 +168,15 @@
     "semantic_hash": ""
   },
   "app_movil_dinerop/lib/features/auth/data/auth_remote_data_source.dart": {
-    "mtime": 1790229369.6127257,
-    "seen": 1794858910.9774034,
-    "ast_hash": "3c7708e4d86eaf9ecee927176069d424",
+    "mtime": 1794976500.7730472,
+    "seen": 1794978000.332827,
+    "ast_hash": "3af242c32204a1c423fb5a223b296f92",
     "semantic_hash": ""
   },
   "app_movil_dinerop/lib/features/auth/data/auth_repository.dart": {
-    "mtime": 1790229369.6127257,
-    "seen": 1794858910.9774048,
-    "ast_hash": "972410b9502fbf9b93c68d4546c315a3",
+    "mtime": 1794976500.7946098,
+    "seen": 1794978000.3328288,
+    "ast_hash": "2ba2e8248ea8f2083f9423e32c1206d5",
     "semantic_hash": ""
   },
   "app_movil_dinerop/lib/features/auth/data/models/app_user.dart": {
@@ -204,9 +204,9 @@
     "semantic_hash": ""
   },
   "app_movil_dinerop/lib/features/auth/presentation/auth_controller.dart": {
-    "mtime": 1794893357.1080961,
-    "seen": 1794894132.2931743,
-    "ast_hash": "d8dd5621ce39969146eca466a1d24360",
+    "mtime": 1794976369.319905,
+    "seen": 1794978000.3328376,
+    "ast_hash": "076dfe8ffe9a6ca3053f90d380d65fb6",
     "semantic_hash": ""
   },
   "app_movil_dinerop/lib/features/auth/presentation/screens/activation_page.dart": {
@@ -228,9 +228,9 @@
     "semantic_hash": ""
   },
   "app_movil_dinerop/lib/features/auth/presentation/screens/login_page.dart": {
-    "mtime": 1794949804.3805203,
-    "seen": 1794950457.598756,
-    "ast_hash": "24abf7c897d11a9f9785a9dd0abf8bfa",
+    "mtime": 1794976283.5042377,
+    "seen": 1794978000.332847,
+    "ast_hash": "fc404d6a47622f5b161bb9d2c9d40835",
     "semantic_hash": ""
   },
   "app_movil_dinerop/lib/features/auth/presentation/screens/pending_activation_page.dart": {
@@ -246,9 +246,9 @@
     "semantic_hash": ""
   },
   "app_movil_dinerop/lib/features/auth/presentation/screens/registration_verification_page.dart": {
-    "mtime": 1794949804.4472406,
-    "seen": 1794950457.5997977,
-    "ast_hash": "862a6c249647e6080a1a6ddfe5dafe8e",
+    "mtime": 1794976552.3241906,
+    "seen": 1794978000.332853,
+    "ast_hash": "861edc21f5faeed74d26614ef6a91624",
     "semantic_hash": ""
   },
   "app_movil_dinerop/lib/features/auth/presentation/screens/reset_password_page.dart": {
@@ -336,9 +336,9 @@
     "semantic_hash": ""
   },
   "app_movil_dinerop/lib/features/credit/presentation/investment_simulator_page.dart": {
-    "mtime": 1794937266.5907385,
-    "seen": 1794942644.9907691,
-    "ast_hash": "f3a020c40aa8cdd10a494a0585c93983",
+    "mtime": 1794976446.676015,
+    "seen": 1794978000.3328848,
+    "ast_hash": "7ae9ff7186892350e4daf642865df27a",
     "semantic_hash": ""
   },
   "app_movil_dinerop/lib/features/credit/presentation/request_credit_page.dart": {
@@ -3240,9 +3240,9 @@
     "semantic_hash": ""
   },
   "app_movil_dinerop/docs/API_INTEGRATION.md": {
-    "mtime": 1794949940.0627062,
-    "seen": 1794950457.9687371,
-    "ast_hash": "a1a3939aea7876fd055bdf8ab5bd0547",
+    "mtime": 1794976484.2770536,
+    "seen": 1794978000.3340166,
+    "ast_hash": "e6fcc10320731d1eed359e4a2b983385",
     "semantic_hash": ""
   },
   "app_movil_dinerop/docs/ARCHITECTURE.md": {
@@ -3276,9 +3276,9 @@
     "semantic_hash": ""
   },
   "app_movil_dinerop/docs/NAVIGATION.md": {
-    "mtime": 1794463052.728243,
-    "seen": 1794858910.9786663,
-    "ast_hash": "afb734eb239fa98e71fbc225c438e4a4",
+    "mtime": 1794976484.2755463,
+    "seen": 1794978000.3340266,
+    "ast_hash": "76f9775ab262aa022113aa57c8a297d5",
     "semantic_hash": ""
   },
   "app_movil_dinerop/docs/PROJECT_OVERVIEW.md": {
@@ -4044,9 +4044,9 @@
     "semantic_hash": ""
   },
   "app_movil_dinerop/lib/features/dolarito/models/dolarito_reaction.dart": {
-    "mtime": 1794949758.4704132,
-    "seen": 1794950457.6084335,
-    "ast_hash": "fa20a760090c64afb6d925096c2cc50d",
+    "mtime": 1794976369.3103738,
+    "seen": 1794978000.3328989,
+    "ast_hash": "11a15dd4117674138953c86359c7a62b",
     "semantic_hash": ""
   },
   "app_movil_dinerop/lib/features/dolarito/models/dolarito_state.dart": {
@@ -4062,9 +4062,9 @@
     "semantic_hash": ""
   },
   "app_movil_dinerop/lib/features/dolarito/services/dolarito_service.dart": {
-    "mtime": 1794949805.065579,
-    "seen": 1794950457.6094599,
-    "ast_hash": "3c3033985b61eaca9e368c5e64b42358",
+    "mtime": 1794976369.3123817,
+    "seen": 1794978000.332904,
+    "ast_hash": "70376e6d84b8af28dfc2edb2ee0495fe",
     "semantic_hash": ""
   },
   "app_movil_dinerop/lib/features/dolarito/widgets/dolarito_message.dart": {
@@ -4383,6 +4383,12 @@
     "mtime": 1794948696.1584854,
     "seen": 1794951029.2387576,
     "ast_hash": "784ae79488e0b22b77428905b0d594d6",
+    "semantic_hash": ""
+  },
+  "app_movil_dinerop/lib/features/auth/presentation/screens/investment_registration_page.dart": {
+    "mtime": 1794976501.1332593,
+    "seen": 1794978000.332845,
+    "ast_hash": "192244d11b099146bd4599691437e6c0",
     "semantic_hash": ""
   },
   "dinerup-app/package-lock.json": {

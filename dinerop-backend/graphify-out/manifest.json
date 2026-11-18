@@ -264,9 +264,9 @@
     "semantic_hash": "845c67440607e06f2a3d8e6b53a1cc33"
   },
   "src/main/java/com/markup/dinerop/auth/config/SecurityConfig.java": {
-    "mtime": 1794948731.2758284,
-    "seen": 1794950006.7974603,
-    "ast_hash": "37bb4f91d1fde709251f2c0568984ee5",
+    "mtime": 1795014529.0931263,
+    "seen": 1795014853.1804445,
+    "ast_hash": "8e442362abc8851ed7980b3b136e8f64",
     "semantic_hash": ""
   },
   "src/main/java/com/markup/dinerop/auth/config/WebClientConfig.java": {
@@ -366,10 +366,10 @@
     "semantic_hash": "44a9687ff18b4fa5a312f21645a1ab3e"
   },
   "src/main/java/com/markup/dinerop/auth/dto/PublicRegistrationRequest.java": {
-    "mtime": 1782016087.203026,
-    "seen": 1794461279.791347,
-    "ast_hash": "9d8709a57fdf56fc06f4b10d4c4f2574",
-    "semantic_hash": "9d8709a57fdf56fc06f4b10d4c4f2574"
+    "mtime": 1795014504.3989747,
+    "seen": 1795014853.1857398,
+    "ast_hash": "1cc2f316e1f4ae8dfd388ddce47e59f5",
+    "semantic_hash": ""
   },
   "src/main/java/com/markup/dinerop/auth/dto/PublicRegistrationResponse.java": {
     "mtime": 1782016087.203026,
@@ -414,10 +414,10 @@
     "semantic_hash": ""
   },
   "src/main/java/com/markup/dinerop/auth/entity/UserPreRegistration.java": {
-    "mtime": 1782016087.205029,
-    "seen": 1794461279.791357,
-    "ast_hash": "9b9d9d794c414ec78f9f0918a9070b99",
-    "semantic_hash": "9b9d9d794c414ec78f9f0918a9070b99"
+    "mtime": 1795014504.399974,
+    "seen": 1795014853.187649,
+    "ast_hash": "3f2dd23e726e8640c6b27892e091930f",
+    "semantic_hash": ""
   },
   "src/main/java/com/markup/dinerop/auth/exception/AccountDisabledException.java": {
     "mtime": 1787854737.1307719,
@@ -504,9 +504,9 @@
     "semantic_hash": ""
   },
   "src/main/java/com/markup/dinerop/auth/service/AuthService.java": {
-    "mtime": 1794873715.1469953,
-    "seen": 1794874790.224978,
-    "ast_hash": "7872e7c74e56f6e2b5fca69217ff556f",
+    "mtime": 1795014943.2001371,
+    "seen": 1795014985.1299064,
+    "ast_hash": "a4face7a9c2b92115f1eed35dd5e1ecb",
     "semantic_hash": ""
   },
   "src/main/java/com/markup/dinerop/auth/service/CustomUserDetailsService.java": {
@@ -1464,9 +1464,9 @@
     "semantic_hash": ""
   },
   "docs/API_ENDPOINTS.md": {
-    "mtime": 1794462213.441383,
-    "seen": 1794858844.2399282,
-    "ast_hash": "45545424c21830e07a915a6a38ba8ed0",
+    "mtime": 1795014956.1082745,
+    "seen": 1795014985.1790473,
+    "ast_hash": "51a03da66c5396328b27115e479f28fb",
     "semantic_hash": ""
   },
   "docs/ARCHITECTURE.md": {
@@ -1686,9 +1686,9 @@
     "semantic_hash": ""
   },
   "src/main/java/com/markup/dinerop/cooperative/domain/service/InvestmentService.java": {
-    "mtime": 1794936393.7902277,
-    "seen": 1794937291.3979273,
-    "ast_hash": "84bf98047e0cd16342218a29b6735445",
+    "mtime": 1795014529.091127,
+    "seen": 1795014853.197837,
+    "ast_hash": "287a0f4a58a404f597e0b2d65dccc225",
     "semantic_hash": ""
   },
   "src/main/java/com/markup/dinerop/cooperative/dto/CreateInvestmentRequest.java": {
@@ -1728,9 +1728,9 @@
     "semantic_hash": ""
   },
   "src/main/java/com/markup/dinerop/cooperative/infrastructure/web/InvestmentController.java": {
-    "mtime": 1794933259.8073711,
-    "seen": 1794933844.3187973,
-    "ast_hash": "2f8622eb9a6d9eebdf8eafa2c351e39c",
+    "mtime": 1795014529.092126,
+    "seen": 1795014853.2024503,
+    "ast_hash": "0323ef3764f491af68e76e8f61e7ceba",
     "semantic_hash": ""
   },
   "src/test/java/com/markup/dinerop/credit/infrastructure/web/CreditControllerOnboardingGateTest.java": {
@@ -1785,6 +1785,12 @@
     "mtime": 1794948726.0060866,
     "seen": 1794950006.8919013,
     "ast_hash": "fc9b01e033eceba070cc5fccc4137a09",
+    "semantic_hash": ""
+  },
+  "src/main/java/com/markup/dinerop/cooperative/dto/PublicInvestmentRegistrationRequest.java": {
+    "mtime": 1795014529.090124,
+    "seen": 1795014853.2012153,
+    "ast_hash": "acacd142c131e891724e17a077abfcb9",
     "semantic_hash": ""
   }
 }

@@ -46,20 +46,6 @@ class AuthRepository {
     required String code,
   }) => _remote.verifyRegistrationCode(email: email, code: code);
 
-  Future<String> startRegistration({
-    required String email,
-    required String firstName,
-    required String lastName,
-    required String identification,
-    String? phone,
-  }) => _remote.startRegistration(
-    email: email,
-    firstName: firstName,
-    lastName: lastName,
-    identification: identification,
-    phone: phone,
-  );
-
   Future<String> resendRegistrationCode(String email) =>
       _remote.resendRegistrationCode(email);
 

@@ -16,9 +16,14 @@ import '../../../dolarito/providers/dolarito_provider.dart';
 import '../../../dolarito/widgets/dolarito_widget.dart';
 
 class RegistrationVerificationPage extends ConsumerStatefulWidget {
-  const RegistrationVerificationPage({super.key, required this.email});
+  const RegistrationVerificationPage({
+    super.key,
+    required this.email,
+    this.isInvestmentRegistration = false,
+  });
 
   final String? email;
+  final bool isInvestmentRegistration;
 
   @override
   ConsumerState<RegistrationVerificationPage> createState() =>
@@ -39,7 +44,7 @@ class _RegistrationVerificationPageState
   Timer? _resendTimer;
   late String _currentEmail;
   String? _error;
-  bool _investmentRegistration = false;
+  late bool _investmentRegistration;
 
   String get _email => _emailController.text.trim();
 
@@ -48,8 +53,25 @@ class _RegistrationVerificationPageState
     super.initState();
     _currentEmail = widget.email?.trim() ?? '';
     _emailController.text = _currentEmail;
+    _investmentRegistration = widget.isInvestmentRegistration;
     _startResendCountdown();
-    _loadInvestmentRegistration();
+    if (_investmentRegistration) {
+      _showInvestmentRegistrationMessage();
+    } else {
+      _loadInvestmentRegistration();
+    }
+  }
+
+  void _showInvestmentRegistrationMessage() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      ref
+          .read(dolaritoProvider.notifier)
+          .show(
+            ref.read(dolaritoServiceProvider).investmentRegistration(),
+            force: true,
+          );
+    });
   }
 
   Future<void> _loadInvestmentRegistration() async {
@@ -203,7 +225,23 @@ class _RegistrationVerificationPageState
       await ref
           .read(authControllerProvider)
           .setRegistrationPassword(email: _email, password: password);
+      if (_investmentRegistration) {
+        await ref.read(investmentDraftStoreProvider).clear();
+        await ref.read(creditSimulationDraftStoreProvider).clear();
+      }
       await ref.read(authControllerProvider).login(_email, password);
+      if (_investmentRegistration) {
+        ref
+            .read(dolaritoProvider.notifier)
+            .show(
+              ref
+                  .read(dolaritoServiceProvider)
+                  .investmentRegistrationComplete(),
+              force: true,
+            );
+        if (mounted) context.go('/dashboard');
+        return;
+      }
       final draft = await ref.read(investmentDraftStoreProvider).read();
       final creditDraft = await ref
           .read(creditSimulationDraftStoreProvider)

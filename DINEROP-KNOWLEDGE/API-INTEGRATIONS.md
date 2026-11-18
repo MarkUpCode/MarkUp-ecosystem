@@ -55,6 +55,7 @@ Referencias primarias: `dinerop-backend/src/main/java/com/markup/dinerop/*Contro
 Los clientes móvil y DinerUp usan los nuevos endpoints definidos en `dinerop-backend/cooperative/infrastructure/web/InvestmentController` y `CooperativeInvestmentController`:
 
 - `GET /api/investments/availability` y `GET /api/investments/offers` son públicos y no reciben PII.
+- `POST /api/investments/public-requests` es público y dedicado al registro de inversión: recibe identidad, ubicación, oferta seleccionada y consentimiento; guarda en `investment_requests` y luego inicia OTP. No pasa por `POST /api/credits/public-request`.
 - `POST /api/investments/requests` y `GET /api/investments/requests/me` requieren rol `CLIENT`.
 - `/api/credits/cooperative/me/investment-products*` y `/investment-requests*` requieren `COOPERATIVE`; el backend toma el ID cooperativo de la cuenta autenticada.
 - La selección requiere consentimiento explícito, guarda snapshot de tasa/condiciones y comparte datos de contacto solo con la cooperativa seleccionada. Los plazos implementados son meses porque las condiciones existentes modelan `minimumTermMonths`/`maximumTermMonths`.

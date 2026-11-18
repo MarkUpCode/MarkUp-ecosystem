@@ -236,9 +236,18 @@ class DolaritoService {
   DolaritoReaction investmentRegistration() => const DolaritoReaction(
     mood: DolaritoMood.motivated,
     message:
-        'Vamos paso a paso: crea tu cuenta para guardar esta inversión y continuar con la oferta que elegiste.',
+        'Vamos paso a paso: completa tus datos y la inversión que buscas. Después validarás tu correo, crearás tu contraseña y entrarás a Dinerop.',
     event: DolaritoEvent.investmentRegistration,
     priority: DolaritoPriority.motivation,
+    scopeKey: 'investment-registration',
+  );
+
+  DolaritoReaction investmentRegistrationComplete() => const DolaritoReaction(
+    mood: DolaritoMood.proud,
+    message:
+        '¡Listo! Tu cuenta y solicitud de inversión están registradas. Ya puedes explorar Dinerop desde la pantalla principal.',
+    event: DolaritoEvent.investmentRegistrationComplete,
+    priority: DolaritoPriority.celebration,
     scopeKey: 'investment-registration',
   );
 

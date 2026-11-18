@@ -35,6 +35,7 @@ enum DolaritoEvent {
   investmentAccountRequired,
   investmentAccountReady,
   investmentRegistration,
+  investmentRegistrationComplete,
   creditSimulationThinking,
   creditSimulationOffers,
   creditSimulationNoOffers,

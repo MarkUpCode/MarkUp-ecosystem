@@ -11,11 +11,11 @@ Base URL es solo host/base; las rutas abajo incluyen `/api/...`. No se asume que
 | Método | Ruta enviada por app | Autenticada | Consumidor | Correspondencia en backend |
 |---|---|---:|---|---|
 | POST | `/api/auth/login` | No | `AuthRemoteDataSource.login` | `AuthController.login` |
-| POST | `/api/credits/public-request` | No | `register` | `CreditController.public-request` |
+| POST | `/api/credits/public-request` | No | `register` (crédito) | `CreditController.public-request`; el flujo de Crédito conserva `type=CREDITO` |
+| POST | `/api/investments/public-requests` | No | `register-investment` | `InvestmentController.createPublicRequest`; crea una solicitud de inversión, guarda preregistro y envía OTP |
 | GET | `/api/auth/activate?token=…` | No | `activate` | `AuthController.activate` |
 | POST | `/api/auth/complete-registration` | No | `completeRegistration` | `AuthController.complete-registration` |
 | POST | `/api/auth/registration/verify-code` | No | `verifyRegistrationCode` | `AuthController.registration/verify-code` |
-| POST | `/api/auth/registration/start` | No | Registro de cuenta para inversión | `AuthController.registration/start`; crea la cuenta pendiente y el OTP sin crear una solicitud de crédito |
 | POST | `/api/auth/registration/resend-code` | No | `resendRegistrationCode` | `AuthController.registration/resend-code` |
 | POST | `/api/auth/registration/change-email` | No | `changeRegistrationEmail` | `AuthController.registration/change-email` |
 | POST | `/api/auth/registration/set-password` | No | `setRegistrationPassword` | `AuthController.registration/set-password` |
@@ -42,7 +42,7 @@ El `POST /api/credits/me` autenticado consulta el estado real de onboarding ante
 ## Formatos y DTO
 
 - Login envía `{email,password}` y parsea `{accessToken,user}` (`LoginResponse`, `AppUser`).
-- Registro público crea solicitud mediante `PublicRegistrationRequest`; mapea a endpoint de crédito público, no a `POST /api/auth/register`.
+- Registro público de Crédito crea solicitud mediante `PublicRegistrationRequest` en `/api/credits/public-request` con `type=CREDITO`.
 - Solicitud de crédito serializa `monto`, `type`, `creditType`, `plazoMeses`, `province`, `city` (`CreditRequestPayload`).
 - Onboarding del solicitante serializa objeto contenedor `destinoCredito/solicitante/conyuge`; garante envía persona plana y elimina `email` (`OnboardingRepository`).
 - El cliente convierte arrays/mapas a `CooperativeSummary`, `ClientCreditRequestSummary`, `CreditCooperativeStatus` y onboarding DTO. Valores enum desconocidos tienen fallback `unknown`.
@@ -66,4 +66,4 @@ La comparación web y móvil consume `GET /api/investments/availability` y `GET 
 
 El simulador de crédito consulta `GET /api/credits/public-offers?creditCategory={CONSUMO|MICROCREDITO}&amount={USD}&termMonths={meses}` sin autenticación ni PII. Muestra productos/tasas actuales que cumplen monto y plazo; no calcula cuotas porque el contrato no proporciona cargos financieros completos. Si el usuario continúa sin sesión, la app guarda el monto, plazo y tipo por 30 minutos en almacenamiento seguro, lo recupera después del acceso/onboarding y vuelve a consultar las ofertas.
 
-El simulador de inversión conserva de forma segura la simulación y la oferta elegida por 30 minutos. Para crear una cuenta usa `POST /api/auth/registration/start`, seguido de verificación OTP y creación de contraseña; después de iniciar sesión y completar onboarding, vuelve al simulador y consulta condiciones vigentes. Este flujo no llama a `/api/credits/public-request`.
+El botón principal de inversión inicia un flujo independiente de cinco pasos: datos personales, ubicación, monto/plazo/modalidad de intereses, selección de oferta real y confirmación. La app consulta `GET /api/investments/availability` y `GET /api/investments/offers`, y envía la oferta elegida con los datos de registro a `POST /api/investments/public-requests`. El backend guarda un registro real en `investment_requests`, conserva provincia/cantón/parroquia en el preregistro y envía OTP tras guardar la solicitud. Tras verificar el código y crear la contraseña, la app inicia sesión y entra directamente al dashboard.

@@ -195,6 +195,21 @@ public class AuthService {
     }
 
     @Transactional
+    public User prepareInvestmentRegistration(PublicRegistrationRequest request) {
+        String normalizedEmail = normalizeEmail(request.getEmail());
+        Optional<User> existing = userRepository.findByEmail(normalizedEmail);
+        if (existing.isPresent() && existing.get().getRole() != Role.CLIENT) {
+            throw new IllegalArgumentException("Este flujo de registro no está disponible para esta cuenta.");
+        }
+        User user = existing.orElseGet(() -> createPendingUser(normalizedEmail, Role.CLIENT));
+        if (existing.isPresent() && "ACTIVE".equals(user.getStatus()) && user.getPassword() != null) {
+            throw new UserAlreadyActiveException(normalizedEmail);
+        }
+        upsertPreRegistration(user, request);
+        return user;
+    }
+
+    @Transactional
     public User inviteUser(InviteUserRequest request) {
 
         Role role = request.role();
@@ -423,6 +438,9 @@ public class AuthService {
         preReg.setPhone(request.getPhone());
         preReg.setProvince(request.getProvince());
         preReg.setCity(request.getCity());
+        if (request.getParish() != null) {
+            preReg.setParish(request.getParish());
+        }
         userPreRegistrationRepository.save(preReg);
     }
 

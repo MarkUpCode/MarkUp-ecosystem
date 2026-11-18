@@ -8,11 +8,11 @@
 |---|---|---|
 | `/splash` | `SplashPage` | Inicial; redirige a welcome al terminar bootstrap |
 | `/welcome` | `WelcomePage` | Pública |
-| `/login`, `/register`, `/register-investment` | Login, solicitud pública de crédito, registro de cuenta para inversión | Públicas |
-| `/activate`, `/complete-registration`, `/verify-registration` | Activación/verificación/clave | Públicas; parámetros query `token`/`email`; inversión conserva la simulación durante el OTP |
+| `/login`, `/register`, `/register-investment` | Login, solicitud pública de crédito, registro independiente de inversión en cinco pasos | Públicas |
+| `/activate`, `/complete-registration`, `/verify-registration` | Activación/verificación/clave | Públicas; parámetros query `token`/`email`; registro de inversión termina en el dashboard después del OTP y la contraseña |
 | `/forgot-password`, `/reset-password` | Recuperación | Públicas; reset lee `token` |
 | `/pending-activation` | Estado pendiente | Permitida para cuenta que requiere activación |
-| `/simulate-credit`, `/simulate-investment` | Simuladores | Públicas; elegir una oferta de inversión permite iniciar sesión o crear cuenta sin generar una solicitud de crédito |
+| `/simulate-credit`, `/simulate-investment` | Simuladores | Públicas; desde inversión se pueden consultar ofertas por separado |
 | `/onboarding`, `/guarantor-onboarding` | Onboarding solicitante/garante | No clasificadas como públicas; requiere sesión activa |
 | `/request-credit` | Crear solicitud | No pública; requiere sesión activa |
 | `/dashboard`, `/requests`, `/cooperatives`, `/profile` | Inicio y navegación principal | Dentro de `ShellRoute`, sesión activa |

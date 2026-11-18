@@ -86,6 +86,18 @@ class _InvestmentSimulatorPageState
     if (!mounted) return;
     await _compare();
     if (!mounted) return;
+    final hasSelectedOffer =
+        draft.productId != null &&
+        draft.cooperativeId != null &&
+        draft.conditionId != null &&
+        draft.annualRate != null;
+    if (!hasSelectedOffer) {
+      setState(
+        () => _draftNotice =
+            'Recuperamos tu monto y plazo. Revisa las ofertas vigentes para continuar.',
+      );
+      return;
+    }
     final current = _offers
         .where(
           (offer) =>

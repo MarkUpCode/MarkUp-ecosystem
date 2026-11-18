@@ -6,6 +6,42 @@ class InvestmentRepository {
 
   final ApiClient _client;
 
+  Future<Map<String, dynamic>> createPublicRequest({
+    required String email,
+    required String firstName,
+    required String lastName,
+    required String identification,
+    required String phone,
+    required String province,
+    required String canton,
+    required String parish,
+    required InvestmentOffer offer,
+    required double amount,
+    required int termMonths,
+    required String interestPaymentOption,
+  }) => _client.request<Map<String, dynamic>>(
+    '/api/investments/public-requests',
+    method: 'POST',
+    authenticated: false,
+    body: {
+      'email': email,
+      'firstName': firstName,
+      'lastName': lastName,
+      'identification': identification,
+      'phone': phone,
+      'province': province,
+      'city': canton,
+      'parish': parish,
+      'productId': offer.productId,
+      'conditionId': offer.conditionId,
+      'amount': amount,
+      'termMonths': termMonths,
+      'interestPaymentOption': interestPaymentOption,
+      'personalDataConsent': true,
+    },
+    parser: (data) => Map<String, dynamic>.from(data as Map),
+  );
+
   Future<InvestmentAvailability> getAvailability({
     required double amount,
     int? termMonths,

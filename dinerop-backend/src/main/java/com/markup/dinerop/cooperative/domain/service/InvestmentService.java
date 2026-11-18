@@ -103,6 +103,12 @@ public class InvestmentService {
 
     @Transactional
     public InvestmentRequestResponse createRequest(Long clientId, CreateInvestmentRequest request) {
+        return createRequest(clientId, request, null, null);
+    }
+
+    @Transactional
+    public InvestmentRequestResponse createRequest(Long clientId, CreateInvestmentRequest request,
+                                                   String submittedClientName, String submittedPhone) {
         if (!Boolean.TRUE.equals(request.personalDataConsent())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "Debes autorizar el envío de tus datos únicamente a la cooperativa seleccionada.");
@@ -151,7 +157,9 @@ public class InvestmentService {
                 .orElseThrow(() -> new EntityNotFoundException("Cooperativa no encontrada."));
         var estimate = calculateInterest(request.amount(), condition.getAnnualRate(),
                 request.termMonths(), product.getCalculationMethod(), request.interestPaymentOption());
-        String clientName = ((user.getFirstName() == null ? "" : user.getFirstName().trim()) + " "
+        String clientName = submittedClientName != null && !submittedClientName.isBlank()
+                ? submittedClientName.trim()
+                : ((user.getFirstName() == null ? "" : user.getFirstName().trim()) + " "
                 + (user.getLastName() == null ? "" : user.getLastName().trim())).trim();
         if (clientName.isBlank()) clientName = user.getEmail();
 
@@ -167,7 +175,7 @@ public class InvestmentService {
         investmentRequest.setTargetAudienceSnapshot(product.getTargetAudience());
         investmentRequest.setClientNameSnapshot(clientName);
         investmentRequest.setClientEmailSnapshot(user.getEmail());
-        investmentRequest.setClientPhoneSnapshot(user.getPhone());
+        investmentRequest.setClientPhoneSnapshot(submittedPhone == null ? user.getPhone() : submittedPhone);
         investmentRequest.setAmount(request.amount().setScale(2, RoundingMode.HALF_UP));
         investmentRequest.setTermMonths(request.termMonths());
         investmentRequest.setInterestPaymentOption(request.interestPaymentOption());

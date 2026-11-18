@@ -264,34 +264,6 @@ class AuthController extends ChangeNotifier {
     }
   }
 
-  Future<void> startRegistration({
-    required String email,
-    required String firstName,
-    required String lastName,
-    required String identification,
-    String? phone,
-  }) async {
-    _setBusy(true);
-    _errorMessage = null;
-    try {
-      await _authRepository.startRegistration(
-        email: email,
-        firstName: firstName,
-        lastName: lastName,
-        identification: identification,
-        phone: phone,
-      );
-      _lastEmail = email;
-    } catch (error) {
-      _errorMessage = error is AppException
-          ? error.message
-          : AppErrorMessages.generic;
-      rethrow;
-    } finally {
-      _setBusy(false);
-    }
-  }
-
   Future<void> resendRegistrationCode(String email) async {
     _setBusy(true);
     _errorMessage = null;
