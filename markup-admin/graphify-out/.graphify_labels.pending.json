@@ -1,10 +1,9 @@
 {
-  "0": "createProduct",
+  "0": "InvestmentCalculationSettingsCard",
   "1": "CooperativesPage.tsx",
   "2": "CooperativesStats.tsx",
   "3": "CooperativeWizard.tsx",
   "4": "CooperativesPage",
-  "5": "CooperativesTable.tsx",
   "6": "products.api.ts",
   "7": "ProductsPage",
   "10": "ProductsPage.tsx"

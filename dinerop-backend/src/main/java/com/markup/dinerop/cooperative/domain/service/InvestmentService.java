@@ -42,6 +42,7 @@ public class InvestmentService {
     private final InvestmentAcceptanceRepository acceptanceRepository;
     private final PushNotificationService pushNotificationService;
     private final UserRepository userRepository;
+    private final InvestmentCalculationSettingsService calculationSettingsService;
 
     @Transactional(readOnly = true)
     public List<InvestmentOfferResponse> compareOffers(
@@ -53,6 +54,7 @@ public class InvestmentService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ingresa un monto y plazo válidos.");
         }
         Instant now = Instant.now();
+        InvestmentCalculationMethod centralMethod = calculationSettingsService.currentMethod();
         return productRepository.findAll().stream()
                 .filter(FinancialProduct::isActive)
                 .filter(product -> product.getType() == FinancialProductType.INVESTMENT)
@@ -65,7 +67,8 @@ public class InvestmentService {
                         .filter(condition -> termMonths >= condition.getMinimumTermMonths()
                                 && termMonths <= condition.getMaximumTermMonths())
                         .filter(condition -> paymentOption == null || product.getInterestPaymentOptions().contains(paymentOption))
-                        .map(condition -> toOffer(product, condition, amount, termMonths, paymentOption)))
+                        .map(condition -> toOffer(product, condition, amount, termMonths, paymentOption,
+                                effectiveCalculationMethod(product, centralMethod))))
                 .sorted(Comparator
                         .comparing(InvestmentOfferResponse::estimatedInterest,
                                 Comparator.nullsLast(Comparator.reverseOrder()))
@@ -155,8 +158,10 @@ public class InvestmentService {
 
         var cooperative = cooperativeRepository.findById(product.getCooperativeId())
                 .orElseThrow(() -> new EntityNotFoundException("Cooperativa no encontrada."));
+        InvestmentCalculationMethod calculationMethod = effectiveCalculationMethod(product,
+                calculationSettingsService.currentMethod());
         var estimate = calculateInterest(request.amount(), condition.getAnnualRate(),
-                request.termMonths(), product.getCalculationMethod(), request.interestPaymentOption());
+                request.termMonths(), calculationMethod, request.interestPaymentOption());
         String clientName = submittedClientName != null && !submittedClientName.isBlank()
                 ? submittedClientName.trim()
                 : ((user.getFirstName() == null ? "" : user.getFirstName().trim()) + " "
@@ -168,8 +173,8 @@ public class InvestmentService {
         investmentRequest.setCooperativeId(product.getCooperativeId());
         investmentRequest.setProductId(product.getId());
         investmentRequest.setConditionId(condition.getId());
-        investmentRequest.setProductNameSnapshot(product.getName());
-        investmentRequest.setProductDescriptionSnapshot(product.getDescription());
+        investmentRequest.setProductNameSnapshot(FinancialProductService.displayName(product));
+        investmentRequest.setProductDescriptionSnapshot(FinancialProductService.displayDescription(product));
         investmentRequest.setRenewalConditionsSnapshot(product.getRenewalConditions());
         investmentRequest.setEarlyCancellationSnapshot(product.getEarlyCancellationConditions());
         investmentRequest.setTargetAudienceSnapshot(product.getTargetAudience());
@@ -186,7 +191,7 @@ public class InvestmentService {
         investmentRequest.setConditionMaximumTermSnapshot(condition.getMaximumTermMonths());
         investmentRequest.setRateValidFromSnapshot(condition.getValidFrom());
         investmentRequest.setRateValidUntilSnapshot(condition.getValidUntil());
-        investmentRequest.setCalculationMethodSnapshot(product.getCalculationMethod());
+        investmentRequest.setCalculationMethodSnapshot(calculationMethod);
         investmentRequest.setEstimatedInterest(estimate);
         investmentRequest.setEstimatedTotal(estimate == null ? null : request.amount().add(estimate).setScale(2, RoundingMode.HALF_UP));
         investmentRequest.setPersonalDataConsent(true);
@@ -307,19 +312,30 @@ public class InvestmentService {
     }
 
     private InvestmentOfferResponse toOffer(FinancialProduct product, FinancialProductCondition condition,
-            BigDecimal amount, Integer months, InterestPaymentOption paymentOption) {
+            BigDecimal amount, Integer months, InterestPaymentOption paymentOption,
+            InvestmentCalculationMethod calculationMethod) {
         var cooperative = cooperativeRepository.findById(product.getCooperativeId()).orElse(null);
         var estimatedInterest = calculateInterest(amount, condition.getAnnualRate(), months,
-                product.getCalculationMethod(), paymentOption);
+                calculationMethod, paymentOption);
         return new InvestmentOfferResponse(
                 product.getCooperativeId(), cooperative == null ? "Cooperativa" : cooperative.getNombre(),
                 cooperative == null ? null : cooperative.getLogoUrl(), product.getId(), condition.getId(),
-                product.getName(), product.getDescription(), product.getMinimumAmount(), product.getMaximumAmount(),
+                FinancialProductService.displayName(product), FinancialProductService.displayDescription(product), product.getMinimumAmount(), product.getMaximumAmount(),
                 condition.getMinimumAmount(), condition.getMaximumAmount(), condition.getMinimumTermMonths(),
                 condition.getMaximumTermMonths(), condition.getAnnualRate(), condition.getValidFrom(),
-                condition.getValidUntil(), product.getInterestPaymentOptions(), product.getCalculationMethod(),
+                condition.getValidUntil(), product.getInterestPaymentOptions(), calculationMethod,
                 product.getRenewalConditions(), product.getEarlyCancellationConditions(), product.getTargetAudience(),
                 estimatedInterest, estimatedInterest == null ? null : amount.add(estimatedInterest).setScale(2, RoundingMode.HALF_UP));
+    }
+
+    private InvestmentCalculationMethod effectiveCalculationMethod(FinancialProduct product,
+            InvestmentCalculationMethod centralMethod) {
+        if (centralMethod != null && centralMethod != InvestmentCalculationMethod.UNSPECIFIED) {
+            return centralMethod;
+        }
+        return product.getCalculationMethod() == null
+                ? InvestmentCalculationMethod.UNSPECIFIED
+                : product.getCalculationMethod();
     }
 
     private InvestmentRequestResponse toResponse(InvestmentRequest request,

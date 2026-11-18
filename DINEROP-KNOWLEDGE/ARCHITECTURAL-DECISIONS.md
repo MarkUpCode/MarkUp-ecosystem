@@ -12,6 +12,8 @@ Este documento registra decisiones inferidas de código/configuración existente
 | Cliente web construido como SPA | Vite, `BrowserRouter`, reglas de fallback en deploy. | No hay evidencia de SSR/App Router; contradice descripción inicial Next.js 15. |
 | Configuración de API externa por ambiente | `VITE_API_BASE_URL`; `DINEROP_API_BASE_URL` y fallback móvil. | El despliegue puede apuntar distinto por configuración; confirmar valores reales fuera de código. |
 | Errores y DTOs específicos por cliente | `ApiError` web y `AppException`/parsers móvil. | No hay contrato común de errores plenamente tipado identificado. |
+| Catálogo financiero con categorías estándar y condiciones versionadas | `FinancialProductService`, índice único de producto activo por cooperativa/categoría y reemplazo transaccional de condiciones. | Evita productos duplicados y conserva filas históricas/snapshots asociados a solicitudes. |
+| Método de cálculo de inversiones elegido centralmente por administración | Configuración central, endpoints admin y selector en `markup-admin`. | Se admiten interés simple y capitalización mensual. `UNSPECIFIED` recurre al método legado si el producto lo tiene; nuevas selecciones no alteran snapshots previos. |
 
 ## Decisiones que siguen abiertas/no demostradas
 

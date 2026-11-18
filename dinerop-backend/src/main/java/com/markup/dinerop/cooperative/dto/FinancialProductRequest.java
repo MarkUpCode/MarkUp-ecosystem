@@ -13,7 +13,7 @@ import java.util.Set;
 public record FinancialProductRequest(
         @NotNull FinancialProductType type,
         CreditProductCategory creditCategory,
-        @NotBlank @Size(max = 120) String name,
+        @Size(max = 120) String name,
         @Size(max = 2000) String description,
         @NotNull @DecimalMin("0.01") BigDecimal minimumAmount,
         @NotNull @DecimalMin("0.01") BigDecimal maximumAmount,

@@ -2,7 +2,7 @@
 
 ## Propósito
 
-Dinerop reúne una API de negocio y persistencia (`dinerop-backend`), una aplicación móvil Flutter (`app_movil_dinerop`) y una aplicación web para clientes y cooperativas (`dinerup-app`). La relación comprobada entre ellos es HTTP: ambos clientes construyen solicitudes a rutas que se corresponden con controladores REST del backend. No se encontró evidencia de importación directa de código entre repositorios.
+Dinerop reúne una API de negocio y persistencia (`dinerop-backend`), una aplicación móvil Flutter (`app_movil_dinerop`), una aplicación web para clientes y cooperativas (`dinerup-app`) y un panel administrativo (`markup-admin`). Los clientes llaman controladores REST del backend mediante HTTP; no se encontró evidencia de importación directa de código entre repositorios.
 
 ```mermaid
 flowchart LR
@@ -21,6 +21,7 @@ La flecha de notificaciones representa capacidades declaradas/configuradas en ba
 | `dinerop-backend/` | Java 17, Spring Boot, monolito modular y PostgreSQL | Auth/JWT, cooperativas, solicitudes de crédito, onboarding, notificaciones, administración y visitas. Inicio: `src/main/java/com/markup/dinerop/`; contratos: `API_DOCUMENTATION.md`; arquitectura: `docs/ARCHITECTURE.md`. |
 | `app_movil_dinerop/` | Flutter/Dart, Riverpod, GoRouter, Dio | Registro/acceso, onboarding, solicitudes, cooperativas, perfil, dashboard y simuladores. Entrada: `lib/main.dart`; integración: `lib/core/network/api_client.dart`. |
 | `dinerup-app/` | Vite 5, React 18.3, TypeScript, React Router | SPA para cliente y cooperativa, autenticación, onboarding y gestión de solicitudes. Entrada: `src/main.tsx`, rutas: `src/App.tsx`, HTTP: `src/api/httpClient.ts`. |
+| `markup-admin/` | Vite 7, React, TypeScript, Axios | Panel administrativo para cooperativas, productos y usuarios; APIs protegidas con rol/token Bearer. Entrada: `src/main.tsx`. |
 
 **Corrección de contexto:** aunque el encargo describe el sitio web como Next.js 15/React 19, `dinerup-app/package.json` declara Vite 5 y React/React DOM 18.3; el código usa `BrowserRouter`. No es una aplicación Next.js según el checkout inspeccionado.
 
@@ -34,7 +35,7 @@ La flecha de notificaciones representa capacidades declaradas/configuradas en ba
 
 ## Evidencia y límites
 
-Los grafos locales reportan estructura intra-repositorio. El global combina nodos de los tres repositorios, pero Graphify no sustituye verificar consumidores HTTP. Rutas frontend cotejadas con mappings Java; los documentos de API pueden estar desactualizados. No se infiere que todas las pantallas visibles estén habilitadas o desplegadas. Para correspondencias y discrepancias, ver [API-INTEGRATIONS.md](API-INTEGRATIONS.md).
+Los grafos locales reportan estructura intra-repositorio. El global combina nodos de cuatro repositorios, pero Graphify no sustituye verificar consumidores HTTP. Rutas frontend cotejadas con mappings Java; los documentos de API pueden estar desactualizados. No se infiere que todas las pantallas visibles estén habilitadas o desplegadas. Para correspondencias y discrepancias, ver [API-INTEGRATIONS.md](API-INTEGRATIONS.md).
 
 ## Mapa de esta documentación
 

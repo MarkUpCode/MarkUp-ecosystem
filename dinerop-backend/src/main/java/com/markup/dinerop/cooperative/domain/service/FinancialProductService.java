@@ -7,6 +7,8 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 import java.time.Instant;
 import java.math.BigDecimal;
 import java.util.*;
@@ -47,7 +49,7 @@ public class FinancialProductService {
                             var cooperative = cooperativeRepository.findById(product.getCooperativeId()).orElse(null);
                             if (cooperative == null) return null;
                             return new PublicCreditOfferResponse(product.getCooperativeId(), cooperative.getNombre(),
-                                    product.getId(), product.getName(), product.getDescription(),
+                                    product.getId(), displayName(product), displayDescription(product),
                                     product.getCreditCategory(), amount, termMonths, condition.getAnnualRate(),
                                     "Condiciones sujetas a evaluación y confirmación de la cooperativa.");
                         }))
@@ -59,6 +61,7 @@ public class FinancialProductService {
     public FinancialProductResponse create(Long cooperativeId, FinancialProductRequest request) {
         lockCooperative(cooperativeId);
         validateProductCategory(request);
+        ensureUniqueCatalogProduct(cooperativeId, request, null);
         validateBounds(request.minimumAmount(), request.maximumAmount(), "El rango del producto es inválido.");
         FinancialProduct product = new FinancialProduct();
         product.setCooperativeId(cooperativeId);
@@ -78,17 +81,27 @@ public class FinancialProductService {
         FinancialProduct product = productRepository.findById(productId)
                 .filter(p -> p.getCooperativeId().equals(cooperativeId))
                 .orElseThrow(() -> new EntityNotFoundException("Producto no encontrado."));
+        ensureUniqueCatalogProduct(cooperativeId, request, productId);
         validateBounds(request.minimumAmount(), request.maximumAmount(), "El rango del producto es inválido.");
         List<FinancialProductCondition> history = conditionRepository.findByProductIdOrderByValidFromDescIdDesc(productId);
         if (!history.isEmpty() && (product.getType() != request.type()
                 || (product.getCreditCategory() != null && product.getCreditCategory() != request.creditCategory())))
             throw new IllegalArgumentException("No se puede cambiar el tipo de un producto con historial financiero.");
-        for (var condition : history) {
-            if (condition.getMinimumAmount().compareTo(request.minimumAmount()) < 0 || condition.getMaximumAmount().compareTo(request.maximumAmount()) > 0)
-                throw new IllegalArgumentException("El nuevo rango debe contener todas las condiciones históricas del producto.");
-        }
         apply(product, request);
-        return toResponse(productRepository.save(product));
+        FinancialProduct savedProduct = productRepository.save(product);
+        if (request.conditions() != null) replaceConditions(savedProduct, request.conditions(), history);
+        else {
+            Instant now = Instant.now();
+            boolean currentConditionOutsideNewBounds = history.stream()
+                    .anyMatch(condition -> !condition.getValidFrom().isAfter(now)
+                            && (condition.getValidUntil() == null || condition.getValidUntil().isAfter(now))
+                            && (condition.getMinimumAmount().compareTo(savedProduct.getMinimumAmount()) < 0
+                            || condition.getMaximumAmount().compareTo(savedProduct.getMaximumAmount()) > 0));
+            if (currentConditionOutsideNewBounds) {
+                throw new IllegalArgumentException("El nuevo rango debe contener las condiciones vigentes. Actualiza también la matriz de tasas.");
+            }
+        }
+        return toResponse(savedProduct);
     }
 
     @Transactional
@@ -104,6 +117,43 @@ public class FinancialProductService {
                 .orElseThrow(() -> new EntityNotFoundException("Producto no encontrado."));
         validateConditions(product, requests, conditionRepository.findByProductIdOrderByValidFromDescIdDesc(productId));
         return requests.stream().map(request -> toCondition(saveCondition(productId, request))).toList();
+    }
+
+    private void replaceConditions(FinancialProduct product, List<FinancialProductConditionRequest> requested,
+                                   List<FinancialProductCondition> history) {
+        Instant now = Instant.now();
+        boolean hasScheduledCondition = history.stream().anyMatch(condition -> condition.getValidFrom().isAfter(now)
+                && (condition.getValidUntil() == null || condition.getValidUntil().isAfter(now)));
+        if (hasScheduledCondition) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "Hay tasas programadas para una fecha futura. Espera a que entren en vigencia antes de reemplazar la matriz.");
+        }
+
+        Instant startsAt = now;
+        for (var existing : history) {
+            boolean current = !existing.getValidFrom().isAfter(now)
+                    && (existing.getValidUntil() == null || existing.getValidUntil().isAfter(now));
+            if (!current) continue;
+            if (!existing.getValidFrom().isBefore(startsAt)) startsAt = existing.getValidFrom().plusNanos(1);
+        }
+
+        for (var existing : history) {
+            boolean current = !existing.getValidFrom().isAfter(now)
+                    && (existing.getValidUntil() == null || existing.getValidUntil().isAfter(now));
+            if (current) {
+                existing.setValidUntil(startsAt);
+                conditionRepository.save(existing);
+            }
+        }
+
+        final Instant effectiveStartsAt = startsAt;
+        List<FinancialProductConditionRequest> newVersion = requested.stream()
+                .map(condition -> new FinancialProductConditionRequest(condition.minimumAmount(), condition.maximumAmount(),
+                        condition.minimumTermMonths(), condition.maximumTermMonths(), condition.annualRate(),
+                        effectiveStartsAt, condition.validUntil()))
+                .toList();
+        validateConditions(product, newVersion, history);
+        newVersion.forEach(condition -> saveCondition(product.getId(), condition));
     }
 
     private void validateConditions(FinancialProduct product, List<FinancialProductConditionRequest> incoming,
@@ -183,8 +233,10 @@ public class FinancialProductService {
         if (min.compareTo(max) > 0) throw new IllegalArgumentException(message);
     }
     private void apply(FinancialProduct product, FinancialProductRequest request) {
-        product.setType(request.type()); product.setCreditCategory(request.creditCategory()); product.setName(request.name().trim());
-        product.setDescription(request.description()); product.setMinimumAmount(request.minimumAmount());
+        product.setType(request.type()); product.setCreditCategory(request.creditCategory());
+        product.setName(displayName(request.type(), request.creditCategory()));
+        product.setDescription(displayDescription(request.type(), request.creditCategory()));
+        product.setMinimumAmount(request.minimumAmount());
         product.setMaximumAmount(request.maximumAmount()); product.setActive(request.active() == null || request.active());
         if (request.calculationMethod() != null) product.setCalculationMethod(request.calculationMethod());
         if (request.interestPaymentOptions() != null) product.setInterestPaymentOptions(new LinkedHashSet<>(request.interestPaymentOptions()));
@@ -212,7 +264,7 @@ public class FinancialProductService {
                 .filter(c -> !activeOnly || !c.getValidFrom().isAfter(now))
                 .filter(c -> !activeOnly || c.getValidUntil() == null || c.getValidUntil().isAfter(now))
                 .map(this::toCondition).toList();
-        return new FinancialProductResponse(p.getId(), p.getCooperativeId(), p.getType(), p.getCreditCategory(), p.getName(), p.getDescription(), p.getMinimumAmount(), p.getMaximumAmount(), p.isActive(), conditions, p.getInterestPaymentOptions(), p.getCalculationMethod(), p.getRenewalConditions(), p.getEarlyCancellationConditions(), p.getTargetAudience());
+        return new FinancialProductResponse(p.getId(), p.getCooperativeId(), p.getType(), p.getCreditCategory(), displayName(p), displayDescription(p), p.getMinimumAmount(), p.getMaximumAmount(), p.isActive(), conditions, p.getInterestPaymentOptions(), p.getCalculationMethod(), p.getRenewalConditions(), p.getEarlyCancellationConditions(), p.getTargetAudience());
     }
 
     private void validateProductCategory(FinancialProductRequest request) {
@@ -220,6 +272,39 @@ public class FinancialProductService {
             throw new IllegalArgumentException("Selecciona consumo o microcrédito para este producto.");
         if (request.type() == FinancialProductType.INVESTMENT && request.creditCategory() != null)
             throw new IllegalArgumentException("Los productos de inversión no tienen una categoría de crédito.");
+    }
+
+    private void ensureUniqueCatalogProduct(Long cooperativeId, FinancialProductRequest request, Long excludedId) {
+        boolean duplicate = productRepository.findByCooperativeIdOrderById(cooperativeId).stream()
+                .anyMatch(product -> !Objects.equals(product.getId(), excludedId)
+                        && product.getType() == request.type()
+                        && product.getCreditCategory() == request.creditCategory());
+        if (duplicate) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "Esta cooperativa ya tiene configurado este producto del catálogo. Edita la configuración existente.");
+        }
+    }
+
+    public static String displayName(FinancialProduct product) {
+        return displayName(product.getType(), product.getCreditCategory());
+    }
+
+    public static String displayDescription(FinancialProduct product) {
+        return displayDescription(product.getType(), product.getCreditCategory());
+    }
+
+    private static String displayName(FinancialProductType type, CreditProductCategory category) {
+        if (type == FinancialProductType.INVESTMENT) return "Depósito a plazo fijo";
+        return category == CreditProductCategory.MICROCREDITO ? "Microcrédito" : "Crédito de consumo";
+    }
+
+    private static String displayDescription(FinancialProductType type, CreditProductCategory category) {
+        if (type == FinancialProductType.INVESTMENT) {
+            return "Depósito de dinero por un plazo acordado, con una tasa anual y condiciones vigentes.";
+        }
+        return category == CreditProductCategory.MICROCREDITO
+                ? "Financiamiento para actividades productivas y pequeños negocios."
+                : "Financiamiento para necesidades personales de consumo.";
     }
     private FinancialProductResponse.Condition toCondition(FinancialProductCondition c) {
         return new FinancialProductResponse.Condition(c.getId(), c.getMinimumAmount(), c.getMaximumAmount(), c.getMinimumTermMonths(), c.getMaximumTermMonths(), c.getAnnualRate(), c.getValidFrom(), c.getValidUntil());

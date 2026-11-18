@@ -12,6 +12,9 @@ Lee primero [GLOBAL-OVERVIEW.md](GLOBAL-OVERVIEW.md) para entender límites y es
 | Crédito/solicitudes y ofertas | `USER-FLOWS.md`, `DATA-FLOW.md` | Backend `credit/`; móvil `lib/features/credit/`; web `src/api/creditRequests.api.ts`, `src/pages/DashboardClient.tsx`, `DashboardCooperative.tsx` |
 | Onboarding cliente/garante/cooperativa | `USER-FLOWS.md`, `API-INTEGRATIONS.md` | Backend `onboarding/`; móvil `lib/features/onboarding/`; web `src/api/onboarding.api.ts`, `src/pages/OnboardingPage.tsx` |
 | Catálogo de cooperativas | `API-INTEGRATIONS.md` | Backend `CooperativeController`; móvil `lib/features/cooperative/`; web `src/api/cooperatives.api.ts` |
+| Catálogo estándar de productos, configuración cooperativa y simulación de inversión | `API-INTEGRATIONS.md`, `DATA-FLOW.md`, `USER-FLOWS.md` | Backend `cooperative/domain/service/FinancialProductService`, `InvestmentService`, `CooperativeCreditProductController`, `CooperativeInvestmentController`; DinerUp `src/components/credit/CooperativeCreditProductsPanel.tsx`, `src/components/investment/CooperativeInvestmentsPanel.tsx`, `src/pages/PublicInvestments.tsx`; administración `markup-admin/src/modules/products/` |
+| Método central de cálculo de inversión | `API-INTEGRATIONS.md`, `ARCHITECTURAL-DECISIONS.md` | Backend `InvestmentCalculationSettingsService`, `InvestmentService`, `AdminInvestmentCalculationSettingsController`; `markup-admin/src/modules/products/pages/ProductsPage.tsx` |
+| Errores del panel administrativo de cooperativas | `AUTHENTICATION-FLOW.md`, `API-INTEGRATIONS.md` | `markup-admin/src/services/axios.ts`, `src/contexts/auth-context.tsx`; backend `auth/config/SecurityConfig.java`, `JwtAuthenticationFilter.java`, `admin/cooperative/`, `admin/dashboard/` |
 | Persistencia/esquema | `DATA-FLOW.md` | Backend `schema.sql`, `application*.yaml`, paquetes `*/infrastructure/repository`, entidades JPA |
 | Push y dispositivos | `API-INTEGRATIONS.md` | Backend `notification/`; móvil `lib/core/notifications/push_notification_service.dart` |
 | Arquitectura local por repo | `GLOBAL-ARCHITECTURE.md` | Cada repo `docs/ARCHITECTURE.md` y `graphify-out/GRAPH_REPORT.md` |
@@ -30,6 +33,7 @@ Lee primero [GLOBAL-OVERVIEW.md](GLOBAL-OVERVIEW.md) para entender límites y es
 - Backend: `dinerop-backend/graphify-out/graph.json`, `GRAPH_REPORT.md`.
 - Móvil: `app_movil_dinerop/graphify-out/graph.json`, `GRAPH_REPORT.md`.
 - Web: `dinerup-app/graphify-out/graph.json`, `GRAPH_REPORT.md`.
+- Administración: `markup-admin/graphify-out/graph.json`, `GRAPH_REPORT.md`.
 
 Los grafos son mapas de símbolos/relaciones para navegar. Confianza `INFERRED` o una relación semántica no constituye prueba de llamada de red entre proyectos.
 

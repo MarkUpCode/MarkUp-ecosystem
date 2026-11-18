@@ -9,6 +9,8 @@ import com.markup.dinerop.cooperative.domain.repository.CooperativeRepository;
 import com.markup.dinerop.cooperative.dto.FinancialProductConditionRequest;
 import com.markup.dinerop.cooperative.dto.FinancialProductRequest;
 import com.markup.dinerop.cooperative.domain.entity.FinancialProductType;
+import com.markup.dinerop.cooperative.domain.entity.CreditProductCategory;
+import org.springframework.web.server.ResponseStatusException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -63,7 +65,51 @@ class FinancialProductServiceTest {
         var request = new FinancialProductRequest(FinancialProductType.CREDIT, "Crédito A", null,
                 new BigDecimal("100"), new BigDecimal("1000"), true, List.of(early, later));
 
-        assertDoesNotThrow(() -> service.create(7L, request));
+        var response = assertDoesNotThrow(() -> service.create(7L, request));
+        assertEquals("Crédito de consumo", response.name());
+        assertEquals("Financiamiento para necesidades personales de consumo.", response.description());
+        verify(conditions, times(2)).save(any(FinancialProductCondition.class));
+    }
+
+    @Test
+    void rejectsDuplicateActiveCatalogProductForCooperative() {
+        FinancialProduct existing = new FinancialProduct();
+        existing.setId(4L); existing.setCooperativeId(7L); existing.setType(FinancialProductType.CREDIT);
+        existing.setCreditCategory(CreditProductCategory.CONSUMO); existing.setActive(true);
+        when(products.findByCooperativeIdOrderById(7L)).thenReturn(List.of(existing));
+        var request = new FinancialProductRequest(FinancialProductType.CREDIT, "Producto personalizado", "Texto",
+                new BigDecimal("100"), new BigDecimal("1000"), true, List.of());
+
+        ResponseStatusException error = assertThrows(ResponseStatusException.class, () -> service.create(7L, request));
+
+        assertEquals(409, error.getStatusCode().value());
+        verify(products, never()).save(any(FinancialProduct.class));
+    }
+
+    @Test
+    void replacingInvestmentMatrixClosesOldConditionsAndKeepsThemForHistory() {
+        FinancialProduct product = new FinancialProduct(); product.setId(11L); product.setCooperativeId(7L);
+        product.setType(FinancialProductType.INVESTMENT); product.setMinimumAmount(new BigDecimal("100"));
+        product.setMaximumAmount(new BigDecimal("5000"));
+        var previousRequest = condition("100", "1000", 3, 6, "7.0", Instant.parse("2026-01-01T00:00:00Z"), null);
+        FinancialProductCondition previous = new FinancialProductCondition();
+        previous.setMinimumAmount(previousRequest.minimumAmount()); previous.setMaximumAmount(previousRequest.maximumAmount());
+        previous.setMinimumTermMonths(previousRequest.minimumTermMonths()); previous.setMaximumTermMonths(previousRequest.maximumTermMonths());
+        previous.setAnnualRate(previousRequest.annualRate()); previous.setValidFrom(previousRequest.validFrom());
+        previous.setId(5L); previous.setProductId(11L);
+        when(products.findById(11L)).thenReturn(Optional.of(product));
+        when(products.findByCooperativeIdOrderById(7L)).thenReturn(List.of(product));
+        when(products.save(any(FinancialProduct.class))).thenAnswer(call -> call.getArgument(0));
+        when(conditions.findByProductIdOrderByValidFromDescIdDesc(11L)).thenReturn(List.of(previous));
+        when(conditions.save(any(FinancialProductCondition.class))).thenAnswer(call -> call.getArgument(0));
+        var replacement = condition("100", "1000", 12, 12, "8.25", Instant.now(), null);
+        var request = new FinancialProductRequest(FinancialProductType.INVESTMENT, "Custom name", "Custom description",
+                new BigDecimal("100"), new BigDecimal("5000"), true, List.of(replacement));
+
+        var response = service.update(7L, 11L, request);
+
+        assertNotNull(previous.getValidUntil());
+        assertEquals("Depósito a plazo fijo", response.name());
         verify(conditions, times(2)).save(any(FinancialProductCondition.class));
     }
 

@@ -23,6 +23,12 @@ flowchart LR
 
 El backend distingue solicitud pública (`POST /api/credits/public-request`, datos de contacto e identidad incluidos) de solicitud autenticada (`POST /api/credits/me`, identidad de usuario y datos de solicitud). La distribución hacia cooperativas elegibles y su estado está en lógica de `credit`; repositorios `CreditRequestRepository`, `SolicitudCooperativaRepository` y entidades asociadas. No asumir que ambas modalidades crean idénticas filas/campos; revisar `CreditService` y DTOs. Respuestas al cliente alimentan lista, estados, ofertas preaprobadas y aceptación.
 
+### Catálogo y condiciones financieras
+
+`markup-admin` administra la ficha institucional y productos; la cooperativa mantiene productos estándar de crédito e inversión desde DinerUp. El servicio valida duplicados y reemplaza condiciones activas de forma transaccional, cerrando la vigencia previa y conservando historial.
+
+La metodología de cálculo se guarda en `investment_calculation_settings`. El backend la aplica al obtener ofertas y la captura al crear solicitudes; las solicitudes históricas no se recalculan. La configuración inicial es `UNSPECIFIED`, que recurre al método legado del producto si existe.
+
 ## Datos de onboarding
 
 `OnboardingClienteController` recibe solicitante/conyuge, guarda contenido modelado por `SolicitudOnboarding`, `PersonaOnboarding`, direcciones, ingresos/egresos, actividad y referencias mediante repositorios de onboarding. Endpoint de garante completa información adicional. Vista cooperativa consulta el expediente. Para trazabilidad, revisar `onboarding/domain`, `onboarding/application` y `onboarding/infrastructure/repository`.

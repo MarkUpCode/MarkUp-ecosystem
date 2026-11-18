@@ -6,6 +6,7 @@
 |---|---|---|
 | Móvil → backend | Rutas construidas en `lib/features/*/data/`, `ApiClient`, coincidencias de mappings Java. | Comprobada para rutas de [API-INTEGRATIONS.md](API-INTEGRATIONS.md). |
 | Web → backend | `src/api/*`, `httpClient.ts`, coincidencias con controladores. | Comprobada salvo rutas señaladas sin mapping. |
+| Panel administrativo → backend | `markup-admin/src/modules/*/api`, Axios Bearer y controladores `/api/admin/**`. | Comprobada para cooperativas, productos y configuración central. |
 | Móvil ↔ web | No hay import, SDK o llamada directa identificada entre repositorios. | No identificada; no prueba ausencia de integraciones externas. |
 | Backend → PostgreSQL | Configuración Spring/JPA y repositorios. | Comprobada por configuración/código. |
 | Clientes → PostgreSQL | No hay cliente DB en flujos inspeccionados. | No encontrado; las rutas de negocio van por API. |
@@ -17,7 +18,7 @@ Los clientes dependen de rutas, métodos, nombres de campos, enums y estados del
 
 ## Grafo global
 
-`DINEROP-KNOWLEDGE/global-graph.json` contiene nodos con `repo` (`dinerop-backend`, `app_movil_dinerop`, `dinerup-app`) y relaciones Graphify. Use el grafo para saltar a símbolos locales. Las llamadas remotas se evidencian mejor en strings de ruta y controladores; una arista inferida entre nodos homónimos no debe interpretarse como dependencia runtime.
+`DINEROP-KNOWLEDGE/global-graph.json` contiene nodos con `repo` (`dinerop-backend`, `app_movil_dinerop`, `dinerup-app`, `markup-admin`) y relaciones Graphify. Use el grafo para saltar a símbolos locales. Las llamadas remotas se evidencian mejor en strings de ruta y controladores; una arista inferida entre nodos homónimos no debe interpretarse como dependencia runtime.
 
 ## Huecos
 

@@ -34,6 +34,12 @@ La web consume bandeja, detalle onboarding, timeline, valores de oferta y decisi
 
 Ambas aplicaciones piden `GET /api/cooperatives`. Web también presenta directorios/componentes de cooperativas; móvil usa `CooperativeRepository`. Los simuladores y catálogos estáticos deben distinguirse de una cotización calculada por backend: confirmar servicio invocado para cada acción.
 
+### Administración y mantenimiento de ofertas
+
+`markup-admin` crea la ficha institucional de cooperativas y administra productos estándar. La cooperativa mantiene su catálogo de crédito e inversión desde DinerUp. Al editar condiciones, el backend versiona la matriz sin borrar historial.
+
+El panel administrativo permite elegir la metodología central de inversión: interés simple anual, capitalización mensual o método sin seleccionar. La opción se aplica a ofertas y solicitudes nuevas.
+
 ## Recuperación de cuenta
 
 Ambos clientes pueden iniciar recuperación de contraseña, abrir el enlace/token recibido y solicitar reset. Backend ofrece `POST /api/auth/password/forgot` y `/reset`; el canal de entrega (email) se implementa en backend.

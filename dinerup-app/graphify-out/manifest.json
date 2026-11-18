@@ -240,9 +240,9 @@
     "semantic_hash": ""
   },
   "src/pages/DashboardCooperative.tsx": {
-    "mtime": 1794934300.842237,
-    "seen": 1794937289.315882,
-    "ast_hash": "e99d9831ff6b669155cafc9723f0c709",
+    "mtime": 1795045322.1923623,
+    "seen": 1795045804.7693837,
+    "ast_hash": "4debe4600297bdee99f1cb2547d386ff",
     "semantic_hash": ""
   },
   "src/pages/Login.tsx": {
@@ -552,15 +552,15 @@
     "semantic_hash": ""
   },
   "src/api/investments.api.ts": {
-    "mtime": 1794937198.0076623,
-    "seen": 1794937289.3158238,
-    "ast_hash": "61f0936f02787d4a42d0fca38b7bd8d5",
+    "mtime": 1795045302.0103688,
+    "seen": 1795045804.769247,
+    "ast_hash": "5bd8b8ac7b718455ecef287ca792988e",
     "semantic_hash": ""
   },
   "src/components/investment/CooperativeInvestmentsPanel.tsx": {
-    "mtime": 1794937328.6635048,
-    "seen": 1794937341.1611304,
-    "ast_hash": "3bea8815137d938f2455b78bfeb5d7b2",
+    "mtime": 1795045138.3873699,
+    "seen": 1795045804.7693102,
+    "ast_hash": "7aee2915e7d6ffbef0c2cf3bc413e119",
     "semantic_hash": ""
   },
   "src/pages/PublicInvestments.tsx": {
@@ -579,6 +579,12 @@
     "mtime": 1794949287.2155762,
     "seen": 1794949995.6625881,
     "ast_hash": "83d2dec2ec9888fa019966d3f801f4bb",
+    "semantic_hash": ""
+  },
+  "src/components/credit/CooperativeCreditProductsPanel.tsx": {
+    "mtime": 1795045288.166608,
+    "seen": 1795045804.769276,
+    "ast_hash": "21fedacfce5c43f49f5ae0c26eb764b9",
     "semantic_hash": ""
   },
   "package-lock.json": {

@@ -2,6 +2,7 @@ import { api } from "@/services/axios";
 
 export type ProductType = "CREDIT" | "INVESTMENT";
 export type CreditProductCategory = "CONSUMO" | "MICROCREDITO";
+export type InvestmentCalculationMethod = "UNSPECIFIED" | "SIMPLE_INTEREST" | "MONTHLY_COMPOUNDING";
 export interface ProductCondition {
   id?: number;
   minimumAmount: number;
@@ -24,7 +25,16 @@ export interface FinancialProduct {
   active: boolean;
   conditions: ProductCondition[];
 }
-export type FinancialProductRequest = Omit<FinancialProduct, "id" | "cooperativeId" | "conditions"> & { conditions?: ProductCondition[] };
+export type FinancialProductRequest = Omit<FinancialProduct, "id" | "cooperativeId" | "conditions" | "name" | "description"> & { name?: string; description?: string; conditions?: ProductCondition[] };
+
+export async function getInvestmentCalculationSetting() {
+  const { data } = await api.get<{ calculationMethod: InvestmentCalculationMethod }>("/api/admin/settings/investment-calculation");
+  return data;
+}
+export async function updateInvestmentCalculationSetting(calculationMethod: InvestmentCalculationMethod) {
+  const { data } = await api.put<{ calculationMethod: InvestmentCalculationMethod }>("/api/admin/settings/investment-calculation", { calculationMethod });
+  return data;
+}
 
 export async function getProducts(cooperativeId: number) {
   const { data } = await api.get<FinancialProduct[]>(`/api/admin/cooperatives/${cooperativeId}/products`);

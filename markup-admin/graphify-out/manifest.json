@@ -234,9 +234,9 @@
     "semantic_hash": "5960fb5b4e3e275d42e583cee816c1ff"
   },
   "src/modules/products/pages/ProductsPage.tsx": {
-    "mtime": 1794949399.2294095,
-    "seen": 1794949991.6676912,
-    "ast_hash": "b0cad4b24c22d6e0a81d4d377053df14",
+    "mtime": 1795045567.4260185,
+    "seen": 1795045803.3212614,
+    "ast_hash": "1216ead121b8ae510af0231ac63f4325",
     "semantic_hash": ""
   },
   "src/modules/profile/pages/ProfilePage.tsx": {
@@ -450,15 +450,15 @@
     "semantic_hash": ""
   },
   "src/modules/cooperatives/components/CooperativeWizard.tsx": {
-    "mtime": 1794949197.7660127,
-    "seen": 1794949991.6676562,
-    "ast_hash": "4e1c9b845189b37e40e9dec4517b1116",
+    "mtime": 1795044625.5531797,
+    "seen": 1795045803.3212361,
+    "ast_hash": "622856664f802d20ad7c9f40a27736aa",
     "semantic_hash": ""
   },
   "src/modules/products/api/products.api.ts": {
-    "mtime": 1794948751.7425792,
-    "seen": 1794949991.6676886,
-    "ast_hash": "4627a1baa73963920ec08b625fae4cc3",
+    "mtime": 1795045539.9832435,
+    "seen": 1795045803.3212593,
+    "ast_hash": "b60dd815b5aef2b17ce61cccc3a4b5e0",
     "semantic_hash": ""
   },
   ".github/copilot-instructions.md": {

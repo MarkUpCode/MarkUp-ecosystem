@@ -34,7 +34,7 @@ public class CooperativeInvestmentController {
 
     @GetMapping("/investment-products")
     public List<FinancialProductResponse> getProducts(@AuthenticationPrincipal User user) {
-        return financialProductService.list(requireCooperativeId(user), false).stream()
+        return financialProductService.list(requireCooperativeId(user), true).stream()
                 .filter(product -> product.type() == FinancialProductType.INVESTMENT)
                 .toList();
     }
