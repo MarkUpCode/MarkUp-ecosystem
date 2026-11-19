@@ -1092,15 +1092,15 @@
     "semantic_hash": ""
   },
   "dinerop-backend/src/main/java/com/markup/dinerop/cooperative/domain/repository/CooperativeRepository.java": {
-    "mtime": 1794874710.7232165,
-    "seen": 1794874992.4305296,
-    "ast_hash": "66a13672d4c6ca280bcc2073f4119343",
+    "mtime": 1795047440.3024154,
+    "seen": 1795047707.036746,
+    "ast_hash": "5072618b653c3b241d687b3332dbd5ff",
     "semantic_hash": ""
   },
   "dinerop-backend/src/main/java/com/markup/dinerop/cooperative/domain/service/CooperativeService.java": {
-    "mtime": 1794874278.24157,
-    "seen": 1794874992.4305406,
-    "ast_hash": "7470aa98ddcd4e52d731c0f50cac73cb",
+    "mtime": 1795047559.9592514,
+    "seen": 1795047707.038079,
+    "ast_hash": "4ad97035ca6e05fc2333a56739744969",
     "semantic_hash": ""
   },
   "dinerop-backend/src/main/java/com/markup/dinerop/cooperative/dto/CooperativeDto.java": {
@@ -1248,9 +1248,9 @@
     "semantic_hash": ""
   },
   "dinerop-backend/src/main/java/com/markup/dinerop/credit/domain/service/CreditDistributionService.java": {
-    "mtime": 1782016087.21756,
-    "seen": 1794858910.977849,
-    "ast_hash": "2980a90a20687ae018982e3bbdb9c04c",
+    "mtime": 1795047610.2876542,
+    "seen": 1795047707.0501423,
+    "ast_hash": "2c35107d6d663374f74dcc8738f9c392",
     "semantic_hash": ""
   },
   "dinerop-backend/src/main/java/com/markup/dinerop/credit/domain/service/CreditGuarantorWorkflowService.java": {
@@ -3168,15 +3168,15 @@
     "semantic_hash": ""
   },
   "DINEROP-KNOWLEDGE/AI-INDEX.md": {
-    "mtime": 1795045919.1158855,
-    "seen": 1795046226.9577217,
-    "ast_hash": "28257cb3416ba62f9800800cdd843982",
+    "mtime": 1795047506.8110385,
+    "seen": 1795047707.149372,
+    "ast_hash": "172668a1828c3b1cecec116890f4a82c",
     "semantic_hash": ""
   },
   "DINEROP-KNOWLEDGE/API-INTEGRATIONS.md": {
-    "mtime": 1795046098.6122746,
-    "seen": 1795046226.9577258,
-    "ast_hash": "33304f9f9e99877e07f811407d8baf78",
+    "mtime": 1795047506.8110385,
+    "seen": 1795047707.1493773,
+    "ast_hash": "6e963524e7f5abefaaecbd5d911ed1da",
     "semantic_hash": ""
   },
   "DINEROP-KNOWLEDGE/ARCHITECTURAL-DECISIONS.md": {
@@ -3198,9 +3198,9 @@
     "semantic_hash": ""
   },
   "DINEROP-KNOWLEDGE/DATA-FLOW.md": {
-    "mtime": 1795046108.7186382,
-    "seen": 1795046226.957989,
-    "ast_hash": "259b9b3358aed55761b3d4b07fc3d273",
+    "mtime": 1795047506.8120387,
+    "seen": 1795047707.1508005,
+    "ast_hash": "660a52f8fb17bee017fc2412bb634980",
     "semantic_hash": ""
   },
   "DINEROP-KNOWLEDGE/GLOBAL-ARCHITECTURE.md": {
@@ -3966,15 +3966,15 @@
     "semantic_hash": ""
   },
   "dinerop-backend/src/main/java/com/markup/dinerop/cooperative/domain/repository/FinancialProductRepository.java": {
-    "mtime": 1794873049.3492634,
-    "seen": 1794874992.4305367,
-    "ast_hash": "b34225025144f03c3645a01ed3aa3b79",
+    "mtime": 1795047417.9288654,
+    "seen": 1795047707.0370567,
+    "ast_hash": "31f0e1762cc0a2194d6459a787034d40",
     "semantic_hash": ""
   },
   "dinerop-backend/src/main/java/com/markup/dinerop/cooperative/domain/service/FinancialProductService.java": {
-    "mtime": 1795044732.6868994,
-    "seen": 1795046226.830049,
-    "ast_hash": "7d244b05d4e0ded57d76d531312e3c36",
+    "mtime": 1795047559.958251,
+    "seen": 1795047707.0380824,
+    "ast_hash": "2f888a40ff513b1a887ed09d486914ee",
     "semantic_hash": ""
   },
   "dinerop-backend/src/main/java/com/markup/dinerop/cooperative/dto/FinancialProductConditionRequest.java": {
@@ -4008,8 +4008,8 @@
     "semantic_hash": ""
   },
   "dinerop-backend/src/test/java/com/markup/dinerop/cooperative/domain/service/FinancialProductServiceTest.java": {
-    "mtime": 1795045659.6951933,
-    "seen": 1795046226.899984,
+    "mtime": 1795047468.8018112,
+    "seen": 1795047707.0887096,
     "ast_hash": "d9aea807982f104f0db2a0a2bac1927b",
     "semantic_hash": ""
   },
@@ -4491,6 +4491,18 @@
     "mtime": 1795045288.166608,
     "seen": 1795046226.9091146,
     "ast_hash": "21fedacfce5c43f49f5ae0c26eb764b9",
+    "semantic_hash": ""
+  },
+  "dinerop-backend/src/main/resources/db/migration/V8__enforce_one_active_standard_product_per_cooperative.sql": {
+    "mtime": 1795044579.6293697,
+    "seen": 1795047707.0873933,
+    "ast_hash": "f3c17055a2d8f4fee6c54a7cef087ceb",
+    "semantic_hash": ""
+  },
+  "dinerop-backend/src/main/resources/db/migration/V9__central_investment_calculation_setting.sql": {
+    "mtime": 1795045464.9068272,
+    "seen": 1795047707.0873969,
+    "ast_hash": "05f6d06a3bd5b944446e8e97a9638a6e",
     "semantic_hash": ""
   },
   "dinerup-app/package-lock.json": {
