@@ -32,6 +32,11 @@ public class CreditDistributionService {
             return 0;
         }
 
+        if (request.getCreditType() == null) {
+            log.warn("[DISTRIBUTION] Credit request {} has no credit category. Skipping distribution.", request.getId());
+            return 0;
+        }
+
         if ((city == null || city.isBlank()) && (province == null || province.isBlank())) {
             log.warn("[DISTRIBUTION] Request {} has no city nor province. Skipping distribution.", request.getId());
             return 0;
@@ -41,7 +46,8 @@ public class CreditDistributionService {
         List<Cooperative> cooperatives = cooperativeService.getEligibleCooperatives(
                 city,
                 province,
-                request.getAmount().doubleValue()
+                request.getAmount(),
+                request.getCreditType()
         );
 
         // 2) Fallback: si no hay cooperativas en la ciudad, intentar a nivel provincia
@@ -53,15 +59,17 @@ public class CreditDistributionService {
             cooperatives = cooperativeService.getEligibleCooperatives(
                     null,
                     province,
-                    request.getAmount().doubleValue()
+                    request.getAmount(),
+                    request.getCreditType()
             );
         }
 
         if (cooperatives.isEmpty()) {
             log.info(
-                    "[DISTRIBUTION] No eligible cooperatives even after fallback | city={} province={} amount={} requestId={}",
+                    "[DISTRIBUTION] No eligible cooperatives even after fallback | city={} province={} category={} amount={} requestId={}",
                     city,
                     province,
+                    request.getCreditType(),
                     request.getAmount(),
                     request.getId()
             );
@@ -96,7 +104,8 @@ public class CreditDistributionService {
             }
         }
 
-        log.info("[DISTRIBUTION] Distribution done requestId={} city={} created={}", request.getId(), city, created);
+        log.info("[DISTRIBUTION] Distribution done requestId={} city={} category={} amount={} created={}",
+                request.getId(), city, request.getCreditType(), request.getAmount(), created);
         return created;
     }
 }

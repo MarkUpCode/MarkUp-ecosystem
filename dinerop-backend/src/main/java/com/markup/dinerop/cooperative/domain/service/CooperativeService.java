@@ -2,6 +2,7 @@ package com.markup.dinerop.cooperative.domain.service;
 
 import com.markup.dinerop.cooperative.domain.entity.Cooperative;
 import com.markup.dinerop.cooperative.domain.entity.CooperativeRate;
+import com.markup.dinerop.cooperative.domain.entity.CreditProductCategory;
 import com.markup.dinerop.cooperative.domain.entity.enums.CreditType;
 import com.markup.dinerop.cooperative.domain.repository.CooperativeRateRepository;
 import com.markup.dinerop.cooperative.domain.repository.CooperativeRepository;
@@ -16,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -100,34 +102,34 @@ public class CooperativeService {
                 .toList();
     }
 
-    public List<Cooperative> getEligibleCooperatives(String ciudad, String provincia, Double monto) {
-        BigDecimal safeAmount = monto == null ? BigDecimal.ZERO : BigDecimal.valueOf(monto);
+    public List<Cooperative> getEligibleCooperatives(
+            String ciudad,
+            String provincia,
+            BigDecimal amount,
+            com.markup.dinerop.credit.domain.model.enums.CreditType creditType
+    ) {
+        if (amount == null || creditType == null) return List.of();
+        BigDecimal safeAmount = amount;
         String safeCity = ciudad == null ? "" : ciudad.trim();
         String safeProvince = provincia == null ? "" : provincia.trim();
+        CreditProductCategory category = CreditProductCategory.valueOf(creditType.name());
+        Set<Long> eligibleProductCooperativeIds = financialProductService
+                .getCooperativeIdsWithEligibleCreditProduct(category, safeAmount);
+        if (eligibleProductCooperativeIds.isEmpty()) return List.of();
 
+        List<Cooperative> candidates;
         if (!safeCity.isBlank() && !safeProvince.isBlank()) {
-            return cooperativeRepository
-                    .findByCiudadIgnoreCaseAndProvinciaIgnoreCaseAndMontoMaximoCreditoGreaterThanEqual(
-                            safeCity,
-                            safeProvince,
-                            safeAmount
-                    );
+            candidates = cooperativeRepository.findByCiudadIgnoreCaseAndProvinciaIgnoreCase(safeCity, safeProvince);
+        } else if (!safeCity.isBlank()) {
+            candidates = cooperativeRepository.findByCiudadIgnoreCase(safeCity);
+        } else if (!safeProvince.isBlank()) {
+            candidates = cooperativeRepository.findByProvinciaIgnoreCase(safeProvince);
+        } else {
+            candidates = cooperativeRepository.findAll();
         }
 
-        if (!safeCity.isBlank()) {
-            return cooperativeRepository
-                    .findByCiudadIgnoreCaseAndMontoMaximoCreditoGreaterThanEqual(safeCity, safeAmount);
-        }
-
-        if (!safeProvince.isBlank()) {
-            return cooperativeRepository
-                    .findByProvinciaIgnoreCaseAndMontoMaximoCreditoGreaterThanEqual(safeProvince, safeAmount);
-        }
-
-        return cooperativeRepository.findAll()
-                .stream()
-                .filter(cooperative -> cooperative.getMontoMaximoCredito() != null)
-                .filter(cooperative -> cooperative.getMontoMaximoCredito().compareTo(safeAmount) >= 0)
+        return candidates.stream()
+                .filter(cooperative -> eligibleProductCooperativeIds.contains(cooperative.getId()))
                 .toList();
     }
 
@@ -144,7 +146,8 @@ public class CooperativeService {
 
     public Double getOfferRate(Long cooperativeId, BigDecimal amount, Integer months,
                                com.markup.dinerop.credit.domain.model.enums.CreditType creditType) {
-        return financialProductService.applicableCreditRate(cooperativeId, amount, months)
+        CreditProductCategory category = CreditProductCategory.valueOf(creditType.name());
+        return financialProductService.applicableCreditRate(cooperativeId, category, amount, months)
                 .orElseGet(() -> BigDecimal.valueOf(getActiveRate(cooperativeId, creditType))).doubleValue();
     }
 

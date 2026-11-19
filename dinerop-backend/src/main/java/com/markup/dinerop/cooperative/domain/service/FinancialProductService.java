@@ -57,6 +57,18 @@ public class FinancialProductService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
+    public Set<Long> getCooperativeIdsWithEligibleCreditProduct(CreditProductCategory category, BigDecimal amount) {
+        if (category == null || amount == null) return Set.of();
+        return productRepository.findByTypeAndCreditCategoryAndActiveTrue(FinancialProductType.CREDIT, category)
+                .stream()
+                .filter(product -> product.getMinimumAmount() != null && product.getMaximumAmount() != null)
+                .filter(product -> amount.compareTo(product.getMinimumAmount()) >= 0
+                        && amount.compareTo(product.getMaximumAmount()) <= 0)
+                .map(FinancialProduct::getCooperativeId)
+                .collect(java.util.stream.Collectors.toSet());
+    }
+
     @Transactional
     public FinancialProductResponse create(Long cooperativeId, FinancialProductRequest request) {
         lockCooperative(cooperativeId);
@@ -197,10 +209,12 @@ public class FinancialProductService {
     }
 
     @Transactional(readOnly = true)
-    public Optional<java.math.BigDecimal> applicableCreditRate(Long cooperativeId, java.math.BigDecimal amount, Integer months) {
+    public Optional<java.math.BigDecimal> applicableCreditRate(Long cooperativeId, CreditProductCategory category,
+            java.math.BigDecimal amount, Integer months) {
         Instant now = Instant.now();
         List<java.math.BigDecimal> rates = productRepository.findByCooperativeIdOrderById(cooperativeId).stream()
-                .filter(p -> p.isActive() && p.getType() == FinancialProductType.CREDIT)
+                .filter(p -> p.isActive() && p.getType() == FinancialProductType.CREDIT
+                        && p.getCreditCategory() == category)
                 .flatMap(p -> conditionRepository.findByProductIdOrderByValidFromDescIdDesc(p.getId()).stream())
                 .filter(c -> !c.getValidFrom().isAfter(now) && (c.getValidUntil() == null || c.getValidUntil().isAfter(now)))
                 .filter(c -> amount.compareTo(c.getMinimumAmount()) >= 0 && amount.compareTo(c.getMaximumAmount()) <= 0)

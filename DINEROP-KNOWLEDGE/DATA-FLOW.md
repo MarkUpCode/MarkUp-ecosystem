@@ -29,6 +29,8 @@ El backend distingue solicitud pública (`POST /api/credits/public-request`, dat
 
 La metodología de cálculo se guarda en `investment_calculation_settings`. El backend la aplica al obtener ofertas y la captura al crear solicitudes; las solicitudes históricas no se recalculan. La configuración inicial es `UNSPECIFIED`, que recurre al método legado del producto si existe.
 
+Para distribuir una solicitud de crédito, `CreditDistributionService` pasa tipo y monto a `CooperativeService`, que consulta la ubicación y filtra por cooperativas con producto activo de esa categoría que cubre el monto. No usa `monto_maximo_credito` de la cooperativa. Si no hay coincidencias en la ciudad, intenta la provincia.
+
 ## Datos de onboarding
 
 `OnboardingClienteController` recibe solicitante/conyuge, guarda contenido modelado por `SolicitudOnboarding`, `PersonaOnboarding`, direcciones, ingresos/egresos, actividad y referencias mediante repositorios de onboarding. Endpoint de garante completa información adicional. Vista cooperativa consulta el expediente. Para trazabilidad, revisar `onboarding/domain`, `onboarding/application` y `onboarding/infrastructure/repository`.

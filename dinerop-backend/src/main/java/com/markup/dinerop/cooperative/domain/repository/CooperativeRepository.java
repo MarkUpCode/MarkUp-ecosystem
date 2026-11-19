@@ -20,6 +20,8 @@ public interface CooperativeRepository extends
 
     List<Cooperative> findByCiudadIgnoreCase(String ciudad);
 
+    List<Cooperative> findByCiudadIgnoreCaseAndProvinciaIgnoreCase(String ciudad, String provincia);
+
     List<Cooperative> findByProvinciaIgnoreCase(String provincia);
 
     List<Cooperative> findByCiudadIgnoreCaseAndMontoMaximoCreditoGreaterThanEqual(
