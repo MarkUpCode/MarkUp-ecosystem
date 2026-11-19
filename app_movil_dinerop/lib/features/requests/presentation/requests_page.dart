@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -868,6 +870,12 @@ class _OfferCardState extends ConsumerState<_OfferCard> {
   @override
   Widget build(BuildContext context) {
     final offer = widget.offer;
+    final cooperativeLogoUrl = ref
+        .watch(cooperativesProvider)
+        .valueOrNull
+        ?.where((cooperative) => cooperative.id == offer.cooperativaId)
+        .map((cooperative) => cooperative.logoUrl)
+        .firstOrNull;
     final needsGuarantor =
         offer.estado == CreditRequestStatus.solicitandoGarante &&
         !offer.garanteEnRevision;
@@ -917,17 +925,9 @@ class _OfferCardState extends ConsumerState<_OfferCard> {
               children: [
                 Row(
                   children: [
-                    Container(
-                      width: 42,
-                      height: 42,
-                      decoration: BoxDecoration(
-                        color: AppColors.primaryContainer,
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                      child: const Icon(
-                        Icons.account_balance_rounded,
-                        color: AppColors.primary,
-                      ),
+                    _CooperativeAvatar(
+                      logoUrl: cooperativeLogoUrl,
+                      size: 46,
                     ),
                     const SizedBox(width: 10),
                     Expanded(
@@ -1009,7 +1009,8 @@ class _OfferCardState extends ConsumerState<_OfferCard> {
                   _GuarantorNotice(message: offer.mensajeGarante),
                 if (guaranteeInReview)
                   _GuaranteeReviewNotice(color: color, soft: soft),
-                TextButton.icon(
+                if (offer.estado != CreditRequestStatus.aceptada)
+                  TextButton.icon(
                   onPressed: _toggleGuarantorHistory,
                   icon: Icon(
                     _showGuarantorHistory
@@ -1022,7 +1023,8 @@ class _OfferCardState extends ConsumerState<_OfferCard> {
                         : 'Ver historial del garante',
                   ),
                 ),
-                if (_showGuarantorHistory)
+                if (_showGuarantorHistory &&
+                    offer.estado != CreditRequestStatus.aceptada)
                   FutureBuilder<List<Map<String, dynamic>>>(
                     future: _guarantorHistory,
                     builder: (context, snapshot) {
@@ -1068,12 +1070,14 @@ class _OfferCardState extends ConsumerState<_OfferCard> {
                       ),
                     ),
                   ),
-                if (!rejected &&
+                if (offer.estado != CreditRequestStatus.aceptada &&
+                    !rejected &&
                     !needsGuarantor &&
                     !guaranteeInReview &&
                     offer.requisitos.isNotEmpty)
                   _RequirementsPreview(requirements: offer.requisitos),
-                if (!rejected &&
+                if (offer.estado != CreditRequestStatus.aceptada &&
+                    !rejected &&
                     !needsGuarantor &&
                     !guaranteeInReview &&
                     offer.requisitos.isNotEmpty)
@@ -1520,72 +1524,262 @@ class _AcceptedOfferNotice extends StatelessWidget {
   final VoidCallback onPreviewPdf;
 
   @override
-  Widget build(BuildContext context) => Container(
-    width: double.infinity,
-    padding: const EdgeInsets.all(14),
-    decoration: BoxDecoration(
-      color: AppColors.successSoft,
-      borderRadius: BorderRadius.circular(15),
-    ),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
+  Widget build(BuildContext context) => Stack(
+    children: [
+      Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [Color(0xFFEAFBF3), Color(0xFFF5FFFA)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          border: Border.all(color: const Color(0xFFB9E9D0)),
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Icon(Icons.verified_rounded, color: AppColors.success),
-            const SizedBox(width: 9),
-            Expanded(
-              child: Text(
-                '¡Felicidades! Tu crédito fue aceptado. Acércate a ${offer.nombreCooperativa} con los requisitos indicados para completar el trámite y retirar tu dinero.',
-                style: const TextStyle(fontWeight: FontWeight.w700),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Icon(Icons.verified_rounded, color: AppColors.success),
+                const SizedBox(width: 9),
+                Expanded(
+                  child: Text(
+                    '¡Tu crédito está listo! Acércate a ${offer.nombreCooperativa} con los requisitos para completar el trámite y retirar tu dinero.',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w900,
+                      fontSize: 16,
+                      height: 1.25,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            const DolaritoWidget(
+              mood: DolaritoMood.proud,
+              message: '¡Lo lograste! Tu crédito ya fue aceptado por ambas partes.',
+              compact: true,
+            ),
+            const SizedBox(height: 12),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(vertical: 13, horizontal: 15),
+              decoration: BoxDecoration(
+                color: const Color(0xFFDCF5E8),
+                borderRadius: BorderRadius.circular(15),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.payments_rounded, color: Color(0xFF16845B)),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'MONTO SOLICITADO',
+                          style: TextStyle(
+                            color: Color(0xFF16845B),
+                            fontSize: 10,
+                            fontWeight: FontWeight.w900,
+                          ),
+                        ),
+                        Text(
+                          formatCurrency(offer.monto),
+                          style: const TextStyle(
+                            color: Color(0xFF126B4A),
+                            fontSize: 23,
+                            fontWeight: FontWeight.w900,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Text(
+                    '${offer.plazoMeses ?? '—'} meses',
+                    style: const TextStyle(
+                      color: Color(0xFF126B4A),
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 9),
+            GridView.count(
+              crossAxisCount: 2,
+              crossAxisSpacing: 8,
+              mainAxisSpacing: 8,
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              childAspectRatio: 2.05,
+              children: [
+                _Metric(
+                  label: 'INTERÉS ANUAL',
+                  value: offer.tasaAnual == null
+                      ? '—'
+                      : '${offer.tasaAnual!.toStringAsFixed(2)}%',
+                ),
+                _Metric(
+                  label: 'CUOTA MENSUAL',
+                  value: offer.cuotaMensual == null
+                      ? '—'
+                      : formatCurrency(offer.cuotaMensual!),
+                ),
+                _Metric(
+                  label: 'TOTAL A PAGAR',
+                  value: offer.totalPagar == null
+                      ? '—'
+                      : formatCurrency(offer.totalPagar!),
+                ),
+                _Metric(
+                  label: 'INTERÉS TOTAL',
+                  value: offer.interesTotal == null
+                      ? '—'
+                      : formatCurrency(offer.interesTotal!),
+                ),
+              ],
+            ),
+            const SizedBox(height: 14),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: onOpenDocuments,
+                icon: const Icon(Icons.list_alt_outlined),
+                label: const Text('Ver requisitos'),
+              ),
+            ),
+            const SizedBox(height: 10),
+            if (offer.mapsUrl?.isNotEmpty == true) ...[
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  onPressed: () => launchUrl(
+                    Uri.parse(offer.mapsUrl!),
+                    mode: LaunchMode.externalApplication,
+                  ),
+                  icon: const Icon(Icons.map_outlined),
+                  label: const Text('Ver ubicación'),
+                ),
+              ),
+              const SizedBox(height: 10),
+            ],
+            SizedBox(
+              width: double.infinity,
+              child: FilledButton.icon(
+                onPressed: onPreviewPdf,
+                icon: const Icon(Icons.picture_as_pdf_outlined),
+                label: const Text('Ver PDF'),
               ),
             ),
           ],
         ),
+      ),
+      const Positioned.fill(
+        child: IgnorePointer(child: _AcceptedCreditConfetti()),
+      ),
+    ],
+  );
+}
 
-        const SizedBox(height: 16),
+class _AcceptedCreditConfetti extends StatefulWidget {
+  const _AcceptedCreditConfetti();
+  @override
+  State<_AcceptedCreditConfetti> createState() => _AcceptedCreditConfettiState();
+}
 
-        // Botón de requisitos
-        SizedBox(
-          width: double.infinity,
-          child: OutlinedButton.icon(
-            onPressed: onOpenDocuments,
-            icon: const Icon(Icons.list_alt_outlined),
-            label: const Text('Ver requisitos'),
-          ),
-        ),
+class _AcceptedCreditConfettiState extends State<_AcceptedCreditConfetti>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 2600),
+  )..forward();
 
-        const SizedBox(height: 10),
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
-        // Botón de ubicación
-        if (offer.mapsUrl?.isNotEmpty == true) ...[
-          SizedBox(
-            width: double.infinity,
-            child: OutlinedButton.icon(
-              onPressed: () => launchUrl(
-                Uri.parse(offer.mapsUrl!),
-                mode: LaunchMode.externalApplication,
-              ),
-              icon: const Icon(Icons.map_outlined),
-              label: const Text('Ver ubicación'),
-            ),
-          ),
-          const SizedBox(height: 10),
-        ],
-
-        // Botón de PDF
-        SizedBox(
-          width: double.infinity,
-          child: FilledButton.icon(
-            onPressed: onPreviewPdf,
-            icon: const Icon(Icons.picture_as_pdf_outlined),
-            label: const Text('Ver PDF'),
-          ),
-        ),
-      ],
+  @override
+  Widget build(BuildContext context) => AnimatedBuilder(
+    animation: _controller,
+    builder: (context, _) => CustomPaint(
+      painter: _AcceptedCreditConfettiPainter(_controller.value),
+      child: const SizedBox.expand(),
     ),
   );
+}
+
+class _AcceptedCreditConfettiPainter extends CustomPainter {
+  const _AcceptedCreditConfettiPainter(this.progress);
+  final double progress;
+  static const _colors = [
+    Color(0xFF16B8A6), Color(0xFF3B82F6), Color(0xFFF4B740),
+    Color(0xFFEC6B87), Color(0xFF8B7CF6),
+  ];
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    for (var index = 0; index < 40; index++) {
+      final delay = (index % 8) * .045;
+      final piece = ((progress - delay) / (1 - delay)).clamp(0.0, 1.0);
+      final x = ((index * 37) % 101) / 100 * size.width +
+          math.sin(piece * math.pi * 2 + index) * 10;
+      final y = -7 + piece * (size.height + 14);
+      final paint = Paint()
+        ..color = _colors[index % _colors.length].withValues(
+          alpha: (1 - piece).clamp(0.0, 1.0),
+        );
+      canvas.save();
+      canvas.translate(x, y);
+      canvas.rotate(piece * 5 + index * .7);
+      canvas.drawRRect(
+        RRect.fromRectAndRadius(
+          Rect.fromCenter(center: Offset.zero, width: 5, height: 8),
+          const Radius.circular(1.5),
+        ),
+        paint,
+      );
+      canvas.restore();
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _AcceptedCreditConfettiPainter oldDelegate) =>
+      oldDelegate.progress != progress;
+}
+
+class _CooperativeAvatar extends StatelessWidget {
+  const _CooperativeAvatar({required this.logoUrl, this.size = 44});
+  final String? logoUrl;
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    final uri = Uri.tryParse(logoUrl ?? '');
+    final hasLogo = uri != null &&
+        (uri.scheme == 'https' || uri.scheme == 'http') &&
+        uri.host.isNotEmpty;
+    return Container(
+      width: size,
+      height: size,
+      clipBehavior: Clip.antiAlias,
+      decoration: BoxDecoration(
+        color: AppColors.primaryContainer,
+        borderRadius: BorderRadius.circular(size * .3),
+      ),
+      child: hasLogo
+          ? Image.network(uri.toString(), fit: BoxFit.cover,
+              errorBuilder: (_, _, _) => const Icon(Icons.account_balance_rounded,
+                  color: AppColors.primary))
+          : const Icon(Icons.account_balance_rounded, color: AppColors.primary),
+    );
+  }
 }
 
 class _Metric extends StatelessWidget {
@@ -1655,87 +1849,157 @@ class _InvestmentRequestCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final label = _investmentStatusLabel(request.status);
-    return Card(
+    final theme = Theme.of(context);
+    return Material(
+      color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(18),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
+        borderRadius: BorderRadius.circular(22),
+        child: Ink(
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              colors: [Colors.white, Color(0xFFF6FAFC)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(22),
+            border: Border.all(color: const Color(0xFFE3EBF0)),
+            boxShadow: const [
+              BoxShadow(color: Color(0x10142B4A), blurRadius: 16,
+                  offset: Offset(0, 6)),
+            ],
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+              Container(
+                height: 5,
+                decoration: BoxDecoration(
+                  color: label.$2,
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(22),
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
                       children: [
-                        Text(
-                          request.cooperativeName,
-                          style: Theme.of(context).textTheme.bodySmall
-                              ?.copyWith(
-                                color: AppColors.primary,
-                                fontWeight: FontWeight.w700,
-                              ),
+                        _CooperativeAvatar(
+                          logoUrl: request.cooperativeLogoUrl,
+                          size: 46,
                         ),
-                        const SizedBox(height: 3),
-                        Text(
-                          request.productName,
-                          style: Theme.of(context).textTheme.titleMedium
-                              ?.copyWith(fontWeight: FontWeight.w900),
+                        const SizedBox(width: 11),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(request.cooperativeName,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: theme.textTheme.bodySmall?.copyWith(
+                                      color: AppColors.primary,
+                                      fontWeight: FontWeight.w800)),
+                              const SizedBox(height: 3),
+                              Text(request.productName,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: theme.textTheme.titleMedium?.copyWith(
+                                      fontWeight: FontWeight.w900)),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        _OfferStatus(
+                          text: label.$1,
+                          color: label.$2,
+                          soft: label.$2.withValues(alpha: .12),
                         ),
                       ],
                     ),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 6,
-                    ),
-                    decoration: BoxDecoration(
-                      color: label.$2.withValues(alpha: .12),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Text(
-                      label.$1,
-                      style: TextStyle(
-                        color: label.$2,
-                        fontSize: 11,
-                        fontWeight: FontWeight.w800,
+                    const SizedBox(height: 14),
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 14, vertical: 12),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFEAF7F5),
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text('MONTO INVERTIDO',
+                                    style: TextStyle(
+                                        color: Color(0xFF087E8B),
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.w900)),
+                                const SizedBox(height: 3),
+                                Text(formatCurrency(request.amount),
+                                    style: const TextStyle(
+                                        color: Color(0xFF142B4A),
+                                        fontSize: 22,
+                                        fontWeight: FontWeight.w900)),
+                              ],
+                            ),
+                          ),
+                          const Icon(Icons.savings_rounded,
+                              color: Color(0xFF087E8B), size: 27),
+                        ],
                       ),
                     ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              Text(
-                '\$${request.amount.toStringAsFixed(2)} · ${request.termMonths} meses · ${request.annualRate.toStringAsFixed(2)}% anual',
-                style: const TextStyle(fontWeight: FontWeight.w700),
-              ),
-              if (request.estimatedInterest != null)
-                Text(
-                  'Interés estimado: \$${request.estimatedInterest!.toStringAsFixed(2)}',
-                  style: Theme.of(context).textTheme.bodySmall,
-                ),
-              const SizedBox(height: 6),
-              Text(
-                'Solicitada ${_formatInvestmentDate(request.createdAt)} · Actualizada ${_formatInvestmentDate(request.updatedAt)}',
-                style: Theme.of(
-                  context,
-                ).textTheme.bodySmall?.copyWith(color: AppColors.textSecondary),
-              ),
-              if (request.acceptance != null)
-                const Padding(
-                  padding: EdgeInsets.only(top: 8),
-                  child: Text(
-                    'La cooperativa respondió. Toca para ver agencia y requisitos.',
-                    style: TextStyle(
-                      color: AppColors.primary,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w700,
+                    const SizedBox(height: 10),
+                    GridView.count(
+                      crossAxisCount: 2,
+                      crossAxisSpacing: 8,
+                      mainAxisSpacing: 8,
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      childAspectRatio: 2.05,
+                      children: [
+                        _Metric(
+                          label: 'GANANCIA ESTIMADA',
+                          value: request.estimatedInterest == null
+                              ? 'Por confirmar'
+                              : formatCurrency(request.estimatedInterest!),
+                        ),
+                        _Metric(
+                          label: 'TOTAL ESTIMADO',
+                          value: request.estimatedTotal == null
+                              ? 'Por confirmar'
+                              : formatCurrency(request.estimatedTotal!),
+                        ),
+                        _Metric(label: 'PLAZO',
+                            value: '${request.termMonths} meses'),
+                        _Metric(label: 'TASA ANUAL',
+                            value: '${request.annualRate.toStringAsFixed(2)}%'),
+                      ],
                     ),
-                  ),
+                    const SizedBox(height: 9),
+                    Text(
+                      'Solicitada ${_formatInvestmentDate(request.createdAt)} · Actualizada ${_formatInvestmentDate(request.updatedAt)}',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                    if (request.acceptance != null)
+                      const Padding(
+                        padding: EdgeInsets.only(top: 9),
+                        child: Text(
+                          'La cooperativa respondió. Toca para ver agencia y requisitos.',
+                          style: TextStyle(color: AppColors.primary,
+                              fontSize: 12, fontWeight: FontWeight.w800),
+                        ),
+                      ),
+                  ],
                 ),
+              ),
             ],
           ),
         ),

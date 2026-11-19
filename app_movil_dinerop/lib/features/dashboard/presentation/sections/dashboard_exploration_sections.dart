@@ -587,38 +587,60 @@ class _InvestmentSummaryCard extends StatelessWidget {
         children: [
           Row(
             children: [
+              _CooperativeLogo(logoUrl: request.cooperativeLogoUrl),
+              const SizedBox(width: 9),
               Expanded(
-                child: Text(
-                  request.cooperativeName,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    color: _navy,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w800,
-                  ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(request.cooperativeName,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(color: _navy, fontSize: 13,
+                            fontWeight: FontWeight.w800)),
+                    Text('${request.productName} · #${request.id}',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(color: _muted, fontSize: 10)),
+                  ],
                 ),
               ),
               _StatusPill(label: status.$1, color: status.$2),
             ],
           ),
-          const SizedBox(height: 2),
-          Text(
-            '${request.productName} · Inversión #${request.id}',
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(color: _muted, fontSize: 10),
-          ),
-          const SizedBox(height: 5),
-          Text(
-            formatCurrency(request.amount),
-            style: const TextStyle(
-              color: _navy,
-              fontSize: 20,
-              fontWeight: FontWeight.w900,
-            ),
-          ),
           const SizedBox(height: 9),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            decoration: BoxDecoration(color: const Color(0xFFEAF7F5),
+                borderRadius: BorderRadius.circular(15)),
+            child: Row(children: [
+              Expanded(child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text('MONTO INVERTIDO', style: TextStyle(
+                      color: Color(0xFF087E8B), fontSize: 9,
+                      fontWeight: FontWeight.w900)),
+                  Text(formatCurrency(request.amount), style: const TextStyle(
+                      color: _navy, fontSize: 19, fontWeight: FontWeight.w900)),
+                ],
+              )),
+              Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
+                const Text('GANANCIA ESTIMADA', style: TextStyle(
+                    color: _muted, fontSize: 8, fontWeight: FontWeight.w900)),
+                Text(request.estimatedInterest == null ? 'Por confirmar' :
+                    formatCurrency(request.estimatedInterest!),
+                    style: const TextStyle(color: Color(0xFF16845B),
+                        fontSize: 12, fontWeight: FontWeight.w900)),
+              ]),
+            ]),
+          ),
+          const SizedBox(height: 6),
+          Text('${request.termMonths} meses · ${request.annualRate.toStringAsFixed(2)}% anual · ${request.interestPaymentOption ?? 'Intereses según oferta'}',
+              maxLines: 1, overflow: TextOverflow.ellipsis,
+              style: const TextStyle(color: _muted, fontSize: 9)),
+          const SizedBox(height: 7),
+          _InvestmentProgress(request: request),
+          const SizedBox(height: 7),
           _DolaritoRequestNote(reaction: reaction),
           Align(
             alignment: Alignment.centerRight,
@@ -637,6 +659,83 @@ class _InvestmentSummaryCard extends StatelessWidget {
         ],
       ),
     );
+  }
+}
+
+class _CooperativeLogo extends StatelessWidget {
+  const _CooperativeLogo({required this.logoUrl, this.size = 42});
+  final String? logoUrl;
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    final uri = Uri.tryParse(logoUrl ?? '');
+    final valid = uri != null && (uri.scheme == 'https' || uri.scheme == 'http') && uri.host.isNotEmpty;
+    return Container(
+      width: size, height: size, clipBehavior: Clip.antiAlias,
+      decoration: BoxDecoration(color: const Color(0xFFEAF0F5),
+          borderRadius: BorderRadius.circular(size * .3)),
+      child: valid
+          ? Image.network(uri.toString(), fit: BoxFit.cover,
+              errorBuilder: (_, _, _) => const Icon(Icons.account_balance_rounded, color: _navy))
+          : const Icon(Icons.account_balance_rounded, color: _navy),
+    );
+  }
+}
+
+class _InvestmentProgress extends StatelessWidget {
+  const _InvestmentProgress({required this.request});
+  final InvestmentRequest request;
+
+  @override
+  Widget build(BuildContext context) {
+    final status = request.status.toUpperCase();
+    final declined = status == 'DECLINED';
+    final step = switch (status) {
+      'CONDITIONS_CONFIRMED' => 3,
+      'INFORMATION_REQUIRED' => 2,
+      'SUBMITTED' || 'IN_REVIEW' => 1,
+      _ => 1,
+    };
+    final message = switch (status) {
+      'CONDITIONS_CONFIRMED' => 'Acércate a la cooperativa para continuar.',
+      'INFORMATION_REQUIRED' => 'Revisa los requisitos solicitados por la cooperativa.',
+      'DECLINED' => 'La cooperativa no aceptó esta solicitud.',
+      _ => 'La cooperativa está revisando y preparando los requisitos.',
+    };
+    final color = declined ? const Color(0xFFB42318) : _teal;
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Row(children: [
+        for (var index = 1; index <= 3; index++) ...[
+          Container(width: 20, height: 20, alignment: Alignment.center,
+            decoration: BoxDecoration(shape: BoxShape.circle,
+                color: declined && index == step ? color : index <= step ? color : const Color(0xFFD9E2EA)),
+            child: Icon(declined && index == step ? Icons.close_rounded :
+                index == 3 && status == 'CONDITIONS_CONFIRMED' ? Icons.account_balance_rounded :
+                index < step ? Icons.check_rounded : Icons.circle,
+                color: Colors.white, size: index < step || declined && index == step ? 13 : 8)),
+          if (index < 3) Expanded(child: Container(height: 2,
+              color: index < step ? color : const Color(0xFFD9E2EA))),
+        ],
+      ]),
+      const SizedBox(height: 3),
+      const Row(children: [
+        Expanded(child: Text('Solicitud', style: TextStyle(color: _muted, fontSize: 8))),
+        Expanded(child: Text('Requisitos', textAlign: TextAlign.center,
+            style: TextStyle(color: _muted, fontSize: 8))),
+        Expanded(child: Text('Cooperativa', textAlign: TextAlign.right,
+            style: TextStyle(color: _muted, fontSize: 8))),
+      ]),
+      const SizedBox(height: 4),
+      Row(children: [
+        Icon(status == 'CONDITIONS_CONFIRMED' ? Icons.place_rounded : Icons.info_outline_rounded,
+            size: 13, color: color),
+        const SizedBox(width: 4),
+        Expanded(child: Text(message, maxLines: 1, overflow: TextOverflow.ellipsis,
+            style: TextStyle(color: declined ? color : _navy, fontSize: 9,
+                fontWeight: FontWeight.w700))),
+      ]),
+    ]);
   }
 }
 
@@ -855,7 +954,23 @@ class _CreditSummaryCard extends StatelessWidget {
                 style: const TextStyle(color: _muted, fontSize: 9),
               ),
               const SizedBox(height: 3),
-              _CreditStepper(step: step, rejected: rejected),
+              _CreditStepper(
+                step: step,
+                rejected: rejected,
+                accepted: request.estado == CreditRequestStatus.aceptada,
+              ),
+              if (request.estado == CreditRequestStatus.aceptada) ...[
+                const SizedBox(height: 4),
+                const Row(mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                  Icon(Icons.account_balance_rounded, size: 13,
+                      color: Color(0xFF16845B)),
+                  SizedBox(width: 4),
+                  Text('Acércate a la cooperativa para retirar tu crédito',
+                      style: TextStyle(color: Color(0xFF16845B), fontSize: 9,
+                          fontWeight: FontWeight.w800)),
+                ]),
+              ],
               const SizedBox(height: 2),
               const SizedBox(height: 5),
               _DolaritoRequestNote(reaction: reaction),
@@ -892,10 +1007,11 @@ class _CreditSummaryCard extends StatelessWidget {
 }
 
 class _CreditStepper extends StatelessWidget {
-  const _CreditStepper({required this.step, required this.rejected});
+  const _CreditStepper({required this.step, required this.rejected, required this.accepted});
 
   final int step;
   final bool rejected;
+  final bool accepted;
 
   static const _labels = ['Perfil', 'Solicitud', 'Evaluación', 'Resultado'];
 
@@ -907,7 +1023,7 @@ class _CreditStepper extends StatelessWidget {
         child: Row(
           children: [
             for (var index = 1; index <= _labels.length; index++) ...[
-              _StepDot(index: index, step: step, rejected: rejected),
+              _StepDot(index: index, step: step, rejected: rejected, accepted: accepted),
               if (index < _labels.length)
                 Expanded(
                   child: Container(
@@ -953,11 +1069,13 @@ class _StepDot extends StatelessWidget {
     required this.index,
     required this.step,
     required this.rejected,
+    required this.accepted,
   });
 
   final int index;
   final int step;
   final bool rejected;
+  final bool accepted;
 
   @override
   Widget build(BuildContext context) {
@@ -981,7 +1099,9 @@ class _StepDot extends StatelessWidget {
         ),
       ),
       child: Icon(
-        complete
+        accepted && index == 4
+            ? Icons.account_balance_rounded
+            : complete
             ? Icons.check_rounded
             : rejected && current
             ? Icons.close_rounded
